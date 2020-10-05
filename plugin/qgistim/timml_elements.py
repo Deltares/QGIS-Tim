@@ -19,6 +19,7 @@ ELEMENT_SPEC = {
             QgsField("resistance", QVariant.Double),
             QgsField("top", QVariant.Double),
             QgsField("bottom", QVariant.Double),
+            QgsField("porosity", QVariant.Double),
         ],
     ),
     "UniformFlow": (

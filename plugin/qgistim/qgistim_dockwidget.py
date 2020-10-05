@@ -88,16 +88,16 @@ class QgisTimDockWidget(QtWidgets.QDockWidget, FORM_CLASS):
         self.group = root.addGroup(str(Path(path).stem))
         # This serves to create the geopackage if it doesn't already exist
         if not Path(path).exists():
-            self.new_model()
+            self.new_timml_model()
         self.add_geopackage_layers(path)
 
-    def new_model(self):
+    def new_timml_model(self):
         # Write the aquifer properties
         layer = create_timml_layer("Aquifer", "", None)
-        _ = geopackage.write_layer(self.path, layer, "Aquifer", newfile=True)
+        _ = geopackage.write_layer(self.path, layer, "timmlAquifer", newfile=True)
         # Write a single constant (reference) head
         layer = create_timml_layer("Constant", "", None)
-        _ = geopackage.write_layer(self.path, layer, "Constant")
+        _ = geopackage.write_layer(self.path, layer, "timmlConstant")
 
     def timml_element(self, elementtype):
         dialog = NameDialog()
@@ -106,7 +106,9 @@ class QgisTimDockWidget(QtWidgets.QDockWidget, FORM_CLASS):
         if ok:
             layername = dialog.lineEdit.text()
             layer = create_timml_layer(elementtype, layername, self.crs)
-            written_layer = geopackage.write_layer(self.path, layer, layername)
+            written_layer = geopackage.write_layer(
+                self.path, layer, f"timml{elementtype}:{layername}"
+            )
             self.add_layer(written_layer)
 
     def domain(self):
@@ -137,7 +139,7 @@ class QgisTimDockWidget(QtWidgets.QDockWidget, FORM_CLASS):
             layername = dialog.layerEdit.text()
             radius = float(dialog.radiusEdit.text())
             layer = create_timml_layer(
-                "timmlCircularAreaSink",
+                "CircularAreaSink",
                 layername,
                 self.crs,
             )
@@ -147,7 +149,9 @@ class QgisTimDockWidget(QtWidgets.QDockWidget, FORM_CLASS):
             feature.setGeometry(QgsGeometry.fromPointXY(center).buffer(radius, 5))
             provider.addFeatures([feature])
             layer.updateFields()
-            written_layer = geopackage.write_layer(self.path, layer, layername)
+            written_layer = geopackage.write_layer(
+                self.path, layer, f"timmlCircularAreaSink:{layername}"
+            )
             QgsProject.instance().addMapLayer(written_layer)
 
 
