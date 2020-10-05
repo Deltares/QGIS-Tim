@@ -1,5 +1,6 @@
 import os
 from pathlib import Path
+import subprocess
 
 from qgis.PyQt import QtGui, QtWidgets, uic
 from qgis.PyQt.QtCore import pyqtSignal, QVariant
@@ -31,7 +32,8 @@ class QgisTimDockWidget(QtWidgets.QDockWidget, FORM_CLASS):
         self.iface = iface
         self.setupUi(self)
         # Dataset management
-        self.selectGeopackageButton.clicked.connect(self.select_geopackage)
+        self.newGeopackageButton.clicked.connect(self.new_geopackage)
+        self.openGeopackageButton.clicked.connect(self.open_geopackage)
         # Elements
         self.wellButton.clicked.connect(lambda: self.timml_element("Well"))
         self.headWellButton.clicked.connect(lambda: self.timml_element("HeadWell"))
@@ -55,8 +57,12 @@ class QgisTimDockWidget(QtWidgets.QDockWidget, FORM_CLASS):
         )
         # Special case entry
         self.circularAreaSinkButton.clicked.connect(self.circular_area_sink)
+        # Interpreter
+        self.selectInterpreterButton.clicked.connect(self.select_interpreter)
         # Domain
         self.domainButton.clicked.connect(self.domain)
+        # Solve
+        self.solveButton.clicked.connect(self.solve)
 
     def closeEvent(self, event):
         self.closingPlugin.emit()
@@ -81,22 +87,29 @@ class QgisTimDockWidget(QtWidgets.QDockWidget, FORM_CLASS):
             layer = QgsVectorLayer(f"{path}|layername={layername}", layername)
             self.add_layer(layer)
 
-    def select_geopackage(self):
-        path, _filter = QFileDialog.getSaveFileName(self, "Select file", "", "*.gpkg")
-        self.datasetLineEdit.setText(path)
+    def load_geopackage(self):
+        path = self.path
         root = QgsProject.instance().layerTreeRoot()
         self.group = root.addGroup(str(Path(path).stem))
-        # This serves to create the geopackage if it doesn't already exist
-        if not Path(path).exists():
-            self.new_timml_model()
         self.add_geopackage_layers(path)
+
+    def new_geopackage(self):
+        path, _ = QFileDialog.getSaveFileName(self, "Select file", "", "*.gpkg")
+        self.datasetLineEdit.setText(path)
+        self.new_timml_model()
+        self.load_geopackage()
+
+    def open_geopackage(self):
+        path, _ = QFileDialog.getOpenFileName(self, "Select file", "", "*.gpkg")
+        self.datasetLineEdit.setText(path)
+        self.load_geopackage()
 
     def new_timml_model(self):
         # Write the aquifer properties
-        layer = create_timml_layer("Aquifer", "", None)
+        layer = create_timml_layer("Aquifer", "", self.crs)
         _ = geopackage.write_layer(self.path, layer, "timmlAquifer", newfile=True)
         # Write a single constant (reference) head
-        layer = create_timml_layer("Constant", "", None)
+        layer = create_timml_layer("Constant", "", self.crs)
         _ = geopackage.write_layer(self.path, layer, "timmlConstant")
 
     def timml_element(self, elementtype):
@@ -130,6 +143,28 @@ class QgisTimDockWidget(QtWidgets.QDockWidget, FORM_CLASS):
         provider.addFeatures([feature])
         written_layer = geopackage.write_layer(self.path, layer, "timmlDomain")
         QgsProject.instance().addMapLayer(written_layer)
+
+    def select_interpreter(self):
+        path, _ = QFileDialog.getOpenFileName(self, "Select Interpreter", "", "*.exe")
+        self.interpreterLineEdit.setText(path)
+
+    def solve(self):
+        cellsize = self.cellsizeSpinBox.value()
+        exe_path = Path(self.interpreterLineEdit.text()).absolute()
+        input_path = Path(self.path).absolute()
+        output_path = (input_path.parent / input_path.name).with_suffix(".nc")
+
+        # subprocess.run(
+        #    args=[str(exe_path), "-m", "gistim", str(input_path), str(output_path), str(cellsize)]
+        # )
+        subprocess.run(
+            args=[
+                "conda run -n salty -m gistim",
+                str(input_path),
+                str(output_path),
+                str(cellsize),
+            ]
+        )
 
     def circular_area_sink(self):
         dialog = RadiusDialog()

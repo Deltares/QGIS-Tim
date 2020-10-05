@@ -127,4 +127,5 @@ def create_timml_layer(elementtype: str, layername: str, crs) -> QgsVectorLayer:
     provider = layer.dataProvider()
     provider.addAttributes(attributes)
     layer.updateFields()
+    layer.setCrs(crs)
     return layer
