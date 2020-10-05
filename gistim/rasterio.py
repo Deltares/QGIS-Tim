@@ -3,32 +3,25 @@ Functions that make use of `rasterio
 <https://rasterio.readthedocs.io/en/stable/>`_ and
 https://corteva.github.io/rioxarray/stable/index.html for input and output to
 raster formats, and contouring/polygonization of raster data.
-
-Maybe copy over a utility to read multiple files (e.g. layers) into a single
-DataArrray: https://gitlab.com/deltares/imod/imod-python/-/tree/master/imod/array_io
 """
+import pathlib
+
 import geopandas as gpd
 import numpy as np
+import rasterio.features
+import rioxarray
 import shapely.geometry as sg
 import xarray as xr
 
 
-# since rasterio is a big dependency that is sometimes hard to install
-# and not always required, this is an optional dependency
-try:
-    import rasterio
-    import rioxarray
-except ImportError:
-    pass
-
-
-def contours(da):
+def contours(da, levels):
     """
     Contour a 2D-DataArray into a GeoDataFrame.
 
     Parameters
     ----------
     da : xr.DataArray with dimensions ("y", "x")
+    levels : np.ndarray of floats
 
     Returns
     -------
@@ -37,19 +30,23 @@ def contours(da):
     if da.dims != ("y", "x"):
         raise ValueError('Dimensions must be ("y", "x")')
 
-    values = da.values
-    if values.dtype == np.float64:
-        values = values.astype(np.float32)
-
     transform = da.rio.transform()
-    shapes = rasterio.features.shapes(values, transform=transform)
+    # rasterio.features.shapes does not accept 64-bit dtypes
+    index = np.digitize(da.values, levels).astype(np.int32)
 
     geometries = []
-    colvalues = []
-    for (geom, colval) in shapes:
-        geometries.append(sg.Polygon(geom["coordinates"][0]))
-        colvalues.append(colval)
+    values = []
+    shapes = rasterio.features.shapes(index, transform=transform)
+    for (geometry_collection, value) in shapes:
+        # Skip if value >= largest level
+        if value < levels.size:
+            # geometry_collection["coordinates"] is a list of linearrings
+            # the first one is the exterior. For contours, we only need this one
+            # or we end up with duplicated geometries.
+            geometry = geometry_collection["coordinates"][0]
+            geometries.append(sg.LineString(geometry))
+            values.append(int(value))
 
-    gdf = gpd.GeoDataFrame({"value": colvalues, "geometry": geometries})
-    gdf.crs = da.attrs.get("crs")
+    gdf = gpd.GeoDataFrame({"head": levels[values], "geometry": geometries})
+    gdf.crs = da.rio.crs
     return gdf
