@@ -1,4 +1,5 @@
 import os
+from pathlib import Path
 
 from qgis.PyQt import QtGui, QtWidgets, uic
 from qgis.PyQt.QtCore import pyqtSignal, QVariant
@@ -12,6 +13,9 @@ from qgis.core import (
     QgsGeometry,
     QgsVectorFileWriter,
 )
+from qgistim.timml_elements import create_timml_layer
+from qgistim import geopackage
+
 
 FORM_CLASS, _ = uic.loadUiType(
     os.path.join(os.path.dirname(__file__), "qt/qgistim_dockwidget_base.ui")
@@ -23,23 +27,34 @@ class QgisTimDockWidget(QtWidgets.QDockWidget, FORM_CLASS):
     closingPlugin = pyqtSignal()
 
     def __init__(self, iface, parent=None):
-        """Constructor."""
         super(QgisTimDockWidget, self).__init__(parent)
         self.iface = iface
         self.setupUi(self)
-        self.pushButton.clicked.connect(self.select_file)
+        # Dataset management
+        self.selectGeopackageButton.clicked.connect(self.select_geopackage)
         # Elements
-        self.aquiferButton.clicked.connect(self.aquifer_properties)
-        self.constantButton.clicked.connect(self.constant)
-        self.wellButton.clicked.connect(self.well)
-        self.headWellButton.clicked.connect(self.headwell)
+        self.wellButton.clicked.connect(lambda: self.timml_element("Well"))
+        self.headWellButton.clicked.connect(lambda: self.timml_element("HeadWell"))
+        self.uniformFlowButton.clicked.connect(
+            lambda: self.timml_element("UniformFlow")
+        )
+        self.headLineSinkButton.clicked.connect(
+            lambda: self.timml_element("HeadLineSink")
+        )
+        self.lineSinkDitchButton.clicked.connect(
+            lambda: self.timml_element("LineSinkDitch")
+        )
+        self.impLineDoubletButton.clicked.connect(
+            lambda: self.timml_element("LineDoublet")
+        )
+        self.leakyLineDoubletButton.clicked.connect(
+            lambda: self.timml_element("LeakyLineDoublet")
+        )
+        self.polygonInhomButton.clicked.connect(
+            lambda: self.timml_element("PolygonInhom")
+        )
+        # Special case entry
         self.circularAreaSinkButton.clicked.connect(self.circular_area_sink)
-        self.uniformFlowButton.clicked.connect(self.uniform_flow)
-        self.headLineSinkButton.clicked.connect(self.head_line_sink)
-        self.lineSinkDitchButton.clicked.connect(self.line_sink_ditch)
-        self.impLineDoubletButton.clicked.connect(self.imp_line_doublet)
-        self.leakyLineDoubletButton.clicked.connect(self.leaky_line_doublet)
-        self.polygonInhomButton.clicked.connect(self.polygon_inhom)
         # Domain
         self.domainButton.clicked.connect(self.domain)
 
@@ -47,83 +62,56 @@ class QgisTimDockWidget(QtWidgets.QDockWidget, FORM_CLASS):
         self.closingPlugin.emit()
         event.accept()
 
-    def select_file(self):
-        filename, _filter = QFileDialog.getSaveFileName(self, "Select file", "", "*")
-        self.lineEdit.setText(filename)
+    @property
+    def path(self):
+        return self.datasetLineEdit.text()
 
-    def write_layer(self, layer):
-        options = QgsVectorFileWriter.SaveVectorOptions()
-        options.layerName = "_".join(layer.name().split(" "))
-        QgsVectorFileWriter.writeAsVectorFormat(layer, self.gpkg_path, options)
-        # options.actionOnExistingFile = QgsVectorFileWriter.CreateOrOverwriteLayer
-        # _writer = QgsVectorFileWriter.writeAsVectorFormat(lyr, gpkgPath, options)
-        # if _writer:
-        #    print(lyr.name(), _writer)
-
+    @property
     def crs(self):
         return self.iface.mapCanvas().mapSettings().destinationCrs()
 
-    def well(self):
+    def add_layer(self, layer):
+        maplayer = QgsProject.instance().addMapLayer(layer, False)
+        self.group.addLayer(maplayer)
+
+    def add_geopackage_layers(self, path):
+        # Adapted from PyQGIS cheatsheet:
+        # https://docs.qgis.org/testing/en/docs/pyqgis_developer_cookbook/cheat_sheet.html#layers
+        for layername in geopackage.layers(self.path):
+            layer = QgsVectorLayer(f"{path}|layername={layername}", layername)
+            self.add_layer(layer)
+
+    def select_geopackage(self):
+        path, _filter = QFileDialog.getSaveFileName(self, "Select file", "", "*.gpkg")
+        self.datasetLineEdit.setText(path)
+        root = QgsProject.instance().layerTreeRoot()
+        self.group = root.addGroup(str(Path(path).stem))
+        # This serves to create the geopackage if it doesn't already exist
+        if not Path(path).exists():
+            self.new_model()
+        self.add_geopackage_layers(path)
+
+    def new_model(self):
+        # Write the aquifer properties
+        layer = create_timml_layer("Aquifer", "", None)
+        _ = geopackage.write_layer(self.path, layer, "Aquifer", newfile=True)
+        # Write a single constant (reference) head
+        layer = create_timml_layer("Constant", "", None)
+        _ = geopackage.write_layer(self.path, layer, "Constant")
+
+    def timml_element(self, elementtype):
         dialog = NameDialog()
         dialog.show()
         ok = dialog.exec_()
         if ok:
-            layer_name = dialog.lineEdit.text()
-            well_layer = QgsVectorLayer(
-                "Point", f"timmlWell:{layer_name}", "memory", crs=self.crs()
-            )
-            provider = well_layer.dataProvider()
-            provider.addAttributes(
-                [
-                    QgsField("discharge", QVariant.Double),
-                    QgsField("radius", QVariant.Double),
-                    QgsField("resistance", QVariant.Double),
-                    QgsField("layer", QVariant.Int),
-                    QgsField("label", QVariant.String),
-                ]
-            )
-            well_layer.updateFields()
-            QgsProject.instance().addMapLayer(well_layer)
-
-    def headwell(self):
-        dialog = NameDialog()
-        dialog.show()
-        ok = dialog.exec_()
-        if ok:
-            layer_name = dialog.lineEdit.text()
-            well_layer = QgsVectorLayer(
-                "Point", f"timmlHeadWell{layer_name}", "memory", crs=self.crs()
-            )
-            provider = well_layer.dataProvider()
-            provider.addAttributes(
-                [
-                    QgsField("head", QVariant.Double),
-                    QgsField("radius", QVariant.Double),
-                    QgsField("resistance", QVariant.Double),
-                    QgsField("layer", QVariant.Int),
-                    QgsField("label", QVariant.String),
-                ]
-            )
-            well_layer.updateFields()
-            QgsProject.instance().addMapLayer(well_layer)
-
-    def aquifer_properties(self):
-        properties = QgsVectorLayer("No geometry", "timmlAquifer", "memory")
-        provider = properties.dataProvider()
-        provider.addAttributes(
-            [
-                QgsField("conductivity", QVariant.Double),
-                QgsField("resistance", QVariant.Double),
-                QgsField("top", QVariant.Double),
-                QgsField("bottom", QVariant.Double),
-            ]
-        )
-        properties.updateFields()
-        QgsProject.instance().addMapLayer(properties)
+            layername = dialog.lineEdit.text()
+            layer = create_timml_layer(elementtype, layername, self.crs)
+            written_layer = geopackage.write_layer(self.path, layer, layername)
+            self.add_layer(written_layer)
 
     def domain(self):
-        bbox = QgsVectorLayer("polygon", "timmlDomain", "memory", crs=self.crs())
-        provider = bbox.dataProvider()
+        layer = QgsVectorLayer("polygon", "timmlDomain", "memory", crs=self.crs)
+        provider = layer.dataProvider()
         extent = self.iface.mapCanvas().extent()
         xmin = extent.xMinimum()
         ymin = extent.yMinimum()
@@ -138,184 +126,29 @@ class QgisTimDockWidget(QtWidgets.QDockWidget, FORM_CLASS):
         feature = QgsFeature()
         feature.setGeometry(QgsGeometry.fromPolygonXY([points]))
         provider.addFeatures([feature])
-        QgsProject.instance().addMapLayer(bbox)
-
-    def constant(self):
-        constant_layer = QgsVectorLayer(
-            "Point", "timmlConstant", "memory", crs=self.crs()
-        )
-        provider = constant_layer.dataProvider()
-        provider.addAttributes(
-            [
-                QgsField("head", QVariant.Double),
-                QgsField("layer", QVariant.Int),
-                QgsField("label", QVariant.String),
-            ]
-        )
-        constant_layer.updateFields()
-        QgsProject.instance().addMapLayer(constant_layer)
+        written_layer = geopackage.write_layer(self.path, layer, "timmlDomain")
+        QgsProject.instance().addMapLayer(written_layer)
 
     def circular_area_sink(self):
         dialog = RadiusDialog()
         dialog.show()
         ok = dialog.exec_()
         if ok:
-            layer_name = dialog.layerEdit.text()
+            layername = dialog.layerEdit.text()
             radius = float(dialog.radiusEdit.text())
-            sink_layer = QgsVectorLayer(
-                "Polygon",
-                f"timmlCircularAreaSink:{layer_name}",
-                "memory",
-                crs=self.crs(),
+            layer = create_timml_layer(
+                "timmlCircularAreaSink",
+                layername,
+                self.crs,
             )
-            provider = sink_layer.dataProvider()
+            provider = layer.dataProvider()
             feature = QgsFeature()
             center = self.iface.mapCanvas().center()
             feature.setGeometry(QgsGeometry.fromPointXY(center).buffer(radius, 5))
-            provider.addAttributes(
-                [
-                    QgsField("rate", QVariant.Double),
-                    QgsField("layer", QVariant.Int),
-                    QgsField("label", QVariant.String),
-                ]
-            )
             provider.addFeatures([feature])
-            sink_layer.updateFields()
-            QgsProject.instance().addMapLayer(sink_layer)
-
-    def uniform_flow(self):
-        uflow = QgsVectorLayer("No geometry", "timmlUniformFlow", "memory")
-        provider = uflow.dataProvider()
-        provider.addAttributes(
-            [
-                QgsField("slope", QVariant.Double),
-                QgsField("angle", QVariant.Double),
-                QgsField("label", QVariant.String),
-            ]
-        )
-        uflow.updateFields()
-        QgsProject.instance().addMapLayer(uflow)
-
-    def head_line_sink(self):
-        dialog = NameDialog()
-        dialog.show()
-        ok = dialog.exec_()
-        if ok:
-            layer_name = dialog.lineEdit.text()
-            line_layer = QgsVectorLayer(
-                "Linestring",
-                f"timmlHeadLineSink:{layer_name}",
-                "memory",
-                crs=self.crs(),
-            )
-            provider = line_layer.dataProvider()
-            provider.addAttributes(
-                [
-                    QgsField("head", QVariant.Double),
-                    QgsField("resistance", QVariant.Double),
-                    QgsField("width", QVariant.Double),
-                    QgsField("order", QVariant.Int),
-                    QgsField("layer", QVariant.Int),
-                    QgsField("label", QVariant.String),
-                ]
-            )
-            line_layer.updateFields()
-            QgsProject.instance().addMapLayer(line_layer)
-
-    def line_sink_ditch(self):
-        dialog = NameDialog()
-        dialog.show()
-        ok = dialog.exec_()
-        if ok:
-            layer_name = dialog.lineEdit.text()
-            line_layer = QgsVectorLayer(
-                "Linestring",
-                f"timmlLineSinkDitch:{layer_name}",
-                "memory",
-                crs=self.crs(),
-            )
-            provider = line_layer.dataProvider()
-            provider.addAttributes(
-                [
-                    QgsField("discharge", QVariant.Double),
-                    QgsField("resistance", QVariant.Double),
-                    QgsField("width", QVariant.Double),
-                    QgsField("order", QVariant.Int),
-                    QgsField("layer", QVariant.Int),
-                    QgsField("label", QVariant.String),
-                ]
-            )
-            line_layer.updateFields()
-            QgsProject.instance().addMapLayer(line_layer)
-
-    def imp_line_doublet(self):
-        dialog = NameDialog()
-        dialog.show()
-        ok = dialog.exec_()
-        if ok:
-            layer_name = dialog.lineEdit.text()
-            line_layer = QgsVectorLayer(
-                "Linestring",
-                f"timmlImpLineDoublet:{layer_name}",
-                "memory",
-                crs=self.crs(),
-            )
-            provider = line_layer.dataProvider()
-            provider.addAttributes(
-                [
-                    QgsField("order", QVariant.Int),
-                    QgsField("layer", QVariant.Int),
-                    QgsField("label", QVariant.String),
-                ]
-            )
-            line_layer.updateFields()
-            QgsProject.instance().addMapLayer(line_layer)
-
-    def leaky_line_doublet(self):
-        dialog = NameDialog()
-        dialog.show()
-        ok = dialog.exec_()
-        if ok:
-            layer_name = dialog.lineEdit.text()
-            line_layer = QgsVectorLayer(
-                "Line", f"timmlLeakyLineDoublet:{layer_name}", "memory", crs=self.crs()
-            )
-            provider = line_layer.dataProvider()
-            provider.addAttributes(
-                [
-                    QgsField("resistance", QVariant.Double),
-                    QgsField("order", QVariant.Int),
-                    QgsField("layer", QVariant.Int),
-                    QgsField("label", QVariant.String),
-                ]
-            )
-            line_layer.updateFields()
-            QgsProject.instance().addMapLayer(line_layer)
-
-    def polygon_inhom(self):
-        dialog = NameDialog()
-        dialog.show()
-        ok = dialog.exec_()
-        if ok:
-            layer_name = dialog.lineEdit.text()
-            properties = QgsVectorLayer(
-                "No geometry", "timmlPolygonInhom:{layer_name}", "memory"
-            )
-            provider = properties.dataProvider()
-            provider.addAttributes(
-                [
-                    QgsField("conductivity", QVariant.Double),
-                    QgsField("resistance", QVariant.Double),
-                    QgsField("top", QVariant.Double),
-                    QgsField("bottom", QVariant.Double),
-                    QgsField("topconfined", QVariant.Bool),
-                    QgsField("tophead", QVariant.Double),
-                    QgsField("order", QVariant.Int),
-                    QgsField("ndegrees", QVariant.Int),
-                ]
-            )
-            properties.updateFields()
-            QgsProject.instance().addMapLayer(properties)
+            layer.updateFields()
+            written_layer = geopackage.write_layer(self.path, layer, layername)
+            QgsProject.instance().addMapLayer(written_layer)
 
 
 FORM_CLASS_LAYERNAMEDIALOG, _ = uic.loadUiType(
