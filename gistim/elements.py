@@ -1,6 +1,7 @@
 from functools import singledispatch
 import pathlib
-from typing import Dict, NamedTuple, Union
+import re
+from typing import Callable, Dict, NamedTuple, Tuple, Union
 
 import geopandas as gpd
 import fiona
@@ -12,135 +13,142 @@ import xarray as xr
 FloatArray = np.ndarray
 
 
-# Map the names of the elements to their TimML types
-MAPPING = {
-    "well": timml.Well,
-    "headwell": timml.HeadWell,
-    "aquifer3d": timml.Model3D,
-    "headlinesink": timml.HeadLineSink,
-}
-
-
-class ModelSpecification(NamedTuple):
-    aquifer: str
-    reference: str
-    elements: Dict[str, timml.Element]
-
-
-def model_specification(path: Union[str, pathlib.Path]) -> ModelSpecification:
-    aquifer = None
-    reference = None
-    elements = {}
-    for layername in fiona.listlayers(path):
-        key = s.split(":")[0].lower()
-        # Special case aquifer and reference points, since only a single instance
-        # may occur in a model (singleton)
-        if key == "aquifer":
-            aquifer = layername
-        elif key == "reference":
-            reference = reference
-        else:
-            try:
-                elements[layername] = MAPPING[key]
-            except KeyError as e:
-                msg = (
-                    f'Invalid element specification "{key}" in {path_geopackage}. '
-                    f'Available types are: {", ".join(MAPPING.keys())}.'
-                )
-                raise KeyError(msg) from e
-    return ModelSpecification(aquifer, reference, elements, domain)
-
-
-def validate(spec: ModelSpecification) -> None:
-    if spec.aquifer is None:
-        raise ValueError("Aquifer entry is missing")
-    if spec.reference is None:
-        raise ValueError("Reference entry is missing")
-
-
-# Add a method that dispatches on the first argument, the timml element
-# thereby calling the appropriate logic required for the element
-@singledispatch
-def add_elements(element, dataframe, model):
-    pass
-
-
+# Some geometry helpers
+# ---------------------
 def point_coordinates(dataframe) -> Tuple[FloatArray, FloatArray]:
-    x, y = dataframe.geometry.coords.transpose()
-    return x, y
+    return dataframe["geometry"].x, dataframe["geometry"].y
 
 
-@add_elements.register
-def _(element: timml.Well, dataframe, model) -> None:
+def linestring_coordinates(row) -> Tuple[FloatArray, FloatArray]:
+    xy = np.array(row["geometry"].coords).transpose()
+    return (xy[0], xy[1])
+
+
+polygon_coordinates = linestring_coordinates
+
+
+# Dataframe to TimML element
+# --------------------------
+def aquifer(dataframe) -> timml.Model:
+    model = timml.Model(
+        kaq=dataframe["conductivity"].values,
+        z=np.append(dataframe["top"].values, dataframe["bottom"].values[-1]),
+        c=dataframe["resistance"],
+        npor=dataframe["porosity"],
+        ltype=["a" for _ in range(len(dataframe))],  # TODO
+    )
+    return model
+
+
+def constant(dataframe, model) -> None:
+    firstrow = dataframe.iloc[0]
+    x, y = point_coordinates(firstrow)
+    timml.Constant(
+        model=model,
+        xr=x,
+        yr=y,
+        hr=firstrow["head"],
+    )
+
+
+def well(dataframe, model) -> None:
     X, Y = point_coordinates(dataframe)
-    for ((rownumber, dataframe), x, y) in zip(dataframe.iterrows(), X, Y):
-        element(
+    for ((_, row), x, y) in zip(dataframe.iterrows(), X, Y):
+        timml.Well(
             model=model,
-            x=x,
-            y=y,
+            xw=x,
+            yw=y,
             Qw=row["discharge"],
             rw=row["radius"],
             res=row["resistance"],
-            layers=row["layers"],
-            label=row["label"],
-        )
-
-
-@add_elements.register
-def _(element: timml.HeadLineSinkString, dataframe, model) -> None:
-    for (rownumber, row) in dataframe.itterrows():
-        coordinates = row.geometry.exterior
-        element(
-            model=model,
-            xy=coordinates,
-            hls=row["head"],
-            res=row["resistance"],
-            wh=row["width"],
-            order=row["order"],
             layers=row["layer"],
             label=row["label"],
         )
 
 
-def add_reference(dataframe, model) -> None:
-    firstrow = dataframe.iloc[0]
-    x, y = point_coordinates(first_row)
-    timml.Reference(
-        x=x,
-        y=y,
-        head=firstrow["head"],
-    )
+def headwell(dataframe, model) -> None:
+    raise NotImplementedError
 
 
-def interleave(top: FloatArray, bottom: FloatArray):
-    # TODO
-    return z
+def headlinesink(dataframe, model) -> None:
+    raise NotImplementedError
 
 
-def initialize_aquifer(dataframe) -> timml.Model:
-    z = interleave(dataframe["top"], dataframe["bottom"])
-    model = timml.Model3D(
-        kaq=dataframe["kaq"].values,
-    )
-    return model
+# Map the names of the elements to their constructors
+# (Basically equivalent to eval(key)...)
+MAPPING = {
+    "well": well,
+    "headwell": headwell,
+    "headlinesink": headlinesink,
+}
+
+
+# Infer model structure from geopackage layers
+# --------------------------------------------
+class ModelSpecification(NamedTuple):
+    aquifer: str
+    constant: str
+    elements: Dict[str, Callable]
+
+
+def extract_elementtype(s: str) -> str:
+    s = s.lower().split(":")[0]
+    return s.split("timml")[-1]
+
+
+def model_specification(path: Union[str, pathlib.Path]) -> ModelSpecification:
+    aquifer = None
+    constant = None
+    elements = {}
+    for layername in fiona.listlayers(path):
+        key = extract_elementtype(layername)
+        # Special case aquifer and reference point, since only a single instance
+        # may occur in a model (singleton)
+        if key == "aquifer":
+            aquifer = layername
+        elif key == "constant":
+            constant = layername
+        elif key == "domain":
+            pass
+        else:
+            try:
+                elements[layername] = MAPPING[key]
+            except KeyError as e:
+                msg = (
+                    f'Invalid element specification "{key}" in {path}. '
+                    f'Available types are: {", ".join(MAPPING.keys())}.'
+                )
+                raise KeyError(msg) from e
+    return ModelSpecification(aquifer, constant, elements)
+
+
+def validate(spec: ModelSpecification) -> None:
+    if spec.aquifer is None:
+        raise ValueError("Aquifer entry is missing")
+    if spec.constant is None:
+        raise ValueError("Constant entry is missing")
+    # TODO: more checks
 
 
 def initialize_model(
     path: Union[str, pathlib.Path], spec: ModelSpecification
 ) -> timml.Model:
+    validate(spec)
     dataframe = gpd.read_file(path, layer=spec.aquifer)
-    model = initialize_aquifer(dataframe)
+    model = aquifer(dataframe)
 
-    dataframe = gpd.read_file(path, layer=spec.reference)
-    add_reference(dataframe, model)
+    dataframe = gpd.read_file(path, layer=spec.constant)
+    constant(dataframe, model)
 
-    for layername, element in spec.elements:
+    for layername, element in spec.elements.items():
         dataframe = gpd.read_file(path, layer=layername)
-        add_elements(element, dataframe, model)
+        element(dataframe, model)
 
     return model
 
 
+# Output methods
+# --------------
 def round_extent(extent, cellsize):
     """
     Increases the extent until all sides lie on a coordinate
@@ -154,18 +162,25 @@ def round_extent(extent, cellsize):
     return xmin, ymin, xmax, ymax
 
 
-def head(model, extent, cellsize) -> xr.DataArray:
-    # TODO: check if model is already solved?
+def gridspec(path, cellsize):
+    domain = gpd.read_file(path, layer="timmlDomain")
+    xmin, ymin, xmax, ymax = domain.bounds.iloc[0]
+    extent = (xmin, xmax, ymin, ymax)
+    return round_extent(extent, cellsize), domain.crs
 
-    extent = round_extent(extent, cellsize)
+
+def headgrid(model, extent, cellsize) -> xr.DataArray:
+    # TODO: check if model is already solved?
     xmin, xmax, ymin, ymax = extent
     x = np.arange(xmin, xmax, cellsize) + 0.5 * cellsize
     # In geospatial rasters, y is DECREASING with row number
     y = np.arange(ymax, ymin, -cellsize) - 0.5 * cellsize
-
+    head = model.headgrid(x, y)
+    nlayer = head.shape[0]
     out = xr.DataArray(
-        data=model.headgrid(x, y),
-        coords={"y": y, "x": x},
-        dims=("y", "x"),
+        data=head,
+        name="head",
+        coords={"layer": range(nlayer), "y": y, "x": x},
+        dims=("layer", "y", "x"),
     )
     return out
