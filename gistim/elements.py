@@ -1,4 +1,3 @@
-from functools import singledispatch
 import pathlib
 import re
 from typing import Callable, Dict, NamedTuple, Tuple, Union

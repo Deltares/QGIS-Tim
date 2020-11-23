@@ -1,5 +1,7 @@
+import json
 import os
 from pathlib import Path
+import socket
 import subprocess
 
 from qgis.PyQt import QtGui, QtWidgets, uic
@@ -13,9 +15,13 @@ from qgis.core import (
     QgsFeature,
     QgsGeometry,
     QgsVectorFileWriter,
+    QgsMeshLayer,
+    QgsSettings,
 )
+from qgis.gui import QgsMessageBar
 from qgistim.timml_elements import create_timml_layer
 from qgistim import geopackage
+from qgistim.server_handler import ServerHandler
 
 
 FORM_CLASS, _ = uic.loadUiType(
@@ -58,13 +64,31 @@ class QgisTimDockWidget(QtWidgets.QDockWidget, FORM_CLASS):
         # Special case entry
         self.circularAreaSinkButton.clicked.connect(self.circular_area_sink)
         # Interpreter
-        self.selectInterpreterButton.clicked.connect(self.select_interpreter)
+        self.interpreterButton.clicked.connect(self.select_interpreter)
         # Domain
         self.domainButton.clicked.connect(self.domain)
         # Solve
-        self.solveButton.clicked.connect(self.solve)
+        self.computeButton.clicked.connect(self.compute)
+        # Initialize buttons disabled, since dataset hasn't been loaded yet.
+        self.toggle_element_buttons(False)
+        # Just used as a viewing port
+        self.datasetLineEdit.setEnabled(False)
+        # To connect with TimServer
+        self.server_handler = ServerHandler()
+
+    def toggle_element_buttons(self, state):
+        self.wellButton.setEnabled(state)
+        self.headWellButton.setEnabled(state)
+        self.uniformFlowButton.setEnabled(state)
+        self.headLineSinkButton.setEnabled(state)
+        self.lineSinkDitchButton.setEnabled(state)
+        self.impLineDoubletButton.setEnabled(state)
+        self.leakyLineDoubletButton.setEnabled(state)
+        self.polygonInhomButton.setEnabled(state)
+        self.circularAreaSinkButton.setEnabled(state)
 
     def closeEvent(self, event):
+        self.server_handler.kill()
         self.closingPlugin.emit()
         event.accept()
 
@@ -95,14 +119,18 @@ class QgisTimDockWidget(QtWidgets.QDockWidget, FORM_CLASS):
 
     def new_geopackage(self):
         path, _ = QFileDialog.getSaveFileName(self, "Select file", "", "*.gpkg")
-        self.datasetLineEdit.setText(path)
-        self.new_timml_model()
-        self.load_geopackage()
+        if path != "":  # Empty string in case of cancel button press
+            self.datasetLineEdit.setText(path)
+            self.new_timml_model()
+            self.load_geopackage()
+            self.toggle_element_buttons(True)
 
     def open_geopackage(self):
         path, _ = QFileDialog.getOpenFileName(self, "Select file", "", "*.gpkg")
-        self.datasetLineEdit.setText(path)
-        self.load_geopackage()
+        if path != "":  # Empty string in case of cancel button press
+            self.datasetLineEdit.setText(path)
+            self.load_geopackage()
+            self.toggle_element_buttons(True)
 
     def new_timml_model(self):
         # Write the aquifer properties
@@ -144,28 +172,6 @@ class QgisTimDockWidget(QtWidgets.QDockWidget, FORM_CLASS):
         written_layer = geopackage.write_layer(self.path, layer, "timmlDomain")
         QgsProject.instance().addMapLayer(written_layer)
 
-    def select_interpreter(self):
-        path, _ = QFileDialog.getOpenFileName(self, "Select Interpreter", "", "*.exe")
-        self.interpreterLineEdit.setText(path)
-
-    def solve(self):
-        cellsize = self.cellsizeSpinBox.value()
-        exe_path = Path(self.interpreterLineEdit.text()).absolute()
-        input_path = Path(self.path).absolute()
-        output_path = (input_path.parent / input_path.name).with_suffix(".nc")
-
-        # subprocess.run(
-        #    args=[str(exe_path), "-m", "gistim", str(input_path), str(output_path), str(cellsize)]
-        # )
-        subprocess.run(
-            args=[
-                "conda run -n salty -m gistim",
-                str(input_path),
-                str(output_path),
-                str(cellsize),
-            ]
-        )
-
     def circular_area_sink(self):
         dialog = RadiusDialog()
         dialog.show()
@@ -189,6 +195,55 @@ class QgisTimDockWidget(QtWidgets.QDockWidget, FORM_CLASS):
             )
             QgsProject.instance().addMapLayer(written_layer)
 
+    def select_interpreter(self):
+        dialog = CondaDialog()
+        dialog.show()
+        ok = dialog.exec_()
+        if ok:
+            key = dialog.envComboBox.currentText()
+            name, _, prefix = dialog.environments[key]
+            settings = QgsSettings()
+            settings.setValue("qgistim/conda_env_name", name)
+            settings.setValue("qgistim/conda_env_prefix", prefix)
+
+    def start_server(self):
+        settings = QgsSettings()
+        name = settings.setValue("qgistim/conda_env_name")
+        prefix = settings.setValue("qgistim/conda_env_prefix")
+        if prefix and name:
+            self.server_handler.start_server(prefix=prefix, name=name)
+        else:
+            self.iface.messageBar().pushMessage(
+                "Error",
+                "The TimML interpreter has not been set. "
+                "Please set one via 'Configure interpreter'.",
+                level=QgsMessageBar.CRITICAL,
+            )
+ 
+    def load_result(self, path, cellsize):
+        netcdf_path = (path.parent / f"{path.name}-{cellsize}").with_suffix(".nc")
+        layer = QgsMeshLayer(netcdf_path, f"{path.name}-{cellsize}")
+        self.add_layer(layer)
+
+    def compute(self):
+        cellsize = self.cellsizeSpinBox.value()
+        path = Path(self.path).absolute()
+        if self.server_handler.socket is None:
+            self.start_server()
+        data = json.dumps(
+            {"path": str(path), "cellsize": cellsize}
+        )
+        self.server_handler.socket.sendall(bytes(data, "utf-8"))
+        received = str(self.server_handler.socket.recv(1024), "utf-8")
+       
+        if received == "0":
+            self.load_result(path, cellsize)
+        else:
+            self.iface.messageBar().pushMessage(
+                "Error", "Something seems to have gone wrong, "
+                "try checking the server window...",
+                level=QgsMessageBar.CRITICAL,
+            )
 
 FORM_CLASS_LAYERNAMEDIALOG, _ = uic.loadUiType(
     os.path.join(os.path.dirname(__file__), "qt/qgistim_name_dialog_base.ui")
@@ -210,3 +265,35 @@ class RadiusDialog(QtWidgets.QDialog, FORM_CLASS_RADIUSDIALOG):
     def __init__(self, parent=None):
         super(RadiusDialog, self).__init__(parent)
         self.setupUi(self)
+
+
+FORM_CLASS_CONDADIALOG, _ = uic.loadUiType(
+    os.path.join(os.path.dirname(__file__), "qt/qgistim_conda_env.ui")
+)
+
+   
+class CondaDialog(QtWidgets.QDialog, FORM_CLASS_CONDADIALOG):
+    def __init__(self, parent=None):
+        super(CondaDialog, self).__init__(parent)
+        self.setupUi(self)
+        self.interpreterButton.clicked.connect(self.select_interpreter)
+        self.collect_interpreters()
+        self.environments = {}
+    
+    def collect_interpreters(self):
+        from qgistim.interpreters import get_conda_environments
+        try:
+            data = get_conda_environments()
+            options = [": ".join(triplet[:2]) for triplet in data]
+            for option, entry in zip(options, data):
+                print(option)
+                #print(entry)
+                self.envComboBox.addItem(option)
+                #self.environments[option] = entry
+        except:
+            pass
+        
+    def select_interpreter(self):
+        path, _ = QFileDialog.getOpenFileName(self, "Select Interpreter", "", "*.exe")
+        self.envComboBox.addItem(path)
+        self.environments[path] = path
