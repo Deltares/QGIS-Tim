@@ -1,13 +1,14 @@
+import os
+from pathlib import Path
 import socket
 import subprocess
 
 
 class ServerHandler:
     def __init__(self):
-        self.interpreter = None
         self.HOST = "localhost"
         self.PORT = None
-        self.socket = None 
+        self.socket = None
         self.process_ID = None
     
     def find_free_port(self):
@@ -15,7 +16,7 @@ class ServerHandler:
         port = 1024
         while port <= 65535:
             try:
-                sock.bind(('', port))
+                sock.bind(("", port))
                 sock.close()
                 break
             except OSError:
@@ -24,15 +25,28 @@ class ServerHandler:
             raise IOError('no free ports')
         return port
 
-    def start_server(self, prefix, name):
+    def start_server(self):
         self.PORT = self.find_free_port()
+
+        configdir = Path(os.environ["APPDATA"]) / "qgis-tim"
+        with open(configdir / "interpreter.txt") as f:
+            interpreter = f.read().strip()
+        
+        script = configdir / "activate.py"
+        env_vars = configdir / "environmental-variables.json"
+        
         process = subprocess.Popen(
-            f"{prefix}/Scripts/activate.bat {name} & python -m gistim {self.PORT}",
+            f"python {script} {env_vars} {interpreter} {self.PORT}", 
             creationflags=subprocess.CREATE_NEW_CONSOLE
         )
         self.process_ID = process.pid
+    
+    def send(self, data):
         self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.socket.connect((self.HOST, self.PORT))
+        self.socket.sendall(bytes(data, "utf-8"))
+        received = str(self.socket.recv(1024), "utf-8")
+        return received
     
     def kill(self):
         try:

@@ -63,8 +63,6 @@ class QgisTimDockWidget(QtWidgets.QDockWidget, FORM_CLASS):
         )
         # Special case entry
         self.circularAreaSinkButton.clicked.connect(self.circular_area_sink)
-        # Interpreter
-        self.interpreterButton.clicked.connect(self.select_interpreter)
         # Domain
         self.domainButton.clicked.connect(self.domain)
         # Solve
@@ -75,6 +73,7 @@ class QgisTimDockWidget(QtWidgets.QDockWidget, FORM_CLASS):
         self.datasetLineEdit.setEnabled(False)
         # To connect with TimServer
         self.server_handler = ServerHandler()
+        self.serverButton.clicked.connect(self.start_server)
 
     def toggle_element_buttons(self, state):
         self.wellButton.setEnabled(state)
@@ -195,46 +194,22 @@ class QgisTimDockWidget(QtWidgets.QDockWidget, FORM_CLASS):
             )
             QgsProject.instance().addMapLayer(written_layer)
 
-    def select_interpreter(self):
-        dialog = CondaDialog()
-        dialog.show()
-        ok = dialog.exec_()
-        if ok:
-            key = dialog.envComboBox.currentText()
-            name, _, prefix = dialog.environments[key]
-            settings = QgsSettings()
-            settings.setValue("qgistim/conda_env_name", name)
-            settings.setValue("qgistim/conda_env_prefix", prefix)
-
-    def start_server(self):
-        settings = QgsSettings()
-        name = settings.setValue("qgistim/conda_env_name")
-        prefix = settings.setValue("qgistim/conda_env_prefix")
-        if prefix and name:
-            self.server_handler.start_server(prefix=prefix, name=name)
-        else:
-            self.iface.messageBar().pushMessage(
-                "Error",
-                "The TimML interpreter has not been set. "
-                "Please set one via 'Configure interpreter'.",
-                level=QgsMessageBar.CRITICAL,
-            )
- 
     def load_result(self, path, cellsize):
         netcdf_path = (path.parent / f"{path.name}-{cellsize}").with_suffix(".nc")
-        layer = QgsMeshLayer(netcdf_path, f"{path.name}-{cellsize}")
+        layer = QgsMeshLayer(str(netcdf_path), f"{path.name}-{cellsize}", "mdal")
         self.add_layer(layer)
+
+    def start_server(self):
+        self.server_handler.start_server()
 
     def compute(self):
         cellsize = self.cellsizeSpinBox.value()
         path = Path(self.path).absolute()
-        if self.server_handler.socket is None:
-            self.start_server()
         data = json.dumps(
             {"path": str(path), "cellsize": cellsize}
         )
-        self.server_handler.socket.sendall(bytes(data, "utf-8"))
-        received = str(self.server_handler.socket.recv(1024), "utf-8")
+        handler = self.server_handler
+        received = handler.send(data)
        
         if received == "0":
             self.load_result(path, cellsize)
@@ -265,35 +240,3 @@ class RadiusDialog(QtWidgets.QDialog, FORM_CLASS_RADIUSDIALOG):
     def __init__(self, parent=None):
         super(RadiusDialog, self).__init__(parent)
         self.setupUi(self)
-
-
-FORM_CLASS_CONDADIALOG, _ = uic.loadUiType(
-    os.path.join(os.path.dirname(__file__), "qt/qgistim_conda_env.ui")
-)
-
-   
-class CondaDialog(QtWidgets.QDialog, FORM_CLASS_CONDADIALOG):
-    def __init__(self, parent=None):
-        super(CondaDialog, self).__init__(parent)
-        self.setupUi(self)
-        self.interpreterButton.clicked.connect(self.select_interpreter)
-        self.collect_interpreters()
-        self.environments = {}
-    
-    def collect_interpreters(self):
-        from qgistim.interpreters import get_conda_environments
-        try:
-            data = get_conda_environments()
-            options = [": ".join(triplet[:2]) for triplet in data]
-            for option, entry in zip(options, data):
-                print(option)
-                #print(entry)
-                self.envComboBox.addItem(option)
-                #self.environments[option] = entry
-        except:
-            pass
-        
-    def select_interpreter(self):
-        path, _ = QFileDialog.getOpenFileName(self, "Select Interpreter", "", "*.exe")
-        self.envComboBox.addItem(path)
-        self.environments[path] = path

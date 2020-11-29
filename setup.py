@@ -1,7 +1,29 @@
+import json
+import os
+from pathlib import Path
 from setuptools import find_packages, setup
+import sys
+
 
 with open("README.md") as f:
     long_description = f.read()
+
+# Write all the environmental variables so the QGIS interpreter
+# can (re)set them properly.
+configdir = Path(os.environ["APPDATA"]) / "qgis-tim"
+configdir.mkdir(exist_ok=True)
+
+env_vars = {key: value for key, value in os.environ.items()}
+with open(configdir / "environmental-variables.json", "w") as f:
+    f.write(json.dumps(env_vars))
+
+with open(configdir / "interpreter.txt", "w") as f:
+    f.write(sys.executable)
+
+with open("activate.py", "r") as src:
+    content = src.read()
+with open(configdir / "activate.py", "w") as dst:
+    dst.write(content)
 
 setup(
     name="gistim",

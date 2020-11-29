@@ -99,7 +99,7 @@ def model_specification(path: Union[str, pathlib.Path]) -> ModelSpecification:
     aquifer = None
     constant = None
     elements = {}
-    for layername in fiona.listlayers(path):
+    for layername in fiona.listlayers(str(path)):
         key = extract_elementtype(layername)
         # Special case aquifer and reference point, since only a single instance
         # may occur in a model (singleton)

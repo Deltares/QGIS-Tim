@@ -9,6 +9,10 @@ import gistim
 import rioxarray
 
 
+# This might be useful:
+# If the geopackage has changed, reinitialize the model.
+# If elements are added piecemeal, hashing per element (maybe via pickle?) could be nicer.
+# Currently, the server is stateless.
 def hash_file(path):
     md5 = hashlib.md5()
     with open(path, "rb") as f:
@@ -21,33 +25,24 @@ def hash_file(path):
     return md5.hexdigest()
 
 
-class TimServer(socketserver.BaseRequestHandler):
-    def setup(self):
-        # Set initial values of the state
-        self.geopackage_hash = "NONE"
-        self.solved = False
-        self.model = None
-
+class TimHandler(socketserver.BaseRequestHandler):
     def initialize(self, path):
         spec = gistim.elements.model_specification(path)
         self.model = gistim.elements.initialize_model(path, spec)
 
     def compute(self, path, cellsize):
-        hashed = hash_file(path)
-        # If the geopackage has changed, reinitialize the model.
-        # If elements are added piecemeal, hashing per element (maybe via pickle?) could be nicer. 
-        if self.geopackage_hash != hashed:
-            self.initialize(path)
-            self.geopackage_hash = hashed
-            self.solved = False
-        if not self.solved:
-            self.model.solve()
-            self.solve = True
-        name = pathlib.Path(path).name
+        path = pathlib.Path(path)
+        self.initialize(path)
+        self.model.solve()
+        self.solve = True
+        name = path.name
         extent, crs = gistim.elements.gridspec(path, cellsize)
         head = gistim.elements.headgrid(self.model, extent, cellsize)
         head.rio.write_crs(crs)
-        head.to_netcdf(pathlib.Path(f"{name}-{cellsize}").with_suffix(".nc"))
+
+        outpath = (path.parent / f"{name}-{cellsize}").with_suffix(".nc")
+        print("Writing result to:", outpath)
+        head.to_netcdf(outpath)
 
     def handle(self):
         # TODO: rfile stream? Seems more robust than these 1024 bytes
@@ -59,15 +54,6 @@ class TimServer(socketserver.BaseRequestHandler):
             path=data["path"],
             cellsize=data["cellsize"],
         )
+        print("Computation succesful")
         # Send error code 0: all okay
         self.request.sendall(bytes("0", "utf-8"))
-
-
-if __name__ == "__main__":
-    PORT = find_free_port()
-    HOST = "localhost"
-    # Create the server, binding to localhost on port 9999
-    with socketserver.TCPServer((HOST, PORT), TimServer) as server:
-        # Activate the server; this will keep running until you
-        # interrupt the program with Ctrl-C
-        server.serve_forever()

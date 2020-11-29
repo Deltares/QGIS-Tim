@@ -1,2 +1,2 @@
 from . import elements
-from .tim_server import TimServer
+from .tim_server import TimHandler

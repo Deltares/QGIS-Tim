@@ -1,8 +1,5 @@
 """
 Turns a geopackage into a TimML model result
-
-Should probably be replaced by a SocketServer
-https://stackoverflow.com/questions/43334302/communication-between-two-separate-python-engines
 """
 import argparse
 import socket
@@ -10,21 +7,6 @@ import socketserver
 
 import gistim
 import rioxarray
-
-
-def find_free_port():
-    sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    port = 1024
-    while port <= 65535:
-        try:
-            sock.bind(('', port))
-            sock.close()
-            break
-        except OSError:
-            port += 1
-    else:
-        raise IOError('no free ports')
-    return port
 
 
 def run(input_path, output_path, cellsize):
@@ -38,7 +20,7 @@ def run(input_path, output_path, cellsize):
     head.to_netcdf(output_path)
 
 
-#if __name__ == "__main__":
+# if __name__ == "__main__":
 #    parser = argparse.ArgumentParser()
 #
 #    parser.add_argument(
@@ -64,11 +46,21 @@ def run(input_path, output_path, cellsize):
 
 
 if __name__ == "__main__":
+    parser = argparse.ArgumentParser()
+
+    parser.add_argument(
+        "port",
+        type=int,
+        nargs=1,
+        help="localhost PORT number",
+    )
+    args = parser.parse_args()
+
     HOST = "localhost"
-    PORT = find_free_port()
+    PORT = args.port[0]
     print(f"Starting TimServer on localhost, port: {PORT}")
     # Create the server, binding to localhost on port 9999
-    with socketserver.TCPServer((HOST, PORT), gistim.TimServer) as server:
+    with socketserver.TCPServer((HOST, PORT), gistim.TimHandler) as server:
         # Activate the server; this will keep running until you
         # interrupt the program with Ctrl-C
         server.serve_forever()
