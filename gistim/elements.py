@@ -50,6 +50,16 @@ def constant(dataframe, model) -> None:
     )
 
 
+def uflow(dataframe, model) -> None:
+    for _, row in dataframe.iterrows():
+        timml.Uflow(
+            model=model,
+            slope=row["slope"],
+            angle=row["angle"],
+            label=row["label"],
+        )
+
+
 def well(dataframe, model) -> None:
     X, Y = point_coordinates(dataframe)
     for ((_, row), x, y) in zip(dataframe.iterrows(), X, Y):
@@ -66,19 +76,102 @@ def well(dataframe, model) -> None:
 
 
 def headwell(dataframe, model) -> None:
+    X, Y = point_coordinates(dataframe)
+    for ((_, row), x, y) in zip(dataframe.iterrows(), X, Y):
+        timml.HeadWell(
+            xw=x,
+            yw=y,
+            hw=row["head"],
+            rw=row["radius"],
+            res=row["resistance"],
+            layers=row["layer"],
+            label=row["label"],
+            model=model,
+        )
+
+
+def polygoninhom(dataframe, model) -> None:
     raise NotImplementedError
 
 
 def headlinesink(dataframe, model) -> None:
-    raise NotImplementedError
+    for _, row in dataframe.iterrows():
+        timml.HeadLineSinkString(
+            model=model,
+            xy=linestring_coordinates(row),
+            hls=row["head"],
+            res=row["resistance"],
+            wh=row["width"],
+            order=row["order"],
+            layers=row["layer"],
+            label=row["label"],
+        )
+
+
+def linesinkditch(dataframe, model) -> None:
+    for _, row in dataframe.iterrows():
+        timml.LineSinkDitchString(
+            model=model,
+            xy=linestring_coordinates(row),
+            Qls=row["discharge"],
+            res=row["resistance"],
+            wh=row["width"],
+            order=row["order"],
+            layers=row["layer"],
+            label=row["label"],
+        )
+
+
+def leakylinedoublet(dataframe, model) -> None:
+    for _, row in dataframe.iterrows():
+        timml.LeakyLineDoubletString(
+            model=model,
+            xy=linestring_coordinates(row),
+            res=row["resistance"],
+            layers=row["layer"],
+            order=row["order"],
+            label=row["label"],
+        )
+
+
+def implinedoublet(dataframe, model) -> None:
+    for _, row in dataframe.iterrows():
+        timml.ImpLineDoubletString(
+            model=model,
+            xy=linestring_coordinates(row),
+            layers=row["layer"],
+            order=row["order"],
+            label=row["label"],
+        )
+
+
+def circareasink(dataframe, model) -> None:
+    for _, row in dataframe.iterrows():
+        x, y = row.geometry.centroid.xy
+        coords = np.array(row.geometry.exterior.coords)
+        x0, y0 = coords[0]
+        radius = np.sqrt((x0 - x) ** 2 + (y0 - y) ** 2)
+        timml.CircAreaSink(
+            model=model,
+            xc=x,
+            yc=y,
+            R=radius,
+            N=row["rate"],
+        )
 
 
 # Map the names of the elements to their constructors
 # (Basically equivalent to eval(key)...)
 MAPPING = {
+    "uflow": uflow,
+    "circareasink": circareasink,
     "well": well,
     "headwell": headwell,
+    "polygoninhom": polygoninhom,
     "headlinesink": headlinesink,
+    "linesinkditch": linesinkditch,
+    "leakylinedoublet": leakylinedoublet,
+    "implinedoublet": implinedoublet,
 }
 
 
@@ -101,6 +194,7 @@ def model_specification(path: Union[str, pathlib.Path]) -> ModelSpecification:
     elements = {}
     for layername in fiona.listlayers(str(path)):
         key = extract_elementtype(layername)
+        print("adding", layername, "as", key)
         # Special case aquifer and reference point, since only a single instance
         # may occur in a model (singleton)
         if key == "aquifer":
