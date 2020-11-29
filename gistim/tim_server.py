@@ -9,10 +9,8 @@ import gistim
 import rioxarray
 
 
-# This might be useful:
 # If the geopackage has changed, reinitialize the model.
-# If elements are added piecemeal, hashing per element (maybe via pickle?) could be nicer.
-# Currently, the server is stateless.
+#  If elements are added piecemeal, hashing per element (maybe via pickle?) could be nicer.
 def hash_file(path):
     md5 = hashlib.md5()
     with open(path, "rb") as f:
@@ -25,19 +23,34 @@ def hash_file(path):
     return md5.hexdigest()
 
 
+class StatefulTimServer(socketserver.ThreadingTCPServer):
+    def __init__(self, *args, **kwargs):
+        super(__class__, self).__init__(*args, **kwargs)
+        self.geopackage_hash = None
+        self.model = None
+        self.solved = False
+
+
 class TimHandler(socketserver.BaseRequestHandler):
     def initialize(self, path):
         spec = gistim.elements.model_specification(path)
-        self.model = gistim.elements.initialize_model(path, spec)
+        self.server.model = gistim.elements.initialize_model(path, spec)
 
     def compute(self, path, cellsize):
         path = pathlib.Path(path)
-        self.initialize(path)
-        self.model.solve()
-        self.solve = True
+        gpkg_hash = hash_file(path)
+        print("Current server hash:", self.server.geopackage_hash)
+        print("md5 hash:", gpkg_hash)
+        if gpkg_hash != self.server.geopackage_hash:
+            self.initialize(path)
+            self.server.geopackage_hash = gpkg_hash
+            self.server.solved = False
+        if not self.server.solved:
+            self.server.model.solve()
+            self.server.solved = True
         name = path.name
         extent, crs = gistim.elements.gridspec(path, cellsize)
-        head = gistim.elements.headgrid(self.model, extent, cellsize)
+        head = gistim.elements.headgrid(self.server.model, extent, cellsize)
         head.rio.write_crs(crs)
 
         outpath = (path.parent / f"{name}-{cellsize}").with_suffix(".nc")

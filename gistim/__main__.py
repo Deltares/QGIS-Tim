@@ -60,7 +60,8 @@ if __name__ == "__main__":
     PORT = args.port[0]
     print(f"Starting TimServer on localhost, port: {PORT}")
     # Create the server, binding to localhost on port 9999
-    with socketserver.TCPServer((HOST, PORT), gistim.TimHandler) as server:
+#    with socketserver.TCPServer((HOST, PORT), gistim.TimHandler) as server:
+    with gistim.StatefulTimServer((HOST, PORT), gistim.TimHandler) as server:
         # Activate the server; this will keep running until you
         # interrupt the program with Ctrl-C
         server.serve_forever()
