@@ -80,7 +80,7 @@ ELEMENT_SPEC = {
             QgsField("label", QVariant.String),
         ],
     ),
-    "CircularAreaSink": (
+    "CircAreaSink": (
         "Polygon",
         [
             QgsField("rate", QVariant.Double),

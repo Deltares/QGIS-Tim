@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>361</width>
-    <height>439</height>
+    <height>433</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -23,7 +23,7 @@
          <x>0</x>
          <y>0</y>
          <width>341</width>
-         <height>31</height>
+         <height>41</height>
         </rect>
        </property>
        <layout class="QGridLayout" name="gridLayout_2">
@@ -47,7 +47,7 @@
         <item row="0" column="2">
          <widget class="QPushButton" name="openGeopackageButton">
           <property name="text">
-           <string>...</string>
+           <string>Open</string>
           </property>
          </widget>
         </item>
@@ -57,7 +57,7 @@
        <property name="geometry">
         <rect>
          <x>0</x>
-         <y>80</y>
+         <y>40</y>
          <width>341</width>
          <height>189</height>
         </rect>
@@ -91,13 +91,6 @@
           </property>
          </widget>
         </item>
-        <item row="1" column="1">
-         <widget class="QPushButton" name="headLineSinkButton">
-          <property name="text">
-           <string>HeadLineSink</string>
-          </property>
-         </widget>
-        </item>
         <item row="7" column="0">
          <widget class="QPushButton" name="polygonInhomButton">
           <property name="text">
@@ -113,7 +106,7 @@
          </widget>
         </item>
         <item row="2" column="0">
-         <widget class="QPushButton" name="circularAreaSinkButton">
+         <widget class="QPushButton" name="circAreaSinkButton">
           <property name="text">
            <string>CircularAreaSink</string>
           </property>
@@ -130,6 +123,13 @@
          <widget class="QPushButton" name="impLineDoubletButton">
           <property name="text">
            <string>ImpLineDoublet</string>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="1">
+         <widget class="QPushButton" name="headLineSinkButton">
+          <property name="text">
+           <string>HeadLineSink</string>
           </property>
          </widget>
         </item>
@@ -199,7 +199,7 @@
        <property name="geometry">
         <rect>
          <x>0</x>
-         <y>40</y>
+         <y>260</y>
          <width>171</width>
          <height>31</height>
         </rect>

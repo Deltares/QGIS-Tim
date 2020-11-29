@@ -8,6 +8,7 @@ from qgis.PyQt import QtGui, QtWidgets, uic
 from qgis.PyQt.QtCore import pyqtSignal, QVariant
 from PyQt5.QtWidgets import QAction, QFileDialog
 from qgis.core import (
+    Qgis,
     QgsProject,
     QgsVectorLayer,
     QgsField,
@@ -62,7 +63,7 @@ class QgisTimDockWidget(QtWidgets.QDockWidget, FORM_CLASS):
             lambda: self.timml_element("PolygonInhom")
         )
         # Special case entry
-        self.circularAreaSinkButton.clicked.connect(self.circular_area_sink)
+        self.circAreaSinkButton.clicked.connect(self.circ_area_sink)
         # Domain
         self.domainButton.clicked.connect(self.domain)
         # Solve
@@ -84,7 +85,7 @@ class QgisTimDockWidget(QtWidgets.QDockWidget, FORM_CLASS):
         self.impLineDoubletButton.setEnabled(state)
         self.leakyLineDoubletButton.setEnabled(state)
         self.polygonInhomButton.setEnabled(state)
-        self.circularAreaSinkButton.setEnabled(state)
+        self.circAreaSinkButton.setEnabled(state)
 
     def closeEvent(self, event):
         self.server_handler.kill()
@@ -171,7 +172,7 @@ class QgisTimDockWidget(QtWidgets.QDockWidget, FORM_CLASS):
         written_layer = geopackage.write_layer(self.path, layer, "timmlDomain")
         QgsProject.instance().addMapLayer(written_layer)
 
-    def circular_area_sink(self):
+    def circ_area_sink(self):
         dialog = RadiusDialog()
         dialog.show()
         ok = dialog.exec_()
@@ -179,7 +180,7 @@ class QgisTimDockWidget(QtWidgets.QDockWidget, FORM_CLASS):
             layername = dialog.layerEdit.text()
             radius = float(dialog.radiusEdit.text())
             layer = create_timml_layer(
-                "CircularAreaSink",
+                "CircAreaSink",
                 layername,
                 self.crs,
             )
@@ -190,7 +191,7 @@ class QgisTimDockWidget(QtWidgets.QDockWidget, FORM_CLASS):
             provider.addFeatures([feature])
             layer.updateFields()
             written_layer = geopackage.write_layer(
-                self.path, layer, f"timmlCircularAreaSink:{layername}"
+                self.path, layer, f"timmlCircAreaSink:{layername}"
             )
             QgsProject.instance().addMapLayer(written_layer)
 
@@ -217,7 +218,7 @@ class QgisTimDockWidget(QtWidgets.QDockWidget, FORM_CLASS):
             self.iface.messageBar().pushMessage(
                 "Error", "Something seems to have gone wrong, "
                 "try checking the server window...",
-                level=QgsMessageBar.CRITICAL,
+                level=Qgis.Critical,
             )
 
 FORM_CLASS_LAYERNAMEDIALOG, _ = uic.loadUiType(
