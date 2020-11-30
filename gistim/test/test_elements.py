@@ -1,11 +1,12 @@
 import subprocess
 
-import pytest
-import gistim
 import geopandas as gpd
+import pytest
 import rioxarray
 import shapely.geometry as sg
 import xarray as xr
+
+import gistim
 
 
 @pytest.fixture

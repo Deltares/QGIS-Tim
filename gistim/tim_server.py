@@ -5,13 +5,15 @@ import socketserver
 import sys
 from typing import NamedTuple
 
-import gistim
 import rioxarray
+
+import gistim
 
 
 # If the geopackage has changed, reinitialize the model.
 #  If elements are added piecemeal, hashing per element (maybe via pickle?) could be nicer.
 def hash_file(path):
+    """Compute an MD5 hash of a file to check if it's changed"""
     md5 = hashlib.md5()
     with open(path, "rb") as f:
         while True:
@@ -24,6 +26,15 @@ def hash_file(path):
 
 
 class StatefulTimServer(socketserver.ThreadingTCPServer):
+    """
+    Stores the state of the analytic element model. If the geopackage content
+    have not changed, there is no need to re-initialize the model, and solve it
+    again.
+
+    If e.g. only cellsize or domain change, values can be computed immediately
+    with the headgrid function.
+    """
+
     def __init__(self, *args, **kwargs):
         super(__class__, self).__init__(*args, **kwargs)
         self.geopackage_hash = None
@@ -32,9 +43,16 @@ class StatefulTimServer(socketserver.ThreadingTCPServer):
 
 
 class TimHandler(socketserver.BaseRequestHandler):
+    """
+    The handler deals with the individual requests from the QGIS plugin.
+
+    It will initialize the model, compute the results for a given domain
+    and cellsize, and write the result to a 3D (layer, y, x) netCDF file.
+    """
+
     def initialize(self, path):
-        spec = gistim.elements.model_specification(path)
-        self.server.model = gistim.elements.initialize_model(path, spec)
+        spec = gistim.model_specification(path)
+        self.server.model = gistim.initialize_model(path, spec)
 
     def compute(self, path, cellsize):
         path = pathlib.Path(path)
@@ -55,8 +73,8 @@ class TimHandler(socketserver.BaseRequestHandler):
             self.server.model.solve()
             self.server.solved = True
         name = path.name
-        extent, crs = gistim.elements.gridspec(path, cellsize)
-        head = gistim.elements.headgrid(self.server.model, extent, cellsize)
+        extent, crs = gistim.gridspec(path, cellsize)
+        head = gistim.headgrid(self.server.model, extent, cellsize)
         head.rio.write_crs(crs)
 
         outpath = (path.parent / f"{name}-{cellsize}").with_suffix(".nc")

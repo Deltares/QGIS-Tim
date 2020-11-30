@@ -28,7 +28,6 @@ import numpy as np
 import shapely
 import shapely.geometry as sg
 
-
 FloatArray = np.ndarray
 IntArray = np.ndarray
 

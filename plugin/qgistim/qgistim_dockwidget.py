@@ -1,29 +1,28 @@
 import json
 import os
-from pathlib import Path
 import socket
 import subprocess
+from pathlib import Path
 
-from qgis.PyQt import QtGui, QtWidgets, uic
-from qgis.PyQt.QtCore import pyqtSignal, QVariant
 from PyQt5.QtWidgets import QAction, QFileDialog
 from qgis.core import (
     Qgis,
-    QgsProject,
-    QgsVectorLayer,
-    QgsField,
-    QgsPointXY,
     QgsFeature,
+    QgsField,
     QgsGeometry,
-    QgsVectorFileWriter,
     QgsMeshLayer,
+    QgsPointXY,
+    QgsProject,
     QgsRasterLayer,
     QgsSettings,
+    QgsVectorFileWriter,
+    QgsVectorLayer,
 )
-from qgistim.timml_elements import create_timml_layer
+from qgis.PyQt import QtGui, QtWidgets, uic
+from qgis.PyQt.QtCore import QVariant, pyqtSignal
 from qgistim import geopackage
 from qgistim.server_handler import ServerHandler
-
+from qgistim.timml_elements import create_timml_layer
 
 FORM_CLASS, _ = uic.loadUiType(
     os.path.join(os.path.dirname(__file__), "qt/qgistim_dockwidget_base.ui")

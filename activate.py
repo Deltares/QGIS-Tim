@@ -3,7 +3,6 @@ import os
 import subprocess
 import sys
 
-
 env_vars_json = sys.argv[1]
 interpreter = sys.argv[2]
 port = sys.argv[3]

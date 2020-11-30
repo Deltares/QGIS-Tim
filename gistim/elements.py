@@ -1,13 +1,12 @@
 import pathlib
 import re
-from typing import Callable, Dict, NamedTuple, Tuple, Union
+from typing import Any, Callable, Dict, NamedTuple, Tuple, Union
 
-import geopandas as gpd
 import fiona
+import geopandas as gpd
 import numpy as np
 import timml
 import xarray as xr
-
 
 FloatArray = np.ndarray
 
@@ -15,10 +14,35 @@ FloatArray = np.ndarray
 # Some geometry helpers
 # ---------------------
 def point_coordinates(dataframe) -> Tuple[FloatArray, FloatArray]:
-    return dataframe["geometry"].x, dataframe["geometry"].y
+    """
+    Get the x and y coordinates from a GeoDataFrame of points.
+
+    Parameters
+    ----------
+    dataframe: geopandas.GeoDataFrame
+
+    Returns
+    -------
+    x: np.array
+    y: np.array
+    """
+    return dataframe["geometry"].x.values, dataframe["geometry"].y.values
 
 
 def linestring_coordinates(row) -> Tuple[FloatArray, FloatArray]:
+    """
+    Get the x and y coordinates from a single LineString feature,
+    which is one row in a GeoDataFrame.
+
+    Parameters
+    ----------
+    row: geopandas.GeoSeries
+
+    Returns
+    -------
+    x: np.array
+    y: np.array
+    """
     xy = np.array(row["geometry"].coords).transpose()
     return (xy[0], xy[1])
 
@@ -28,7 +52,16 @@ polygon_coordinates = linestring_coordinates
 
 # Dataframe to TimML element
 # --------------------------
-def aquifer(dataframe) -> timml.Model:
+def aquifer(dataframe: gpd.GeoDataFrame) -> timml.Model:
+    """
+    Parameters
+    ----------
+    dataframe: geopandas.GeoDataFrame
+
+    Returns
+    -------
+    timml.Model
+    """
     model = timml.Model(
         kaq=dataframe["conductivity"].values,
         z=np.append(dataframe["top"].values, dataframe["bottom"].values[-1]),
@@ -39,7 +72,16 @@ def aquifer(dataframe) -> timml.Model:
     return model
 
 
-def constant(dataframe, model) -> None:
+def constant(dataframe: gpd.GeoDataFrame, model: timml.Model) -> None:
+    """
+    Parameters
+    ----------
+    dataframe: geopandas.GeoDataFrame
+
+    Returns
+    -------
+    None
+    """
     firstrow = dataframe.iloc[0]
     x, y = point_coordinates(firstrow)
     timml.Constant(
@@ -50,7 +92,16 @@ def constant(dataframe, model) -> None:
     )
 
 
-def uflow(dataframe, model) -> None:
+def uflow(dataframe: gpd.GeoDataFrame, model: timml.Model) -> None:
+    """
+    Parameters
+    ----------
+    dataframe: geopandas.GeoDataFrame
+
+    Returns
+    -------
+    None
+    """
     for _, row in dataframe.iterrows():
         timml.Uflow(
             model=model,
@@ -60,7 +111,16 @@ def uflow(dataframe, model) -> None:
         )
 
 
-def well(dataframe, model) -> None:
+def well(dataframe: gpd.GeoDataFrame, model: timml.Model) -> None:
+    """
+    Parameters
+    ----------
+    dataframe: geopandas.GeoDataFrame
+
+    Returns
+    -------
+    None
+    """
     X, Y = point_coordinates(dataframe)
     for ((_, row), x, y) in zip(dataframe.iterrows(), X, Y):
         timml.Well(
@@ -75,7 +135,16 @@ def well(dataframe, model) -> None:
         )
 
 
-def headwell(dataframe, model) -> None:
+def headwell(dataframe: gpd.GeoDataFrame, model: timml.Model) -> None:
+    """
+    Parameters
+    ----------
+    dataframe: geopandas.GeoDataFrame
+
+    Returns
+    -------
+    None
+    """
     X, Y = point_coordinates(dataframe)
     for ((_, row), x, y) in zip(dataframe.iterrows(), X, Y):
         timml.HeadWell(
@@ -90,11 +159,29 @@ def headwell(dataframe, model) -> None:
         )
 
 
-def polygoninhom(dataframe, model) -> None:
+def polygoninhom(dataframe: gpd.GeoDataFrame, model: timml.Model) -> None:
+    """
+    Parameters
+    ----------
+    dataframe: geopandas.GeoDataFrame
+
+    Returns
+    -------
+    None
+    """
     raise NotImplementedError
 
 
-def headlinesink(dataframe, model) -> None:
+def headlinesink(dataframe: gpd.GeoDataFrame, model: timml.Model) -> None:
+    """
+    Parameters
+    ----------
+    dataframe: geopandas.GeoDataFrame
+
+    Returns
+    -------
+    None
+    """
     for _, row in dataframe.iterrows():
         timml.HeadLineSinkString(
             model=model,
@@ -108,7 +195,16 @@ def headlinesink(dataframe, model) -> None:
         )
 
 
-def linesinkditch(dataframe, model) -> None:
+def linesinkditch(dataframe: gpd.GeoDataFrame, model: timml.Model) -> None:
+    """
+    Parameters
+    ----------
+    dataframe: geopandas.GeoDataFrame
+
+    Returns
+    -------
+    None
+    """
     for _, row in dataframe.iterrows():
         timml.LineSinkDitchString(
             model=model,
@@ -122,7 +218,16 @@ def linesinkditch(dataframe, model) -> None:
         )
 
 
-def leakylinedoublet(dataframe, model) -> None:
+def leakylinedoublet(dataframe: gpd.GeoDataFrame, model: timml.Model) -> None:
+    """
+    Parameters
+    ----------
+    dataframe: geopandas.GeoDataFrame
+
+    Returns
+    -------
+    None
+    """
     for _, row in dataframe.iterrows():
         timml.LeakyLineDoubletString(
             model=model,
@@ -134,7 +239,16 @@ def leakylinedoublet(dataframe, model) -> None:
         )
 
 
-def implinedoublet(dataframe, model) -> None:
+def implinedoublet(dataframe: gpd.GeoDataFrame, model: timml.Model) -> None:
+    """
+    Parameters
+    ----------
+    dataframe: geopandas.GeoDataFrame
+
+    Returns
+    -------
+    None
+    """
     for _, row in dataframe.iterrows():
         timml.ImpLineDoubletString(
             model=model,
@@ -145,7 +259,16 @@ def implinedoublet(dataframe, model) -> None:
         )
 
 
-def circareasink(dataframe, model) -> None:
+def circareasink(dataframe: gpd.GeoDataFrame, model: timml.Model) -> None:
+    """
+    Parameters
+    ----------
+    dataframe: geopandas.GeoDataFrame
+
+    Returns
+    -------
+    None
+    """
     for _, row in dataframe.iterrows():
         x, y = row.geometry.centroid.xy
         coords = np.array(row.geometry.exterior.coords)
@@ -189,6 +312,25 @@ def extract_elementtype(s: str) -> str:
 
 
 def model_specification(path: Union[str, pathlib.Path]) -> ModelSpecification:
+    """
+    Parse the layer names of the geopackage to find which elements are present
+    in the model.
+
+    Special case the aquifer properties and the constant, since these are
+    mandatory for every model, and singleton (there can only be one).
+
+    Returns a named tuple with the layer name of the aquifer, the constant, and
+    a dictionary of other element names to its construction function.
+
+    Parameters
+    ----------
+    path: Union[str, pathlib.Path]
+        path to the geopackage containing the model data
+
+    Returns
+    -------
+    ModelSpecification
+    """
     aquifer = None
     constant = None
     elements = {}
@@ -226,6 +368,31 @@ def validate(spec: ModelSpecification) -> None:
 def initialize_model(
     path: Union[str, pathlib.Path], spec: ModelSpecification
 ) -> timml.Model:
+    """
+    Initialize a TimML analytic model based on the data in a geopackage.
+
+    Parameters
+    ----------
+    path: Union[str, pathlib.Path]
+        path to the geopackage containing the model data
+    spec: ModelSpecification
+        Named tuple with the layer name of the aquifer, the constant, and a
+        dictionary of other element names to its construction function.
+
+    Returns
+    -------
+    timml.Model
+
+    Examples
+    --------
+
+    >>> import gistim
+    >>> path = "my-model.gpkg"
+    >>> spec = gistim.model_specification(path)
+    >>> model = gistim.initialize_model(path, spec)
+    >>> model.solve()
+
+    """
     validate(spec)
     dataframe = gpd.read_file(path, layer=spec.aquifer)
     model = aquifer(dataframe)
@@ -242,7 +409,7 @@ def initialize_model(
 
 # Output methods
 # --------------
-def round_extent(extent, cellsize):
+def round_extent(extent: Tuple[float], cellsize: float) -> Tuple[float]:
     """
     Increases the extent until all sides lie on a coordinate
     divisible by cellsize.
@@ -255,14 +422,22 @@ def round_extent(extent, cellsize):
     return xmin, xmax, ymin, ymax
 
 
-def gridspec(path, cellsize):
+def gridspec(path: Union[pathlib.Path, str], cellsize: float) -> Tuple[float, Any]:
+    """
+    Infer the grid specifiction from the geopackage Domain layer and the
+    provided cellsize.
+    """
     domain = gpd.read_file(path, layer="timmlDomain")
     xmin, ymin, xmax, ymax = domain.bounds.iloc[0]
     extent = (xmin, xmax, ymin, ymax)
     return round_extent(extent, cellsize), domain.crs
 
 
-def headgrid(model, extent, cellsize) -> xr.DataArray:
+def headgrid(model: timml.Model, extent: Tuple[float], cellsize: float) -> xr.DataArray:
+    """
+    Compute the headgrid of the TimML model, and store the results
+    in an xarray DataArray with the appropriate dimensions.
+    """
     xmin, xmax, ymin, ymax = extent
     x = np.arange(xmin, xmax, cellsize) + 0.5 * cellsize
     # In geospatial rasters, y is DECREASING with row number

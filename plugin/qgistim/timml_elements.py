@@ -1,15 +1,8 @@
 """
 Specification of TimML data requirements
 """
+from qgis.core import QgsFeature, QgsField, QgsGeometry, QgsPointXY, QgsVectorLayer
 from qgis.PyQt.QtCore import QVariant
-from qgis.core import (
-    QgsVectorLayer,
-    QgsField,
-    QgsPointXY,
-    QgsFeature,
-    QgsGeometry,
-)
-
 
 ELEMENT_SPEC = {
     "Aquifer": (

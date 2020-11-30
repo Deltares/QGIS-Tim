@@ -8,10 +8,10 @@ __license__ = "GPL"
 __copyright__ = "Copyright 2012, Australia Indonesia Facility for "
 __copyright__ += "Disaster Reduction"
 
+import configparser
+import logging
 import os
 import unittest
-import logging
-import configparser
 
 LOGGER = logging.getLogger("QGIS")
 

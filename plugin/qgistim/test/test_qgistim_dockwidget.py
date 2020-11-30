@@ -15,9 +15,7 @@ __copyright__ = "Copyright 2020, Deltares"
 import unittest
 
 from qgis.PyQt.QtGui import QDockWidget
-
 from qgistim_dockwidget import QgisTimDockWidget
-
 from utilities import get_qgis_app
 
 QGIS_APP = get_qgis_app()

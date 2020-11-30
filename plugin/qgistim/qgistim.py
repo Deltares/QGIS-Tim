@@ -5,16 +5,17 @@ This module contains no plugin specific logic, basically all of this is
 boilerplate dealing with including a menu item and icon in the QGIS menus,
 and some logic for shutting down the plugin.
 """
-from qgis.PyQt.QtCore import QSettings, QTranslator, QCoreApplication, Qt
+import os.path
+
+from qgis.PyQt.QtCore import QCoreApplication, QSettings, Qt, QTranslator
 from qgis.PyQt.QtGui import QIcon
 from qgis.PyQt.QtWidgets import QAction
 
-# Initialize Qt resources from file resources.py
-from .resources import *
-
 # Import the code for the DockWidget
 from .qgistim_dockwidget import QgisTimDockWidget
-import os.path
+
+# Initialize Qt resources from file resources.py
+from .resources import *
 
 
 class QgisTim:
@@ -47,9 +48,9 @@ class QgisTim:
 
         # Declare instance attributes
         self.actions = []
-        self.menu = self.tr(u"&Qgis-Tim")
-        self.toolbar = self.iface.addToolBar(u"QgisTim")
-        self.toolbar.setObjectName(u"QgisTim")
+        self.menu = self.tr("&Qgis-Tim")
+        self.toolbar = self.iface.addToolBar("QgisTim")
+        self.toolbar.setObjectName("QgisTim")
         self.pluginIsActive = False
         self.dockwidget = None
 
@@ -146,7 +147,7 @@ class QgisTim:
         icon_path = ":/plugins/qgistim/icon.png"
         self.add_action(
             icon_path,
-            text=self.tr(u"QgisTim"),
+            text=self.tr("QgisTim"),
             callback=self.run,
             parent=self.iface.mainWindow(),
         )
@@ -170,7 +171,7 @@ class QgisTim:
     def unload(self):
         """Removes the plugin menu item and icon from QGIS GUI."""
         for action in self.actions:
-            self.iface.removePluginMenu(self.tr(u"&Qgis-Tim"), action)
+            self.iface.removePluginMenu(self.tr("&Qgis-Tim"), action)
             self.iface.removeToolBarIcon(action)
         # remove the toolbar
         del self.toolbar

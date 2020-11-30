@@ -2,7 +2,8 @@
 Geopackage management utilities
 """
 from typing import List
-from qgis.core import QgsVectorLayer, QgsVectorFileWriter
+
+from qgis.core import QgsVectorFileWriter, QgsVectorLayer
 
 
 def layers(path: str) -> List[str]:
