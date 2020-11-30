@@ -26,7 +26,7 @@ def point_coordinates(dataframe) -> Tuple[FloatArray, FloatArray]:
     x: np.array
     y: np.array
     """
-    return dataframe["geometry"].x.values, dataframe["geometry"].y.values
+    return dataframe["geometry"].x, dataframe["geometry"].y
 
 
 def linestring_coordinates(row) -> Tuple[FloatArray, FloatArray]:
