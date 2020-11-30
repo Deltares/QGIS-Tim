@@ -41,10 +41,16 @@ class TimHandler(socketserver.BaseRequestHandler):
         gpkg_hash = hash_file(path)
         print("Current server hash:", self.server.geopackage_hash)
         print("md5 hash:", gpkg_hash)
-        if gpkg_hash != self.server.geopackage_hash:
-            self.initialize(path)
-            self.server.geopackage_hash = gpkg_hash
-            self.server.solved = False
+        # TODO: this currently gives issues, where md5 hashes are the same
+        # even after changes?
+        # Probably due to Write-Ahead-Logging (WAL) from the geopackage?
+        # if gpkg_hash != self.server.geopackage_hash:
+        #    self.initialize(path)
+        #    self.server.geopackage_hash = gpkg_hash
+        #    self.server.solved = False
+        self.initialize(path)
+        self.server.geopackage_hash = gpkg_hash
+        self.server.solved = False
         if not self.server.solved:
             self.server.model.solve()
             self.server.solved = True

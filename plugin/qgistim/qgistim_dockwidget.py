@@ -17,9 +17,9 @@ from qgis.core import (
     QgsGeometry,
     QgsVectorFileWriter,
     QgsMeshLayer,
+    QgsRasterLayer,
     QgsSettings,
 )
-from qgis.gui import QgsMessageBar
 from qgistim.timml_elements import create_timml_layer
 from qgistim import geopackage
 from qgistim.server_handler import ServerHandler
@@ -196,8 +196,9 @@ class QgisTimDockWidget(QtWidgets.QDockWidget, FORM_CLASS):
             QgsProject.instance().addMapLayer(written_layer)
 
     def load_result(self, path, cellsize):
-        netcdf_path = (path.parent / f"{path.name}-{cellsize}").with_suffix(".nc")
-        layer = QgsMeshLayer(str(netcdf_path), f"{path.name}-{cellsize}", "mdal")
+        netcdf_path = str((path.parent / f"{path.name}-{cellsize}").with_suffix(".nc"))
+        # layer = QgsMeshLayer(str(netcdf_path), f"{path.name}-{cellsize}", "mdal")
+        layer = QgsRasterLayer(netcdf_path, f"{path.name}-{cellsize}", "gdal")
         self.add_layer(layer)
 
     def start_server(self):
@@ -206,20 +207,20 @@ class QgisTimDockWidget(QtWidgets.QDockWidget, FORM_CLASS):
     def compute(self):
         cellsize = self.cellsizeSpinBox.value()
         path = Path(self.path).absolute()
-        data = json.dumps(
-            {"path": str(path), "cellsize": cellsize}
-        )
+        data = json.dumps({"path": str(path), "cellsize": cellsize})
         handler = self.server_handler
         received = handler.send(data)
-       
+
         if received == "0":
             self.load_result(path, cellsize)
         else:
             self.iface.messageBar().pushMessage(
-                "Error", "Something seems to have gone wrong, "
+                "Error",
+                "Something seems to have gone wrong, "
                 "try checking the server window...",
                 level=Qgis.Critical,
             )
+
 
 FORM_CLASS_LAYERNAMEDIALOG, _ = uic.loadUiType(
     os.path.join(os.path.dirname(__file__), "qt/qgistim_name_dialog_base.ui")

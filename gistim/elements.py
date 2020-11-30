@@ -247,12 +247,12 @@ def round_extent(extent, cellsize):
     Increases the extent until all sides lie on a coordinate
     divisible by cellsize.
     """
-    xmin, ymin, xmax, ymax = extent
+    xmin, xmax, ymin, ymax = extent
     xmin = np.floor(xmin / cellsize) * cellsize
     ymin = np.floor(ymin / cellsize) * cellsize
     xmax = np.ceil(xmax / cellsize) * cellsize
     ymax = np.ceil(ymax / cellsize) * cellsize
-    return xmin, ymin, xmax, ymax
+    return xmin, xmax, ymin, ymax
 
 
 def gridspec(path, cellsize):
@@ -263,7 +263,6 @@ def gridspec(path, cellsize):
 
 
 def headgrid(model, extent, cellsize) -> xr.DataArray:
-    # TODO: check if model is already solved?
     xmin, xmax, ymin, ymax = extent
     x = np.arange(xmin, xmax, cellsize) + 0.5 * cellsize
     # In geospatial rasters, y is DECREASING with row number
