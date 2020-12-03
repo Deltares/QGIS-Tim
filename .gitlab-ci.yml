@@ -10,7 +10,16 @@ before_script:
 
 tests:
   script:
-    - cd gistim/test
-    - python -m pytest --cache-clear
-    - cd ..
     - black --check . 
+
+pages:
+  script:
+    - cd docs
+    - make html
+    - cd ...
+    - mv docs/_build/html/ public/
+    artifacts:
+      paths:
+      - public
+    only:
+    - master

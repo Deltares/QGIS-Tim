@@ -1,5 +1,5 @@
-Developer Documentation
-=======================
+QGIS and conda interpreters
+===========================
 
 Communicating between Python interpreters
 -----------------------------------------
@@ -11,11 +11,9 @@ One of the difficulties of this specific project lies within combining:
   distribution
 
 The Python data ecosystem "GIS-stack" (rasterio, geopandas) does not combine
-well with QGIS Python interpreter. Worse, numba (a JIT compiler) does not seem
-to run at all within the QGIS at all.
-
-Trying to install QGIS via conda results in not being able to run Python in QGIS
-at all.
+well with QGIS Python interpreter and, numba (a JIT compiler) does not seem to
+run at all within the QGIS at all. Trying to install QGIS via conda results in
+not being able to run Python in QGIS at all when I last tried.
 
 These are likely not small issues, since QGIS and e.g. rasterio may depend on the
 same libaries (GDAL), but not the same version of it; or perhaps require subtly

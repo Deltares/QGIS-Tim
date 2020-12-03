@@ -17,6 +17,10 @@ Qgis-Tim represent a single model with a single GeoPackage. To quote wikipedia:
     standards-based data format for geographic information system implemented as
     a SQLite database container.
 
+
+.. image:: https://www.geopackage.org/img/geopkg.png
+  :target: https://www.geopackage.org//
+
 The primary benefit of a format like GeoPackage over e.g. ESRI Shapefiles is
 that it is possible to store multiple vector layers in a single file. This means
 that a single geopackage file is sufficient to describe all input of a TimML
@@ -45,9 +49,15 @@ To delete a layer from a GeoPackage, use the Browser Panel, and find the GeoPack
 icon. Right-click on the GeoPackage icon, and choose "New Connection". Now, find
 the geopackage of interest. 
 
+.. image:: _static/qgis-geopackage-connection.png
+  :target: _static/qgis-geopackage-connection.png
+
 It will be added under the GeoPackage icon (check the triangle dropdown menu if
 it's not visible). Right-click the layer to delete, and choose "Delete
 Layer...".
+
+.. image:: _static/qgis-geopackage-delete-layer.png
+  :target: _static/qgis-geopackage-delete-layer.png
 
 Elements
 ========
@@ -101,6 +111,36 @@ Of course, this does mean a server has to running, listening for the calls!
 
 This "Start TimServer" button starts the server. It'll open a new command line
 window, which shows some information about the current status of the server.
+
+.. code-block:: console
+
+    Starting TimServer on localhost, port: 1024
+    b'{"path": "C:\\\\tmp\\\\test-model.gpkg", "cellsize": 500.0}'
+    Current server hash: None
+    md5 hash: ea70382beb61a2240fed4b47baaed499
+    adding timmlConstant as constant
+    adding timmlHeadLineSink:kanalen as headlinesink
+    adding timmlWell:onttrekking as well
+    adding timmlDomain as domain
+    adding timmlAquifer as aquifer
+    Number of elements, Number of equations: 5 , 5
+    .....
+    solution complete
+    Writing result to: C:\tmp\test-model.gpkg-500.nc
+    Computation succesful
+    b'{"path": "C:\\\\tmp\\\\test-model.gpkg", "cellsize": 100.0}'
+    Current server hash: ea70382beb61a2240fed4b47baaed499
+    md5 hash: ea70382beb61a2240fed4b47baaed499
+    adding timmlConstant as constant
+    adding timmlHeadLineSink:kanalen as headlinesink
+    adding timmlWell:onttrekking as well
+    adding timmlDomain as domain
+    adding timmlAquifer as aquifer
+    Number of elements, Number of equations: 5 , 5
+    .....
+    solution complete
+    Writing result to: C:\tmp\test-model.gpkg-100.nc
+    Computation succesful
 
 Domain
 ======

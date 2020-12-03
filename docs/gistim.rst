@@ -18,26 +18,25 @@ Qgis-Tim plugin).
 
 To illustrate, a typical interactive workflow consists of the following steps:
 
-1. Start QGIS.
-2. Define the TimML model with the plugin.
-3. The model input is written to a geopackage.
-4. Start the TimServer.
-5. Compute is called, the server reads the geopackage, sets up the model,
-   solves, produces a grid of heads, and stores the heads in a netCDF file.
-6. The netCDF file is loaded into QGIS.
+* Start QGIS.
+* Define the TimML model with the plugin.
+* The model input is written to a geopackage.
+* Start the TimServer.
+* Compute is called, the server reads the geopackage, sets up the model,
+* solves, produces a grid of heads, and stores the heads in a netCDF file.
+* The netCDF file is loaded into QGIS.
 
 In comparison, a scripting workflow:
 
-1. Start QGIS.
-2. Define the TimML model with the plugin.
-3. The model input is written to a geopackage.
-4. Close QGIS.
-5. Start an interactive Python (conda) session.
-6. Use ``gistim`` to load the GeoPackage data into a number of dataframes.
-7. Initialize the model with the dataframes.
-8. Solve the model and compute heads, store some results.
-9. Change the values in a dataframe (e.g. in the context of a sensitivity
-   analysis).
-10. Initialize the model for the second time.
-12. Solve, compute heads, store some results.
-13. ... and so forth.
+* Start QGIS.
+* Define the TimML model with the plugin.
+* The model input is written to a geopackage.
+* Close QGIS.
+* Start an interactive Python (conda) session.
+* Use ``gistim`` to load the GeoPackage data into a number of dataframes.
+* Initialize the model with the dataframes.
+* Solve the model and compute heads, store some results.
+* Change the values in a dataframe.
+* Initialize the model for the second time.
+* Solve, compute heads, store some results.
+* ... and so forth.
