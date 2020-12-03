@@ -14,12 +14,12 @@ tests:
 
 pages:
   script:
-    - cd docs
-    - make html
-    - cd ...
-    - mv docs/_build/html/ public/
-    artifacts:
-      paths:
-      - public
-    only:
-    - master
+  - cd docs
+  - make html
+  - cd ...
+  - mv docs/_build/html/ public/
+  artifacts:
+    paths:
+    - public
+  only:
+  - master
