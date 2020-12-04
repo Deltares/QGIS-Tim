@@ -1,4 +1,5 @@
 import os
+import platform
 import socket
 import subprocess
 from pathlib import Path
@@ -28,7 +29,11 @@ class ServerHandler:
     def start_server(self):
         self.PORT = self.find_free_port()
 
-        configdir = Path(os.environ["APPDATA"]) / "qgis-tim"
+        if platform.system() == "Windows":
+            configdir = Path(os.environ["APPDATA"]) / "qgis-tim"
+        else:
+            configdir = Path("./etc") / "qgis-tim"
+
         with open(configdir / "interpreter.txt") as f:
             interpreter = f.read().strip()
 

@@ -1,5 +1,6 @@
 import json
 import os
+import platform
 import sys
 from pathlib import Path
 
@@ -10,7 +11,10 @@ with open("README.md") as f:
 
 # Write all the environmental variables so the QGIS interpreter
 # can (re)set them properly.
-configdir = Path(os.environ["APPDATA"]) / "qgis-tim"
+if platform.system() == "Windows":
+    configdir = Path(os.environ["APPDATA"]) / "qgis-tim"
+else:
+    configdir = Path("./etc") / "qgis-tim"
 configdir.mkdir(exist_ok=True)
 
 env_vars = {key: value for key, value in os.environ.items()}
