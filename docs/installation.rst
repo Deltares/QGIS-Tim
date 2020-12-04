@@ -15,7 +15,8 @@ This repository contains two Python packages:
 
 A modern (>=3.0) QGIS installation is required. A basic QGIS installation (as can be
 gotten `here <https://qgis.org/en/site/>`_) suffices to run the plugin, but will
-not suffice for full development capabilities (see section below).
+not suffice for full development capabilities (see section below). When downloading,
+choose the Standalone installer, currently version 3.16.
 
 QGIS comes with its own Python installation and interpreter. This installation
 does not provide a package manager such as
