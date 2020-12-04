@@ -21,6 +21,7 @@ dependencies:
   - pytest-cov
   - python>=3.6
   - rasterio>=1.0
+  - rioxarray
   - scipy
   - setuptools_scm
   - sphinx
