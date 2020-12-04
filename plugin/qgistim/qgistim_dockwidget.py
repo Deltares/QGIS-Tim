@@ -53,7 +53,7 @@ class QgisTimDockWidget(QtWidgets.QDockWidget, FORM_CLASS):
             lambda: self.timml_element("LineSinkDitch")
         )
         self.impLineDoubletButton.clicked.connect(
-            lambda: self.timml_element("LineDoublet")
+            lambda: self.timml_element("ImpLineDoublet")
         )
         self.leakyLineDoubletButton.clicked.connect(
             lambda: self.timml_element("LeakyLineDoublet")
