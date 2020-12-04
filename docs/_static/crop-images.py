@@ -1,6 +1,6 @@
-from PIL import Image
 from pathlib import Path
 
+from PIL import Image
 
 dst = Path("./cropped")
 dst.mkdir(exist_ok=True)
