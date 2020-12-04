@@ -14,7 +14,7 @@ with open("README.md") as f:
 if platform.system() == "Windows":
     configdir = Path(os.environ["APPDATA"]) / "qgis-tim"
 else:
-    configdir = Path("./etc") / "qgis-tim"
+    configdir = Path("~") / ".qgis-tim"
 configdir.mkdir(exist_ok=True)
 
 env_vars = {key: value for key, value in os.environ.items()}

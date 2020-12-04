@@ -32,7 +32,7 @@ class ServerHandler:
         if platform.system() == "Windows":
             configdir = Path(os.environ["APPDATA"]) / "qgis-tim"
         else:
-            configdir = Path("./etc") / "qgis-tim"
+            configdir = Path("~") / ".qgis-tim"
 
         with open(configdir / "interpreter.txt") as f:
             interpreter = f.read().strip()
