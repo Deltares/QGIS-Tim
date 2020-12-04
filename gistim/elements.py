@@ -43,8 +43,7 @@ def linestring_coordinates(row) -> Tuple[FloatArray, FloatArray]:
     x: np.array
     y: np.array
     """
-    xy = np.array(row["geometry"].coords).transpose()
-    return (xy[0], xy[1])
+    return np.array(row["geometry"].coords)
 
 
 polygon_coordinates = linestring_coordinates
