@@ -2,6 +2,7 @@ import json
 import os
 import socket
 import subprocess
+import tempfile
 from pathlib import Path
 
 from PyQt5.QtWidgets import QAction, QFileDialog
@@ -9,18 +10,22 @@ from qgis.core import (
     Qgis,
     QgsFeature,
     QgsField,
+    QgsFillSymbol,
     QgsGeometry,
     QgsMeshLayer,
     QgsPointXY,
     QgsProject,
+    QgsRasterBandStats,
     QgsRasterLayer,
     QgsSettings,
+    QgsSingleBandPseudoColorRenderer,
+    QgsStyle,
     QgsVectorFileWriter,
     QgsVectorLayer,
 )
 from qgis.PyQt import QtGui, QtWidgets, uic
 from qgis.PyQt.QtCore import QVariant, pyqtSignal
-from qgistim import geopackage
+from qgistim import geopackage, layer_styling
 from qgistim.server_handler import ServerHandler
 from qgistim.timml_elements import create_timml_layer
 
@@ -99,8 +104,10 @@ class QgisTimDockWidget(QtWidgets.QDockWidget, FORM_CLASS):
     def crs(self):
         return self.iface.mapCanvas().mapSettings().destinationCrs()
 
-    def add_layer(self, layer):
+    def add_layer(self, layer, renderer=None):
         maplayer = QgsProject.instance().addMapLayer(layer, False)
+        if renderer is not None:
+            maplayer.setRenderer(renderer)
         self.group.addLayer(maplayer)
 
     def add_geopackage_layers(self, path):
@@ -108,7 +115,11 @@ class QgisTimDockWidget(QtWidgets.QDockWidget, FORM_CLASS):
         # https://docs.qgis.org/testing/en/docs/pyqgis_developer_cookbook/cheat_sheet.html#layers
         for layername in geopackage.layers(self.path):
             layer = QgsVectorLayer(f"{path}|layername={layername}", layername)
-            self.add_layer(layer)
+            if layername == "timmlDomain":
+                renderer = layer_styling.domain_renderer()
+            else:
+                renderer = None
+            self.add_layer(layer, renderer)
 
     def load_geopackage(self):
         path = self.path
@@ -169,7 +180,16 @@ class QgisTimDockWidget(QtWidgets.QDockWidget, FORM_CLASS):
         feature.setGeometry(QgsGeometry.fromPolygonXY([points]))
         provider.addFeatures([feature])
         written_layer = geopackage.write_layer(self.path, layer, "timmlDomain")
-        QgsProject.instance().addMapLayer(written_layer)
+
+        # Remove the previous domain specification
+        for existing_layer in QgsProject.instance().mapLayers().values():
+            if Path(existing_layer.source()) == Path(
+                str(self.path) + "|layername=timmlDomain"
+            ):
+                QgsProject.instance().removeMapLayer(existing_layer.id())
+
+        renderer = layer_styling.domain_renderer()
+        self.add_layer(written_layer, renderer)
 
     def circ_area_sink(self):
         dialog = RadiusDialog()
@@ -195,10 +215,34 @@ class QgisTimDockWidget(QtWidgets.QDockWidget, FORM_CLASS):
             QgsProject.instance().addMapLayer(written_layer)
 
     def load_result(self, path, cellsize):
-        netcdf_path = str((path.parent / f"{path.name}-{cellsize}").with_suffix(".nc"))
-        # layer = QgsMeshLayer(str(netcdf_path), f"{path.name}-{cellsize}", "mdal")
-        layer = QgsRasterLayer(netcdf_path, f"{path.name}-{cellsize}", "gdal")
-        self.add_layer(layer)
+        netcdf_path = str(
+            (path.parent / f"{path.stem}-{cellsize}".replace(".", "_")).with_suffix(
+                ".nc"
+            )
+        )
+        with tempfile.TemporaryDirectory() as tmpdir:
+            dirpath = Path(tmpdir)
+            # Loop through layers first. If the path already exists as a layer source, remove it.
+            # Otherwise QGIS will not the load the new result (this feels like a bug?).
+            exists = False
+            for layer in QgsProject.instance().mapLayers().values():
+                if Path(netcdf_path) == Path(layer.source()):
+                    QgsProject.instance().removeMapLayer(layer.id())
+
+            # For a Mesh Layer, use:
+            # layer = QgsMeshLayer(str(netcdf_path), f"{path.stem}-{cellsize}", "mdal")
+
+            # Check layer for number of bands
+            layer = QgsRasterLayer(netcdf_path, "", "gdal")
+            bandcount = layer.bandCount()
+            for band in range(1, bandcount + 1):  # Bands use 1-based indexing
+                layer = QgsRasterLayer(
+                    netcdf_path, f"{path.stem}-{band}-{cellsize}", "gdal"
+                )
+                renderer = layer_styling.pseudocolor_renderer(
+                    layer, band, colormap="Magma", nclass=10
+                )
+                self.add_layer(layer, renderer)
 
     def start_server(self):
         self.server_handler.start_server()
@@ -216,7 +260,7 @@ class QgisTimDockWidget(QtWidgets.QDockWidget, FORM_CLASS):
             self.iface.messageBar().pushMessage(
                 "Error",
                 "Something seems to have gone wrong, "
-                "try checking the server window...",
+                "try checking the TimServer window...",
                 level=Qgis.Critical,
             )
 

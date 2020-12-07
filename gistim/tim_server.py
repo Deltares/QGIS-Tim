@@ -72,12 +72,14 @@ class TimHandler(socketserver.BaseRequestHandler):
         if not self.server.solved:
             self.server.model.solve()
             self.server.solved = True
-        name = path.name
+        name = path.stem
         extent, crs = gistim.gridspec(path, cellsize)
         head = gistim.headgrid(self.server.model, extent, cellsize)
         head.rio.write_crs(crs)
 
-        outpath = (path.parent / f"{name}-{cellsize}").with_suffix(".nc")
+        outpath = (path.parent / f"{name}-{cellsize}".replace(".", "_")).with_suffix(
+            ".nc"
+        )
         print("Writing result to:", outpath)
         head.to_netcdf(outpath)
 
