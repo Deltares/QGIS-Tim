@@ -61,6 +61,8 @@ def aquifer(dataframe: gpd.GeoDataFrame) -> timml.Model:
     -------
     timml.Model
     """
+    # Make sure the layers are in the right order.
+    dataframe = dataframe.sort_index()
     model = timml.Model(
         kaq=dataframe["conductivity"].values,
         z=np.append(dataframe["top"].values, dataframe["bottom"].values[-1]),
