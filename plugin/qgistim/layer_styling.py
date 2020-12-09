@@ -58,7 +58,7 @@ def circareasink_renderer() -> QgsSingleSymbolRenderer:
     symbol = QgsFillSymbol.createSimple(
         {
             "color": "255,0,0,0",  # transparent
-            "color_border": "3182bd",  # blue
+            "color_border": "#3182bd",  # blue
             "width_border": "0.75",
         }
     )
