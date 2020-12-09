@@ -46,6 +46,7 @@ class QgisTimDockWidget(QtWidgets.QDockWidget, FORM_CLASS):
         self.newGeopackageButton.clicked.connect(self.new_geopackage)
         self.openGeopackageButton.clicked.connect(self.open_geopackage)
         # Elements
+        self.constantButton.clicked.connect(lambda: self.timml_element("Constant"))
         self.wellButton.clicked.connect(lambda: self.timml_element("Well"))
         self.headWellButton.clicked.connect(lambda: self.timml_element("HeadWell"))
         self.uniformFlowButton.clicked.connect(
@@ -81,6 +82,7 @@ class QgisTimDockWidget(QtWidgets.QDockWidget, FORM_CLASS):
         self.serverButton.clicked.connect(self.start_server)
 
     def toggle_element_buttons(self, state):
+        self.constantButton.setEnabled(state)
         self.wellButton.setEnabled(state)
         self.headWellButton.setEnabled(state)
         self.uniformFlowButton.setEnabled(state)
@@ -146,9 +148,6 @@ class QgisTimDockWidget(QtWidgets.QDockWidget, FORM_CLASS):
         # Write the aquifer properties
         layer = create_timml_layer("Aquifer", "", self.crs)
         _ = geopackage.write_layer(self.path, layer, "timmlAquifer", newfile=True)
-        # Write a single constant (reference) head
-        layer = create_timml_layer("Constant", "", self.crs)
-        _ = geopackage.write_layer(self.path, layer, "timmlConstant")
 
     def timml_element(self, elementtype):
         dialog = NameDialog()
@@ -212,7 +211,8 @@ class QgisTimDockWidget(QtWidgets.QDockWidget, FORM_CLASS):
             written_layer = geopackage.write_layer(
                 self.path, layer, f"timmlCircAreaSink:{layername}"
             )
-            QgsProject.instance().addMapLayer(written_layer)
+            renderer = layer_styling.circareasink_renderer()
+            self.add_layer(written_layer, renderer)
 
     def load_result(self, path, cellsize):
         netcdf_path = str(

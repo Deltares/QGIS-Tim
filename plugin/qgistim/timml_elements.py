@@ -8,11 +8,13 @@ ELEMENT_SPEC = {
     "Aquifer": (
         "No geometry",
         [
+            QgsField("index", QVariant.Int),
             QgsField("conductivity", QVariant.Double),
             QgsField("resistance", QVariant.Double),
             QgsField("top", QVariant.Double),
             QgsField("bottom", QVariant.Double),
             QgsField("porosity", QVariant.Double),
+            QgsField("headtop", QVariant.Double),
         ],
     ),
     "UniformFlow": (

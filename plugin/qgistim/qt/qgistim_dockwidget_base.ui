@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>361</width>
-    <height>433</height>
+    <height>435</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -70,66 +70,73 @@
           </property>
          </widget>
         </item>
-        <item row="3" column="0">
-         <widget class="QPushButton" name="wellButton">
-          <property name="text">
-           <string>Well</string>
-          </property>
-         </widget>
-        </item>
-        <item row="6" column="0">
-         <widget class="QPushButton" name="headWellButton">
-          <property name="text">
-           <string>HeadWell</string>
-          </property>
-         </widget>
-        </item>
-        <item row="2" column="1">
-         <widget class="QPushButton" name="lineSinkDitchButton">
-          <property name="text">
-           <string>LineSinkDitch</string>
-          </property>
-         </widget>
-        </item>
-        <item row="7" column="0">
-         <widget class="QPushButton" name="polygonInhomButton">
-          <property name="text">
-           <string>PolygonInhom</string>
-          </property>
-         </widget>
-        </item>
-        <item row="3" column="1">
-         <widget class="QPushButton" name="leakyLineDoubletButton">
-          <property name="text">
-           <string>LeakyLineDoublet</string>
-          </property>
-         </widget>
-        </item>
-        <item row="2" column="0">
-         <widget class="QPushButton" name="circAreaSinkButton">
-          <property name="text">
-           <string>CircularAreaSink</string>
-          </property>
-         </widget>
-        </item>
-        <item row="1" column="0">
-         <widget class="QPushButton" name="uniformFlowButton">
-          <property name="text">
-           <string>UniformFlow</string>
-          </property>
-         </widget>
-        </item>
-        <item row="6" column="1">
+        <item row="7" column="1">
          <widget class="QPushButton" name="impLineDoubletButton">
           <property name="text">
            <string>ImpLineDoublet</string>
           </property>
          </widget>
         </item>
-        <item row="1" column="1">
+        <item row="6" column="1">
+         <widget class="QPushButton" name="leakyLineDoubletButton">
+          <property name="text">
+           <string>LeakyLineDoublet</string>
+          </property>
+         </widget>
+        </item>
+        <item row="3" column="1">
+         <widget class="QPushButton" name="lineSinkDitchButton">
+          <property name="text">
+           <string>LineSinkDitch</string>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="1">
          <widget class="QPushButton" name="headLineSinkButton">
           <property name="text">
            <string>HeadLineSink</string>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="1">
+         <widget class="QPushButton" name="polygonInhomButton">
+          <property name="text">
+           <string>PolygonInhom</string>
+          </property>
+         </widget>
+        </item>
+        <item row="7" column="0">
+         <widget class="QPushButton" name="headWellButton">
+          <property name="text">
+           <string>HeadWell</string>
+          </property>
+         </widget>
+        </item>
+        <item row="6" column="0">
+         <widget class="QPushButton" name="wellButton">
+          <property name="text">
+           <string>Well</string>
+          </property>
+         </widget>
+        </item>
+        <item row="3" column="0">
+         <widget class="QPushButton" name="circAreaSinkButton">
+          <property name="text">
+           <string>CircularAreaSink</string>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="0">
+         <widget class="QPushButton" name="uniformFlowButton">
+          <property name="text">
+           <string>UniformFlow</string>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="0">
+         <widget class="QPushButton" name="constantButton">
+          <property name="text">
+           <string>Constant</string>
           </property>
          </widget>
         </item>

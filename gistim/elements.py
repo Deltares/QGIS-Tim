@@ -5,6 +5,7 @@ from typing import Any, Callable, Dict, NamedTuple, Tuple, Union
 import fiona
 import geopandas as gpd
 import numpy as np
+import pandas as pd
 import timml
 import xarray as xr
 
@@ -62,13 +63,22 @@ def aquifer(dataframe: gpd.GeoDataFrame) -> timml.Model:
     timml.Model
     """
     # Make sure the layers are in the right order.
-    dataframe = dataframe.sort_index()
-    model = timml.Model(
-        kaq=dataframe["conductivity"].values,
+    dataframe = dataframe.sort_values(by="index")
+    # Deal with optional semi-confined top layer.
+    hstar = dataframe["headtop"].values[0]
+    semi = pd.notnull(hstar)
+    k_offset = 1 if semi else 0
+    c_offset = 0 if semi else 1
+    kaq = dataframe["conductivity"].values[k_offset::2]
+    c = dataframe["resistance"].values[c_offset:-1:2]
+
+    model = timml.ModelMaq(
+        kaq=kaq,
         z=np.append(dataframe["top"].values, dataframe["bottom"].values[-1]),
-        c=dataframe["resistance"],
+        c=c,
         npor=dataframe["porosity"],
-        ltype=["a" for _ in range(len(dataframe))],  # TODO
+        topboundary="semi" if semi else "conf",
+        hstar=hstar,
     )
     return model
 
@@ -287,7 +297,7 @@ def circareasink(dataframe: gpd.GeoDataFrame, model: timml.Model) -> None:
 # Map the names of the elements to their constructors
 # (Basically equivalent to eval(key)...)
 MAPPING = {
-    "uflow": uflow,
+    "uniformflow": uflow,
     "circareasink": circareasink,
     "well": well,
     "headwell": headwell,
