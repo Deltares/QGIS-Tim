@@ -69,33 +69,201 @@ Individual elements can be added to this layer by toggling Editing, and adding
 Geometries. Per element, a menu will pop up where parameter values can be
 entered.
 
+If you're entering a great deal of values -- e.g. dozens of wells with the same
+discharge, it's probably inconvenient to enter a feature one by one. The pop-up
+form can be disabled via the QGIS settings as follows:
+
+``Settings > Options > Digitizing > Feature Creation > Suppress attribute form pop-up after feature creation``
+
+Aquifer
+-------
+
+The aquifer and aquitard properties are stored in this layer. Note that TimML
+has multiple Model constructors: ``ModelMaq``, ``Model3D``, and ``Model``. They
+vary subtly in input requirements. The table of this plugin is meant for the
+``ModelMaq`` class. For the input it means:
+
+* Aquifers and leaky layers always interleave each other;
+* Therefore, a row should either contain a resistance value or a conductivity value;
+* Every row with with a conductivity (an aquifer) **must** be followed by a row
+  with a resistance (the leaky layer);
+* Only the final row bottom value is used, all top values are used to define
+  the vertical position of the layers;
+* Note that leaky layers can have a thickness of 0 in TimML;
+* The final row is always an aquifer, with a closed geohydrological base below.
+
+For a leaky top layer:
+
+* A leaky layer on top can be set by entering a value for ``tophead``, in the
+  first row;
+* In that case, the first row must contain a resistance value.
+
+Find two examples below. The attribute table without a leaky layer on top:
+
++-----+-----+-------+--------------+------------+-------+---------+----------+---------+
+| row | fid | index | conductivity | resistance | top   |  bottom | porosity | headtop |
++-----+-----+-------+--------------+------------+-------+---------+----------+---------+
+|   0 |   0 |     0 |          5.0 |            |   5.0 |         |      0.3 |         |
+|   1 |   1 |     1 |              |      100.0 |   0.0 |         |      0.3 |         |
+|   2 |   2 |     2 |          5.0 |            |  -5.0 |   -10.0 |      0.3 |         |
++-----+-----+-------+--------------+------------+-------+---------+----------+---------+
+
+The same input, now with a semi-confined leaky layer on top:
+
++-----+-----+-------+--------------+------------+-------+---------+----------+---------+
+| row | fid | index | conductivity | resistance | top   |  bottom | porosity | headtop |
++-----+-----+-------+--------------+------------+-------+---------+----------+---------+
+|   0 |   0 |     0 |              |      100.0 |  10.0 |         |      0.3 |     3.0 |
+|   1 |   1 |     1 |          5.0 |            |   5.0 |         |      0.3 |         |
+|   2 |   2 |     2 |              |      100.0 |   0.0 |         |      0.3 |         |
+|   3 |   3 |     3 |          5.0 |            |  -5.0 |   -10.0 |      0.3 |         |
++-----+-----+-------+--------------+------------+-------+---------+----------+---------+
+
+The inclusion of a semi-confined leaky top exludes the use of
+a Constant element, unless explicitly placed within an inhomogeneity.
+
+**Note bene**: the index column specifies the relative order of this table, and
+thereby which layers are on top, and which are bottom. Within TimML, only
+aquifers have layer numbers, and leaky layers do not. Furthermore, heads are
+only computed for the aquifers.
+
+The Aquifer has the following columns:
+
+* fid: int, QGIS feature ID
+* index: int, determines table order for TimML
+* conductivity: float, ``kaq``
+* resistance: float, ``c``
+* top: float, ``z``
+* bottom: float, ``z``
+* porosity: float, ``npor``
+* headtop: float, ``hstar`` and ``topboundary``
+
+Constant
+--------
+
+The following columns which correspond with the following TimML
+keyword arguments:
+
+* fid: int, QGIS feature ID
+* head: float, ``hr``
+* layer: int, ``layer``
+* label: str, ``label``
+
 UniformFlow
 -----------
+
+The following columns which correspond with the following TimML
+keyword arguments:
+
+* fid: int, QGIS feature ID
+* slope: float, ``slope``
+* angle: float, ``angle``
+* label: str, ``label``
 
 CircularAreaSink
 ----------------
 
+The following columns which correspond with the following TimML
+keyword arguments:
+
+* fid: int, QGIS feature ID
+* rate: float, ``N``
+
+``xc``, ``yc``, and ``R`` (radius) are inferred from the geometry.
+
 Well
 ----
+
+The following columns which correspond with the following TimML
+keyword arguments:
+
+* fid: int, QGIS feature ID
+* discharge: float, ``Qw``
+* radius: float, ``rw``
+* resistance: float, ``res``
+* layer: float, ``layers``
+* label: str, ``label``
+
+``xw`` and ``yw`` are inferred from the geometry.
 
 Headwell
 --------
 
+The following columns which correspond with the following TimML
+keyword arguments:
+
+* fid: int, QGIS feature ID
+* head: float, ``hw``
+* radius: float, ``rw``
+* resistance: float, ``res``
+* layer: float, ``layers``
+* label: str, ``label``
+
+``xw`` and ``yw`` are inferred from the geometry.
+
 PolygonInhom
 ------------
+
+Not implemented yet.
 
 HeadLineSink
 ------------
 
+The following columns which correspond with the following TimML
+HeadLineSinkString keyword arguments:
+
+* fid: int, QGIS feature ID
+* head: float, ``hls``
+* resistance: float, ``res``
+* width: float, ``wh`` 
+* order: int, ``order`` 
+* layer: int, ``layers`` 
+* label: str, ``label``
+
+``xy`` is inferred from the geometry (row by row).
+
 LineSinkDitch
 -------------
+
+The following columns which correspond with the following TimML
+keyword arguments:
+
+* fid: int, QGIS feature ID
+* discharge: float, ``Qls``
+* resistance: float, ``res``
+* width: float, ``wh`` 
+* order: int, ``order`` 
+* layer: int, ``layers`` 
+* label: str, ``label``
+
+``xy`` is inferred from the geometry (row by row).
 
 LeakyLineDoublet
 ----------------
 
+The following columns which correspond with the following TimML
+keyword arguments:
+
+* fid: int, QGIS feature ID
+* resistance: float, ``res``
+* order: int, ``order`` 
+* layer: int, ``layers`` 
+* label: str, ``label``
+
+``xy`` is inferred from the geometry (row by row).
+
 ImpLineDoublet
 --------------
 
+The following columns which correspond with the following TimML
+keyword arguments:
+
+* fid: int, QGIS feature ID
+* order: int, ``order`` 
+* layer: int, ``layers`` 
+* label: str, ``label``
+
+``xy`` is inferred from the geometry (row by row).
 
 Start TimServer
 ===============
@@ -147,7 +315,7 @@ Domain
 
 The domain button creates a rectangular polygon, with its corners on the current
 viewing extent of the QGIS map view. This polygon determines the area in which
-head values of the analytic element model are computed (recall that the analytic
+head values of the analytic element model are computed (since the analytic
 elements give results for an infinite plane).
 
 To change the domain, either zoom in or out and click the domain button again.
@@ -164,7 +332,7 @@ Note that the units of the cellsize are defined by the coordinate reference
 system. If your coordinate reference system is a projected system (like RD New,
 EPSG:28992) cellsize units are generally in meters; if your coordinate reference
 system is set to WGS84 (latitudes and longitudes), cellsize is interpreted in
-degrees
+degrees.
 
 Compute
 =======
@@ -175,3 +343,7 @@ The active GeoPackage (visible in the Dataset "window") at the top of the
 Qgis-Tim panel is converted into a TimML model. The heads are computed
 within the most recently created Domain polygon, at a cellsize provided
 by the cellsize spinbox.
+
+The computation result will be written to a netCDF file, in the same location
+as the model geopackage. The cellsize is included in the filename. Every layer
+of the result is automatically added to the QGIS Map View.
