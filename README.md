@@ -1,3 +1,5 @@
+Documentation: https://deltares.gitlab.io/imod/qgis-tim
+
 This repository contains two Python packages:
 
 * `./plugin` contains the source code for a QGIS plugin. This plugin provides a
