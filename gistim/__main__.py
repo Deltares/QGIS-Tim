@@ -10,7 +10,6 @@ import rioxarray
 
 import gistim
 
-
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
 
