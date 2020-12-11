@@ -79,3 +79,6 @@ venv.bak/
 
 # PyCharm
 .idea
+
+# sphinx gallery output
+docs/auto_examples

@@ -325,6 +325,9 @@ class ModelSpecification(NamedTuple):
 
 
 def extract_elementtype(s: str) -> str:
+    """
+    Extract the TimML element type from the geopackage layer name.
+    """
     s = s.lower().split(":")[0]
     return s.split("timml")[-1]
 
@@ -427,6 +430,18 @@ def round_extent(extent: Tuple[float], cellsize: float) -> Tuple[float]:
     """
     Increases the extent until all sides lie on a coordinate
     divisible by cellsize.
+
+    Parameters
+    ----------
+    extent: Tuple[float]
+        xmin, xmax, ymin, ymax
+    cellsize: float
+        Desired cell size of the output head grids
+
+    Returns
+    -------
+    extent: Tuple[float]
+        xmin, xmax, ymin, ymax
     """
     xmin, xmax, ymin, ymax = extent
     xmin = np.floor(xmin / cellsize) * cellsize
@@ -436,10 +451,26 @@ def round_extent(extent: Tuple[float], cellsize: float) -> Tuple[float]:
     return xmin, xmax, ymin, ymax
 
 
-def gridspec(path: Union[pathlib.Path, str], cellsize: float) -> Tuple[float, Any]:
+def gridspec(
+    path: Union[pathlib.Path, str], cellsize: float
+) -> Tuple[Tuple[float], Any]:
     """
-    Infer the grid specifiction from the geopackage Domain layer and the
-    provided cellsize.
+    Infer the grid specifiction from the geopackage ``timmlDomain``  layer and
+    the provided cellsize.
+
+    Parameters
+    ----------
+    path: Union[pathlib.Path, str]
+        Path to the GeoPackage file.
+    cellsize: float
+        Desired cell size of the output head grids
+
+    Returns
+    -------
+    extent: tuple[float]
+        xmin, xmax, ymin, ymax
+    crs: Any
+        Coordinate Reference System
     """
     domain = gpd.read_file(path, layer="timmlDomain")
     xmin, ymin, xmax, ymax = domain.bounds.iloc[0]
@@ -451,6 +482,20 @@ def headgrid(model: timml.Model, extent: Tuple[float], cellsize: float) -> xr.Da
     """
     Compute the headgrid of the TimML model, and store the results
     in an xarray DataArray with the appropriate dimensions.
+
+    Parameters
+    ----------
+    model: timml.Model
+        Solved model to get heads from
+    extent: Tuple[float]
+        xmin, xmax, ymin, ymax
+    cellsize: float
+        Desired cell size of the output head grids
+
+    Returns
+    -------
+    head: xr.DataArray
+        DataArray with dimensions ``("layer", "y", "x")``.
     """
     xmin, xmax, ymin, ymax = extent
     x = np.arange(xmin, xmax, cellsize) + 0.5 * cellsize

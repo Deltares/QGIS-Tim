@@ -1,8 +1,3 @@
-.. Qgis-Tim documentation master file, created by
-   sphinx-quickstart on Mon Nov 30 13:09:00 2020.
-   You can adapt this file completely to your liking, but it should at least
-   contain the root `toctree` directive.
-
 Welcome to Qgis-Tim's documentation!
 ------------------------------------
 
@@ -30,18 +25,48 @@ User Guide
 * :doc:`qgis-tim`
 
 
+Examples
+--------
+
+.. toctree::
+   :maxdepth: 1
+   :hidden:
+   :caption: Examples
+
+   auto_examples/index
+
+* :doc:`auto_examples/index`
+
+API Reference & Help
+--------------------
+
+.. toctree::
+   :maxdepth: 1
+   :hidden:
+   :caption: API Reference & Help
+
+   api
+   changelog
+
+* :doc:`api`
+* :doc:`changelog`
+
+
 Developer's Documentation
 -------------------------
 
 .. toctree::
    :maxdepth: 1
    :hidden:
-   :caption: Developer's Documentation
+   :caption: Developer Documentation
 
-   dev-docs
+   dev-server
+   dev-plugin
 
+More details about the implementation regarding interpreter communication can be
+found in :doc:`dev-server`.
 
-More details about the implementation can be found in :doc:`dev-docs`.
+Some requirements for developing the plugin can be found in :doc:`dev-plugin`.
 
 Indices and tables
 ------------------

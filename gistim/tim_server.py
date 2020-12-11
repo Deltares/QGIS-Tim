@@ -14,7 +14,7 @@ import gistim
 # If the geopackage has changed, reinitialize the model.
 #  If elements are added piecemeal, hashing per element (maybe via pickle?) could be nicer.
 def hash_file(path: Union[pathlib.Path, str]) -> int:
-    """Compute an MD5 hash of a file to check if it's changed"""
+    """Compute an MD5 hash of a file to check if it has changed"""
     md5 = hashlib.md5()
     with open(path, "rb") as f:
         while True:

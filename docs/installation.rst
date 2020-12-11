@@ -13,10 +13,11 @@ This repository contains two Python packages:
   as `rasterio` and `geopandas` instead of QGIS functions. The utilities it
   provides can be used independently of QGIS, in a fully scripted workflow.
 
-A modern (>=3.0) QGIS installation is required. A basic QGIS installation (as can be
-gotten `here <https://qgis.org/en/site/>`_) suffices to run the plugin, but will
-not suffice for full development capabilities (see section below). When downloading,
-choose the Standalone installer, currently version 3.16.
+A modern (>=3.0) QGIS installation is required. A basic QGIS installation (as
+can be gotten `here <https://qgis.org/en/site/>`_) suffices to run the plugin,
+but will not suffice for full development capabilities, see the Developer
+Documentation. When downloading, choose the Standalone installer, currently
+version 3.16.
 
 QGIS comes with its own Python installation and interpreter. This installation
 does not provide a package manager such as
@@ -79,30 +80,3 @@ There are a few ways to install this plugin:
 
 The plugin is good to go now. Find the Qgis-Tim entry in the Plugins menu, and
 click it to open a docked menu on the right side of your QGIS screen.
-
-Development installation
-========================
-
-A modern (>=3.0) QGIS installation, within the context of
-`OSGeo4W <https://trac.osgeo.org/osgeo4w/>`_. A basic QGIS installation (as can be
-gotten `here <https://qgis.org/en/site/>`_) suffices to run the plugin, but will
-not suffice for full development capabilities.
-
-Compiling Qt resources
-----------------------
-
-pyrcc5 takes a Qt Resource File (. qrc) and converts it into a Python module
-which can be imported into a PyQt5 application.
-
-It is available in the OSGeo4W shell, after running the following commands:
-
-.. code-block:: console
-
-    qt5_env.bat
-    py3_env.bat
-
-Then, within the `./plugin/qgistim/` directory, run:
-
-.. code-block:: console
-
-    pyrcc5 -o resources.py resources.qrc
