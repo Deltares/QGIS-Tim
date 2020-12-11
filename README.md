@@ -10,7 +10,7 @@ This repository contains two Python packages:
   as `rasterio` and `geopandas` instead of QGIS functions. The utilities it
   provides can be used independently of QGIS, in a fully scripted workflow.
 
-# Development requirements
+# Installation requirements
 
 In terms of development requirements, the packages are independent as well. The
 plugin requires:

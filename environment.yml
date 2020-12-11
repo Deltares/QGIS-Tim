@@ -25,6 +25,7 @@ dependencies:
   - scipy
   - setuptools_scm
   - sphinx
+  - sphinx-gallery
   - sphinx_rtd_theme
   - timml
   - twine
