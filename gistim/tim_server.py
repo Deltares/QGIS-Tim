@@ -4,7 +4,7 @@ import os
 import pathlib
 import socketserver
 import sys
-from typing import NamedTuple
+from typing import NamedTuple, Union
 
 import rioxarray
 
@@ -13,7 +13,7 @@ import gistim
 
 # If the geopackage has changed, reinitialize the model.
 #  If elements are added piecemeal, hashing per element (maybe via pickle?) could be nicer.
-def hash_file(path):
+def hash_file(path: Union[pathlib.Path, str]) -> int:
     """Compute an MD5 hash of a file to check if it's changed"""
     md5 = hashlib.md5()
     with open(path, "rb") as f:
@@ -51,11 +51,40 @@ class TimHandler(socketserver.BaseRequestHandler):
     and cellsize, and write the result to a 3D (layer, y, x) netCDF file.
     """
 
-    def initialize(self, path):
+    def initialize(self, path: Union[pathlib.Path, str]) -> None:
+        """
+        Convert the contents of the GeoPackage into a TimML model.
+
+        Parameters
+        ----------
+        path: Union[pathlib.Path, str]
+            Path to the GeoPackage file containing the full model input.
+        """
         spec = gistim.model_specification(path)
         self.server.model = gistim.initialize_model(spec)
 
-    def compute(self, path, cellsize):
+    def compute(self, path: Union[pathlib.Path, str], cellsize: float) -> None:
+        """
+        Compute the results of TimML model.
+
+        The model is fully specified by the GeoPacakge dataset in the path.
+
+        The extent of the head grids is read from a vector layer in the
+        GeoPackage file.
+
+        Parameters
+        ----------
+        path: Union[pathlib.Path, str]
+            Path to the GeoPackage file containing the full model input.
+        cellsize: float
+            Grid cell size of the computed output
+
+        Returns
+        -------
+        None
+            The result is written to a netCDF file. Its name is generated from
+            the geopackage name, and the requested grid cell size.
+        """
         path = pathlib.Path(path)
         gpkg_hash = hash_file(path)
         print("Current server hash:", self.server.geopackage_hash)
@@ -84,7 +113,11 @@ class TimHandler(socketserver.BaseRequestHandler):
         print("Writing result to:", outpath)
         head.to_netcdf(outpath)
 
-    def handle(self):
+    def handle(self) -> None:
+        """
+        Handle a request. This function has to be overloaded for a request
+        handler class.
+        """
         # TODO: rfile stream? Seems more robust than these 1024 bytes
         # TODO: try-except, and return error in return message
         message = self.request.recv(1024).strip()
