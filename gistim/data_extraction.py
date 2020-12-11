@@ -1,17 +1,23 @@
+import pathlib
+from typing import Union
+
 import numpy as np
 import pandas as pd
 import xarray as xr
 
 
-def layer_statistics(path, xmin=None, xmax=None, ymin=None, ymax=None):
+def layer_statistics(
+    path: Union[pathlib.Path, str], xmin=None, xmax=None, ymin=None, ymax=None
+):
     """
     Extract summary statistics of all variables present in a Dataset.
 
-    Variables must contain dimensions ("layer", "y","x").
+    Variables must contain dimensions ``("layer", "y","x")``.
 
     Parameters
     ----------
     path: Union[pathlib.Path, str]
+        Path to the netCDF dataset containing geohydrologic subsoil properties.
     xmin: float
     xmax: float
     ymin: float
@@ -39,14 +45,15 @@ def as_aquifer_aquitard(dataframe: pd.DataFrame, statistic: str = "mean"):
     Convert a layer statistics dataframe into a table that can be directly
     copy-pasted into the QGIS plugin Aquifer properties layer.
 
-    Primarily, this mean interleaving conductivities and resistances
+    Primarily, this means interleaving conductivities and resistances
     in separate rows.
 
     Parameters
     ----------
     dataframe: pandas.DataFrame
+        A dataframe containing layer statistics.
     statistic: str, optional
-        Default value "mean"
+        Which statistic to use. Default value: ``"mean"``
 
     Returns
     -------
@@ -66,13 +73,13 @@ def as_aquifer_aquitard(dataframe: pd.DataFrame, statistic: str = "mean"):
     out["porosity"] = 0.30
     out["headtop"] = np.full(n_layer, np.nan)
 
-    out["conductivity"].iloc[::2] = dataframe[f"kh-{statistic}"].values
-    out["resistance"].iloc[1::2] = dataframe[f"c-{statistic}"].values[:-1]
+    out.loc[out.index[::2], "conductivity"] = dataframe[f"kh-{statistic}"].values
+    out.loc[out.index[1::2], "resistance"] = dataframe[f"c-{statistic}"].values[:-1]
 
     z = np.empty(n_aquifer * 2)
     z[::2] = dataframe[f"top-{statistic}"]
     z[1::2] = dataframe[f"bottom-{statistic}"]
-    out["top"].iloc[:] = z[:-1]
-    out["bottom"].iloc[-1] = z[-1]
+    out.loc[:, "top"] = z[:-1]
+    out.loc[out.index[-1], "bottom"] = z[-1]
 
     return out
