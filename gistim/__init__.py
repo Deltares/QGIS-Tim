@@ -1,3 +1,4 @@
+from .data_extraction import as_aquifer_aquitard, layer_statistics
 from .elements import (
     aquifer,
     circareasink,
