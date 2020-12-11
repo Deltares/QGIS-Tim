@@ -297,6 +297,7 @@ def circareasink(dataframe: gpd.GeoDataFrame, model: timml.Model) -> None:
 # Map the names of the elements to their constructors
 # (Basically equivalent to eval(key)...)
 MAPPING = {
+    "constant": constant,
     "uniformflow": uflow,
     "circareasink": circareasink,
     "well": well,
@@ -311,10 +312,16 @@ MAPPING = {
 
 # Infer model structure from geopackage layers
 # --------------------------------------------
+
+
+class ElementSpecification(NamedTuple):
+    elementtype: str
+    dataframe: gpd.GeoDataFrame
+
+
 class ModelSpecification(NamedTuple):
-    aquifer: str
-    constant: str
-    elements: Dict[str, Callable]
+    aquifer: ElementSpecification
+    elements: Dict[str, ElementSpecification]
 
 
 def extract_elementtype(s: str) -> str:
@@ -343,42 +350,30 @@ def model_specification(path: Union[str, pathlib.Path]) -> ModelSpecification:
     ModelSpecification
     """
     aquifer = None
-    constant = None
     elements = {}
     for layername in fiona.listlayers(str(path)):
         key = extract_elementtype(layername)
         print("adding", layername, "as", key)
         # Special case aquifer and reference point, since only a single instance
         # may occur in a model (singleton)
+        element_spec = ElementSpecification(
+            elementtype=key, dataframe=gpd.read_file(path, layer=layername)
+        )
         if key == "aquifer":
-            aquifer = layername
-        elif key == "constant":
-            constant = layername
-        elif key == "domain":
-            pass
+            aquifer = element_spec
         else:
-            try:
-                elements[layername] = MAPPING[key]
-            except KeyError as e:
-                msg = (
-                    f'Invalid element specification "{key}" in {path}. '
-                    f'Available types are: {", ".join(MAPPING.keys())}.'
-                )
-                raise KeyError(msg) from e
-    return ModelSpecification(aquifer, constant, elements)
+            elements[layername] = element_spec
+
+    return ModelSpecification(aquifer, elements)
 
 
 def validate(spec: ModelSpecification) -> None:
     if spec.aquifer is None:
         raise ValueError("Aquifer entry is missing")
-    if spec.constant is None:
-        raise ValueError("Constant entry is missing")
     # TODO: more checks
 
 
-def initialize_model(
-    path: Union[str, pathlib.Path], spec: ModelSpecification
-) -> timml.Model:
+def initialize_model(spec: ModelSpecification) -> timml.Model:
     """
     Initialize a TimML analytic model based on the data in a geopackage.
 
@@ -400,20 +395,28 @@ def initialize_model(
     >>> import gistim
     >>> path = "my-model.gpkg"
     >>> spec = gistim.model_specification(path)
-    >>> model = gistim.initialize_model(path, spec)
+    >>> model = gistim.initialize_model(spec)
     >>> model.solve()
 
     """
     validate(spec)
-    dataframe = gpd.read_file(path, layer=spec.aquifer)
+    _, dataframe = spec.aquifer
     model = aquifer(dataframe)
 
-    dataframe = gpd.read_file(path, layer=spec.constant)
-    constant(dataframe, model)
+    for elementtype, dataframe in spec.elements.values():
+        if elementtype == "domain":
+            continue
 
-    for layername, element in spec.elements.items():
-        dataframe = gpd.read_file(path, layer=layername)
-        element(dataframe, model)
+        # Grab conversion function
+        try:
+            element = MAPPING[elementtype]
+            element(dataframe, model)
+        except KeyError as e:
+            msg = (
+                f'Invalid element specification "{elementtype}". '
+                f'Available types are: {", ".join(MAPPING.keys())}.'
+            )
+            raise KeyError(msg) from e
 
     return model
 

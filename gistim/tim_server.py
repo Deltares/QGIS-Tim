@@ -1,5 +1,6 @@
 import hashlib
 import json
+import os
 import pathlib
 import socketserver
 import sys
@@ -52,7 +53,7 @@ class TimHandler(socketserver.BaseRequestHandler):
 
     def initialize(self, path):
         spec = gistim.model_specification(path)
-        self.server.model = gistim.initialize_model(path, spec)
+        self.server.model = gistim.initialize_model(spec)
 
     def compute(self, path, cellsize):
         path = pathlib.Path(path)
@@ -89,10 +90,16 @@ class TimHandler(socketserver.BaseRequestHandler):
         message = self.request.recv(1024).strip()
         print(message)
         data = json.loads(message)
-        self.compute(
-            path=data["path"],
-            cellsize=data["cellsize"],
-        )
-        print("Computation succesful")
-        # Send error code 0: all okay
-        self.request.sendall(bytes("0", "utf-8"))
+        operation = data.pop("operation")
+        if operation == "compute":
+            self.compute(
+                path=data["path"],
+                cellsize=data["cellsize"],
+            )
+            print("Computation succesful")
+            # Send error code 0: all okay
+            self.request.sendall(bytes("0", "utf-8"))
+        elif operation == "process_ID":
+            self.request.sendall(bytes(str(os.getpid()), "utf-8"))
+        else:
+            print('Invalid operation. Valid options are: "compute", "process_ID".')
