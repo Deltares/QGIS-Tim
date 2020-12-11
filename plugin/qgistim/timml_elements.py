@@ -117,6 +117,22 @@ ELEMENT_SPEC = {
 
 
 def create_timml_layer(elementtype: str, layername: str, crs) -> QgsVectorLayer:
+    """
+    Parameters
+    ----------
+    elementtype: str
+        Used as a key in ELEMENT_SPEC, to find the geometry type (e.g. point,
+        linestring), and the required attributes (columns in the attribute
+        table).
+    layername: str
+    crs:
+        Coordinate Reference System to assign to the new layer.
+
+    Returns
+    -------
+    layer: QgsVectorLayer
+        A new vector layer
+    """
     geometry_type, attributes = ELEMENT_SPEC[elementtype]
     layer = QgsVectorLayer(geometry_type, f"timml{elementtype}:{layername}", "memory")
     provider = layer.dataProvider()
