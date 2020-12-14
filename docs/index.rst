@@ -34,8 +34,11 @@ Examples
    :caption: Examples
 
    auto_examples/index
+   prob-toolkit
 
 * :doc:`auto_examples/index`
+* :doc:`prob-toolkit`
+
 
 API Reference & Help
 --------------------
@@ -67,6 +70,7 @@ More details about the implementation regarding interpreter communication can be
 found in :doc:`dev-server`.
 
 Some requirements for developing the plugin can be found in :doc:`dev-plugin`.
+
 
 Indices and tables
 ------------------
