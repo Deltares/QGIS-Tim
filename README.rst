@@ -1,3 +1,6 @@
+QGIS-Tim
+========
+
 Documentation: https://deltares.gitlab.io/imod/qgis-tim
 
 This repository contains two Python packages:
@@ -12,7 +15,8 @@ This repository contains two Python packages:
   as ``rasterio`` and ``geopandas`` instead of QGIS functions. The utilities it
   provides can be used independently of QGIS, in a fully scripted workflow.
 
-# Installation requirements
+Installation requirements
+-------------------------
 
 In terms of development requirements, the packages are independent as well. The
 plugin requires:
@@ -44,7 +48,8 @@ specification is included in the ``environment.yml`` of this repository.
 
 See the installation instruction below.
 
-# Installing the plugin in QGIS
+Installing the plugin in QGIS
+-----------------------------
 
 There are a few ways to install this plugin:
 
@@ -65,17 +70,20 @@ There are a few ways to install this plugin:
 The plugin is good to go now. Find the Qgis-Tim entry in the Plugins menu, and
 click it to open a docked menu on the right side of your QGIS screen.
 
-# Installing the Python package
+Installing the Python package
+-------------------------------
 
 The recommended way of installing is using conda, in a separate conda
 environment. This environment (called ``tim``) can be setup by downloading the
-`environment.yml` and running the following command in the anaconda prompt:
+``environment.yml`` and running the following command in the anaconda prompt:
 
-.. code-block::console
+.. code-block:: console
+
     conda env create -f environment.yml
 
 After creation, the conda environment can be activated by running the following
 command in the anaconda prompt:
 
-.. code-block::console
+.. code-block:: console
+
     conda activate tim
