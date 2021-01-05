@@ -1,32 +1,16 @@
-Plugin Builder Results
+This QGIS plugin serves to easily create model input TimML analytic element
+models: https://github.com/mbakker7/timml
 
-Your plugin QgisTim was created in:
-    c:\src\qgis-tim\plugin\qgistim
+Analytic element input is typically a collection of points, lines, and polygons.
+This plugin represent a single model with a single GeoPackage. The different
+elements are represented as layers in the GeoPackage, and also as ordinary
+vector layers in QGIS.
 
-Your QGIS plugin directory is located at:
-    C:/Users/bootsma/AppData/Roaming/QGIS/QGIS3/profiles/default/python/plugins
+To run the model with TimML, this plugin relies on a second package called
+`gistim`: https://pypi.org/project/gistim/
 
-What's Next:
+Please find documentation here:
+https://deltares.gitlab.io/imod/qgis-tim/
 
-  * Copy the entire directory containing your new plugin to the QGIS plugin
-    directory
-
-  * Compile the resources file using pyrcc5
-
-  * Run the tests (``make test``)
-
-  * Test the plugin by enabling it in the QGIS plugin manager
-
-  * Customize it by editing the implementation file: ``qgistim.py``
-
-  * Create your own custom icon, replacing the default icon.png
-
-  * Modify your user interface by opening QgisTim_dockwidget_base.ui in Qt Designer
-
-  * You can use the Makefile to compile your Ui and resource files when
-    you make changes. This requires GNU make (gmake)
-
-For more information, see the PyQGIS Developer Cookbook at:
-http://www.qgis.org/pyqgis-cookbook/index.html
-
-(C) 2011-2018 GeoApt LLC - geoapt.com
+And the repository and issue tracker here:
+https://gitlab.com/deltares/imod/qgis-tim

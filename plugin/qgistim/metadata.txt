@@ -20,10 +20,10 @@ repository=https://gitlab.com/deltares/imod/qgis-tim
 
 hasProcessingProvider=no
 # Uncomment the following line and add your changelog:
-# changelog=
+# changelog=https://deltares.gitlab.io/imod/qgis-tim/changelog.html
 
 # Tags are comma separated with spaces allowed
-tags=python
+tags=python, groundwater, groundwater modeling, analytic element, TTim, TimML
 
 homepage=https://gitlab.com/deltares/imod/qgis-tim
 category=Plugins
