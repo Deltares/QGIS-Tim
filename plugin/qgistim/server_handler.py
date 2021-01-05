@@ -17,10 +17,6 @@ class ServerHandler:
         self.HOST = "localhost"
         self.PORT = None
         self.socket = None
-        if platform.system() == "Windows":
-            self.configdir = Path(os.environ["APPDATA"]) / "qgis-tim"
-        else:
-            self.configdir = Path(os.environ["HOME"]) / ".qgis-tim"
 
     def find_free_port(self) -> int:
         """
@@ -36,19 +32,35 @@ class ServerHandler:
             sock.bind(("localhost", 0))
             return sock.getsockname()[1]
 
+    def get_configdir(self) -> Path:
+        """
+        Get the location of the qgis-tim plugin settings.
+
+        The location differs per OS.
+
+        Returns
+        -------
+        configdir: pathlib.Path
+        """
+        if platform.system() == "Windows":
+            configdir = Path(os.environ["APPDATA"]) / "qgis-tim"
+        else:
+            configdir = Path(os.environ["HOME"]) / ".qgis-tim"
+        return configdir
+
     def start_server(self) -> None:
         """
         Starts a new (conda) interpreter, based on the settings in the
         configuration directory.
         """
         self.PORT = self.find_free_port()
-        self.configdir = self.get_configdir()
+        configdir = self.get_configdir()
 
-        with open(self.configdir / "interpreter.txt") as f:
+        with open(configdir / "interpreter.txt") as f:
             interpreter = f.read().strip()
 
-        script = self.configdir / "activate.py"
-        env_vars = self.configdir / "environmental-variables.json"
+        script = configdir / "activate.py"
+        env_vars = configdir / "environmental-variables.json"
 
         subprocess.Popen(
             f"python {script} {env_vars} {interpreter} {self.PORT}",
