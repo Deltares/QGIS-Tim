@@ -36,7 +36,7 @@ Styling layers
 The different elements are represented as layers in the GeoPackage, and also as
 ordinary vector layers in QGIS. Consequently, all the standard QGIS
 functionality works on them, and layers can be styled via the Layers Panel, by
-right-clicking on a layer.
+right-clicking on a layer, clicking Properties, and finding the Symbology menu.
 
 Deleting element layers
 =======================
@@ -209,7 +209,86 @@ keyword arguments:
 PolygonInhom
 ------------
 
-Not implemented yet.
+A polygon inhomogeneity is defined by two layers: a layer containing the vector
+geometry (timmlPolygonInhom), and an associated table containing the aquifer
+properties of the inhomogeneity.
+
+The geometry table contains the following (scalar) values:
+
+* fid: int, QGIS feature ID
+* order: int, ``order``
+* ndegrees: int, ``ndeg``
+
+The aquifer properties are identical to those of the aquifer table:
+
+* fid: int, QGIS feature ID
+* index: int, determines table order for TimML
+* conductivity: float, ``kaq``
+* resistance: float, ``c``
+* top: float, ``z``
+* bottom: float, ``z``
+* porosity: float, ``npor``
+* headtop: float, ``hstar`` and ``topboundary``
+
+With the exception that a single column has been added: geometry_id. This column
+connects the rows to the geometry table, specifying for which geometry the
+aquifer properites are valid. See the example below, where the first polygon
+(geometry_fid 0) has a conductivity of 5.0, and the second polygon (geometry_fid
+1) has a conductivity of 1.0. Note that a geometry_fid is required for every
+row, as these are used to split the table.
+
+The table containing the geometry;
+
++-----+-----+-------+----------+
+| row | fid | order | ndegrees |
++-----+-----+-------+----------+
+|   0 |   0 |     1 |        3 |
++-----+-----+-------+----------+
+|   1 |   1 |     1 |        3 |
++-----+-----+-------+----------+
+
+The associated table containing the aquifer properties:
+
++-----+-----+-------+--------------+------------+-------+---------+----------+---------+--------------+
+| row | fid | index | conductivity | resistance | top   |  bottom | porosity | headtop | geometry_fid |
++-----+-----+-------+--------------+------------+-------+---------+----------+---------+--------------+
+|   0 |   0 |     0 |          5.0 |            |   5.0 |         |      0.3 |         |            0 |
++-----+-----+-------+--------------+------------+-------+---------+----------+---------+--------------+
+|   1 |   1 |     1 |              |      100.0 |   0.0 |         |      0.3 |         |            0 |
++-----+-----+-------+--------------+------------+-------+---------+----------+---------+--------------+
+|   2 |   2 |     2 |          5.0 |            |  -5.0 |   -10.0 |      0.3 |         |            0 |
++-----+-----+-------+--------------+------------+-------+---------+----------+---------+--------------+
+|   0 |   0 |     0 |          1.0 |            |   5.0 |         |      0.3 |         |            1 |
++-----+-----+-------+--------------+------------+-------+---------+----------+---------+--------------+
+|   1 |   1 |     1 |              |     100.0  |   0.0 |         |      0.3 |         |            1 |
++-----+-----+-------+--------------+------------+-------+---------+----------+---------+--------------+
+|   2 |   2 |     2 |          1.0 |            |  -5.0 |   -10.0 |      0.3 |         |            1 |
++-----+-----+-------+--------------+------------+-------+---------+----------+---------+--------------+
+
+A semi-confined top is added in the same way as for the aquifer, by specifying a
+value for headtop in the first row, and a resistance. The following example
+shows a head of 1.0 for the first inhomogeneity, and a head of 2.0 for the
+second:
+
++-----+-----+-------+--------------+------------+-------+---------+----------+---------+--------------+
+| row | fid | index | conductivity | resistance | top   |  bottom | porosity | headtop | geometry_fid |
++-----+-----+-------+--------------+------------+-------+---------+----------+---------+--------------+
+|   0 |   0 |     0 |              |       10.0 |   6.0 |         |      0.3 |     1.0 |            0 |
++-----+-----+-------+--------------+------------+-------+---------+----------+---------+--------------+
+|   0 |   0 |     1 |          5.0 |            |   5.0 |         |      0.3 |         |            0 |
++-----+-----+-------+--------------+------------+-------+---------+----------+---------+--------------+
+|   1 |   1 |     2 |              |      100.0 |   0.0 |         |      0.3 |         |            0 |
++-----+-----+-------+--------------+------------+-------+---------+----------+---------+--------------+
+|   2 |   2 |     3 |          5.0 |            |  -5.0 |   -10.0 |      0.3 |         |            0 |
++-----+-----+-------+--------------+------------+-------+---------+----------+---------+--------------+
+|   0 |   0 |     0 |              |       10.0 |   6.0 |         |      0.3 |     2.0 |            1 |
++-----+-----+-------+--------------+------------+-------+---------+----------+---------+--------------+
+|   0 |   0 |     1 |          1.0 |            |   5.0 |         |      0.3 |         |            1 |
++-----+-----+-------+--------------+------------+-------+---------+----------+---------+--------------+
+|   1 |   1 |     2 |              |     100.0  |   0.0 |         |      0.3 |         |            1 |
++-----+-----+-------+--------------+------------+-------+---------+----------+---------+--------------+
+|   2 |   2 |     3 |          1.0 |            |  -5.0 |   -10.0 |      0.3 |         |            1 |
++-----+-----+-------+--------------+------------+-------+---------+----------+---------+--------------+
 
 HeadLineSink
 ------------

@@ -1,3 +1,4 @@
+from collections import defaultdict
 import pathlib
 import re
 from typing import Any, Callable, Dict, NamedTuple, Tuple, Union
@@ -10,6 +11,17 @@ import timml
 import xarray as xr
 
 FloatArray = np.ndarray
+
+
+class ElementSpecification(NamedTuple):
+    elementtype: str
+    dataframe: gpd.GeoDataFrame
+    associated_dataframe: gpd.GeoDataFrame
+
+
+class ModelSpecification(NamedTuple):
+    aquifer: ElementSpecification
+    elements: Dict[str, ElementSpecification]
 
 
 # Some geometry helpers
@@ -47,7 +59,21 @@ def linestring_coordinates(row) -> Tuple[FloatArray, FloatArray]:
     return np.array(row["geometry"].coords)
 
 
-polygon_coordinates = linestring_coordinates
+def polygon_coordinates(row) -> Tuple[FloatArray, FloatArray]:
+    """
+    Get the x and y coordinates from a single Polygon feature,
+    which is one row in a GeoDataFrame.
+
+    Parameters
+    ----------
+    row: geopandas.GeoSeries
+
+    Returns
+    -------
+    x: np.array
+    y: np.array
+    """
+    return np.array(row["geometry"].exterior.coords)
 
 
 # Dataframe to TimML element
@@ -83,7 +109,7 @@ def aquifer(dataframe: gpd.GeoDataFrame) -> timml.Model:
     return model
 
 
-def constant(dataframe: gpd.GeoDataFrame, model: timml.Model) -> None:
+def constant(spec: ElementSpecification, model: timml.Model) -> None:
     """
     Parameters
     ----------
@@ -93,7 +119,7 @@ def constant(dataframe: gpd.GeoDataFrame, model: timml.Model) -> None:
     -------
     None
     """
-    firstrow = dataframe.iloc[0]
+    firstrow = spec.dataframe.iloc[0]
     x, y = point_coordinates(firstrow)
     timml.Constant(
         model=model,
@@ -103,7 +129,7 @@ def constant(dataframe: gpd.GeoDataFrame, model: timml.Model) -> None:
     )
 
 
-def uflow(dataframe: gpd.GeoDataFrame, model: timml.Model) -> None:
+def uflow(spec: ElementSpecification, model: timml.Model) -> None:
     """
     Parameters
     ----------
@@ -113,7 +139,7 @@ def uflow(dataframe: gpd.GeoDataFrame, model: timml.Model) -> None:
     -------
     None
     """
-    for _, row in dataframe.iterrows():
+    for _, row in spec.dataframe.iterrows():
         timml.Uflow(
             model=model,
             slope=row["slope"],
@@ -122,7 +148,7 @@ def uflow(dataframe: gpd.GeoDataFrame, model: timml.Model) -> None:
         )
 
 
-def well(dataframe: gpd.GeoDataFrame, model: timml.Model) -> None:
+def well(spec: ElementSpecification, model: timml.Model) -> None:
     """
     Parameters
     ----------
@@ -132,6 +158,7 @@ def well(dataframe: gpd.GeoDataFrame, model: timml.Model) -> None:
     -------
     None
     """
+    dataframe = spec.dataframe
     X, Y = point_coordinates(dataframe)
     for ((_, row), x, y) in zip(dataframe.iterrows(), X, Y):
         timml.Well(
@@ -146,7 +173,7 @@ def well(dataframe: gpd.GeoDataFrame, model: timml.Model) -> None:
         )
 
 
-def headwell(dataframe: gpd.GeoDataFrame, model: timml.Model) -> None:
+def headwell(spec: ElementSpecification, model: timml.Model) -> None:
     """
     Parameters
     ----------
@@ -156,6 +183,7 @@ def headwell(dataframe: gpd.GeoDataFrame, model: timml.Model) -> None:
     -------
     None
     """
+    dataframe = spec.dataframe
     X, Y = point_coordinates(dataframe)
     for ((_, row), x, y) in zip(dataframe.iterrows(), X, Y):
         timml.HeadWell(
@@ -170,7 +198,53 @@ def headwell(dataframe: gpd.GeoDataFrame, model: timml.Model) -> None:
         )
 
 
-def polygoninhom(dataframe: gpd.GeoDataFrame, model: timml.Model) -> None:
+def polygoninhom(spec: ElementSpecification, model: timml.Model) -> None:
+    """
+    Parameters
+    ----------
+    dataframe: tuple of geopandas.GeoDataFrame
+
+    Returns
+    -------
+    None
+    """
+    geometry = spec.dataframe
+    properties = spec.associated_dataframe
+    # Iterate through the row containing the geometry
+    # and iterate through the associated table containing k properties.
+    for (geom_fid, row), (assoc_fid, dataframe) in zip(
+        geometry.iterrows(), properties.groupby("geometry_fid")
+    ):
+        if geom_fid != assoc_fid:
+            raise ValueError(
+                f"Feature IDs do not match up between geometry table and its associated table: "
+                f"{geom_fid} versus {assoc_fid}"
+            )
+        # Make sure the layers are in the right order.
+        dataframe = dataframe.sort_values(by="index")
+        # Deal with optional semi-confined top layer.
+        hstar = dataframe["headtop"].values[0]
+        semi = pd.notnull(hstar)
+        k_offset = 1 if semi else 0
+        c_offset = 0 if semi else 1
+        kaq = dataframe["conductivity"].values[k_offset::2]
+        c = dataframe["resistance"].values[c_offset:-1:2]
+
+        timml.PolygonInhomMaq(
+            model=model,
+            xy=polygon_coordinates(row),
+            kaq=kaq,
+            z=np.append(dataframe["top"].values, dataframe["bottom"].values[-1]),
+            c=c,
+            npor=dataframe["porosity"],
+            topboundary="semi" if semi else "conf",
+            hstar=hstar,
+            order=row["order"],
+            ndeg=row["ndegrees"],
+        )
+
+
+def headlinesink(spec: ElementSpecification, model: timml.Model) -> None:
     """
     Parameters
     ----------
@@ -180,20 +254,7 @@ def polygoninhom(dataframe: gpd.GeoDataFrame, model: timml.Model) -> None:
     -------
     None
     """
-    raise NotImplementedError
-
-
-def headlinesink(dataframe: gpd.GeoDataFrame, model: timml.Model) -> None:
-    """
-    Parameters
-    ----------
-    dataframe: geopandas.GeoDataFrame
-
-    Returns
-    -------
-    None
-    """
-    for _, row in dataframe.iterrows():
+    for _, row in spec.dataframe.iterrows():
         timml.HeadLineSinkString(
             model=model,
             xy=linestring_coordinates(row),
@@ -206,7 +267,7 @@ def headlinesink(dataframe: gpd.GeoDataFrame, model: timml.Model) -> None:
         )
 
 
-def linesinkditch(dataframe: gpd.GeoDataFrame, model: timml.Model) -> None:
+def linesinkditch(spec: ElementSpecification, model: timml.Model) -> None:
     """
     Parameters
     ----------
@@ -216,7 +277,7 @@ def linesinkditch(dataframe: gpd.GeoDataFrame, model: timml.Model) -> None:
     -------
     None
     """
-    for _, row in dataframe.iterrows():
+    for _, row in spec.dataframe.iterrows():
         timml.LineSinkDitchString(
             model=model,
             xy=linestring_coordinates(row),
@@ -229,7 +290,7 @@ def linesinkditch(dataframe: gpd.GeoDataFrame, model: timml.Model) -> None:
         )
 
 
-def leakylinedoublet(dataframe: gpd.GeoDataFrame, model: timml.Model) -> None:
+def leakylinedoublet(spec: ElementSpecification, model: timml.Model) -> None:
     """
     Parameters
     ----------
@@ -239,7 +300,7 @@ def leakylinedoublet(dataframe: gpd.GeoDataFrame, model: timml.Model) -> None:
     -------
     None
     """
-    for _, row in dataframe.iterrows():
+    for _, row in spec.dataframe.iterrows():
         timml.LeakyLineDoubletString(
             model=model,
             xy=linestring_coordinates(row),
@@ -250,7 +311,7 @@ def leakylinedoublet(dataframe: gpd.GeoDataFrame, model: timml.Model) -> None:
         )
 
 
-def implinedoublet(dataframe: gpd.GeoDataFrame, model: timml.Model) -> None:
+def implinedoublet(spec: ElementSpecification, model: timml.Model) -> None:
     """
     Parameters
     ----------
@@ -260,7 +321,7 @@ def implinedoublet(dataframe: gpd.GeoDataFrame, model: timml.Model) -> None:
     -------
     None
     """
-    for _, row in dataframe.iterrows():
+    for _, row in spec.dataframe.iterrows():
         timml.ImpLineDoubletString(
             model=model,
             xy=linestring_coordinates(row),
@@ -270,7 +331,7 @@ def implinedoublet(dataframe: gpd.GeoDataFrame, model: timml.Model) -> None:
         )
 
 
-def circareasink(dataframe: gpd.GeoDataFrame, model: timml.Model) -> None:
+def circareasink(spec: ElementSpecification, model: timml.Model) -> None:
     """
     Parameters
     ----------
@@ -280,7 +341,7 @@ def circareasink(dataframe: gpd.GeoDataFrame, model: timml.Model) -> None:
     -------
     None
     """
-    for _, row in dataframe.iterrows():
+    for _, row in spec.dataframe.iterrows():
         x, y = row.geometry.centroid.xy
         coords = np.array(row.geometry.exterior.coords)
         x0, y0 = coords[0]
@@ -312,18 +373,6 @@ MAPPING = {
 
 # Infer model structure from geopackage layers
 # --------------------------------------------
-
-
-class ElementSpecification(NamedTuple):
-    elementtype: str
-    dataframe: gpd.GeoDataFrame
-
-
-class ModelSpecification(NamedTuple):
-    aquifer: ElementSpecification
-    elements: Dict[str, ElementSpecification]
-
-
 def extract_elementtype(s: str) -> str:
     """
     Extract the TimML element type from the geopackage layer name.
@@ -354,18 +403,35 @@ def model_specification(path: Union[str, pathlib.Path]) -> ModelSpecification:
     """
     aquifer = None
     elements = {}
-    for layername in fiona.listlayers(str(path)):
-        key = extract_elementtype(layername)
-        print("adding", layername, "as", key)
-        # Special case aquifer and reference point, since only a single instance
-        # may occur in a model (singleton)
-        element_spec = ElementSpecification(
-            elementtype=key, dataframe=gpd.read_file(path, layer=layername)
-        )
-        if key == "aquifer":
-            aquifer = element_spec
+    layernames = fiona.listlayers(str(path))
+    for layername in layernames:
+        elementtype = extract_elementtype(layername)
+        print("adding", layername, "as", elementtype)
+        if "polygoninhom" in elementtype:
+            if elementtype == "polygoninhom":
+                # Find geometry table and associated table.
+                name = layername.split(":")[-1]
+                geometry_name = f"timmlPolygonInhom:{name}"
+                properties_name = f"timmlPolygonInhomProperties:{name}"
+                elements[layername] = ElementSpecification(
+                    elementtype="polygoninhom",
+                    dataframe=gpd.read_file(path, layer=geometry_name),
+                    associated_dataframe=gpd.read_file(path, layer=properties_name),
+                )
+            elif elementtype == "polygoninhomproperties":
+                # Skip if it's the associated table
+                continue
         else:
-            elements[layername] = element_spec
+            element_spec = ElementSpecification(
+                elementtype=elementtype,
+                dataframe=gpd.read_file(path, layer=layername),
+                associated_dataframe=None,
+            )
+            # Special case aquifer, since only a single instance may occur
+            if elementtype == "aquifer":
+                aquifer = element_spec
+            else:
+                elements[layername] = element_spec
 
     return ModelSpecification(aquifer, elements)
 
@@ -403,17 +469,17 @@ def initialize_model(spec: ModelSpecification) -> timml.Model:
 
     """
     validate(spec)
-    _, dataframe = spec.aquifer
-    model = aquifer(dataframe)
+    model = aquifer(spec.aquifer.dataframe)
 
-    for elementtype, dataframe in spec.elements.values():
+    for element_spec in spec.elements.values():
+        elementtype = element_spec.elementtype
         if elementtype == "domain":
             continue
 
         # Grab conversion function
         try:
             element = MAPPING[elementtype]
-            element(dataframe, model)
+            element(element_spec, model)
         except KeyError as e:
             msg = (
                 f'Invalid element specification "{elementtype}". '

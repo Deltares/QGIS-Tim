@@ -103,14 +103,21 @@ ELEMENT_SPEC = {
     "PolygonInhom": (
         "Polygon",
         [
+            QgsField("order", QVariant.Int),
+            QgsField("ndegrees", QVariant.Int),
+        ],
+    ),
+    "PolygonInhomProperties": (
+        "No geometry",
+        [
+            QgsField("index", QVariant.Int),
             QgsField("conductivity", QVariant.Double),
             QgsField("resistance", QVariant.Double),
             QgsField("top", QVariant.Double),
             QgsField("bottom", QVariant.Double),
-            QgsField("topconfined", QVariant.Bool),
-            QgsField("tophead", QVariant.Double),
-            QgsField("order", QVariant.Int),
-            QgsField("ndegrees", QVariant.Int),
+            QgsField("porosity", QVariant.Double),
+            QgsField("headtop", QVariant.Double),
+            QgsField("geometry_fid", QVariant.Int),
         ],
     ),
 }

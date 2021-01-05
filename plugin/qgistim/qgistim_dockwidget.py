@@ -59,10 +59,8 @@ class QgisTimDockWidget(QtWidgets.QDockWidget, FORM_CLASS):
         self.leakyLineDoubletButton.clicked.connect(
             lambda: self.timml_element("LeakyLineDoublet")
         )
-        self.polygonInhomButton.clicked.connect(
-            lambda: self.timml_element("PolygonInhom")
-        )
         # Special case entry
+        self.polygonInhomButton.clicked.connect(self.polygon_inhom)
         self.circAreaSinkButton.clicked.connect(self.circ_area_sink)
         # Domain
         self.domainButton.clicked.connect(self.domain)
@@ -210,6 +208,27 @@ class QgisTimDockWidget(QtWidgets.QDockWidget, FORM_CLASS):
                 self.path, layer, f"timml{elementtype}:{layername}"
             )
             self.add_layer(written_layer)
+
+    def polygon_inhom(self) -> None:
+        dialog = NameDialog()
+        dialog.show()
+        ok = dialog.exec_()
+        if ok:
+            layername = dialog.lineEdit.text()
+            geometry_layer = create_timml_layer("PolygonInhom", layername, self.crs)
+            property_layer = create_timml_layer(
+                "PolygonInhomProperties", layername, self.crs
+            )
+            written_geometry = geopackage.write_layer(
+                self.path, geometry_layer, f"timmlPolygonInhom:{layername}"
+            )
+            written_property = geopackage.write_layer(
+                self.path,
+                property_layer,
+                f"timmlPolygonInhomProperties:{layername}",
+            )
+            self.add_layer(written_geometry)
+            self.add_layer(written_property)
 
     def domain(self) -> None:
         """
