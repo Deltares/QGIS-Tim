@@ -105,7 +105,7 @@ class TimHandler(socketserver.BaseRequestHandler):
         name = path.stem
         extent, crs = gistim.gridspec(path, cellsize)
         head = gistim.headgrid(self.server.model, extent, cellsize)
-        head.rio.write_crs(crs)
+        head = head.rio.write_crs(crs)
 
         outpath = (path.parent / f"{name}-{cellsize}".replace(".", "_")).with_suffix(
             ".nc"
