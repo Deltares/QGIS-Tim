@@ -1,33 +1,7 @@
-import json
-import os
-import platform
-import sys
-from pathlib import Path
-
 from setuptools import find_packages, setup
 
 with open("README.rst") as f:
     long_description = f.read()
-
-# Write all the environmental variables so the QGIS interpreter
-# can (re)set them properly.
-if platform.system() == "Windows":
-    configdir = Path(os.environ["APPDATA"]) / "qgis-tim"
-else:
-    configdir = Path(os.environ["HOME"]) / ".qgis-tim"
-configdir.mkdir(exist_ok=True)
-
-env_vars = {key: value for key, value in os.environ.items()}
-with open(configdir / "environmental-variables.json", "w") as f:
-    f.write(json.dumps(env_vars))
-
-with open(configdir / "interpreter.txt", "w") as f:
-    f.write(sys.executable)
-
-with open("activate.py", "r") as src:
-    content = src.read()
-with open(configdir / "activate.py", "w") as dst:
-    dst.write(content)
 
 setup(
     name="gistim",

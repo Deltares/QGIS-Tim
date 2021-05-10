@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>361</width>
-    <height>435</height>
+    <height>487</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -59,86 +59,89 @@
          <x>0</x>
          <y>40</y>
          <width>341</width>
-         <height>189</height>
+         <height>237</height>
         </rect>
        </property>
        <layout class="QGridLayout" name="gridLayout_3">
-        <item row="0" column="0">
-         <widget class="QLabel" name="label_2">
-          <property name="text">
-           <string>Elements:</string>
-          </property>
-         </widget>
-        </item>
-        <item row="7" column="1">
-         <widget class="QPushButton" name="impLineDoubletButton">
-          <property name="text">
-           <string>ImpLineDoublet</string>
-          </property>
-         </widget>
-        </item>
-        <item row="6" column="1">
-         <widget class="QPushButton" name="leakyLineDoubletButton">
-          <property name="text">
-           <string>LeakyLineDoublet</string>
-          </property>
-         </widget>
-        </item>
-        <item row="3" column="1">
+        <item row="4" column="1">
          <widget class="QPushButton" name="lineSinkDitchButton">
           <property name="text">
            <string>LineSinkDitch</string>
           </property>
          </widget>
         </item>
-        <item row="2" column="1">
-         <widget class="QPushButton" name="headLineSinkButton">
-          <property name="text">
-           <string>HeadLineSink</string>
-          </property>
-         </widget>
-        </item>
-        <item row="1" column="1">
-         <widget class="QPushButton" name="polygonInhomButton">
-          <property name="text">
-           <string>PolygonInhom</string>
-          </property>
-         </widget>
-        </item>
-        <item row="7" column="0">
-         <widget class="QPushButton" name="headWellButton">
-          <property name="text">
-           <string>HeadWell</string>
-          </property>
-         </widget>
-        </item>
-        <item row="6" column="0">
-         <widget class="QPushButton" name="wellButton">
-          <property name="text">
-           <string>Well</string>
-          </property>
-         </widget>
-        </item>
         <item row="3" column="0">
-         <widget class="QPushButton" name="circAreaSinkButton">
-          <property name="text">
-           <string>CircularAreaSink</string>
-          </property>
-         </widget>
-        </item>
-        <item row="2" column="0">
          <widget class="QPushButton" name="uniformFlowButton">
           <property name="text">
            <string>UniformFlow</string>
           </property>
          </widget>
         </item>
+        <item row="7" column="0">
+         <widget class="QPushButton" name="wellButton">
+          <property name="text">
+           <string>Well</string>
+          </property>
+         </widget>
+        </item>
+        <item row="7" column="1">
+         <widget class="QPushButton" name="leakyLineDoubletButton">
+          <property name="text">
+           <string>LeakyLineDoublet</string>
+          </property>
+         </widget>
+        </item>
         <item row="1" column="0">
+         <widget class="QLabel" name="label_2">
+          <property name="text">
+           <string>Elements:</string>
+          </property>
+         </widget>
+        </item>
+        <item row="8" column="1">
+         <widget class="QPushButton" name="impLineDoubletButton">
+          <property name="text">
+           <string>ImpLineDoublet</string>
+          </property>
+         </widget>
+        </item>
+        <item row="3" column="1">
+         <widget class="QPushButton" name="headLineSinkButton">
+          <property name="text">
+           <string>HeadLineSink</string>
+          </property>
+         </widget>
+        </item>
+        <item row="8" column="0">
+         <widget class="QPushButton" name="headWellButton">
+          <property name="text">
+           <string>HeadWell</string>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="0">
          <widget class="QPushButton" name="constantButton">
           <property name="text">
            <string>Constant</string>
           </property>
          </widget>
+        </item>
+        <item row="2" column="1">
+         <widget class="QPushButton" name="polygonInhomButton">
+          <property name="text">
+           <string>PolygonInhom</string>
+          </property>
+         </widget>
+        </item>
+        <item row="4" column="0">
+         <widget class="QPushButton" name="circAreaSinkButton">
+          <property name="text">
+           <string>CircularAreaSink</string>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="0" colspan="2">
+         <widget class="QTreeView" name="treeView"/>
         </item>
        </layout>
       </widget>
@@ -146,7 +149,7 @@
        <property name="geometry">
         <rect>
          <x>0</x>
-         <y>290</y>
+         <y>340</y>
          <width>341</width>
          <height>102</height>
         </rect>
@@ -179,6 +182,13 @@
           </item>
          </layout>
         </item>
+        <item row="4" column="0">
+         <widget class="QPushButton" name="computeButton">
+          <property name="text">
+           <string>Compute</string>
+          </property>
+         </widget>
+        </item>
         <item row="3" column="0">
          <widget class="QPushButton" name="domainButton">
           <property name="text">
@@ -193,27 +203,60 @@
           </property>
          </widget>
         </item>
-        <item row="4" column="0">
-         <widget class="QPushButton" name="computeButton">
-          <property name="text">
-           <string>Compute</string>
-          </property>
-         </widget>
-        </item>
        </layout>
       </widget>
-      <widget class="QPushButton" name="serverButton">
+      <widget class="QWidget" name="verticalLayoutWidget_2">
        <property name="geometry">
         <rect>
          <x>0</x>
-         <y>260</y>
-         <width>171</width>
-         <height>31</height>
+         <y>250</y>
+         <width>341</width>
+         <height>80</height>
         </rect>
        </property>
-       <property name="text">
-        <string>Start TimServer</string>
-       </property>
+       <layout class="QVBoxLayout" name="verticalLayout_3">
+        <item>
+         <widget class="QLabel" name="label_6">
+          <property name="text">
+           <string>Server:</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <layout class="QHBoxLayout" name="horizontalLayout">
+          <item>
+           <widget class="QLabel" name="label_5">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="text">
+             <string>Interpreter:</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QComboBox" name="comboBox">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPushButton" name="serverButton">
+            <property name="text">
+             <string>Start</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </item>
+       </layout>
       </widget>
      </widget>
     </item>

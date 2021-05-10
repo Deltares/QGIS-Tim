@@ -3,6 +3,7 @@ Geopackage management utilities
 """
 from typing import List
 
+from qgis import processing
 from qgis.core import QgsVectorFileWriter, QgsVectorLayer
 
 
@@ -62,3 +63,13 @@ def write_layer(
         )
     layer = QgsVectorLayer(f"{path}|layername={layername}", layername, "ogr")
     return layer
+
+
+def remove_layer(path: str, layer: str) -> None:
+    processing.run(
+        "native:spatialiteexecutesql",
+        {
+            "DATABASE": f"{path}|layername={layer}",
+            "SQL": f"drop table {layer}"
+        },
+    )

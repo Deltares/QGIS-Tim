@@ -10,6 +10,7 @@ import socket
 import subprocess
 from contextlib import closing
 from pathlib import Path
+from typing import List
 
 
 class ServerHandler:
@@ -48,23 +49,28 @@ class ServerHandler:
             configdir = Path(os.environ["HOME"]) / ".qgis-tim"
         return configdir
 
-    def start_server(self) -> None:
+    def interpreters(self) -> List[str]:
+        with open(self.get_configdir() / "environmental-variables.json", "r") as f:
+            env_vars = json.loads(f.read())
+        return list(env_vars.keys())
+
+    def environmental_variables(self):
+        with open(self.get_configdir() / "environmental-variables.json", "r") as f:
+            env_vars = json.loads(f.read())
+        return env_vars
+
+    def start_server(self, interpreter: str) -> None:
         """
         Starts a new (conda) interpreter, based on the settings in the
         configuration directory.
         """
         self.PORT = self.find_free_port()
-        configdir = self.get_configdir()
-
-        with open(configdir / "interpreter.txt") as f:
-            interpreter = f.read().strip()
-
-        script = configdir / "activate.py"
-        env_vars = configdir / "environmental-variables.json"
+        env_vars = self.environmental_variables()
 
         subprocess.Popen(
-            f"python {script} {env_vars} {interpreter} {self.PORT}",
+            f"{interpreter} -m gistim serve {self.PORT}",
             creationflags=subprocess.CREATE_NEW_CONSOLE,
+            env=env_vars[interpreter],
         )
 
     def send(self, data) -> str:
