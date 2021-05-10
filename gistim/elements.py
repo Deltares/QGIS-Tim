@@ -129,7 +129,7 @@ def aquifer(dataframe: gpd.GeoDataFrame) -> timml.Model:
     return timml.ModelMaq(**aquifer_data(dataframe))
 
 
-def constant(spec: ElementSpecification, model: timml.Model) -> None:
+def constant(spec: ElementSpecification, model: timml.Model, name: str, elements: Dict) -> None:
     """
     Parameters
     ----------
@@ -141,7 +141,7 @@ def constant(spec: ElementSpecification, model: timml.Model) -> None:
     """
     firstrow = spec.dataframe.iloc[0]
     x, y = point_coordinates(firstrow)
-    timml.Constant(
+    elements[name] = timml.Constant(
         model=model,
         xr=x,
         yr=y,
@@ -149,7 +149,7 @@ def constant(spec: ElementSpecification, model: timml.Model) -> None:
     )
 
 
-def uflow(spec: ElementSpecification, model: timml.Model) -> None:
+def uflow(spec: ElementSpecification, model: timml.Model, name: str, elements: Dict) -> None:
     """
     Parameters
     ----------
@@ -159,8 +159,8 @@ def uflow(spec: ElementSpecification, model: timml.Model) -> None:
     -------
     None
     """
-    for _, row in spec.dataframe.iterrows():
-        timml.Uflow(
+    for i, row in spec.dataframe.iterrows():
+        elements[f"{name}_{i}"] = timml.Uflow(
             model=model,
             slope=row["slope"],
             angle=row["angle"],
@@ -168,7 +168,7 @@ def uflow(spec: ElementSpecification, model: timml.Model) -> None:
         )
 
 
-def well(spec: ElementSpecification, model: timml.Model) -> None:
+def well(spec: ElementSpecification, model: timml.Model, name: str, elements: Dict) -> None:
     """
     Parameters
     ----------
@@ -180,8 +180,8 @@ def well(spec: ElementSpecification, model: timml.Model) -> None:
     """
     dataframe = spec.dataframe
     X, Y = point_coordinates(dataframe)
-    for ((_, row), x, y) in zip(dataframe.iterrows(), X, Y):
-        timml.Well(
+    for ((i, row), x, y) in zip(dataframe.iterrows(), X, Y):
+        elements[f"{name}_{i}"] = timml.Well(
             model=model,
             xw=x,
             yw=y,
@@ -193,7 +193,7 @@ def well(spec: ElementSpecification, model: timml.Model) -> None:
         )
 
 
-def headwell(spec: ElementSpecification, model: timml.Model) -> None:
+def headwell(spec: ElementSpecification, model: timml.Model, name: str, elements: Dict) -> None:
     """
     Parameters
     ----------
@@ -205,8 +205,8 @@ def headwell(spec: ElementSpecification, model: timml.Model) -> None:
     """
     dataframe = spec.dataframe
     X, Y = point_coordinates(dataframe)
-    for ((_, row), x, y) in zip(dataframe.iterrows(), X, Y):
-        timml.HeadWell(
+    for ((i, row), x, y) in zip(dataframe.iterrows(), X, Y):
+        elements[f"{name}_{i}"] = timml.HeadWell(
             xw=x,
             yw=y,
             hw=row["head"],
@@ -218,7 +218,7 @@ def headwell(spec: ElementSpecification, model: timml.Model) -> None:
         )
 
 
-def polygoninhom(spec: ElementSpecification, model: timml.Model) -> None:
+def polygoninhom(spec: ElementSpecification, model: timml.Model, name: str, elements: Dict) -> None:
     """
     Parameters
     ----------
@@ -232,17 +232,17 @@ def polygoninhom(spec: ElementSpecification, model: timml.Model) -> None:
     properties = spec.associated_dataframe.set_index("geometry_id")
     # Iterate through the row containing the geometry
     # and iterate through the associated table containing k properties.
-    for _, row in geometry.iterrows():
+    for i, row in geometry.iterrows():
         dataframe = properties.loc[row["geometry_id"]]
         data = aquifer_data(dataframe)
         data["model"] = model
         data["xy"] = polygon_coordinates(row)
         data["order"] = row["order"]
         data["ndeg"] = row["ndegrees"]
-        timml.PolygonInhomMaq(**data)
+        elements[f"{name}_{i}"] = timml.PolygonInhomMaq(**data)
 
 
-def buildingpit(spec: ElementSpecification, model: timml.Model) -> None:
+def buildingpit(spec: ElementSpecification, model: timml.Model, name: str, elements: Dict) -> None:
     """
     Parameters
     ----------
@@ -256,7 +256,7 @@ def buildingpit(spec: ElementSpecification, model: timml.Model) -> None:
     properties = spec.associated_dataframe.set_index("geometry_id")
     # Iterate through the row containing the geometry
     # and iterate through the associated table containing k properties.
-    for _, row in geometry.iterrows():
+    for i, row in geometry.iterrows():
         dataframe = properties.loc[row["geometry_id"]]
         data = aquifer_data(dataframe)
         data["model"] = model
@@ -264,10 +264,10 @@ def buildingpit(spec: ElementSpecification, model: timml.Model) -> None:
         data["order"] = row["order"]
         data["ndeg"] = row["ndegrees"]
         data["layers"] = np.atleast_1d(row["layer"])
-        timml.BuildingPit(**data)
+        elements[f"{name}_{i}"] = timml.BuildingPit(**data)
 
 
-def headlinesink(spec: ElementSpecification, model: timml.Model) -> None:
+def headlinesink(spec: ElementSpecification, model: timml.Model, name: str, elements: Dict) -> None:
     """
     Parameters
     ----------
@@ -277,8 +277,8 @@ def headlinesink(spec: ElementSpecification, model: timml.Model) -> None:
     -------
     None
     """
-    for _, row in spec.dataframe.iterrows():
-        timml.HeadLineSinkString(
+    for i, row in spec.dataframe.iterrows():
+        elements[f"{name}_{i}"] = timml.HeadLineSinkString(
             model=model,
             xy=linestring_coordinates(row),
             hls=row["head"],
@@ -290,7 +290,7 @@ def headlinesink(spec: ElementSpecification, model: timml.Model) -> None:
         )
 
 
-def linesinkditch(spec: ElementSpecification, model: timml.Model) -> None:
+def linesinkditch(spec: ElementSpecification, model: timml.Model, name: str, elements: Dict) -> None:
     """
     Parameters
     ----------
@@ -300,8 +300,8 @@ def linesinkditch(spec: ElementSpecification, model: timml.Model) -> None:
     -------
     None
     """
-    for _, row in spec.dataframe.iterrows():
-        timml.LineSinkDitchString(
+    for i, row in spec.dataframe.iterrows():
+        elements[f"{name}_{i}"] = timml.LineSinkDitchString(
             model=model,
             xy=linestring_coordinates(row),
             Qls=row["discharge"],
@@ -313,7 +313,7 @@ def linesinkditch(spec: ElementSpecification, model: timml.Model) -> None:
         )
 
 
-def leakylinedoublet(spec: ElementSpecification, model: timml.Model) -> None:
+def leakylinedoublet(spec: ElementSpecification, model: timml.Model, name: str, elements: Dict) -> None:
     """
     Parameters
     ----------
@@ -323,8 +323,8 @@ def leakylinedoublet(spec: ElementSpecification, model: timml.Model) -> None:
     -------
     None
     """
-    for _, row in spec.dataframe.iterrows():
-        timml.LeakyLineDoubletString(
+    for i, row in spec.dataframe.iterrows():
+        elements[f"{name}_{i}"] = timml.LeakyLineDoubletString(
             model=model,
             xy=linestring_coordinates(row),
             res=row["resistance"],
@@ -334,7 +334,7 @@ def leakylinedoublet(spec: ElementSpecification, model: timml.Model) -> None:
         )
 
 
-def implinedoublet(spec: ElementSpecification, model: timml.Model) -> None:
+def implinedoublet(spec: ElementSpecification, model: timml.Model, name: str, elements: Dict) -> None:
     """
     Parameters
     ----------
@@ -344,8 +344,8 @@ def implinedoublet(spec: ElementSpecification, model: timml.Model) -> None:
     -------
     None
     """
-    for _, row in spec.dataframe.iterrows():
-        timml.ImpLineDoubletString(
+    for i, row in spec.dataframe.iterrows():
+        elements[f"{name}_{i}"] = timml.ImpLineDoubletString(
             model=model,
             xy=linestring_coordinates(row),
             layers=row["layer"],
@@ -354,7 +354,7 @@ def implinedoublet(spec: ElementSpecification, model: timml.Model) -> None:
         )
 
 
-def circareasink(spec: ElementSpecification, model: timml.Model) -> None:
+def circareasink(spec: ElementSpecification, model: timml.Model, name: str, elements: Dict) -> None:
     """
     Parameters
     ----------
@@ -364,12 +364,12 @@ def circareasink(spec: ElementSpecification, model: timml.Model) -> None:
     -------
     None
     """
-    for _, row in spec.dataframe.iterrows():
+    for i, row in spec.dataframe.iterrows():
         x, y = row.geometry.centroid.xy
         coords = np.array(row.geometry.exterior.coords)
         x0, y0 = coords[0]
         radius = np.sqrt((x0 - x) ** 2 + (y0 - y) ** 2)
-        timml.CircAreaSink(
+        elements[f"{name}_{i}"] = timml.CircAreaSink(
             model=model,
             xc=x,
             yc=y,
@@ -492,8 +492,9 @@ def initialize_model(spec: ModelSpecification) -> timml.Model:
     """
     validate(spec)
     model = aquifer(spec.aquifer.dataframe)
+    elements = {}
 
-    for element_spec in spec.elements.values():
+    for name, element_spec in spec.elements.items():
         elementtype = element_spec.elementtype
         if elementtype == "Domain":
             continue
@@ -501,7 +502,7 @@ def initialize_model(spec: ModelSpecification) -> timml.Model:
         # Grab conversion function
         try:
             element = MAPPING[elementtype]
-            element(element_spec, model)
+            element(element_spec, model, name, elements)
         except KeyError as e:
             msg = (
                 f'Invalid element specification "{elementtype}". '
@@ -509,7 +510,7 @@ def initialize_model(spec: ModelSpecification) -> timml.Model:
             )
             raise KeyError(msg) from e
 
-    return model
+    return model, elements
 
 
 # Output methods
@@ -543,7 +544,7 @@ def gridspec(
     path: Union[pathlib.Path, str], cellsize: float
 ) -> Tuple[Tuple[float], Any]:
     """
-    Infer the grid specifiction from the geopackage ``timmlDomain``  layer and
+    Infer the grid specification from the geopackage ``timmlDomain``  layer and
     the provided cellsize.
 
     Parameters

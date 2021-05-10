@@ -61,7 +61,7 @@ class TimHandler(socketserver.BaseRequestHandler):
             Path to the GeoPackage file containing the full model input.
         """
         spec = gistim.model_specification(path)
-        self.server.model = gistim.initialize_model(spec)
+        self.server.model, _ = gistim.initialize_model(spec)
 
     def compute(self, path: Union[pathlib.Path, str], cellsize: float) -> None:
         """
