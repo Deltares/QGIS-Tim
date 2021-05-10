@@ -1,4 +1,3 @@
-from collections import defaultdict
 import pathlib
 import re
 from typing import Any, Callable, Dict, NamedTuple, Tuple, Union
@@ -76,6 +75,45 @@ def polygon_coordinates(row) -> Tuple[FloatArray, FloatArray]:
     return np.array(row["geometry"].exterior.coords)
 
 
+def aquifer_data(dataframe):
+    # Make sure the layers are in the right order.
+    dataframe = dataframe.sort_values(by="layer").set_index("layer")
+    nlayer = len(dataframe)
+    # Deal with optional semi-confined top layer.
+    hstar = dataframe.loc[0, "head_topboundary"]
+    semi = pd.notnull(hstar)
+    kaq = dataframe["conductivity"].values
+
+    if semi:
+        c = dataframe["resistance"].values
+        porosity = np.empty(nlayer * 2)
+        z = np.empty(nlayer * 2 + 1)
+        z[0] = dataframe.loc[0, "z_topboundary"]
+        z[1::2] = dataframe["z_top"].values
+        z[2::2] = dataframe["z_bottom"].values
+        porosity[::2] = dataframe["porosity_aquitard"].values
+        porosity[1::2] = dataframe["porosity_aquifer"].values
+        topboundary = "semi"
+    else:
+        c = dataframe["resistance"].values[1:]
+        z = np.empty(nlayer * 2)
+        z[::2] = dataframe["z_top"].values
+        z[1::2] = dataframe["z_bottom"].values
+        porosity = np.empty(nlayer * 2 - 1)
+        porosity[::2] = dataframe["porosity_aquifer"].values
+        porosity[1::2] = dataframe["porosity_aquitard"].values[1:]
+        topboundary = "conf"
+
+    return {
+        "kaq": kaq,
+        "z": z,
+        "c": c,
+        "npor": porosity,
+        "topboundary": topboundary,
+        "hstar": hstar,
+    }
+
+
 # Dataframe to TimML element
 # --------------------------
 def aquifer(dataframe: gpd.GeoDataFrame) -> timml.Model:
@@ -88,25 +126,7 @@ def aquifer(dataframe: gpd.GeoDataFrame) -> timml.Model:
     -------
     timml.Model
     """
-    # Make sure the layers are in the right order.
-    dataframe = dataframe.sort_values(by="index")
-    # Deal with optional semi-confined top layer.
-    hstar = dataframe["headtop"].values[0]
-    semi = pd.notnull(hstar)
-    k_offset = 1 if semi else 0
-    c_offset = 0 if semi else 1
-    kaq = dataframe["conductivity"].values[k_offset::2]
-    c = dataframe["resistance"].values[c_offset:-1:2]
-
-    model = timml.ModelMaq(
-        kaq=kaq,
-        z=np.append(dataframe["top"].values, dataframe["bottom"].values[-1]),
-        c=c,
-        npor=dataframe["porosity"],
-        topboundary="semi" if semi else "conf",
-        hstar=hstar,
-    )
-    return model
+    return timml.ModelMaq(**aquifer_data(dataframe))
 
 
 def constant(spec: ElementSpecification, model: timml.Model) -> None:
@@ -209,39 +229,42 @@ def polygoninhom(spec: ElementSpecification, model: timml.Model) -> None:
     None
     """
     geometry = spec.dataframe
-    properties = spec.associated_dataframe
+    properties = spec.associated_dataframe.set_index("geometry_id")
     # Iterate through the row containing the geometry
     # and iterate through the associated table containing k properties.
-    for (geom_fid, row), (assoc_fid, dataframe) in zip(
-        geometry.iterrows(), properties.groupby("geometry_fid")
-    ):
-        if geom_fid != assoc_fid:
-            raise ValueError(
-                f"Feature IDs do not match up between geometry table and its associated table: "
-                f"{geom_fid} versus {assoc_fid}"
-            )
-        # Make sure the layers are in the right order.
-        dataframe = dataframe.sort_values(by="index")
-        # Deal with optional semi-confined top layer.
-        hstar = dataframe["headtop"].values[0]
-        semi = pd.notnull(hstar)
-        k_offset = 1 if semi else 0
-        c_offset = 0 if semi else 1
-        kaq = dataframe["conductivity"].values[k_offset::2]
-        c = dataframe["resistance"].values[c_offset:-1:2]
+    for _, row in geometry.iterrows():
+        dataframe = properties.loc[row["geometry_id"]]
+        data = aquifer_data(dataframe)
+        data["model"] = model
+        data["xy"] = polygon_coordinates(row)
+        data["order"] = row["order"]
+        data["ndeg"] = row["ndegrees"]
+        timml.PolygonInhomMaq(**data)
 
-        timml.PolygonInhomMaq(
-            model=model,
-            xy=polygon_coordinates(row),
-            kaq=kaq,
-            z=np.append(dataframe["top"].values, dataframe["bottom"].values[-1]),
-            c=c,
-            npor=dataframe["porosity"],
-            topboundary="semi" if semi else "conf",
-            hstar=hstar,
-            order=row["order"],
-            ndeg=row["ndegrees"],
-        )
+
+def buildingpit(spec: ElementSpecification, model: timml.Model) -> None:
+    """
+    Parameters
+    ----------
+    dataframe: tuple of geopandas.GeoDataFrame
+
+    Returns
+    -------
+    None
+    """
+    geometry = spec.dataframe
+    properties = spec.associated_dataframe.set_index("geometry_id")
+    # Iterate through the row containing the geometry
+    # and iterate through the associated table containing k properties.
+    for _, row in geometry.iterrows():
+        dataframe = properties.loc[row["geometry_id"]]
+        data = aquifer_data(dataframe)
+        data["model"] = model
+        data["xy"] = polygon_coordinates(row)
+        data["order"] = row["order"]
+        data["ndeg"] = row["ndegrees"]
+        data["layers"] = np.atleast_1d(row["layer"])
+        timml.BuildingPit(**data)
 
 
 def headlinesink(spec: ElementSpecification, model: timml.Model) -> None:
@@ -356,18 +379,18 @@ def circareasink(spec: ElementSpecification, model: timml.Model) -> None:
 
 
 # Map the names of the elements to their constructors
-# (Basically equivalent to eval(key)...)
 MAPPING = {
-    "constant": constant,
-    "uniformflow": uflow,
-    "circareasink": circareasink,
-    "well": well,
-    "headwell": headwell,
-    "polygoninhom": polygoninhom,
-    "headlinesink": headlinesink,
-    "linesinkditch": linesinkditch,
-    "leakylinedoublet": leakylinedoublet,
-    "implinedoublet": implinedoublet,
+    "Constant": constant,
+    "Uniform Flow": uflow,
+    "Circular Area Sink": circareasink,
+    "Well": well,
+    "Head Well": headwell,
+    "Polygon Inhomogeneity": polygoninhom,
+    "Head Line Sink": headlinesink,
+    "Line Sink Ditch": linesinkditch,
+    "Leaky Line Doublet": leakylinedoublet,
+    "Impermeable Line Doublet": implinedoublet,
+    "Building Pit": buildingpit,
 }
 
 
@@ -377,8 +400,8 @@ def extract_elementtype(s: str) -> str:
     """
     Extract the TimML element type from the geopackage layer name.
     """
-    s = s.lower().split(":")[0]
-    return s.split("timml")[-1]
+    s = s.split(":")[0]
+    return s.split("timml ")[-1]
 
 
 def model_specification(path: Union[str, pathlib.Path]) -> ModelSpecification:
@@ -406,21 +429,20 @@ def model_specification(path: Union[str, pathlib.Path]) -> ModelSpecification:
     layernames = fiona.listlayers(str(path))
     for layername in layernames:
         elementtype = extract_elementtype(layername)
+        if "Properties" in elementtype:
+            # Skip if it's the associated table
+            continue
         print("adding", layername, "as", elementtype)
-        if "polygoninhom" in elementtype:
-            if elementtype == "polygoninhom":
-                # Find geometry table and associated table.
-                name = layername.split(":")[-1]
-                geometry_name = f"timmlPolygonInhom:{name}"
-                properties_name = f"timmlPolygonInhomProperties:{name}"
-                elements[layername] = ElementSpecification(
-                    elementtype="polygoninhom",
-                    dataframe=gpd.read_file(path, layer=geometry_name),
-                    associated_dataframe=gpd.read_file(path, layer=properties_name),
-                )
-            elif elementtype == "polygoninhomproperties":
-                # Skip if it's the associated table
-                continue
+        if elementtype == "Polygon Inhomogeneity" or elementtype == "Building Pit":
+            # Find geometry table and associated table.
+            name = layername.split(":")[-1]
+            geometry_name = f"timml {elementtype}:{name}"
+            properties_name = f"timml {elementtype} Properties:{name}"
+            elements[layername] = ElementSpecification(
+                elementtype=elementtype,
+                dataframe=gpd.read_file(path, layer=geometry_name),
+                associated_dataframe=gpd.read_file(path, layer=properties_name),
+            )
         else:
             element_spec = ElementSpecification(
                 elementtype=elementtype,
@@ -428,7 +450,7 @@ def model_specification(path: Union[str, pathlib.Path]) -> ModelSpecification:
                 associated_dataframe=None,
             )
             # Special case aquifer, since only a single instance may occur
-            if elementtype == "aquifer":
+            if elementtype == "Aquifer":
                 aquifer = element_spec
             else:
                 elements[layername] = element_spec
@@ -473,7 +495,7 @@ def initialize_model(spec: ModelSpecification) -> timml.Model:
 
     for element_spec in spec.elements.values():
         elementtype = element_spec.elementtype
-        if elementtype == "domain":
+        if elementtype == "Domain":
             continue
 
         # Grab conversion function
@@ -538,7 +560,7 @@ def gridspec(
     crs: Any
         Coordinate Reference System
     """
-    domain = gpd.read_file(path, layer="timmlDomain")
+    domain = gpd.read_file(path, layer="timml Domain")
     xmin, ymin, xmax, ymax = domain.bounds.iloc[0]
     extent = (xmin, xmax, ymin, ymax)
     return round_extent(extent, cellsize), domain.crs
