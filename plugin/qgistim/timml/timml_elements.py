@@ -8,16 +8,18 @@ ELEMENT_SPEC = {
     "Aquifer": (
         "No geometry",
         [
-            QgsField("index", QVariant.Int),
+            QgsField("layer", QVariant.Int),
             QgsField("conductivity", QVariant.Double),
             QgsField("resistance", QVariant.Double),
-            QgsField("top", QVariant.Double),
-            QgsField("bottom", QVariant.Double),
-            QgsField("porosity", QVariant.Double),
-            QgsField("headtop", QVariant.Double),
+            QgsField("z_top", QVariant.Double),
+            QgsField("z_bottom", QVariant.Double),
+            QgsField("porosity_aquifer", QVariant.Double),
+            QgsField("porosity_aquitard", QVariant.Double),
+            QgsField("head_topboundary", QVariant.Double),
+            QgsField("z_topboundary", QVariant.Double),
         ],
     ),
-    "UniformFlow": (
+    "Uniform Flow": (
         "No geometry",
         [
             QgsField("slope", QVariant.Double),
@@ -43,7 +45,7 @@ ELEMENT_SPEC = {
             QgsField("label", QVariant.String),
         ],
     ),
-    "HeadWell": (
+    "Head Well": (
         "Point",
         [
             QgsField("head", QVariant.Double),
@@ -53,7 +55,7 @@ ELEMENT_SPEC = {
             QgsField("label", QVariant.String),
         ],
     ),
-    "HeadLineSink": (
+    "Head Line Sink": (
         "Linestring",
         [
             QgsField("head", QVariant.Double),
@@ -64,7 +66,7 @@ ELEMENT_SPEC = {
             QgsField("label", QVariant.String),
         ],
     ),
-    "LineSinkDitch": (
+    "Line Sink Ditch": (
         "Linestring",
         [
             QgsField("discharge", QVariant.Double),
@@ -75,7 +77,7 @@ ELEMENT_SPEC = {
             QgsField("label", QVariant.String),
         ],
     ),
-    "CircAreaSink": (
+    "Circular Area Sink": (
         "Polygon",
         [
             QgsField("rate", QVariant.Double),
@@ -83,7 +85,7 @@ ELEMENT_SPEC = {
             QgsField("label", QVariant.String),
         ],
     ),
-    "ImpLineDoublet": (
+    "Impermeable Line Doublet": (
         "Linestring",
         [
             QgsField("order", QVariant.Int),
@@ -91,7 +93,7 @@ ELEMENT_SPEC = {
             QgsField("label", QVariant.String),
         ],
     ),
-    "LeakyLineDoublet": (
+    "Leaky Line Doublet": (
         "Linestring",
         [
             QgsField("resistance", QVariant.Double),
@@ -100,24 +102,51 @@ ELEMENT_SPEC = {
             QgsField("label", QVariant.String),
         ],
     ),
-    "PolygonInhom": (
+    "Polygon Inhomogeneity": (
         "Polygon",
         [
+            QgsField("geometry_id", QVariant.Int),
             QgsField("order", QVariant.Int),
             QgsField("ndegrees", QVariant.Int),
         ],
     ),
-    "PolygonInhomProperties": (
+    "Polygon Inhomogeneity Properties": (
         "No geometry",
         [
-            QgsField("index", QVariant.Int),
+            QgsField("geometry_id", QVariant.Int),
+            QgsField("layer", QVariant.Int),
             QgsField("conductivity", QVariant.Double),
             QgsField("resistance", QVariant.Double),
-            QgsField("top", QVariant.Double),
-            QgsField("bottom", QVariant.Double),
-            QgsField("porosity", QVariant.Double),
-            QgsField("headtop", QVariant.Double),
-            QgsField("geometry_fid", QVariant.Int),
+            QgsField("z_top", QVariant.Double),
+            QgsField("z_bottom", QVariant.Double),
+            QgsField("porosity_aquifer", QVariant.Double),
+            QgsField("porosity_aquitard", QVariant.Double),
+            QgsField("head_topboundary", QVariant.Double),
+            QgsField("z_topboundary", QVariant.Double),
+        ],
+    ),
+    "Building Pit": (
+        "Polygon",
+        [
+            QgsField("geometry_id", QVariant.Int),
+            QgsField("order", QVariant.Int),
+            QgsField("ndegrees", QVariant.Int),
+            QgsField("layer", QVariant.Int),
+        ],
+    ),
+    "Building Pit Properties": (
+        "No geometry",
+        [
+            QgsField("geometry_id", QVariant.Int),
+            QgsField("layer", QVariant.Int),
+            QgsField("conductivity", QVariant.Double),
+            QgsField("resistance", QVariant.Double),
+            QgsField("z_top", QVariant.Double),
+            QgsField("z_bottom", QVariant.Double),
+            QgsField("porosity_aquifer", QVariant.Double),
+            QgsField("porosity_aquitard", QVariant.Double),
+            QgsField("head_topboundary", QVariant.Double),
+            QgsField("z_topboundary", QVariant.Double),
         ],
     ),
 }
@@ -141,7 +170,7 @@ def create_timml_layer(elementtype: str, layername: str, crs) -> QgsVectorLayer:
         A new vector layer
     """
     geometry_type, attributes = ELEMENT_SPEC[elementtype]
-    layer = QgsVectorLayer(geometry_type, f"timml{elementtype}:{layername}", "memory")
+    layer = QgsVectorLayer(geometry_type, f"timml {elementtype}:{layername}", "memory")
     provider = layer.dataProvider()
     provider.addAttributes(attributes)
     layer.updateFields()
