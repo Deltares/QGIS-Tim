@@ -250,6 +250,6 @@ def netcdf_to_table(inpath: str, outpath: str, wkt_geometry: List[str]) -> None:
     outpath = pathlib.Path(outpath)
     gdf = gpd.GeoDataFrame(geometry=geometries)
     stats = layer_statistics(inpath, gdf)
-    stats.to_csv(outpath.parent / f"{outpath.stem}-statistics.csv", index=False)
+    stats.to_csv(outpath.parent / f"{outpath.stem}-statistics.csv")
     table = as_aquifer_aquitard(stats)
-    table.to_csv(outpath, index=False)
+    table.to_csv(outpath)
