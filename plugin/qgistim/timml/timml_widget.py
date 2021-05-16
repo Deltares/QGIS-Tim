@@ -219,6 +219,10 @@ class QgisTimmlWidget(QWidget):
             layer = QgsVectorLayer(f"{path}|layername={layername}", layername)
             if layername == "timml Domain":
                 renderer = layer_styling.domain_renderer()
+                bbox = layer.getFeature(1).geometry().boundingBox()
+                ymax = bbox.yMaximum()
+                ymin = bbox.yMinimum()
+                self.set_cellsize_from_domain(ymax, ymin)
             elif "timml Circular Area Sink" in layername:
                 renderer = layer_styling.circareasink_renderer()
             else:
@@ -361,6 +365,20 @@ class QgisTimmlWidget(QWidget):
 
         renderer = layer_styling.domain_renderer()
         self.add_layer(written_layer, renderer, to_dataset_tree=False)
+        self.set_cellsize_from_domain(ymax, ymin)
+
+    def set_cellsize_from_domain(self, ymax, ymin):
+        # Guess a reasonable value for the cellsize: about 50 rows
+        dy = (ymax - ymin) / 50.0
+        if dy > 500.0:
+            dy = round(dy / 500.0) * 500.0
+        elif dy > 50.0:
+            dy = round(dy / 50.0) * 50.0
+        elif dy > 5.0:  # round to five
+            dy = round(dy / 5.0) * 5.0
+        elif dy > 1.0:
+            dy = round(dy)
+        self.cellsize_spin_box.setValue(dy)
 
     def circ_area_sink(self) -> None:
         """
