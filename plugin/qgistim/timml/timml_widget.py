@@ -275,8 +275,14 @@ class QgisTimmlWidget(QWidget):
         qgs_instance = QgsProject.instance()
         for item in selection:
             layer = item.layer
-            qgs_instance.removeMapLayer(layer.id())
             geopackage.remove_layer(self.path, item.text(0))
+            try:
+                qgs_instance.removeMapLayer(layer.id())
+            except RuntimeError as e:
+                if e.args[0] == "wrapped C/C++ object of type QgsVectorLayer has been deleted":
+                    pass
+                else:
+                    raise
             index = self.dataset_tree.indexOfTopLevelItem(item)
             self.dataset_tree.takeTopLevelItem(index)
 
