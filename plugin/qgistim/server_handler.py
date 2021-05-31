@@ -33,7 +33,8 @@ class ServerHandler:
             sock.bind(("localhost", 0))
             return sock.getsockname()[1]
 
-    def get_configdir(self) -> Path:
+    @staticmethod
+    def get_configdir() -> Path:
         """
         Get the location of the qgis-tim plugin settings.
 
@@ -49,13 +50,15 @@ class ServerHandler:
             configdir = Path(os.environ["HOME"]) / ".qgis-tim"
         return configdir
 
-    def interpreters(self) -> List[str]:
-        with open(self.get_configdir() / "environmental-variables.json", "r") as f:
+    @staticmethod
+    def interpreters() -> List[str]:
+        with open(ServerHandler.get_configdir() / "environmental-variables.json", "r") as f:
             env_vars = json.loads(f.read())
         return list(env_vars.keys())
 
-    def environmental_variables(self):
-        with open(self.get_configdir() / "environmental-variables.json", "r") as f:
+    @staticmethod
+    def environmental_variables():
+        with open(ServerHandler.get_configdir() / "environmental-variables.json", "r") as f:
             env_vars = json.loads(f.read())
         return env_vars
 
