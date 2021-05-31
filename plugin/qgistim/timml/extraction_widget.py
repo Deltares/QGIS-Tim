@@ -1,7 +1,10 @@
 import json
 import subprocess
+from pathlib import Path
 
-from PyQt5.QtCore import Qt, pyqtSignal
+import gdal
+
+from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QColor
 from PyQt5.QtWidgets import (
     QApplication,
@@ -10,18 +13,18 @@ from PyQt5.QtWidgets import (
     QPushButton,
     QVBoxLayout,
     QWidget,
+    QLineEdit,
 )
 from qgis.core import (
+    Qgis,
     QgsGeometry,
-    QgsLineString,
     QgsMapLayerType,
-    QgsMultiLineString,
-    QgsPoint,
-    QgsPointXY,
     QgsProject,
-    QgsRectangle,
     QgsWkbTypes,
+    QgsRasterLayer,
+    QgsLayerTreeGroup,
 )
+from qgistim import layer_styling
 from qgis.gui import QgsMapLayerComboBox, QgsMapTool, QgsRubberBand
 
 RUBBER_BAND_COLOR = QColor(Qt.yellow)
@@ -216,54 +219,79 @@ def is_netcdf_layer(layer):
     return True
 
 
-class UpdatingQgsMapLayerComboBox(QgsMapLayerComboBox):
-    def enterEvent(self, e):
-        self.update_layers()
-        super(UpdatingQgsMapLayerComboBox, self).enterEvent(e)
-
-    def update_layers(self):
-        # Allow:
-        # * Point data with associated IPF borehole data
-        # * Mesh layers
-        # * Raster layers
-        excepted_layers = []
-        for layer in QgsProject.instance().mapLayers().values():
-            if not is_netcdf_layer(layer):
-                excepted_layers.append(layer)
-        self.setExceptedLayerList(excepted_layers)
-
-
 class DataExtractionWidget(QWidget):
     def __init__(self, iface, parent=None):
         super(DataExtractionWidget, self).__init__(parent)
         self.iface = iface
         self.canvas = iface.mapCanvas()
-        layout = QHBoxLayout()
-        self.layer_selection = UpdatingQgsMapLayerComboBox()
-        self.layer_selection.setMinimumWidth(200)
+        layout = QVBoxLayout()
+        netcdf_row = QHBoxLayout()
+        extraction_row = QHBoxLayout()
+        self.netcdf_line_edit = QLineEdit()
+        self.netcdf_line_edit.setEnabled(False)  # Just used as a viewing port
+        self.open_netcdf_button = QPushButton("Open")
+        self.open_netcdf_button.clicked.connect(self.open_netcdf)
         self.select_polygon_button = QPushButton("Select by Polygon")
         self.select_polygon_button.clicked.connect(self.draw_selection)
         self.polygon_tool = SelectionMapTool(iface)
         self.extract_button = QPushButton("Extract")
-        layout.addWidget(self.layer_selection)
-        layout.addWidget(self.select_polygon_button)
-        layout.addWidget(self.extract_button)
+        netcdf_row.addWidget(self.netcdf_line_edit)
+        netcdf_row.addWidget(self.open_netcdf_button)
+        extraction_row.addWidget(self.select_polygon_button)
+        extraction_row.addWidget(self.extract_button)
+        layout.addLayout(netcdf_row)
+        layout.addLayout(extraction_row)
         self.setLayout(layout)
+
+    def open_netcdf(self):
+        netcdf_path, _ = QFileDialog.getOpenFileName(self, "Select file", "", "*.nc")
+        if netcdf_path == "":  # Empty string in case of cancel button press
+            return
+        self.netcdf_line_edit.setText(netcdf_path)
+        
+        # Get the variables:
+        ds = gdal.Open(netcdf_path)
+        metadata = ds.GetMetadata("SUBDATASETS")
+        paths = [v for k, v in metadata.items() if "_NAME" in k]
+
+        root = QgsProject.instance().layerTreeRoot()
+        netcdf_group = root.addGroup(Path(netcdf_path).stem)
+        for path in paths:
+            print(path)
+            variable = path.split(":")[-1]
+            group = QgsLayerTreeGroup(variable, False)
+            group.setExpanded(False)
+            netcdf_group.addChildNode(group)
+            # Check layer for number of bands
+            layer = QgsRasterLayer(path, "", "gdal")
+            bandcount = layer.bandCount()
+            for band in range(1, bandcount + 1):  # Bands use 1-based indexing
+                layer = QgsRasterLayer(
+                    path, f"{variable}-{band - 1}", "gdal"
+                )
+                renderer = layer_styling.pseudocolor_renderer(
+                    layer, band, colormap="Magma", nclass=10
+                )
+                maplayer = QgsProject.instance().addMapLayer(layer, False)
+                if renderer is not None:
+                    maplayer.setRenderer(renderer)
+                group.addLayer(maplayer)
+            group.setItemVisibilityCheckedRecursive(False)
+
 
     def draw_selection(self):
         self.canvas.setMapTool(self.polygon_tool)
 
     def extract(self, interpreter, env_vars, handler):
-        layer = self.layer_selection.currentLayer()
+        inpath = self.netcdf_line_edit.text()
         geometries = self.polygon_tool.selected_geometries
-        if len(geometries) == 0 or layer is None:
+        if len(geometries) == 0:
             return
         wkts = ";".join([geom.asWkt() for geom in geometries])
         outpath, _ = QFileDialog.getSaveFileName(self, "New file", "", "*.csv")
         if outpath == "":
             return
 
-        inpath = layer.dataProvider().dataSourceUri().split('"')[1]
         if handler is None:
             subprocess.Popen(
                 f'{interpreter} -m gistim extract "{inpath}" "{outpath}" "{wkts}"',
