@@ -8,7 +8,7 @@ from functools import partial
 from pathlib import Path
 from typing import Any
 
-from PyQt5.QtCore import Qt
+from PyQt5.QtCore import QLine, Qt
 from PyQt5.QtGui import QDoubleValidator
 from PyQt5.QtWidgets import (
     QAbstractItemView,
@@ -16,7 +16,6 @@ from PyQt5.QtWidgets import (
     QComboBox,
     QDoubleSpinBox,
     QFileDialog,
-    QFrame,
     QGridLayout,
     QGroupBox,
     QHBoxLayout,
@@ -24,7 +23,6 @@ from PyQt5.QtWidgets import (
     QLineEdit,
     QPushButton,
     QSizePolicy,
-    QSpacerItem,
     QTreeWidget,
     QTreeWidgetItem,
     QVBoxLayout,
@@ -32,9 +30,7 @@ from PyQt5.QtWidgets import (
 )
 from qgis.core import (
     Qgis,
-    QgsBrowserModel,
     QgsFeature,
-    QgsField,
     QgsGeometry,
     QgsPointXY,
     QgsProject,
@@ -60,10 +56,10 @@ class QgisTimmlWidget(QWidget):
         self.extraction_widget.extract_button.clicked.connect(self.extract)
         # Dataset management
         self.dataset_line_edit = QLineEdit()
+        self.dataset_line_edit.setEnabled(False)  # Just used as a viewing port
         self.new_geopackage_button = QPushButton("New")
         self.open_geopackage_button = QPushButton("Open")
         self.remove_button = QPushButton("Remove Layer")
-        self.dataset_line_edit.setEnabled(False)  # Just used as a viewing port
         self.new_geopackage_button.clicked.connect(self.new_geopackage)
         self.open_geopackage_button.clicked.connect(self.open_geopackage)
         self.remove_button.clicked.connect(self.remove_geopackage_layer)
@@ -107,7 +103,7 @@ class QgisTimmlWidget(QWidget):
         interpreter_groupbox.setLayout(interpreter_layout)
         # Data extraction
         extraction_group = QGroupBox("Data extraction")
-        extraction_group.setMaximumHeight(80)
+        extraction_group.setMaximumHeight(110)
         extraction_layout = QVBoxLayout()
         extraction_layout.addWidget(self.extraction_widget)
         extraction_group.setLayout(extraction_layout)
@@ -115,7 +111,7 @@ class QgisTimmlWidget(QWidget):
         dataset_groupbox = QGroupBox("Dataset")
         dataset_layout = QVBoxLayout()
         dataset_row = QHBoxLayout()
-        dataset_row.addWidget(QLabel("Dataset:"))
+        dataset_row.addWidget(QLabel("GPKG Dataset:"))
         dataset_row.addWidget(self.dataset_line_edit)
         dataset_row.addWidget(self.open_geopackage_button)
         dataset_row.addWidget(self.new_geopackage_button)
@@ -143,7 +139,6 @@ class QgisTimmlWidget(QWidget):
         solution_grid.addWidget(label, 0, 1)
         solution_grid.addWidget(self.cellsize_spin_box, 0, 2)
         solution_grid.addWidget(self.compute_button, 1, 0)
-        vertical_spacer = QSpacerItem(0, 0, QSizePolicy.Minimum, QSizePolicy.Expanding)
         solution_groupbox.setLayout(solution_grid)
         # Set for the dock widget
         layout = QVBoxLayout()
@@ -442,7 +437,7 @@ class QgisTimmlWidget(QWidget):
         bandcount = layer.bandCount()
         for band in range(1, bandcount + 1):  # Bands use 1-based indexing
             layer = QgsRasterLayer(
-                netcdf_path, f"{path.stem}-{band - 1}-{cellsize}", "gdal"
+                netcdf_path, f"{path.stem}-layer{band - 1}-{cellsize}", "gdal"
             )
             renderer = layer_styling.pseudocolor_renderer(
                 layer, band, colormap="Magma", nclass=10
@@ -465,10 +460,18 @@ class QgisTimmlWidget(QWidget):
         Run a TimML computation with the current state of the currently active
         GeoPackage dataset.
         """
+        # Collect checked elements
+        active_elements = {}
+        root = self.dataset_tree.invisibleRootItem()
+        for i in range(root.childCount()):
+            item = root.child(i)
+            state = not (item.checkState(0) == 0)
+            active_elements[item.text(0)] = state
+
         cellsize = self.cellsize_spin_box.value()
         path = Path(self.path).absolute()
         data = json.dumps(
-            {"operation": "compute", "path": str(path), "cellsize": cellsize}
+            {"operation": "compute", "path": str(path), "cellsize": cellsize, "active_elements": active_elements}
         )
         handler = self.server_handler
         received = handler.send(data)
@@ -484,13 +487,9 @@ class QgisTimmlWidget(QWidget):
             )
 
     def extract(self) -> None:
-        if self.server_handler.PORT is not None:
-            handler = self.server_handler
-        else:
-            handler = None
         interpreter = self.interpreter_combo_box.currentText()
         env_vars = self.server_handler.environmental_variables()
-        self.extraction_widget.extract(interpreter, env_vars, handler)
+        self.extraction_widget.extract(interpreter, env_vars, self.server_handler)
 
 
 class DatasetTreeWidget(QTreeWidget):
@@ -502,6 +501,7 @@ class DatasetTreeWidget(QTreeWidget):
 
     def add_layer(self, layer):
         item = QTreeWidgetItem([layer.name()])
+        item.setCheckState(0, Qt.Checked)
         item.layer = layer
         self.addTopLevelItem(item)
 
