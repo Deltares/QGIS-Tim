@@ -1,6 +1,6 @@
 import pathlib
 import re
-from typing import Any, Callable, Dict, NamedTuple, Tuple, Union
+from typing import Any, Callable, Dict, List, NamedTuple, Tuple, Union
 
 import fiona
 import geopandas as gpd
@@ -310,7 +310,7 @@ def extract_elementtype(s: str) -> str:
     return s.split("timml ")[-1]
 
 
-def model_specification(path: Union[str, pathlib.Path]) -> ModelSpecification:
+def model_specification(path: Union[str, pathlib.Path], active_elements: Dict[str, bool]) -> ModelSpecification:
     """
     Parse the layer names of the geopackage to find which elements are present
     in the model.
@@ -333,11 +333,19 @@ def model_specification(path: Union[str, pathlib.Path]) -> ModelSpecification:
     aquifer = None
     elements = {}
     layernames = fiona.listlayers(str(path))
+    print(active_elements)
     for layername in layernames:
         elementtype = extract_elementtype(layername)
         if "Properties" in elementtype:
             # Skip if it's the associated table
             continue
+
+        active = True
+        try:
+            active = active_elements[layername]
+        except KeyError:
+            pass
+
         print("adding", layername, "as", elementtype)
         if elementtype == "Polygon Inhomogeneity" or elementtype == "Building Pit":
             # Find geometry table and associated table.
@@ -346,12 +354,14 @@ def model_specification(path: Union[str, pathlib.Path]) -> ModelSpecification:
             properties_name = f"timml {elementtype} Properties:{name}"
             elements[layername] = ElementSpecification(
                 elementtype=elementtype,
+                active=active,
                 dataframe=gpd.read_file(path, layer=geometry_name),
                 associated_dataframe=gpd.read_file(path, layer=properties_name),
             )
         else:
             element_spec = ElementSpecification(
                 elementtype=elementtype,
+                active=active,
                 dataframe=gpd.read_file(path, layer=layername),
                 associated_dataframe=None,
             )
@@ -402,7 +412,7 @@ def initialize_model(spec: ModelSpecification) -> timml.Model:
 
     for name, element_spec in spec.elements.items():
         elementtype = element_spec.elementtype
-        if elementtype == "Domain":
+        if elementtype == "Domain" or not element_spec.active:
             continue
 
         # Grab conversion function
@@ -451,3 +461,20 @@ def headgrid(model: timml.Model, extent: Tuple[float], cellsize: float) -> xr.Da
         dims=("layer", "y", "x"),
     )
     return out
+
+
+def discharge(model: timml.Model, elements: Dict) -> Tuple[List[gpd.GeoDataFrame]]:
+    """
+    Extract the discharge for elements that have a discharge.
+    
+    Do this twice: once for the integral elements, and once for the individual
+    line sections. Return this as two lists of geodataframes, which can be
+    written to geopackages.
+    
+    Parameters
+    ---------
+    model: timml.Model
+    elements: dict
+    """
+
+

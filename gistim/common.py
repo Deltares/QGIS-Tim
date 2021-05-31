@@ -17,6 +17,7 @@ FloatArray = np.ndarray
 
 class ElementSpecification(NamedTuple):
     elementtype: str
+    active: bool
     dataframe: gpd.GeoDataFrame
     associated_dataframe: gpd.GeoDataFrame
 

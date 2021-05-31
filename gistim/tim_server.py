@@ -4,7 +4,7 @@ import os
 import pathlib
 import socketserver
 import sys
-from typing import NamedTuple, Union
+from typing import NamedTuple, Union, Dict
 
 import rioxarray
 
@@ -51,7 +51,7 @@ class TimHandler(socketserver.BaseRequestHandler):
     and cellsize, and write the result to a 3D (layer, y, x) netCDF file.
     """
 
-    def initialize(self, path: Union[pathlib.Path, str]) -> None:
+    def initialize(self, path: Union[pathlib.Path, str], active_elements: Dict[str, bool]) -> None:
         """
         Convert the contents of the GeoPackage into a TimML model.
 
@@ -60,10 +60,10 @@ class TimHandler(socketserver.BaseRequestHandler):
         path: Union[pathlib.Path, str]
             Path to the GeoPackage file containing the full model input.
         """
-        spec = gistim.model_specification(path)
+        spec = gistim.model_specification(path, active_elements)
         self.server.model, _ = gistim.initialize_model(spec)
 
-    def compute(self, path: Union[pathlib.Path, str], cellsize: float) -> None:
+    def compute(self, path: Union[pathlib.Path, str], cellsize: float, active_elements: Dict[str, bool]) -> None:
         """
         Compute the results of TimML model.
 
@@ -96,7 +96,7 @@ class TimHandler(socketserver.BaseRequestHandler):
         #    self.initialize(path)
         #    self.server.geopackage_hash = gpkg_hash
         #    self.server.solved = False
-        self.initialize(path)
+        self.initialize(path, active_elements)
         self.server.geopackage_hash = gpkg_hash
         self.server.solved = False
         if not self.server.solved:
@@ -128,6 +128,7 @@ class TimHandler(socketserver.BaseRequestHandler):
             self.compute(
                 path=data["path"],
                 cellsize=data["cellsize"],
+                active_elements=data["active_elements"],
             )
             print("Computation succesful")
             # Send error code 0: all okay
