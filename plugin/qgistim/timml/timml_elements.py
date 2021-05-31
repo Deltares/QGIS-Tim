@@ -9,8 +9,8 @@ ELEMENT_SPEC = {
         "No geometry",
         [
             QgsField("layer", QVariant.Int),
-            QgsField("conductivity", QVariant.Double),
             QgsField("resistance", QVariant.Double),
+            QgsField("conductivity", QVariant.Double),
             QgsField("z_top", QVariant.Double),
             QgsField("z_bottom", QVariant.Double),
             QgsField("porosity_aquifer", QVariant.Double),
