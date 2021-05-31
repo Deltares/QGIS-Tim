@@ -80,9 +80,9 @@ class QgisTimmlWidget(QWidget):
             self.element_buttons[element] = button
         self.toggle_element_buttons(False)  # no dataset loaded yet
         # Interpreter combo box
-        self.server_handler = ServerHandler()  # To connect with TimServer
+        self.server_handler = None# ServerHandler()  # To connect with TimServer
         self.interpreter_combo_box = QComboBox()
-        self.interpreter_combo_box.insertItems(0, self.server_handler.interpreters())
+        self.interpreter_combo_box.insertItems(0, ServerHandler.interpreters())
         self.interpreter_button = QPushButton("Start")
         self.interpreter_button.clicked.connect(self.start_server)
         # Solution
@@ -165,14 +165,6 @@ class QgisTimmlWidget(QWidget):
         """
         for button in self.element_buttons.values():
             button.setEnabled(state)
-
-    def closeEvent(self, event: Any) -> None:
-        """
-        Closes the plugin
-        """
-        self.server_handler.kill()
-        self.closingPlugin.emit()
-        event.accept()
 
     @property
     def path(self) -> str:
@@ -459,8 +451,14 @@ class QgisTimmlWidget(QWidget):
 
     def start_server(self) -> None:
         """Start an external interpreter running gistim"""
+        self.server_handler = ServerHandler()
         interpreter = self.interpreter_combo_box.currentText()
         self.server_handler.start_server(interpreter)
+    
+    def shutdown_server(self) -> None:
+        if self.server_handler is not None:
+            self.server_handler.kill()
+            self.server_handler = None
 
     def compute(self) -> None:
         """

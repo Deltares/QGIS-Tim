@@ -6,6 +6,16 @@ from qgis.PyQt.QtWidgets import QAction
 from qgis.gui import QgsDockWidget
 
 
+class TimDockWidget(QgsDockWidget):
+    def closeEvent(self, event) -> None:
+        """
+        Make sure the external interpreter is shutdown as well.
+        """
+        widget = self.widget()
+        widget.shutdown_server()
+        event.accept()
+
+
 class QgisTimPlugin:
     def __init__(self, iface):
         # Save reference to the QGIS interface
@@ -37,7 +47,7 @@ class QgisTimPlugin:
     def toggle_timml(self):
         if self.timml_widget is None:
             from .timml import QgisTimmlWidget
-            self.timml_widget = QgsDockWidget("Qgis-TimML")
+            self.timml_widget = TimDockWidget("Qgis-TimML")
             self.timml_widget.setObjectName("QgisTimmlDock")
             self.iface.addDockWidget(Qt.RightDockWidgetArea, self.timml_widget)
             widget = QgisTimmlWidget(self.timml_widget, self.iface)
