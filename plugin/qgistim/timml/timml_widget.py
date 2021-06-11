@@ -8,11 +8,10 @@ from functools import partial
 from pathlib import Path
 from typing import Any
 
-from PyQt5.QtCore import QLine, Qt
-from PyQt5.QtGui import QDoubleValidator
+from PyQt5.QtCore import Qt
+from PyQt5.QtGui import QDoubleValidator, QMessageBox
 from PyQt5.QtWidgets import (
     QAbstractItemView,
-    QAction,
     QComboBox,
     QDoubleSpinBox,
     QFileDialog,
@@ -37,9 +36,7 @@ from qgis.core import (
     QgsRasterLayer,
     QgsVectorLayer,
 )
-from qgis.gui import QgsBrowserGuiModel, QgsBrowserTreeView
-from qgis.PyQt import QtGui, QtWidgets, uic
-from qgis.PyQt.QtCore import QVariant, pyqtSignal
+from qgis.PyQt import QtWidgets
 from qgistim import geopackage, layer_styling
 from qgistim.server_handler import ServerHandler
 
@@ -59,13 +56,20 @@ class QgisTimmlWidget(QWidget):
         self.dataset_line_edit.setEnabled(False)  # Just used as a viewing port
         self.new_geopackage_button = QPushButton("New")
         self.open_geopackage_button = QPushButton("Open")
-        self.remove_button = QPushButton("Remove Layer")
+        self.remove_button = QPushButton("Remove from Dataset")
+        self.add_button = QPushButton("Add to QGIS")
         self.new_geopackage_button.clicked.connect(self.new_geopackage)
         self.open_geopackage_button.clicked.connect(self.open_geopackage)
         self.remove_button.clicked.connect(self.remove_geopackage_layer)
+        self.add_button.clicked.connect(self.add_layer_to_qgis)
+        self.group = None
         self.dataset_tree = DatasetTreeWidget()
         self.dataset_tree.setSizePolicy(QSizePolicy.Preferred, QSizePolicy.Expanding)
-        # Elements
+        # Connect to reading of project file
+        instance = QgsProject().instance()
+        instance.readProject.connect(self.read_plugin_state_from_project)
+        instance.projectSaved.connect(self.write_plugin_state_to_project)
+        # Element
         self.element_buttons = {}
         for element in ELEMENT_SPEC:
             # Skip associated table
@@ -76,7 +80,7 @@ class QgisTimmlWidget(QWidget):
             self.element_buttons[element] = button
         self.toggle_element_buttons(False)  # no dataset loaded yet
         # Interpreter combo box
-        self.server_handler = None# ServerHandler()  # To connect with TimServer
+        self.server_handler = None  # ServerHandler()  # To connect with TimServer
         self.interpreter_combo_box = QComboBox()
         self.interpreter_combo_box.insertItems(0, ServerHandler.interpreters())
         self.interpreter_button = QPushButton("Start")
@@ -108,16 +112,18 @@ class QgisTimmlWidget(QWidget):
         extraction_layout.addWidget(self.extraction_widget)
         extraction_group.setLayout(extraction_layout)
         # Dataset
-        dataset_groupbox = QGroupBox("Dataset")
+        dataset_groupbox = QGroupBox("GeoPackage Dataset")
         dataset_layout = QVBoxLayout()
         dataset_row = QHBoxLayout()
-        dataset_row.addWidget(QLabel("GPKG Dataset:"))
+        layer_row = QHBoxLayout()
         dataset_row.addWidget(self.dataset_line_edit)
         dataset_row.addWidget(self.open_geopackage_button)
         dataset_row.addWidget(self.new_geopackage_button)
         dataset_layout.addLayout(dataset_row)
         dataset_layout.addWidget(self.dataset_tree)
-        dataset_layout.addWidget(self.remove_button)
+        layer_row.addWidget(self.add_button)
+        layer_row.addWidget(self.remove_button)
+        dataset_layout.addLayout(layer_row)
         dataset_groupbox.setLayout(dataset_layout)
         # Elements
         element_groupbox = QGroupBox("Elements")
@@ -171,9 +177,7 @@ class QgisTimmlWidget(QWidget):
         """Returns coordinate reference system of current mapview"""
         return self.iface.mapCanvas().mapSettings().destinationCrs()
 
-    def add_layer(
-        self, layer: Any, renderer: Any = None, to_dataset_tree: bool = True
-    ) -> None:
+    def add_layer(self, layer: Any, renderer: Any = None) -> None:
         """
         Add a layer to the Layers Panel
 
@@ -188,42 +192,99 @@ class QgisTimmlWidget(QWidget):
         if renderer is not None:
             maplayer.setRenderer(renderer)
         self.group.addLayer(maplayer)
-        if to_dataset_tree:
-            self.dataset_tree.add_layer(layer)
 
-    def add_geopackage_layers(self, path: str) -> None:
-        """
-        Add all the layers from a geopackage to the Layers Panel.
-
-        Parameters
-        ----------
-        path: str
-            Path to the GeoPackage
-        """
-        # Adapted from PyQGIS cheatsheet:
-        # https://docs.qgis.org/testing/en/docs/pyqgis_developer_cookbook/cheat_sheet.html#layers
-        for layername in geopackage.layers(self.path):
-            layer = QgsVectorLayer(f"{path}|layername={layername}", layername)
-            if layername == "timml Domain":
-                renderer = layer_styling.domain_renderer()
-                bbox = layer.getFeature(1).geometry().boundingBox()
-                ymax = bbox.yMaximum()
-                ymin = bbox.yMinimum()
-                self.set_cellsize_from_domain(ymax, ymin)
-            elif "timml Circular Area Sink" in layername:
-                renderer = layer_styling.circareasink_renderer()
-            else:
-                renderer = None
-            self.add_layer(layer, renderer)
+    def add_geopackage_layer(self, path: str, layername: str) -> QgsVectorLayer:
+        layer = QgsVectorLayer(f"{path}|layername={layername}", layername)
+        if layername == "timml Domain":
+            renderer = layer_styling.domain_renderer()
+            bbox = layer.getFeature(1).geometry().boundingBox()
+            ymax = bbox.yMaximum()
+            ymin = bbox.yMinimum()
+            self.set_cellsize_from_domain(ymax, ymin)
+        elif "timml Circular Area Sink" in layername:
+            renderer = layer_styling.circareasink_renderer()
+        else:
+            renderer = None
+        self.add_layer(layer, renderer)
+        return layer
 
     def load_geopackage(self) -> None:
         """
         Load the layers of a GeoPackage into the Layers Panel
         """
+        self.dataset_tree.clear()
         path = self.path
         root = QgsProject.instance().layerTreeRoot()
         self.group = root.addGroup(str(Path(path).stem))
-        self.add_geopackage_layers(path)
+        # Adapted from PyQGIS cheatsheet:
+        # https://docs.qgis.org/testing/en/docs/pyqgis_developer_cookbook/cheat_sheet.html#layers
+        for layername in geopackage.layers(self.path):
+            layer = self.add_geopackage_layer(path, layername)
+            self.dataset_tree.add_layer(layer)
+
+    def write_plugin_state_to_project(self) -> None:
+        PROJECT_SCOPE = "QgisTim"
+        GPGK_PATH_ENTRY = "timml_geopackage_path"
+        GPKG_LAYERS_ENTRY = "timml_geopackage_layers"
+        TIMML_GROUP_ENTRY = "timml_group"
+
+        project = QgsProject().instance()
+        # Store geopackage path
+        project.writeEntry(PROJECT_SCOPE, GPGK_PATH_ENTRY, self.path)
+
+        # Store maplayers
+        maplayers = QgsProject().instance().mapLayers()
+        names = [layer for layer in maplayers]
+        entry = "␞".join(names)
+        project.writeEntry(PROJECT_SCOPE, GPKG_LAYERS_ENTRY, entry)
+
+        # Store root group
+        try:
+            group_name = self.group.name()
+        except (RuntimeError, AttributeError):
+            group_name = ""
+        project.writeEntry(PROJECT_SCOPE, TIMML_GROUP_ENTRY, group_name)
+
+        project.blockSignals(True)
+        project.write()
+        project.blockSignals(False)
+
+    def read_plugin_state_from_project(self) -> None:
+        PROJECT_SCOPE = "QgisTim"
+        GPGK_PATH_ENTRY = "timml_geopackage_path"
+        GPKG_LAYERS_ENTRY = "timml_geopackage_layers"
+        TIMML_GROUP_ENTRY = "timml_group"
+
+        project = QgsProject().instance()
+        path, _ = project.readEntry(PROJECT_SCOPE, GPGK_PATH_ENTRY)
+        if path == "":
+            return
+
+        group_name, _ = project.readEntry(PROJECT_SCOPE, TIMML_GROUP_ENTRY)
+        root = QgsProject.instance().layerTreeRoot()
+        self.group = root.findGroup(group_name)
+        if self.group is None:
+            self.group = root.addGroup(str(Path(path).stem))
+
+        entry, success = project.readEntry(PROJECT_SCOPE, GPKG_LAYERS_ENTRY)
+        if success:
+            names = entry.split("␞")
+        else:
+            names = []
+
+        self.dataset_tree.clear()
+        self.dataset_line_edit.setText(path)
+        self.toggle_element_buttons(True)
+
+        gpkg_names = geopackage.layers(path)
+        maplayers_dict = QgsProject().instance().mapLayers()
+        maplayers = {v.name(): v for k, v in maplayers_dict.items() if k in names}
+        for name in gpkg_names:
+            try:
+                layer = maplayers[name]
+            except KeyError:
+                layer = None
+            self.dataset_tree.add_layer(layer=layer, name=name)
 
     def new_geopackage(self) -> None:
         """
@@ -259,19 +320,40 @@ class QgisTimmlWidget(QWidget):
 
     def remove_geopackage_layer(self) -> None:
         selection = self.dataset_tree.selectedItems()
+        message = "\n".join([f"- {item.text(0)}" for item in selection])
+        reply = QMessageBox.question(
+            self,
+            "Deleting from Geopackage",
+            f"Deleting:\n{message}",
+            QMessageBox.Yes | QMessageBox.No,
+            QMessageBox.No,
+        )
+        if reply == QMessageBox.No:
+            return
         qgs_instance = QgsProject.instance()
         for item in selection:
             layer = item.layer
             geopackage.remove_layer(self.path, item.text(0))
             try:
                 qgs_instance.removeMapLayer(layer.id())
-            except RuntimeError as e:
-                if e.args[0] == "wrapped C/C++ object of type QgsVectorLayer has been deleted":
+            except (RuntimeError, AttributeError) as e:
+                if e.args[0] in (
+                    "wrapped C/C++ object of type QgsVectorLayer has been deleted",
+                    "'NoneType' object has no attribute 'id'",
+                ):
                     pass
                 else:
                     raise
             index = self.dataset_tree.indexOfTopLevelItem(item)
             self.dataset_tree.takeTopLevelItem(index)
+
+    def add_layer_to_qgis(self) -> None:
+        selection = self.dataset_tree.selectedItems()
+        for item in selection:
+            layername = item.text(0)
+            layer = self.add_geopackage_layer(self.path, layername)
+            # Overwrite the old reference
+            item.layer = layer
 
     def timml_element(self, elementtype: str) -> None:
         """
@@ -300,6 +382,7 @@ class QgisTimmlWidget(QWidget):
                         self.path, layer, f"timml {elementtype}:{layername}"
                     )
                     self.add_layer(written_layer)
+                    self.dataset_tree.add_layer(written_layer)
 
     def timml_polygon_element(self, elementtype: str, layername: str) -> None:
         """
@@ -326,6 +409,8 @@ class QgisTimmlWidget(QWidget):
         )
         self.add_layer(written_geometry)
         self.add_layer(written_property)
+        self.dataset_tree.add_layer(written_geometry)
+        self.dataset_tree.add_layer(written_property)
 
     def domain(self) -> None:
         """
@@ -357,7 +442,8 @@ class QgisTimmlWidget(QWidget):
                 QgsProject.instance().removeMapLayer(existing_layer.id())
 
         renderer = layer_styling.domain_renderer()
-        self.add_layer(written_layer, renderer, to_dataset_tree=False)
+        self.add_layer(written_layer, renderer)
+        self.dataset_tree.add_layer(written_layer)
         self.set_cellsize_from_domain(ymax, ymin)
 
     def set_cellsize_from_domain(self, ymax, ymin):
@@ -407,6 +493,7 @@ class QgisTimmlWidget(QWidget):
             )
             renderer = layer_styling.circareasink_renderer()
             self.add_layer(written_layer, renderer)
+            self.dataset_tree.add_layer(written_layer)
 
     def load_result(self, path: Path, cellsize: float) -> None:
         """
@@ -442,14 +529,15 @@ class QgisTimmlWidget(QWidget):
             renderer = layer_styling.pseudocolor_renderer(
                 layer, band, colormap="Magma", nclass=10
             )
-            self.add_layer(layer, renderer, to_dataset_tree=False)
+            self.add_layer(layer, renderer)
+            self.dataset_tree.add_layer(layer)
 
     def start_server(self) -> None:
         """Start an external interpreter running gistim"""
         self.server_handler = ServerHandler()
         interpreter = self.interpreter_combo_box.currentText()
         self.server_handler.start_server(interpreter)
-    
+
     def shutdown_server(self) -> None:
         if self.server_handler is not None:
             self.server_handler.kill()
@@ -471,7 +559,12 @@ class QgisTimmlWidget(QWidget):
         cellsize = self.cellsize_spin_box.value()
         path = Path(self.path).absolute()
         data = json.dumps(
-            {"operation": "compute", "path": str(path), "cellsize": cellsize, "active_elements": active_elements}
+            {
+                "operation": "compute",
+                "path": str(path),
+                "cellsize": cellsize,
+                "active_elements": active_elements,
+            }
         )
         handler = self.server_handler
         received = handler.send(data)
@@ -499,8 +592,10 @@ class DatasetTreeWidget(QTreeWidget):
         self.setHeaderHidden(True)
         self.setSortingEnabled(True)
 
-    def add_layer(self, layer):
-        item = QTreeWidgetItem([layer.name()])
+    def add_layer(self, layer=None, name=None):
+        if name is None:
+            name = layer.name()
+        item = QTreeWidgetItem([name])
         item.setCheckState(0, Qt.Checked)
         item.layer = layer
         self.addTopLevelItem(item)
