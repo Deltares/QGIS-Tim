@@ -8,6 +8,7 @@ from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QColor
 from PyQt5.QtWidgets import (
     QApplication,
+    QCheckBox,
     QFileDialog,
     QHBoxLayout,
     QPushButton,
@@ -231,12 +232,15 @@ class DataExtractionWidget(QWidget):
         self.netcdf_line_edit.setEnabled(False)  # Just used as a viewing port
         self.open_netcdf_button = QPushButton("Open")
         self.open_netcdf_button.clicked.connect(self.open_netcdf)
+        self.add_to_qgis_checkbox = QCheckBox("Add to QGIS")
+        self.add_to_qgis_checkbox.setChecked(True)
         self.select_polygon_button = QPushButton("Select by Polygon")
         self.select_polygon_button.clicked.connect(self.draw_selection)
         self.polygon_tool = SelectionMapTool(iface)
         self.extract_button = QPushButton("Extract")
         netcdf_row.addWidget(self.netcdf_line_edit)
         netcdf_row.addWidget(self.open_netcdf_button)
+        netcdf_row.addWidget(self.add_to_qgis_checkbox)
         extraction_row.addWidget(self.select_polygon_button)
         extraction_row.addWidget(self.extract_button)
         layout.addLayout(netcdf_row)
@@ -249,6 +253,9 @@ class DataExtractionWidget(QWidget):
             return
         self.netcdf_line_edit.setText(netcdf_path)
         
+        if not self.add_to_qgis_checkbox.isChecked():
+            return
+        
         # Get the variables:
         ds = gdal.Open(netcdf_path)
         metadata = ds.GetMetadata("SUBDATASETS")
@@ -257,7 +264,6 @@ class DataExtractionWidget(QWidget):
         root = QgsProject.instance().layerTreeRoot()
         netcdf_group = root.addGroup(Path(netcdf_path).stem)
         for path in paths:
-            print(path)
             variable = path.split(":")[-1]
             group = QgsLayerTreeGroup(variable, False)
             group.setExpanded(False)
