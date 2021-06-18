@@ -87,6 +87,8 @@ class QgisTimmlWidget(QWidget):
         self.interpreter_button.clicked.connect(self.start_server)
         # Solution
         self.domain_button = QPushButton("Domain")
+        self.transient_combo_box = QComboBox()
+        self.transient_combo_box.addItems(["Steady-state", "Transient"])
         self.compute_button = QPushButton("Compute")
         self.cellsize_spin_box = QDoubleSpinBox()
         self.cellsize_spin_box.setMinimum(0.0)
@@ -144,7 +146,8 @@ class QgisTimmlWidget(QWidget):
         label.setFixedWidth(45)
         solution_grid.addWidget(label, 0, 1)
         solution_grid.addWidget(self.cellsize_spin_box, 0, 2)
-        solution_grid.addWidget(self.compute_button, 1, 0)
+        solution_grid.addWidget(self.transient_combo_box, 1, 0)
+        solution_grid.addWidget(self.compute_button, 1, 2)
         solution_groupbox.setLayout(solution_grid)
         # Set for the dock widget
         layout = QVBoxLayout()
@@ -459,6 +462,12 @@ class QgisTimmlWidget(QWidget):
             dy = round(dy)
         self.cellsize_spin_box.setValue(dy)
 
+    def on_transient_changed(self) -> None:
+        transient = self.transient_combo_box.text() == "Transient"
+        if transient:
+            self.dataset_tree.on_transient_changed(transient)
+
+
     def circ_area_sink(self) -> None:
         """
         Create a circular area sink layer.
@@ -598,6 +607,9 @@ class DatasetTreeWidget(QTreeWidget):
         item.setCheckState(0, Qt.Checked)
         item.layer = layer
         self.addTopLevelItem(item)
+
+    def on_transient_changed(self, transient: bool) -> None:
+        pass
 
 
 class NameDialog(QtWidgets.QDialog):
