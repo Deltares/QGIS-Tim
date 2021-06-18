@@ -530,7 +530,6 @@ class QgisTimmlWidget(QWidget):
                 layer, band, colormap="Magma", nclass=10
             )
             self.add_layer(layer, renderer)
-            self.dataset_tree.add_layer(layer)
 
     def start_server(self) -> None:
         """Start an external interpreter running gistim"""
