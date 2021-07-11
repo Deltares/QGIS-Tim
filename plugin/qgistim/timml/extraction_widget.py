@@ -252,10 +252,10 @@ class DataExtractionWidget(QWidget):
         if netcdf_path == "":  # Empty string in case of cancel button press
             return
         self.netcdf_line_edit.setText(netcdf_path)
-        
+
         if not self.add_to_qgis_checkbox.isChecked():
             return
-        
+
         # Get the variables:
         ds = gdal.Open(netcdf_path)
         metadata = ds.GetMetadata("SUBDATASETS")
@@ -272,9 +272,7 @@ class DataExtractionWidget(QWidget):
             layer = QgsRasterLayer(path, "", "gdal")
             bandcount = layer.bandCount()
             for band in range(1, bandcount + 1):  # Bands use 1-based indexing
-                layer = QgsRasterLayer(
-                    path, f"{variable}-{band - 1}", "gdal"
-                )
+                layer = QgsRasterLayer(path, f"{variable}-{band - 1}", "gdal")
                 renderer = layer_styling.pseudocolor_renderer(
                     layer, band, colormap="Magma", nclass=10
                 )
@@ -283,7 +281,6 @@ class DataExtractionWidget(QWidget):
                     maplayer.setRenderer(renderer)
                 group.addLayer(maplayer)
             group.setItemVisibilityCheckedRecursive(False)
-
 
     def draw_selection(self):
         self.canvas.setMapTool(self.polygon_tool)
