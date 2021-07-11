@@ -4,6 +4,7 @@ Specification of TimML data requirements
 from qgis.core import QgsFeature, QgsField, QgsGeometry, QgsPointXY, QgsVectorLayer
 from qgis.PyQt.QtCore import QVariant
 
+
 ELEMENT_SPEC = {
     "Aquifer": (
         "No geometry",
@@ -43,6 +44,9 @@ ELEMENT_SPEC = {
             QgsField("resistance", QVariant.Double),
             QgsField("layer", QVariant.Int),
             QgsField("label", QVariant.String),
+            QgsField("caisson_radius", QVariant.Double),
+            QgsField("slug", QVariant.Bool),
+            QgsField("geometry_id", QVariant.Int),
         ],
     ),
     "Head Well": (
@@ -53,6 +57,7 @@ ELEMENT_SPEC = {
             QgsField("resistance", QVariant.Double),
             QgsField("layer", QVariant.Int),
             QgsField("label", QVariant.String),
+            QgsField("geometry_id", QVariant.Int),
         ],
     ),
     "Head Line Sink": (
@@ -64,6 +69,7 @@ ELEMENT_SPEC = {
             QgsField("order", QVariant.Int),
             QgsField("layer", QVariant.Int),
             QgsField("label", QVariant.String),
+            QgsField("geometry_id", QVariant.Int),
         ],
     ),
     "Line Sink Ditch": (
@@ -75,6 +81,7 @@ ELEMENT_SPEC = {
             QgsField("order", QVariant.Int),
             QgsField("layer", QVariant.Int),
             QgsField("label", QVariant.String),
+            QgsField("geometry_id", QVariant.Int),
         ],
     ),
     "Circular Area Sink": (
@@ -83,6 +90,7 @@ ELEMENT_SPEC = {
             QgsField("rate", QVariant.Double),
             QgsField("layer", QVariant.Int),
             QgsField("label", QVariant.String),
+            QgsField("geometry_id", QVariant.Int),
         ],
     ),
     "Impermeable Line Doublet": (

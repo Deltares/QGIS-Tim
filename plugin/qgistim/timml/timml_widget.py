@@ -9,9 +9,10 @@ from pathlib import Path
 from typing import Any
 
 from PyQt5.QtCore import Qt
-from PyQt5.QtGui import QDoubleValidator, QMessageBox
+from PyQt5.QtGui import QDoubleValidator, QHeaderView, QMessageBox
 from PyQt5.QtWidgets import (
     QAbstractItemView,
+    QCheckBox,
     QComboBox,
     QDoubleSpinBox,
     QFileDialog,
@@ -27,6 +28,7 @@ from PyQt5.QtWidgets import (
     QVBoxLayout,
     QWidget,
 )
+from xarray.core.common import T
 from qgis.core import (
     Qgis,
     QgsFeature,
@@ -42,6 +44,7 @@ from qgistim.server_handler import ServerHandler
 
 from .extraction_widget import DataExtractionWidget
 from .timml_elements import ELEMENT_SPEC, create_timml_layer
+from .ttim_elements import create_ttim_layer, TTIM_ELEMENT_SPEC
 
 
 class QgisTimmlWidget(QWidget):
@@ -287,7 +290,7 @@ class QgisTimmlWidget(QWidget):
                 layer = maplayers[name]
             except KeyError:
                 layer = None
-            self.dataset_tree.add_layer(layer=layer, name=name)
+            self.dataset_tree.add_layer(layer=layer)  # , name=name)
 
     def new_geopackage(self) -> None:
         """
@@ -323,7 +326,7 @@ class QgisTimmlWidget(QWidget):
 
     def remove_geopackage_layer(self) -> None:
         selection = self.dataset_tree.selectedItems()
-        message = "\n".join([f"- {item.text(0)}" for item in selection])
+        message = "\n".join([f"- {item.text(1)}" for item in selection])
         reply = QMessageBox.question(
             self,
             "Deleting from Geopackage",
@@ -335,28 +338,35 @@ class QgisTimmlWidget(QWidget):
             return
         qgs_instance = QgsProject.instance()
         for item in selection:
-            layer = item.layer
-            geopackage.remove_layer(self.path, item.text(0))
-            try:
-                qgs_instance.removeMapLayer(layer.id())
-            except (RuntimeError, AttributeError) as e:
-                if e.args[0] in (
-                    "wrapped C/C++ object of type QgsVectorLayer has been deleted",
-                    "'NoneType' object has no attribute 'id'",
-                ):
-                    pass
-                else:
-                    raise
+            for i, layer in zip((1, 3), item.layers):
+                if layer is None:
+                    continue
+                geopackage.remove_layer(self.path, item.text(i))
+                try:
+                    qgs_instance.removeMapLayer(layer.id())
+                except (RuntimeError, AttributeError) as e:
+                    if e.args[0] in (
+                        "wrapped C/C++ object of type QgsVectorLayer has been deleted",
+                        "'NoneType' object has no attribute 'id'",
+                    ):
+                        pass
+                    else:
+                        raise
             index = self.dataset_tree.indexOfTopLevelItem(item)
             self.dataset_tree.takeTopLevelItem(index)
 
     def add_layer_to_qgis(self) -> None:
         selection = self.dataset_tree.selectedItems()
         for item in selection:
-            layername = item.text(0)
-            layer = self.add_geopackage_layer(self.path, layername)
+            timml_layername = item.text(1)
+            ttim_layername = item.text(3)
+            timml_layer = self.add_geopackage_layer(self.path, timml_layername)
+            if ttim_layername != "":
+                ttim_layer = self.add_geopackage_layer(self.path, ttim_layername)
+            else:
+                ttim_layer = None
             # Overwrite the old reference
-            item.layer = layer
+            item.layers = [timml_layer, ttim_layer]
 
     def timml_element(self, elementtype: str) -> None:
         """
@@ -385,7 +395,21 @@ class QgisTimmlWidget(QWidget):
                         self.path, layer, f"timml {elementtype}:{layername}"
                     )
                     self.add_layer(written_layer)
-                    self.dataset_tree.add_layer(written_layer)
+
+                    # Have to skip polygon inhom, building pit
+                    if elementtype in TTIM_ELEMENT_SPEC:
+                        ttim_layer = create_ttim_layer(elementtype, layername, self.crs)
+                        written_ttim_layer = geopackage.write_layer(
+                            self.path, ttim_layer, f"ttim {elementtype}:{layername}"
+                        )
+                        self.add_layer(written_ttim_layer)
+                    else:
+                        written_ttim_layer = None
+
+                    self.dataset_tree.add_layer(
+                        timml_layer=written_layer,
+                        ttim_layer=written_ttim_layer,
+                    )
 
     def timml_polygon_element(self, elementtype: str, layername: str) -> None:
         """
@@ -466,7 +490,6 @@ class QgisTimmlWidget(QWidget):
         transient = self.transient_combo_box.text() == "Transient"
         if transient:
             self.dataset_tree.on_transient_changed(transient)
-
 
     def circ_area_sink(self) -> None:
         """
@@ -561,8 +584,8 @@ class QgisTimmlWidget(QWidget):
         root = self.dataset_tree.invisibleRootItem()
         for i in range(root.childCount()):
             item = root.child(i)
-            state = not (item.checkState(0) == 0)
-            active_elements[item.text(0)] = state
+            active_elements[item.text(1)] = not (item.timml_checkbox.isChecked() == 0)
+            active_elements[item.text(3)] = not (item.ttim_checkbox.isChecked() == 0)
 
         cellsize = self.cellsize_spin_box.value()
         path = Path(self.path).absolute()
@@ -599,17 +622,37 @@ class DatasetTreeWidget(QTreeWidget):
         self.setSelectionMode(QAbstractItemView.ExtendedSelection)
         self.setHeaderHidden(True)
         self.setSortingEnabled(True)
+        self.setSizePolicy(QSizePolicy.Minimum, QSizePolicy.Preferred)
+        self.setHeaderLabels(["", "steady", "", "transient"])
+        self.setHeaderHidden(False)
+        header = self.header()
+        header.setSectionResizeMode(1, QHeaderView.Stretch)
+        header.setSectionResizeMode(3, QHeaderView.Stretch)
+        header.setSectionsMovable(False)
+        self.setColumnCount(4)
+        self.setColumnWidth(0, 1)
+        self.setColumnWidth(2, 1)
 
-    def add_layer(self, layer=None, name=None):
-        if name is None:
-            name = layer.name()
-        item = QTreeWidgetItem([name])
-        item.setCheckState(0, Qt.Checked)
-        item.layer = layer
+    def add_layer(self, timml_layer=None, ttim_layer=None):
+        timml_name = timml_layer.name()
+        ttim_name = ttim_layer.name() if ttim_layer is not None else ""
+        item = QTreeWidgetItem()
         self.addTopLevelItem(item)
+        item.timml_checkbox = QCheckBox()
+        item.ttim_checkbox = QCheckBox()
+        item.layers = [timml_layer, ttim_layer]
+        self.setItemWidget(item, 0, item.timml_checkbox)
+        item.setText(1, timml_name)
+        self.setItemWidget(item, 2, item.ttim_checkbox)
+        item.setText(3, ttim_name)
+        item.ttim_checkbox.setEnabled(ttim_layer is not None)
+        item.timml_checkbox.setChecked(True)
 
     def on_transient_changed(self, transient: bool) -> None:
-        pass
+        for i in range(self.invisibleRootItem().childCount()):
+            item = self.takeTopLevelItem(i)
+            if item.layers[1] is not None:
+                item.ttim_checkbox.setEnabled(transient)
 
 
 class NameDialog(QtWidgets.QDialog):
