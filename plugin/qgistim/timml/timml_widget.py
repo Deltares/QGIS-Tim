@@ -4,9 +4,11 @@ to the actual functionality.
 """
 import json
 import os
+import re
+from collections import defaultdict
 from functools import partial
 from pathlib import Path
-from typing import Any
+from typing import Any, List, Tuple
 
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QDoubleValidator, QHeaderView, QMessageBox
@@ -183,6 +185,22 @@ class QgisTimmlWidget(QWidget):
         """Returns coordinate reference system of current mapview"""
         return self.iface.mapCanvas().mapSettings().destinationCrs()
 
+    def group_geopackage_names(self, gpkg_names: List[str]) -> List[Tuple[str, str]]:
+        grouped_names = defaultdict(dict)
+        for name in gpkg_names:
+            if not ("timml " in name or "ttim " in name):
+                raise ValueError(
+                    "Element name specify either timml or ttim. "
+                    f"{name} contains neither." 
+                )
+            element_name = re.split("timml |ttim ", name)[1]
+            if "timml " in name:
+                grouped_names[element_name]["timml"] = name
+            elif "ttim " in name:
+                grouped_names[element_name]["ttim"] = name
+        print(grouped_names)
+        return [(d.get("timml", ""), d.get("ttim", "")) for d in grouped_names.values()]
+
     def add_layer(self, layer: Any, renderer: Any = None) -> None:
         """
         Add a layer to the Layers Panel
@@ -222,17 +240,23 @@ class QgisTimmlWidget(QWidget):
         path = self.path
         root = QgsProject.instance().layerTreeRoot()
         self.group = root.addGroup(str(Path(path).stem))
-        # Adapted from PyQGIS cheatsheet:
-        # https://docs.qgis.org/testing/en/docs/pyqgis_developer_cookbook/cheat_sheet.html#layers
-        for layername in geopackage.layers(self.path):
-            layer = self.add_geopackage_layer(path, layername)
-            self.dataset_tree.add_layer(layer)
+        gpkg_names = geopackage.layers(self.path)
+        grouped_names = self.group_geopackage_names(gpkg_names)
+        print(grouped_names)
+        for (timml_name, ttim_name) in grouped_names:
+            layer = self.add_geopackage_layer(path, timml_name)
+            if ttim_name == "":
+                ttim_layer = None
+            else:
+                ttim_layer = self.add_geopackage_layer(path, ttim_name)
+            item = self.dataset_tree.add_layer(timml_name, ttim_name)
+            item.layers = [layer, ttim_layer]
 
     def write_plugin_state_to_project(self) -> None:
         PROJECT_SCOPE = "QgisTim"
-        GPGK_PATH_ENTRY = "timml_geopackage_path"
-        GPKG_LAYERS_ENTRY = "timml_geopackage_layers"
-        TIMML_GROUP_ENTRY = "timml_group"
+        GPGK_PATH_ENTRY = "tim_geopackage_path"
+        GPKG_LAYERS_ENTRY = "tim_geopackage_layers"
+        TIMML_GROUP_ENTRY = "tim_group"
 
         project = QgsProject().instance()
         # Store geopackage path
@@ -257,9 +281,9 @@ class QgisTimmlWidget(QWidget):
 
     def read_plugin_state_from_project(self) -> None:
         PROJECT_SCOPE = "QgisTim"
-        GPGK_PATH_ENTRY = "timml_geopackage_path"
-        GPKG_LAYERS_ENTRY = "timml_geopackage_layers"
-        TIMML_GROUP_ENTRY = "timml_group"
+        GPGK_PATH_ENTRY = "tim_geopackage_path"
+        GPKG_LAYERS_ENTRY = "tim_geopackage_layers"
+        TIMML_GROUP_ENTRY = "tim_group"
 
         project = QgsProject().instance()
         path, _ = project.readEntry(PROJECT_SCOPE, GPGK_PATH_ENTRY)
@@ -283,14 +307,15 @@ class QgisTimmlWidget(QWidget):
         self.toggle_element_buttons(True)
 
         gpkg_names = geopackage.layers(path)
+        grouped_names = self.group_geopackage_names(gpkg_names)
+        
         maplayers_dict = QgsProject().instance().mapLayers()
         maplayers = {v.name(): v for k, v in maplayers_dict.items() if k in names}
-        for name in gpkg_names:
-            try:
-                layer = maplayers[name]
-            except KeyError:
-                layer = None
-            self.dataset_tree.add_layer(layer=layer)  # , name=name)
+        for timml_name, ttim_name in grouped_names:
+            timml_layer = maplayers.get(timml_name, None)
+            ttim_layer = maplayers.get(ttim_name, None)
+            item = self.dataset_tree.add_layer(timml_name, ttim_name)
+            item.layers = [timml_layer, ttim_layer]
 
     def new_geopackage(self) -> None:
         """
@@ -395,6 +420,7 @@ class QgisTimmlWidget(QWidget):
                         self.path, layer, f"timml {elementtype}:{layername}"
                     )
                     self.add_layer(written_layer)
+                    timml_name = written_layer.name()
 
                     # Have to skip polygon inhom, building pit
                     if elementtype in TTIM_ELEMENT_SPEC:
@@ -403,13 +429,16 @@ class QgisTimmlWidget(QWidget):
                             self.path, ttim_layer, f"ttim {elementtype}:{layername}"
                         )
                         self.add_layer(written_ttim_layer)
+                        ttim_name = written_ttim_layer.name()
                     else:
                         written_ttim_layer = None
+                        ttim_name = ""
 
-                    self.dataset_tree.add_layer(
-                        timml_layer=written_layer,
-                        ttim_layer=written_ttim_layer,
+                    item = self.dataset_tree.add_layer(
+                        timml_name=timml_name,
+                        ttim_name=ttim_name,
                     )
+                    item.layers = [written_layer, written_ttim_layer]
 
     def timml_polygon_element(self, elementtype: str, layername: str) -> None:
         """
@@ -633,20 +662,17 @@ class DatasetTreeWidget(QTreeWidget):
         self.setColumnWidth(0, 1)
         self.setColumnWidth(2, 1)
 
-    def add_layer(self, timml_layer=None, ttim_layer=None):
-        timml_name = timml_layer.name()
-        ttim_name = ttim_layer.name() if ttim_layer is not None else ""
+    def add_layer(self, timml_name: str, ttim_name: str = ""):
         item = QTreeWidgetItem()
         self.addTopLevelItem(item)
         item.timml_checkbox = QCheckBox()
         item.ttim_checkbox = QCheckBox()
-        item.layers = [timml_layer, ttim_layer]
         self.setItemWidget(item, 0, item.timml_checkbox)
         item.setText(1, timml_name)
         self.setItemWidget(item, 2, item.ttim_checkbox)
         item.setText(3, ttim_name)
-        item.ttim_checkbox.setEnabled(ttim_layer is not None)
-        item.timml_checkbox.setChecked(True)
+        item.layers = [None, None]
+        return item
 
     def on_transient_changed(self, transient: bool) -> None:
         for i in range(self.invisibleRootItem().childCount()):
