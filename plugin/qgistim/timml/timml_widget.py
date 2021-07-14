@@ -98,6 +98,7 @@ class QgisTimmlWidget(QWidget):
         self.domain_button = QPushButton("Domain")
         self.transient_combo_box = QComboBox()
         self.transient_combo_box.addItems(["Steady-state", "Transient"])
+        self.transient_combo_box.currentTextChanged.connect(self.on_transient_changed)
         self.compute_button = QPushButton("Compute")
         self.cellsize_spin_box = QDoubleSpinBox()
         self.cellsize_spin_box.setMinimum(0.0)
@@ -166,6 +167,7 @@ class QgisTimmlWidget(QWidget):
         layout.addWidget(element_groupbox)
         layout.addWidget(solution_groupbox)
         self.setLayout(layout)
+        self.on_transient_changed()
 
     def toggle_element_buttons(self, state: bool) -> None:
         """
@@ -211,7 +213,6 @@ class QgisTimmlWidget(QWidget):
         """
         self.dataset_tree.clear()
         elements = load_elements_from_geopackage(self.path)
-        print(elements)
         for element in elements:
             self.dataset_tree.add_element(element)
         path = self.path
@@ -221,6 +222,7 @@ class QgisTimmlWidget(QWidget):
             self.add_item_to_qgis(item)
 
     def write_plugin_state_to_project(self) -> None:
+        print("storing state")
         PROJECT_SCOPE = "QgisTim"
         GPGK_PATH_ENTRY = "tim_geopackage_path"
         GPKG_LAYERS_ENTRY = "tim_geopackage_layers"
@@ -274,16 +276,14 @@ class QgisTimmlWidget(QWidget):
         self.dataset_line_edit.setText(path)
         self.toggle_element_buttons(True)
 
-        gpkg_names = geopackage.layers(path)
-        grouped_names = self.group_geopackage_names(gpkg_names)
-        
         maplayers_dict = QgsProject().instance().mapLayers()
         maplayers = {v.name(): v for k, v in maplayers_dict.items() if k in names}
-        for timml_name, ttim_name in grouped_names:
-            timml_layer = maplayers.get(timml_name, None)
-            ttim_layer = maplayers.get(ttim_name, None)
-            item = self.dataset_tree.add_layer(timml_name, ttim_name)
-            item.layers = [timml_layer, ttim_layer]
+        elements = load_elements_from_geopackage(self.path)
+        for element in elements:
+            element.timml_layer = maplayers.get(element.timml_name, None)
+            element.ttim_layer = maplayers.get(element.ttim_name, None)
+            element.assoc_layer = maplayers.get(element.assoc_name, None)
+            self.dataset_tree.add_element(element)
 
     def new_geopackage(self) -> None:
         """
@@ -394,7 +394,7 @@ class QgisTimmlWidget(QWidget):
             element.assoc_layer,
         ]:
             if layer is not None:
-                self.add_layer(element.timml_layer)
+                self.add_layer(layer)
         # Add to dataset tree
         self.dataset_tree.add_element(element)
 
@@ -412,7 +412,7 @@ class QgisTimmlWidget(QWidget):
         ymax, ymin = item.element.update_extent(self.iface)
         self.set_cellsize_from_domain(ymax, ymin)
 
-    def set_cellsize_from_domain(self, ymax, ymin):
+    def set_cellsize_from_domain(self, ymax: float, ymin: float) -> None:
         # Guess a reasonable value for the cellsize: about 50 rows
         dy = (ymax - ymin) / 50.0
         if dy > 500.0:
@@ -426,9 +426,8 @@ class QgisTimmlWidget(QWidget):
         self.cellsize_spin_box.setValue(dy)
 
     def on_transient_changed(self) -> None:
-        transient = self.transient_combo_box.text() == "Transient"
-        if transient:
-            self.dataset_tree.on_transient_changed(transient)
+        transient = self.transient_combo_box.currentText() == "Transient"
+        self.dataset_tree.on_transient_changed(transient)
 
     def load_result(self, path: Path, cellsize: float) -> None:
         """

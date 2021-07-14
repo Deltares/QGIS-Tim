@@ -99,7 +99,7 @@ class RadiusDialog(QDialog):
         first_row.addWidget(self.name_line_edit)
         second_row = QHBoxLayout()
         second_row.addWidget(QLabel("Radius"))
-        first_row.addWidget(self.radius_line_edit)
+        second_row.addWidget(self.radius_line_edit)
         third_row = QHBoxLayout()
         third_row.addStretch()
         third_row.addWidget(self.ok_button)
@@ -186,6 +186,7 @@ class Element:
         pass
 
     def from_geopackage(self, names: List[str]):
+        names = [name for name in names if name is not None]
         methods = {
             self.timml_name: self.timml_layer_from_geopackage,
             self.ttim_name: self.ttim_layer_from_geopackage,
@@ -306,6 +307,7 @@ class Domain(TransientElement):
 class Aquifer(TransientElement):
     def _initialize(self, path, name):
         self._initialize_default(path, name)
+        self.name = "Aquifer"
         self.element_type = "Aquifer"
         self.geometry_type = "No geometry"
         self.timml_attributes = [
@@ -593,15 +595,19 @@ ELEMENTS = {
 def extract_element_type(layername: str) -> Tuple[str, str]:
     prefix, name = layername.split(":")
     element_type = re.split("timml |ttim ", prefix)[1]
-    if element_type == "Computation Times":
-        element_type = "Domain"
-    elif element_type == "Temporal Settings":
-        element_type = "Aquifer"
+    mapping = {
+        "Computation Times": "Domain",
+        "Temporal Settings": "Aquifer",
+        "Polygon Inhomogeneity Properties": "Polygon Inhomogeneity",
+        "Building Pit Properties": "Building Pit",
+    }
+    element_type = mapping.get(element_type, element_type)
     return element_type, name
 
 
 def load_elements_from_geopackage(path: str) -> List[Element]:
     gpkg_names = geopackage.layers(path)
+    print(gpkg_names)
     grouped_names = defaultdict(list)
     for layername in gpkg_names:
         element_type, name = extract_element_type(layername)
@@ -612,4 +618,5 @@ def load_elements_from_geopackage(path: str) -> List[Element]:
         uniques = list(set(group))
         for name in uniques:
             elements.append(ELEMENTS[element_type](path, name))
+    print(elements)
     return elements
