@@ -44,9 +44,14 @@ from qgis.PyQt import QtWidgets
 from qgistim import geopackage, layer_styling
 from qgistim.server_handler import ServerHandler
 
+from .dataset_tree_widget import DatasetTreeWidget
 from .extraction_widget import DataExtractionWidget
-from .timml_elements import ELEMENT_SPEC, create_timml_layer
-from .ttim_elements import create_ttim_layer, TTIM_ELEMENT_SPEC
+from .tim_elements import (
+    Aquifer,
+    Domain,
+    ELEMENTS,
+    load_elements_from_geopackage,
+)
 
 
 class QgisTimmlWidget(QWidget):
@@ -66,7 +71,7 @@ class QgisTimmlWidget(QWidget):
         self.new_geopackage_button.clicked.connect(self.new_geopackage)
         self.open_geopackage_button.clicked.connect(self.open_geopackage)
         self.remove_button.clicked.connect(self.remove_geopackage_layer)
-        self.add_button.clicked.connect(self.add_layer_to_qgis)
+        self.add_button.clicked.connect(self.add_selection_to_qgis)
         self.group = None
         self.dataset_tree = DatasetTreeWidget()
         self.dataset_tree.setSizePolicy(QSizePolicy.Preferred, QSizePolicy.Expanding)
@@ -76,12 +81,11 @@ class QgisTimmlWidget(QWidget):
         instance.projectSaved.connect(self.write_plugin_state_to_project)
         # Element
         self.element_buttons = {}
-        for element in ELEMENT_SPEC:
-            # Skip associated table
-            if "Properties" in element:
+        for element in ELEMENTS:
+            if element in ("Aquifer", "Domain"):
                 continue
             button = QPushButton(element)
-            button.clicked.connect(partial(self.timml_element, elementtype=element))
+            button.clicked.connect(partial(self.tim_element, element_type=element))
             self.element_buttons[element] = button
         self.toggle_element_buttons(False)  # no dataset loaded yet
         # Interpreter combo box
@@ -119,7 +123,7 @@ class QgisTimmlWidget(QWidget):
         extraction_layout.addWidget(self.extraction_widget)
         extraction_group.setLayout(extraction_layout)
         # Dataset
-        dataset_groupbox = QGroupBox("GeoPackage Dataset")
+        dataset_groupbox = QGroupBox("Input: GeoPackage Dataset")
         dataset_layout = QVBoxLayout()
         dataset_row = QHBoxLayout()
         layer_row = QHBoxLayout()
@@ -143,7 +147,7 @@ class QgisTimmlWidget(QWidget):
                 element_grid.addWidget(button, i % n_row, 1)
         element_groupbox.setLayout(element_grid)
         # Solution
-        solution_groupbox = QGroupBox("Solution")
+        solution_groupbox = QGroupBox("Output")
         solution_groupbox.setMaximumHeight(150)
         solution_grid = QGridLayout()
         solution_grid.addWidget(self.domain_button, 0, 0)
@@ -185,22 +189,6 @@ class QgisTimmlWidget(QWidget):
         """Returns coordinate reference system of current mapview"""
         return self.iface.mapCanvas().mapSettings().destinationCrs()
 
-    def group_geopackage_names(self, gpkg_names: List[str]) -> List[Tuple[str, str]]:
-        grouped_names = defaultdict(dict)
-        for name in gpkg_names:
-            if not ("timml " in name or "ttim " in name):
-                raise ValueError(
-                    "Element name specify either timml or ttim. "
-                    f"{name} contains neither." 
-                )
-            element_name = re.split("timml |ttim ", name)[1]
-            if "timml " in name:
-                grouped_names[element_name]["timml"] = name
-            elif "ttim " in name:
-                grouped_names[element_name]["ttim"] = name
-        print(grouped_names)
-        return [(d.get("timml", ""), d.get("ttim", "")) for d in grouped_names.values()]
-
     def add_layer(self, layer: Any, renderer: Any = None) -> None:
         """
         Add a layer to the Layers Panel
@@ -217,40 +205,20 @@ class QgisTimmlWidget(QWidget):
             maplayer.setRenderer(renderer)
         self.group.addLayer(maplayer)
 
-    def add_geopackage_layer(self, path: str, layername: str) -> QgsVectorLayer:
-        layer = QgsVectorLayer(f"{path}|layername={layername}", layername)
-        if layername == "timml Domain":
-            renderer = layer_styling.domain_renderer()
-            bbox = layer.getFeature(1).geometry().boundingBox()
-            ymax = bbox.yMaximum()
-            ymin = bbox.yMinimum()
-            self.set_cellsize_from_domain(ymax, ymin)
-        elif "timml Circular Area Sink" in layername:
-            renderer = layer_styling.circareasink_renderer()
-        else:
-            renderer = None
-        self.add_layer(layer, renderer)
-        return layer
-
     def load_geopackage(self) -> None:
         """
         Load the layers of a GeoPackage into the Layers Panel
         """
         self.dataset_tree.clear()
+        elements = load_elements_from_geopackage(self.path)
+        print(elements)
+        for element in elements:
+            self.dataset_tree.add_element(element)
         path = self.path
         root = QgsProject.instance().layerTreeRoot()
         self.group = root.addGroup(str(Path(path).stem))
-        gpkg_names = geopackage.layers(self.path)
-        grouped_names = self.group_geopackage_names(gpkg_names)
-        print(grouped_names)
-        for (timml_name, ttim_name) in grouped_names:
-            layer = self.add_geopackage_layer(path, timml_name)
-            if ttim_name == "":
-                ttim_layer = None
-            else:
-                ttim_layer = self.add_geopackage_layer(path, ttim_name)
-            item = self.dataset_tree.add_layer(timml_name, ttim_name)
-            item.layers = [layer, ttim_layer]
+        for item in self.dataset_tree.items():
+            self.add_item_to_qgis(item)
 
     def write_plugin_state_to_project(self) -> None:
         PROJECT_SCOPE = "QgisTim"
@@ -324,7 +292,10 @@ class QgisTimmlWidget(QWidget):
         path, _ = QFileDialog.getSaveFileName(self, "Select file", "", "*.gpkg")
         if path != "":  # Empty string in case of cancel button press
             self.dataset_line_edit.setText(path)
-            self.new_timml_model()
+            for element in (Aquifer, Domain):
+                instance = element(self.path, "")
+                instance.create_layers(self.crs)
+                instance.write()
             self.load_geopackage()
             self.toggle_element_buttons(True)
 
@@ -340,17 +311,13 @@ class QgisTimmlWidget(QWidget):
             self.toggle_element_buttons(True)
         self.dataset_tree.sortByColumn(0, Qt.SortOrder.AscendingOrder)
 
-    def new_timml_model(self) -> None:
-        """
-        Create a new TimML model; writes a new GeoPackage file.
-        """
-        # Write the aquifer properties
-        self.dataset_tree.clear()
-        layer = create_timml_layer("Aquifer", "", self.crs)
-        _ = geopackage.write_layer(self.path, layer, "timml Aquifer", newfile=True)
-
     def remove_geopackage_layer(self) -> None:
         selection = self.dataset_tree.selectedItems()
+        # Append associated items
+        for item in selection:
+            if item.assoc_item is not None and item.assoc_item not in selection:
+                selection.append(assoc_item)
+        # Warn before deletion
         message = "\n".join([f"- {item.text(1)}" for item in selection])
         reply = QMessageBox.question(
             self,
@@ -361,12 +328,20 @@ class QgisTimmlWidget(QWidget):
         )
         if reply == QMessageBox.No:
             return
+        # Delete from:
+        # * QGIS layers
+        # * Geopackage 
+        # * Dataset tree
         qgs_instance = QgsProject.instance()
         for item in selection:
-            for i, layer in zip((1, 3), item.layers):
+            element = item.element
+            for layer in [
+                element.timml_layer,
+                element.ttim_layer,
+                element.assoc_layer,
+            ]: 
                 if layer is None:
                     continue
-                geopackage.remove_layer(self.path, item.text(i))
                 try:
                     qgs_instance.removeMapLayer(layer.id())
                 except (RuntimeError, AttributeError) as e:
@@ -377,129 +352,59 @@ class QgisTimmlWidget(QWidget):
                         pass
                     else:
                         raise
+            element.remove()
             index = self.dataset_tree.indexOfTopLevelItem(item)
             self.dataset_tree.takeTopLevelItem(index)
 
-    def add_layer_to_qgis(self) -> None:
+    def add_item_to_qgis(self, item) -> None:
+        names = [item.text(1), item.text(3)]
+        layers = item.element.from_geopackage(names)
+        for layer, renderer in layers:
+            self.add_layer(layer, renderer)
+
+    def add_selection_to_qgis(self) -> None:
         selection = self.dataset_tree.selectedItems()
         for item in selection:
-            timml_layername = item.text(1)
-            ttim_layername = item.text(3)
-            timml_layer = self.add_geopackage_layer(self.path, timml_layername)
-            if ttim_layername != "":
-                ttim_layer = self.add_geopackage_layer(self.path, ttim_layername)
-            else:
-                ttim_layer = None
-            # Overwrite the old reference
-            item.layers = [timml_layer, ttim_layer]
+            self.add_item_to_qgis(item)
 
-    def timml_element(self, elementtype: str) -> None:
+    def tim_element(self, element_type: str) -> None:
         """
         Create a new TimML element input layer.
 
         Parameters
         ----------
-        elementtype: str
-            Name of the element type. Used to search for the required geometry
-            and attributes (columns).
-
+        element_type: str
+            Name of the element type. 
         """
-        if elementtype == "Circular Area Sink":
-            self.circ_area_sink()
-        else:
-            dialog = NameDialog()
-            dialog.show()
-            ok = dialog.exec_()
-            if ok:
-                layername = dialog.name_line_edit.text()
-                if elementtype in ("Polygon Inhomogeneity", "Building Pit"):
-                    self.timml_polygon_element(elementtype, layername)
-                else:
-                    layer = create_timml_layer(elementtype, layername, self.crs)
-                    written_layer = geopackage.write_layer(
-                        self.path, layer, f"timml {elementtype}:{layername}"
-                    )
-                    self.add_layer(written_layer)
-                    timml_name = written_layer.name()
-
-                    # Have to skip polygon inhom, building pit
-                    if elementtype in TTIM_ELEMENT_SPEC:
-                        ttim_layer = create_ttim_layer(elementtype, layername, self.crs)
-                        written_ttim_layer = geopackage.write_layer(
-                            self.path, ttim_layer, f"ttim {elementtype}:{layername}"
-                        )
-                        self.add_layer(written_ttim_layer)
-                        ttim_name = written_ttim_layer.name()
-                    else:
-                        written_ttim_layer = None
-                        ttim_name = ""
-
-                    item = self.dataset_tree.add_layer(
-                        timml_name=timml_name,
-                        ttim_name=ttim_name,
-                    )
-                    item.layers = [written_layer, written_ttim_layer]
-
-    def timml_polygon_element(self, elementtype: str, layername: str) -> None:
-        """
-        Create a new TimML element input layer, which stores geometry and
-        properties in two separate tables.
-
-        Parameters
-        ----------
-        elementtype: str
-            Name of the element type. Used to search for the required geometry
-            and attributes (columns).
-
-        """
-        properties_elementtype = f"{elementtype} Properties"
-        geometry_layer = create_timml_layer(elementtype, layername, self.crs)
-        property_layer = create_timml_layer(properties_elementtype, layername, self.crs)
-        written_geometry = geopackage.write_layer(
-            self.path, geometry_layer, f"timml {elementtype}:{layername}"
-        )
-        written_property = geopackage.write_layer(
-            self.path,
-            property_layer,
-            f"timml {properties_elementtype}:{layername}",
-        )
-        self.add_layer(written_geometry)
-        self.add_layer(written_property)
-        self.dataset_tree.add_layer(written_geometry)
-        self.dataset_tree.add_layer(written_property)
+        klass = ELEMENTS[element_type]
+        element = klass.dialog(self.path, self.crs, self.iface, klass)
+        if element is None: # cancelled
+            return
+        # Write to geopackage
+        element.write()
+        # Add to QGIS
+        self.add_layer(element.timml_layer, element.renderer())
+        for layer in [
+            element.ttim_layer,
+            element.assoc_layer,
+        ]:
+            if layer is not None:
+                self.add_layer(element.timml_layer)
+        # Add to dataset tree
+        self.dataset_tree.add_element(element)
 
     def domain(self) -> None:
         """
         Write the current viewing extent as rectangle to the GeoPackage.
         """
-        layer = QgsVectorLayer("polygon", "timml Domain", "memory", crs=self.crs)
-        provider = layer.dataProvider()
-        extent = self.iface.mapCanvas().extent()
-        xmin = extent.xMinimum()
-        ymin = extent.yMinimum()
-        xmax = extent.xMaximum()
-        ymax = extent.yMaximum()
-        points = [
-            QgsPointXY(xmin, ymax),
-            QgsPointXY(xmax, ymax),
-            QgsPointXY(xmax, ymin),
-            QgsPointXY(xmin, ymin),
-        ]
-        feature = QgsFeature()
-        feature.setGeometry(QgsGeometry.fromPolygonXY([points]))
-        provider.addFeatures([feature])
-        written_layer = geopackage.write_layer(self.path, layer, "timml Domain")
-
-        # Remove the previous domain specification
-        for existing_layer in QgsProject.instance().mapLayers().values():
-            if Path(existing_layer.source()) == Path(
-                str(self.path) + "|layername=timml Domain"
-            ):
-                QgsProject.instance().removeMapLayer(existing_layer.id())
-
-        renderer = layer_styling.domain_renderer()
-        self.add_layer(written_layer, renderer)
-        self.dataset_tree.add_layer(written_layer)
+        # Find domain entry
+        for item in self.dataset_tree.items():
+            if isinstance(item.element, Domain):
+                break
+        else:
+            # Create domain instead?
+            raise ValueError("Geopackage does not contain domain")
+        ymax, ymin = item.element.update_extent(self.iface)
         self.set_cellsize_from_domain(ymax, ymin)
 
     def set_cellsize_from_domain(self, ymax, ymin):
@@ -519,42 +424,6 @@ class QgisTimmlWidget(QWidget):
         transient = self.transient_combo_box.text() == "Transient"
         if transient:
             self.dataset_tree.on_transient_changed(transient)
-
-    def circ_area_sink(self) -> None:
-        """
-        Create a circular area sink layer.
-
-        A circle with a specified radius cannot be directly created. This
-        creates a "circle-like" geometry instead, by buffering a point and the
-        center point of view.
-
-        The radius can later be extracted again by computing the distance from a
-        vertex to the midpoint.
-        """
-        dialog = RadiusDialog()
-        dialog.show()
-        ok = dialog.exec_()
-        if ok:
-            elementtype = "Circular Area Sink"
-            layername = dialog.name_line_edit.text()
-            radius = float(dialog.radius_line_edit.text())
-            layer = create_timml_layer(
-                elementtype,
-                layername,
-                self.crs,
-            )
-            provider = layer.dataProvider()
-            feature = QgsFeature()
-            center = self.iface.mapCanvas().center()
-            feature.setGeometry(QgsGeometry.fromPointXY(center).buffer(radius, 5))
-            provider.addFeatures([feature])
-            layer.updateFields()
-            written_layer = geopackage.write_layer(
-                self.path, layer, f"timml {elementtype}:{layername}"
-            )
-            renderer = layer_styling.circareasink_renderer()
-            self.add_layer(written_layer, renderer)
-            self.dataset_tree.add_layer(written_layer)
 
     def load_result(self, path: Path, cellsize: float) -> None:
         """
@@ -610,9 +479,7 @@ class QgisTimmlWidget(QWidget):
         """
         # Collect checked elements
         active_elements = {}
-        root = self.dataset_tree.invisibleRootItem()
-        for i in range(root.childCount()):
-            item = root.child(i)
+        for item in self.dataset_tree.items():
             active_elements[item.text(1)] = not (item.timml_checkbox.isChecked() == 0)
             active_elements[item.text(3)] = not (item.ttim_checkbox.isChecked() == 0)
 
@@ -644,86 +511,3 @@ class QgisTimmlWidget(QWidget):
         env_vars = self.server_handler.environmental_variables()
         self.extraction_widget.extract(interpreter, env_vars, self.server_handler)
 
-
-class DatasetTreeWidget(QTreeWidget):
-    def __init__(self, parent=None):
-        super(DatasetTreeWidget, self).__init__(parent)
-        self.setSelectionMode(QAbstractItemView.ExtendedSelection)
-        self.setHeaderHidden(True)
-        self.setSortingEnabled(True)
-        self.setSizePolicy(QSizePolicy.Minimum, QSizePolicy.Preferred)
-        self.setHeaderLabels(["", "steady", "", "transient"])
-        self.setHeaderHidden(False)
-        header = self.header()
-        header.setSectionResizeMode(1, QHeaderView.Stretch)
-        header.setSectionResizeMode(3, QHeaderView.Stretch)
-        header.setSectionsMovable(False)
-        self.setColumnCount(4)
-        self.setColumnWidth(0, 1)
-        self.setColumnWidth(2, 1)
-
-    def add_layer(self, timml_name: str, ttim_name: str = ""):
-        item = QTreeWidgetItem()
-        self.addTopLevelItem(item)
-        item.timml_checkbox = QCheckBox()
-        item.ttim_checkbox = QCheckBox()
-        self.setItemWidget(item, 0, item.timml_checkbox)
-        item.setText(1, timml_name)
-        self.setItemWidget(item, 2, item.ttim_checkbox)
-        item.setText(3, ttim_name)
-        item.layers = [None, None]
-        return item
-
-    def on_transient_changed(self, transient: bool) -> None:
-        for i in range(self.invisibleRootItem().childCount()):
-            item = self.takeTopLevelItem(i)
-            if item.layers[1] is not None:
-                item.ttim_checkbox.setEnabled(transient)
-
-
-class NameDialog(QtWidgets.QDialog):
-    def __init__(self, parent=None):
-        super(NameDialog, self).__init__(parent)
-        self.name_line_edit = QLineEdit()
-        self.ok_button = QPushButton("OK")
-        self.cancel_button = QPushButton("Cancel")
-        self.ok_button.clicked.connect(self.accept)
-        self.cancel_button.clicked.connect(self.reject)
-        first_row = QHBoxLayout()
-        first_row.addWidget(QLabel("Layer name"))
-        first_row.addWidget(self.name_line_edit)
-        second_row = QHBoxLayout()
-        second_row.addStretch()
-        second_row.addWidget(self.ok_button)
-        second_row.addWidget(self.cancel_button)
-        layout = QVBoxLayout()
-        layout.addLayout(first_row)
-        layout.addLayout(second_row)
-        self.setLayout(layout)
-
-
-class RadiusDialog(QtWidgets.QDialog):
-    def __init__(self, parent=None):
-        super(RadiusDialog, self).__init__(parent)
-        self.name_line_edit = QLineEdit()
-        self.radius_line_edit = QLineEdit()
-        self.radius_line_edit.setValidator(QDoubleValidator())
-        self.ok_button = QPushButton("OK")
-        self.cancel_button = QPushButton("Cancel")
-        self.ok_button.clicked.connect(self.accept)
-        self.cancel_button.clicked.connect(self.reject)
-        first_row = QHBoxLayout()
-        first_row.addWidget(QLabel("Layer name"))
-        first_row.addWidget(self.name_line_edit)
-        second_row = QHBoxLayout()
-        second_row.addWidget(QLabel("Radius"))
-        first_row.addWidget(self.radius_line_edit)
-        third_row = QHBoxLayout()
-        third_row.addStretch()
-        third_row.addWidget(self.ok_button)
-        third_row.addWidget(self.cancel_button)
-        layout = QVBoxLayout()
-        layout.addLayout(first_row)
-        layout.addLayout(second_row)
-        layout.addLayout(third_row)
-        self.setLayout(layout)

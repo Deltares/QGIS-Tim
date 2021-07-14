@@ -59,7 +59,7 @@ def write_layer(
     if write_result != QgsVectorFileWriter.NoError:
         raise RuntimeError(
             f"Layer {layername} could not be written to geopackage: {path}"
-            f"with error: {error_message}"
+            f" with error: {error_message}"
         )
     layer = QgsVectorLayer(f"{path}|layername={layername}", layername, "ogr")
     return layer
