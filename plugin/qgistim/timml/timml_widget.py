@@ -316,7 +316,7 @@ class QgisTimmlWidget(QWidget):
         # Append associated items
         for item in selection:
             if item.assoc_item is not None and item.assoc_item not in selection:
-                selection.append(assoc_item)
+                selection.append(item.assoc_item)
         # Warn before deletion
         message = "\n".join([f"- {item.text(1)}" for item in selection])
         reply = QMessageBox.question(
@@ -332,14 +332,15 @@ class QgisTimmlWidget(QWidget):
         # * QGIS layers
         # * Geopackage 
         # * Dataset tree
+        elements = set([item.element for item in selection])
         qgs_instance = QgsProject.instance()
-        for item in selection:
-            element = item.element
+        for element in elements:
             for layer in [
                 element.timml_layer,
                 element.ttim_layer,
                 element.assoc_layer,
             ]: 
+                # QGIS layers
                 if layer is None:
                     continue
                 try:
@@ -352,7 +353,11 @@ class QgisTimmlWidget(QWidget):
                         pass
                     else:
                         raise
-            element.remove()
+
+            # Geopackage
+            element.remove_from_geopackage()
+        for item in selection:
+            # Dataset tree
             index = self.dataset_tree.indexOfTopLevelItem(item)
             self.dataset_tree.takeTopLevelItem(index)
 
