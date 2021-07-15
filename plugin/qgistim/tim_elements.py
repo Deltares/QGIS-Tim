@@ -37,6 +37,7 @@ unique within a group of the same type of elements.
 """
 
 from collections import defaultdict
+from functools import partial
 import re
 from typing import Any, List, Tuple
 
@@ -185,21 +186,16 @@ class Element:
     def assoc_layer_from_geopackage(self):
         pass
 
-    def from_geopackage(self, names: List[str]):
-        names = [name for name in names if name is not None]
-        methods = {
-            self.timml_name: self.timml_layer_from_geopackage,
-            self.ttim_name: self.ttim_layer_from_geopackage,
-            self.assoc_name: self.assoc_layer_from_geopackage,
-        }
-        for name in names:
-            methods[name]()
-        layers = {
-            self.timml_name: (self.timml_layer, self.renderer()),
-            self.ttim_name: (self.ttim_layer, None),
-            self.assoc_name: (self.assoc_layer, None),
-        }
-        return [layers[name] for name in names]
+    def from_geopackage(self):
+        self.timml_layer_from_geopackage()
+        self.ttim_layer_from_geopackage()
+        self.assoc_layer_from_geopackage()
+        layers = [
+            (self.timml_layer, self.renderer()),
+            (self.ttim_layer, None),
+            (self.assoc_layer, None),
+        ]
+        return [pair for pair in layers if pair[0] is not None]
     
     def write(self):
         self.timml_layer = geopackage.write_layer(self.path, self.timml_layer, self.timml_name)
@@ -592,7 +588,7 @@ ELEMENTS = {
 }
 
 
-def extract_element_type(layername: str) -> Tuple[str, str]:
+def parse_name(layername: str) -> Tuple[str, str]:
     prefix, name = layername.split(":")
     element_type = re.split("timml |ttim ", prefix)[1]
     mapping = {
@@ -602,21 +598,27 @@ def extract_element_type(layername: str) -> Tuple[str, str]:
         "Building Pit Properties": "Building Pit",
     }
     element_type = mapping.get(element_type, element_type)
-    return element_type, name
+    if "timml" in prefix:
+        if "Properties" in prefix:
+            tim_type = "timml_assoc"
+        else:
+            tim_type = "timml"
+    elif "ttim" in prefix:
+        tim_type = "ttim"
+    else:
+        raise ValueError("Neither timml nor ttim in layername")
+    return tim_type, element_type, name
 
 
 def load_elements_from_geopackage(path: str) -> List[Element]:
     gpkg_names = geopackage.layers(path)
-    print(gpkg_names)
-    grouped_names = defaultdict(list)
+    grouped_names = defaultdict(partial(partial(defaultdict(defaultdict, list))))
     for layername in gpkg_names:
-        element_type, name = extract_element_type(layername)
-        grouped_names[element_type].append(name)
-    print(grouped_names)
+        tim_type, element_type, name = parse_name(layername)
+        grouped_names[element_type][name][tim_type] = layername
     elements = []
     for element_type, group in grouped_names.items():
-        uniques = list(set(group))
-        for name in uniques:
+        for name in group:
             elements.append(ELEMENTS[element_type](path, name))
     print(elements)
     return elements
