@@ -3,9 +3,6 @@ This module contains the logic connecting the buttons of the plugin dockwidget
 to the actual functionality.
 """
 import json
-import os
-import re
-from collections import defaultdict
 from functools import partial
 from pathlib import Path
 from typing import Any, List, Tuple
@@ -13,8 +10,6 @@ from typing import Any, List, Tuple
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QDoubleValidator, QHeaderView, QMessageBox
 from PyQt5.QtWidgets import (
-    QAbstractItemView,
-    QCheckBox,
     QComboBox,
     QDoubleSpinBox,
     QFileDialog,
@@ -25,23 +20,16 @@ from PyQt5.QtWidgets import (
     QLineEdit,
     QPushButton,
     QSizePolicy,
-    QTreeWidget,
-    QTreeWidgetItem,
     QVBoxLayout,
     QWidget,
 )
 from xarray.core.common import T
 from qgis.core import (
     Qgis,
-    QgsFeature,
-    QgsGeometry,
-    QgsPointXY,
     QgsProject,
     QgsRasterLayer,
-    QgsVectorLayer,
 )
-from qgis.PyQt import QtWidgets
-from qgistim import geopackage, layer_styling
+from qgistim import layer_styling
 from qgistim.server_handler import ServerHandler
 
 from .dataset_tree_widget import DatasetTreeWidget
@@ -214,6 +202,9 @@ class QgisTimmlWidget(QWidget):
         self.dataset_tree.clear()
         elements = load_elements_from_geopackage(self.path)
         for element in elements:
+            print(element.timml_name)
+            print(element.ttim_name)
+            print(element.assoc_name)
             self.dataset_tree.add_element(element)
         path = self.path
         root = QgsProject.instance().layerTreeRoot()
@@ -313,6 +304,7 @@ class QgisTimmlWidget(QWidget):
 
     def remove_geopackage_layer(self) -> None:
         selection = self.dataset_tree.selectedItems()
+        selection = [item for item in selection if not isinstance(item.element, (Aquifer, Domain))]
         # Append associated items
         for item in selection:
             if item.assoc_item is not None and item.assoc_item not in selection:
@@ -362,8 +354,7 @@ class QgisTimmlWidget(QWidget):
             self.dataset_tree.takeTopLevelItem(index)
 
     def add_item_to_qgis(self, item) -> None:
-        names = [item.text(1), item.text(3)]
-        layers = item.element.from_geopackage(names)
+        layers = item.element.from_geopackage()
         for layer, renderer in layers:
             self.add_layer(layer, renderer)
 
@@ -514,4 +505,3 @@ class QgisTimmlWidget(QWidget):
         interpreter = self.interpreter_combo_box.currentText()
         env_vars = self.server_handler.environmental_variables()
         self.extraction_widget.extract(interpreter, env_vars, self.server_handler)
-
