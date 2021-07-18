@@ -20,10 +20,7 @@ class QgisTimPlugin:
     def __init__(self, iface):
         # Save reference to the QGIS interface
         self.iface = iface
-        self.timml_widget = None
-        self.ttim_widget = None
-        self.timml_action = None
-        self.ttim_action = None
+        self.tim_widget = None
         self.plugin_dir = Path(__file__).parent
         self.pluginIsActive = False
         self.menu = u"Qgis-Tim"
@@ -45,15 +42,15 @@ class QgisTimPlugin:
         )
 
     def toggle_timml(self):
-        if self.timml_widget is None:
-            from .timml import QgisTimmlWidget
-            self.timml_widget = TimDockWidget("Qgis-TimML")
-            self.timml_widget.setObjectName("QgisTimmlDock")
-            self.iface.addDockWidget(Qt.RightDockWidgetArea, self.timml_widget)
-            widget = QgisTimmlWidget(self.timml_widget, self.iface)
-            self.timml_widget.setWidget(widget)
-            self.timml_widget.hide()
-        self.timml_widget.setVisible(not self.timml_widget.isVisible())
+        if self.tim_widget is None:
+            from .tim_widget import QgisTimmlWidget
+            self.tim_widget = TimDockWidget("Qgis-TimML")
+            self.tim_widget.setObjectName("QgisTimmlDock")
+            self.iface.addDockWidget(Qt.RightDockWidgetArea, self.tim_widget)
+            widget = QgisTimmlWidget(self.tim_widget, self.iface)
+            self.tim_widget.setWidget(widget)
+            self.tim_widget.hide()
+        self.tim_widget.setVisible(not self.tim_widget.isVisible())
 
     def unload(self):
         for action in self.actions:
