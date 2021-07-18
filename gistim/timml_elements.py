@@ -10,9 +10,8 @@ import timml
 import xarray as xr
 
 from .common import (
-    FloatArray,
     ElementSpecification,
-    ModelSpecification,
+    TimmlModelSpecification,
     point_coordinates,
     linestring_coordinates,
     polygon_coordinates,
@@ -35,7 +34,9 @@ def aquifer(dataframe: gpd.GeoDataFrame) -> timml.Model:
     return timml.ModelMaq(**aquifer_data(dataframe))
 
 
-def constant(spec: ElementSpecification, model: timml.Model, name: str, elements: Dict) -> None:
+def constant(
+    spec: ElementSpecification, model: timml.Model, name: str, elements: Dict
+) -> None:
     """
     Parameters
     ----------
@@ -55,7 +56,9 @@ def constant(spec: ElementSpecification, model: timml.Model, name: str, elements
     )
 
 
-def uflow(spec: ElementSpecification, model: timml.Model, name: str, elements: Dict) -> None:
+def uflow(
+    spec: ElementSpecification, model: timml.Model, name: str, elements: Dict
+) -> None:
     """
     Parameters
     ----------
@@ -74,7 +77,9 @@ def uflow(spec: ElementSpecification, model: timml.Model, name: str, elements: D
         )
 
 
-def well(spec: ElementSpecification, model: timml.Model, name: str, elements: Dict) -> None:
+def well(
+    spec: ElementSpecification, model: timml.Model, name: str, elements: Dict
+) -> None:
     """
     Parameters
     ----------
@@ -99,7 +104,9 @@ def well(spec: ElementSpecification, model: timml.Model, name: str, elements: Di
         )
 
 
-def headwell(spec: ElementSpecification, model: timml.Model, name: str, elements: Dict) -> None:
+def headwell(
+    spec: ElementSpecification, model: timml.Model, name: str, elements: Dict
+) -> None:
     """
     Parameters
     ----------
@@ -124,7 +131,9 @@ def headwell(spec: ElementSpecification, model: timml.Model, name: str, elements
         )
 
 
-def polygoninhom(spec: ElementSpecification, model: timml.Model, name: str, elements: Dict) -> None:
+def polygoninhom(
+    spec: ElementSpecification, model: timml.Model, name: str, elements: Dict
+) -> None:
     """
     Parameters
     ----------
@@ -139,7 +148,7 @@ def polygoninhom(spec: ElementSpecification, model: timml.Model, name: str, elem
     # Iterate through the row containing the geometry
     # and iterate through the associated table containing k properties.
     for i, row in geometry.iterrows():
-        dataframe = properties.loc[row["geometry_id"]]
+        dataframe = properties.loc[[row["geometry_id"]]]
         data = aquifer_data(dataframe)
         data["model"] = model
         data["xy"] = polygon_coordinates(row)
@@ -148,7 +157,9 @@ def polygoninhom(spec: ElementSpecification, model: timml.Model, name: str, elem
         elements[f"{name}_{i}"] = timml.PolygonInhomMaq(**data)
 
 
-def buildingpit(spec: ElementSpecification, model: timml.Model, name: str, elements: Dict) -> None:
+def buildingpit(
+    spec: ElementSpecification, model: timml.Model, name: str, elements: Dict
+) -> None:
     """
     Parameters
     ----------
@@ -173,7 +184,9 @@ def buildingpit(spec: ElementSpecification, model: timml.Model, name: str, eleme
         elements[f"{name}_{i}"] = timml.BuildingPit(**data)
 
 
-def headlinesink(spec: ElementSpecification, model: timml.Model, name: str, elements: Dict) -> None:
+def headlinesink(
+    spec: ElementSpecification, model: timml.Model, name: str, elements: Dict
+) -> None:
     """
     Parameters
     ----------
@@ -196,7 +209,9 @@ def headlinesink(spec: ElementSpecification, model: timml.Model, name: str, elem
         )
 
 
-def linesinkditch(spec: ElementSpecification, model: timml.Model, name: str, elements: Dict) -> None:
+def linesinkditch(
+    spec: ElementSpecification, model: timml.Model, name: str, elements: Dict
+) -> None:
     """
     Parameters
     ----------
@@ -219,7 +234,9 @@ def linesinkditch(spec: ElementSpecification, model: timml.Model, name: str, ele
         )
 
 
-def leakylinedoublet(spec: ElementSpecification, model: timml.Model, name: str, elements: Dict) -> None:
+def leakylinedoublet(
+    spec: ElementSpecification, model: timml.Model, name: str, elements: Dict
+) -> None:
     """
     Parameters
     ----------
@@ -240,7 +257,9 @@ def leakylinedoublet(spec: ElementSpecification, model: timml.Model, name: str, 
         )
 
 
-def implinedoublet(spec: ElementSpecification, model: timml.Model, name: str, elements: Dict) -> None:
+def implinedoublet(
+    spec: ElementSpecification, model: timml.Model, name: str, elements: Dict
+) -> None:
     """
     Parameters
     ----------
@@ -260,7 +279,9 @@ def implinedoublet(spec: ElementSpecification, model: timml.Model, name: str, el
         )
 
 
-def circareasink(spec: ElementSpecification, model: timml.Model, name: str, elements: Dict) -> None:
+def circareasink(
+    spec: ElementSpecification, model: timml.Model, name: str, elements: Dict
+) -> None:
     """
     Parameters
     ----------
@@ -300,97 +321,21 @@ MAPPING = {
 }
 
 
-# Infer model structure from geopackage layers
-# --------------------------------------------
-def extract_elementtype(s: str) -> str:
-    """
-    Extract the TimML element type from the geopackage layer name.
-    """
-    s = s.split(":")[0]
-    return s.split("timml ")[-1]
-
-
-def model_specification(path: Union[str, pathlib.Path], active_elements: Dict[str, bool]) -> ModelSpecification:
-    """
-    Parse the layer names of the geopackage to find which elements are present
-    in the model.
-
-    Special case the aquifer properties and the constant, since these are
-    mandatory for every model, and singleton (there can only be one).
-
-    Returns a named tuple with the layer name of the aquifer, the constant, and
-    a dictionary of other element names to its construction function.
-
-    Parameters
-    ----------
-    path: Union[str, pathlib.Path]
-        path to the geopackage containing the model data
-
-    Returns
-    -------
-    ModelSpecification
-    """
-    aquifer = None
-    elements = {}
-    layernames = fiona.listlayers(str(path))
-    print(active_elements)
-    for layername in layernames:
-        elementtype = extract_elementtype(layername)
-        if "Properties" in elementtype:
-            # Skip if it's the associated table
-            continue
-
-        active = True
-        try:
-            active = active_elements[layername]
-        except KeyError:
-            pass
-
-        print("adding", layername, "as", elementtype)
-        if elementtype == "Polygon Inhomogeneity" or elementtype == "Building Pit":
-            # Find geometry table and associated table.
-            name = layername.split(":")[-1]
-            geometry_name = f"timml {elementtype}:{name}"
-            properties_name = f"timml {elementtype} Properties:{name}"
-            elements[layername] = ElementSpecification(
-                elementtype=elementtype,
-                active=active,
-                dataframe=gpd.read_file(path, layer=geometry_name),
-                associated_dataframe=gpd.read_file(path, layer=properties_name),
-            )
-        else:
-            element_spec = ElementSpecification(
-                elementtype=elementtype,
-                active=active,
-                dataframe=gpd.read_file(path, layer=layername),
-                associated_dataframe=None,
-            )
-            # Special case aquifer, since only a single instance may occur
-            if elementtype == "Aquifer":
-                aquifer = element_spec
-            else:
-                elements[layername] = element_spec
-
-    return ModelSpecification(aquifer, elements)
-
-
-def validate(spec: ModelSpecification) -> None:
+def validate(spec: TimmlModelSpecification) -> None:
     if spec.aquifer is None:
         raise ValueError("Aquifer entry is missing")
     # TODO: more checks
 
 
-def initialize_model(spec: ModelSpecification) -> timml.Model:
+def initialize_model(spec: TimmlModelSpecification) -> timml.Model:
     """
     Initialize a TimML analytic model based on the data in a geopackage.
 
     Parameters
     ----------
-    path: Union[str, pathlib.Path]
-        path to the geopackage containing the model data
     spec: ModelSpecification
-        Named tuple with the layer name of the aquifer, the constant, and a
-        dictionary of other element names to its construction function.
+        Named tuple with the layer name of the aquifer and a dictionary of
+        other element names to its construction function.
 
     Returns
     -------
@@ -407,13 +352,11 @@ def initialize_model(spec: ModelSpecification) -> timml.Model:
 
     """
     validate(spec)
-    model = aquifer(spec.aquifer.dataframe)
+    model = aquifer(spec.aquifer)
     elements = {}
 
     for name, element_spec in spec.elements.items():
         elementtype = element_spec.elementtype
-        if elementtype == "Domain" or not element_spec.active:
-            continue
 
         # Grab conversion function
         try:
@@ -466,15 +409,13 @@ def headgrid(model: timml.Model, extent: Tuple[float], cellsize: float) -> xr.Da
 def discharge(model: timml.Model, elements: Dict) -> Tuple[List[gpd.GeoDataFrame]]:
     """
     Extract the discharge for elements that have a discharge.
-    
+
     Do this twice: once for the integral elements, and once for the individual
     line sections. Return this as two lists of geodataframes, which can be
     written to geopackages.
-    
+
     Parameters
     ---------
     model: timml.Model
     elements: dict
     """
-
-
