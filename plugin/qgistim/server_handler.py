@@ -52,13 +52,17 @@ class ServerHandler:
 
     @staticmethod
     def interpreters() -> List[str]:
-        with open(ServerHandler.get_configdir() / "environmental-variables.json", "r") as f:
+        with open(
+            ServerHandler.get_configdir() / "environmental-variables.json", "r"
+        ) as f:
             env_vars = json.loads(f.read())
         return list(env_vars.keys())
 
     @staticmethod
     def environmental_variables():
-        with open(ServerHandler.get_configdir() / "environmental-variables.json", "r") as f:
+        with open(
+            ServerHandler.get_configdir() / "environmental-variables.json", "r"
+        ) as f:
             env_vars = json.loads(f.read())
         return env_vars
 

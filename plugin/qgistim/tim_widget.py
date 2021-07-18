@@ -304,7 +304,11 @@ class QgisTimmlWidget(QWidget):
 
     def remove_geopackage_layer(self) -> None:
         selection = self.dataset_tree.selectedItems()
-        selection = [item for item in selection if not isinstance(item.element, (Aquifer, Domain))]
+        selection = [
+            item
+            for item in selection
+            if not isinstance(item.element, (Aquifer, Domain))
+        ]
         # Append associated items
         for item in selection:
             if item.assoc_item is not None and item.assoc_item not in selection:
@@ -322,7 +326,7 @@ class QgisTimmlWidget(QWidget):
             return
         # Delete from:
         # * QGIS layers
-        # * Geopackage 
+        # * Geopackage
         # * Dataset tree
         elements = set([item.element for item in selection])
         qgs_instance = QgsProject.instance()
@@ -331,7 +335,7 @@ class QgisTimmlWidget(QWidget):
                 element.timml_layer,
                 element.ttim_layer,
                 element.assoc_layer,
-            ]: 
+            ]:
                 # QGIS layers
                 if layer is None:
                     continue
@@ -370,11 +374,11 @@ class QgisTimmlWidget(QWidget):
         Parameters
         ----------
         element_type: str
-            Name of the element type. 
+            Name of the element type.
         """
         klass = ELEMENTS[element_type]
         element = klass.dialog(self.path, self.crs, self.iface, klass)
-        if element is None: # cancelled
+        if element is None:  # cancelled
             return
         # Write to geopackage
         element.write()

@@ -31,12 +31,12 @@ class DatasetTreeWidget(QTreeWidget):
         self.setColumnWidth(0, 1)
         self.setColumnWidth(2, 1)
         self.domain = None
-        
+
     def items(self) -> List[QTreeWidgetItem]:
         root = self.invisibleRootItem()
         return [root.child(i) for i in range(root.childCount())]
 
-    def add_item(self, timml_name: str, ttim_name: str = None, enabled: bool=True):
+    def add_item(self, timml_name: str, ttim_name: str = None, enabled: bool = True):
         item = QTreeWidgetItem()
         self.addTopLevelItem(item)
         item.timml_checkbox = QCheckBox()
@@ -66,16 +66,11 @@ class DatasetTreeWidget(QTreeWidget):
         else:
             enabled = True
         item = self.add_item(
-            timml_name=element.timml_name,
-            ttim_name=element.ttim_name,
-            enabled=enabled
+            timml_name=element.timml_name, ttim_name=element.ttim_name, enabled=enabled
         )
         item.element = element
         if element.assoc_layer is not None:
-            assoc_item = self.add_item(
-                timml_name=element.assoc_name,
-                enabled=enabled
-            )
+            assoc_item = self.add_item(timml_name=element.assoc_name, enabled=enabled)
             assoc_item.element = element
             # Cross-reference items
             item.assoc_item = assoc_item

@@ -59,7 +59,7 @@ from qgis.core import (
     QgsFeature,
     QgsGeometry,
     QgsPointXY,
-) 
+)
 
 from qgistim import geopackage
 
@@ -90,6 +90,7 @@ INHOM_ATTRIBUTES = [
     QgsField("topboundary_top", QVariant.Double),
     QgsField("topboundary_head", QVariant.Double),
 ]
+
 
 class NameDialog(QDialog):
     def __init__(self, parent=None):
@@ -164,7 +165,7 @@ class Element:
     @staticmethod
     def dialog(path: str, crs: Any, iface: Any, klass: type) -> Tuple[Any]:
         dialog = NameDialog()
-        dialog.show() 
+        dialog.show()
         ok = dialog.exec_()
         if not ok:
             return
@@ -194,7 +195,7 @@ class Element:
 
     def create_assoc_layer(self, crs: Any):
         pass
-    
+
     def create_layers(self, crs: Any):
         self.create_timml_layer(crs)
         self.create_ttim_layer(crs)
@@ -207,6 +208,7 @@ class Element:
         self.timml_layer = QgsVectorLayer(
             f"{self.path}|layername={self.timml_name}", self.timml_name
         )
+
     def ttim_layer_from_geopackage(self):
         pass
 
@@ -223,9 +225,11 @@ class Element:
             (self.assoc_layer, None),
         ]
         return [pair for pair in layers if pair[0] is not None]
-    
+
     def write(self):
-        self.timml_layer = geopackage.write_layer(self.path, self.timml_layer, self.timml_name)
+        self.timml_layer = geopackage.write_layer(
+            self.path, self.timml_layer, self.timml_name
+        )
 
     def remove_from_geopackage(self):
         geopackage.remove_layer(self.path, self.timml_name)
@@ -238,7 +242,12 @@ class TransientElement(Element):
         self.ttim_name = f"ttim {self.element_type}:{name}"
 
     def create_ttim_layer(self, crs: Any):
-        self.ttim_layer = self.layer(crs=crs, geometry_type="No Geometry", name=self.ttim_name, attributes=self.ttim_attributes)
+        self.ttim_layer = self.layer(
+            crs=crs,
+            geometry_type="No Geometry",
+            name=self.ttim_name,
+            attributes=self.ttim_attributes,
+        )
 
     def ttim_layer_from_geopackage(self):
         self.ttim_layer = QgsVectorLayer(
@@ -247,8 +256,12 @@ class TransientElement(Element):
         )
 
     def write(self):
-        self.timml_layer = geopackage.write_layer(self.path, self.timml_layer, self.timml_name)
-        self.ttim_layer = geopackage.write_layer(self.path, self.ttim_layer, self.ttim_name)
+        self.timml_layer = geopackage.write_layer(
+            self.path, self.timml_layer, self.timml_name
+        )
+        self.ttim_layer = geopackage.write_layer(
+            self.path, self.ttim_layer, self.ttim_name
+        )
 
     def remove_from_geopackage(self):
         geopackage.remove_layer(self.path, self.timml_name)
@@ -262,7 +275,12 @@ class AssociatedElement(Element):
         self.assoc_name = f"timml {self.element_type} Properties:{name}"
 
     def create_assoc_layer(self, crs: Any):
-        self.assoc_layer = self.layer(crs=crs, geometry_type="No Geometry", name=self.assoc_name, attributes=self.assoc_attributes)
+        self.assoc_layer = self.layer(
+            crs=crs,
+            geometry_type="No Geometry",
+            name=self.assoc_name,
+            attributes=self.assoc_attributes,
+        )
 
     def assoc_layer_from_geopackage(self):
         self.assoc_layer = QgsVectorLayer(
@@ -271,9 +289,13 @@ class AssociatedElement(Element):
         )
 
     def write(self):
-        self.timml_layer = geopackage.write_layer(self.path, self.timml_layer, self.timml_name)
-        self.assoc_layer = geopackage.write_layer(self.path, self.assoc_layer, self.assoc_name)
-        
+        self.timml_layer = geopackage.write_layer(
+            self.path, self.timml_layer, self.timml_name
+        )
+        self.assoc_layer = geopackage.write_layer(
+            self.path, self.assoc_layer, self.assoc_name
+        )
+
     def remove_from_geopackage(self):
         geopackage.remove_layer(self.path, self.timml_name)
         geopackage.remove_layer(self.path, self.assoc_name)
@@ -308,7 +330,7 @@ class Domain(TransientElement):
 
     def remove_from_geopackage(self):
         pass
-    
+
     def update_extent(self, iface: Any) -> Tuple[float, float]:
         provider = self.timml_layer.dataProvider()
         provider.truncate()  # removes all features
@@ -327,8 +349,9 @@ class Domain(TransientElement):
         feature = QgsFeature()
         feature.setGeometry(QgsGeometry.fromPolygonXY([points]))
         provider.addFeatures([feature])
-        #canvas.refresh()
+        # canvas.refresh()
         return ymax, ymin
+
 
 class Aquifer(TransientElement):
     def _initialize(self, path, name):
@@ -351,8 +374,12 @@ class Aquifer(TransientElement):
         self.ttim_name = f"ttim Temporal Settings:Aquifer"
 
     def write(self):
-        self.timml_layer = geopackage.write_layer(self.path, self.timml_layer, self.timml_name, newfile=True)
-        self.ttim_layer = geopackage.write_layer(self.path, self.ttim_layer, self.ttim_name)
+        self.timml_layer = geopackage.write_layer(
+            self.path, self.timml_layer, self.timml_name, newfile=True
+        )
+        self.ttim_layer = geopackage.write_layer(
+            self.path, self.ttim_layer, self.ttim_name
+        )
 
     def remove_from_geopackage(self):
         pass
@@ -511,7 +538,7 @@ class CircularAreaSink(TransientElement):
     @staticmethod
     def dialog(path: str, crs: Any, iface: Any, klass: type) -> Tuple[Any]:
         dialog = RadiusDialog()
-        dialog.show() 
+        dialog.show()
         ok = dialog.exec_()
         if not ok:
             return
@@ -525,8 +552,8 @@ class CircularAreaSink(TransientElement):
         feature.setGeometry(QgsGeometry.fromPointXY(center).buffer(radius, 5))
         provider.addFeatures([feature])
         instance.timml_layer.updateFields()
-        
-        return instance 
+
+        return instance
 
     def renderer(self):
         """

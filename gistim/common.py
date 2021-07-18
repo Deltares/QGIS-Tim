@@ -29,7 +29,7 @@ class TransientElementSpecification(NamedTuple):
     active: bool
     dataframe: gpd.GeoDataFrame
     steady_spec: ElementSpecification
-    
+
 
 class TimmlModelSpecification(NamedTuple):
     aquifer: gpd.GeoDataFrame
@@ -97,7 +97,9 @@ def polygon_coordinates(row) -> Tuple[FloatArray, FloatArray]:
     return np.array(row["geometry"].exterior.coords)
 
 
-def aquifer_data(dataframe: gpd.GeoDataFrame, transient: bool=False) -> Dict[str, Any]:
+def aquifer_data(
+    dataframe: gpd.GeoDataFrame, transient: bool = False
+) -> Dict[str, Any]:
     # Make sure the layers are in the right order.
     dataframe = dataframe.sort_values(by="layer").set_index("layer")
     nlayer = len(dataframe)
@@ -129,7 +131,7 @@ def aquifer_data(dataframe: gpd.GeoDataFrame, transient: bool=False) -> Dict[str
         topboundary = "conf"
         storage_aquifer = dataframe["aquifer_storage"].values
         storage_aquitard = dataframe["aquifer_storage"].values[1:]
-        
+
     d = {
         "kaq": kaq,
         "z": z,

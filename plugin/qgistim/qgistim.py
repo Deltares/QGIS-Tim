@@ -25,7 +25,7 @@ class QgisTimPlugin:
         self.pluginIsActive = False
         self.menu = u"Qgis-Tim"
         self.actions = []
-        
+
     def add_action(self, icon_name, text="", callback=None, add_to_menu=False):
         icon = QIcon(str(self.plugin_dir / icon_name))
         action = QAction(icon, text, self.iface.mainWindow())
@@ -44,6 +44,7 @@ class QgisTimPlugin:
     def toggle_timml(self):
         if self.tim_widget is None:
             from .tim_widget import QgisTimmlWidget
+
             self.tim_widget = TimDockWidget("Qgis-TimML")
             self.tim_widget.setObjectName("QgisTimmlDock")
             self.iface.addDockWidget(Qt.RightDockWidgetArea, self.tim_widget)

@@ -104,12 +104,16 @@ class TimHandler(socketserver.BaseRequestHandler):
         self.server.timml_model, _ = gistim.timml_elements.initialize_model(timml_spec)
         self.server.timml_model.solve()
         if mode == "transient":
-            self.server.ttim_model, _ = gistim.ttim_elements.initialize_model(ttim_spec, self.server.timml_model)
+            self.server.ttim_model, _ = gistim.ttim_elements.initialize_model(
+                ttim_spec, self.server.timml_model
+            )
 
         name = path.stem
         extent, crs = gistim.gridspec(path, cellsize)
         if mode == "steady-state":
-            head = gistim.timml_elements.headgrid(self.server.timml_model, extent, cellsize)
+            head = gistim.timml_elements.headgrid(
+                self.server.timml_model, extent, cellsize
+            )
         elif mode == "transient":
             self.server.ttim_model.solve()
             head = gistim.ttim_elements.headgrid(
@@ -120,7 +124,9 @@ class TimHandler(socketserver.BaseRequestHandler):
                 ttim_spec.temporal_settings["reference_date"].iloc[0],
             )
         else:
-            raise ValueError(f'Mode should be "steady-state" or "transient". Received: {mode}')
+            raise ValueError(
+                f'Mode should be "steady-state" or "transient". Received: {mode}'
+            )
         head = head.rio.write_crs(crs)
 
         outpath = (path.parent / f"{name}-{cellsize}".replace(".", "_")).with_suffix(

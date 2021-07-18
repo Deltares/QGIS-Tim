@@ -66,13 +66,9 @@ def write_layer(
 
 
 def remove_layer(path: str, layer: str) -> None:
-    query = {
-        "DATABASE": f"{path}|layername={layer}",
-        "SQL": f"drop table {layer}"
-    }
+    query = {"DATABASE": f"{path}|layername={layer}", "SQL": f"drop table {layer}"}
     print(query)
     try:
         processing.run("native:spatialiteexecutesql", query)
     except Exception as e:
-        raise RuntimeError(
-            f"Failed to remove layer with {query}")
+        raise RuntimeError(f"Failed to remove layer with {query}")
