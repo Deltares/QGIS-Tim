@@ -63,6 +63,33 @@ from qgis.core import (
 
 from qgistim import geopackage
 
+# These columns are reused by Aquifer and Polygon Inhom, Building pit
+# Aquitards are on top of the aquifer, so it comes first
+AQUIFER_ATTRIBUTES = [
+    QgsField("layer", QVariant.Int),
+    QgsField("aquitard_resistance", QVariant.Double),
+    QgsField("aquitard_porosity", QVariant.Double),
+    QgsField("aquitard_storage", QVariant.Double),
+    QgsField("aquifer_conductivity", QVariant.Double),
+    QgsField("aquifer_porosity", QVariant.Double),
+    QgsField("aquifer_storage", QVariant.Double),
+    QgsField("aquifer_top", QVariant.Double),
+    QgsField("aquifer_bottom", QVariant.Double),
+    QgsField("topboundary_top", QVariant.Double),
+    QgsField("topboundary_head", QVariant.Double),
+]
+INHOM_ATTRIBUTES = [
+    QgsField("geometry_id", QVariant.Int),
+    QgsField("layer", QVariant.Int),
+    QgsField("aquitard_resistance", QVariant.Double),
+    QgsField("aquitard_porosity", QVariant.Double),
+    QgsField("aquifer_conductivity", QVariant.Double),
+    QgsField("aquifer_porosity", QVariant.Double),
+    QgsField("aquifer_top", QVariant.Double),
+    QgsField("aquifer_bottom", QVariant.Double),
+    QgsField("topboundary_top", QVariant.Double),
+    QgsField("topboundary_head", QVariant.Double),
+]
 
 class NameDialog(QDialog):
     def __init__(self, parent=None):
@@ -257,6 +284,9 @@ class Domain(TransientElement):
         self._initialize_default(path, name)
         self.element_type = "Domain"
         self.geometry_type = "Polygon"
+        self.ttim_attributes = [
+            QgsField("time", QVariant.Double),
+        ]
 
     def __init__(self, path: str, name: str):
         self._initialize(path, name)
@@ -306,23 +336,13 @@ class Aquifer(TransientElement):
         self.name = "Aquifer"
         self.element_type = "Aquifer"
         self.geometry_type = "No geometry"
-        self.timml_attributes = [
-            QgsField("layer", QVariant.Int),
-            QgsField("resistance", QVariant.Double),
-            QgsField("conductivity", QVariant.Double),
-            QgsField("z_top", QVariant.Double),
-            QgsField("z_bottom", QVariant.Double),
-            QgsField("porosity_aquifer", QVariant.Double),
-            QgsField("porosity_aquitard", QVariant.Double),
-            QgsField("head_topboundary", QVariant.Double),
-            QgsField("z_topboundary", QVariant.Double),
-        ]
+        self.timml_attributes = AQUIFER_ATTRIBUTES.copy()
         self.ttim_attributes = [
             QgsField("tmin", QVariant.Double),
             QgsField("tmax", QVariant.Double),
             QgsField("tstart", QVariant.Double),
             QgsField("M", QVariant.Int),
-            QgsField("starting_date", QVariant.DateTime),
+            QgsField("reference_date", QVariant.DateTime),
         ]
 
     def __init__(self, path: str, name: str):
@@ -532,18 +552,7 @@ class PolygonInhomogeneity(AssociatedElement):
             QgsField("order", QVariant.Int),
             QgsField("ndegrees", QVariant.Int),
         ]
-        self.assoc_attributes = [
-            QgsField("geometry_id", QVariant.Int),
-            QgsField("layer", QVariant.Int),
-            QgsField("conductivity", QVariant.Double),
-            QgsField("resistance", QVariant.Double),
-            QgsField("z_top", QVariant.Double),
-            QgsField("z_bottom", QVariant.Double),
-            QgsField("porosity_aquifer", QVariant.Double),
-            QgsField("porosity_aquitard", QVariant.Double),
-            QgsField("head_topboundary", QVariant.Double),
-            QgsField("z_topboundary", QVariant.Double),
-        ]
+        self.assoc_attributes = INHOM_ATTRIBUTES.copy()
 
 
 class BuildingPit(AssociatedElement):
@@ -557,18 +566,7 @@ class BuildingPit(AssociatedElement):
             QgsField("ndegrees", QVariant.Int),
             QgsField("layer", QVariant.Int),
         ]
-        self.assoc_attributes = [
-            QgsField("geometry_id", QVariant.Int),
-            QgsField("layer", QVariant.Int),
-            QgsField("conductivity", QVariant.Double),
-            QgsField("resistance", QVariant.Double),
-            QgsField("z_top", QVariant.Double),
-            QgsField("z_bottom", QVariant.Double),
-            QgsField("porosity_aquifer", QVariant.Double),
-            QgsField("porosity_aquitard", QVariant.Double),
-            QgsField("head_topboundary", QVariant.Double),
-            QgsField("z_topboundary", QVariant.Double),
-        ]
+        self.assoc_attributes = INHOM_ATTRIBUTES.copy()
 
 
 ELEMENTS = {
@@ -612,7 +610,8 @@ def parse_name(layername: str) -> Tuple[str, str]:
 
 def load_elements_from_geopackage(path: str) -> List[Element]:
     gpkg_names = geopackage.layers(path)
-    grouped_names = defaultdict(partial(partial(defaultdict(defaultdict, list))))
+    dd = defaultdict
+    grouped_names = dd(partial(dd, partial(dd, list)))
     for layername in gpkg_names:
         tim_type, element_type, name = parse_name(layername)
         grouped_names[element_type][name][tim_type] = layername
