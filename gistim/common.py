@@ -1,6 +1,8 @@
 """
 Common utilities 
 """
+from collections import defaultdict
+from functools import partial
 import pathlib
 import re
 from typing import Any, Callable, Dict, NamedTuple, Tuple, Union
@@ -22,9 +24,25 @@ class ElementSpecification(NamedTuple):
     associated_dataframe: gpd.GeoDataFrame
 
 
-class ModelSpecification(NamedTuple):
-    aquifer: ElementSpecification
+class TransientElementSpecification(NamedTuple):
+    elementtype: str
+    active: bool
+    dataframe: gpd.GeoDataFrame
+    steady_spec: ElementSpecification
+    
+
+class TimmlModelSpecification(NamedTuple):
+    aquifer: gpd.GeoDataFrame
     elements: Dict[str, ElementSpecification]
+    domain: gpd.GeoDataFrame
+
+
+class TtimModelSpecification(NamedTuple):
+    aquifer: gpd.GeoDataFrame
+    temporal_settings: gpd.GeoDataFrame
+    elements: Dict[str, ElementSpecification]
+    domain: gpd.GeoDataFrame
+    output_times: FloatArray
 
 
 # Some geometry helpers
@@ -79,43 +97,137 @@ def polygon_coordinates(row) -> Tuple[FloatArray, FloatArray]:
     return np.array(row["geometry"].exterior.coords)
 
 
-def aquifer_data(dataframe):
+def aquifer_data(dataframe: gpd.GeoDataFrame, transient: bool=False) -> Dict[str, Any]:
     # Make sure the layers are in the right order.
     dataframe = dataframe.sort_values(by="layer").set_index("layer")
     nlayer = len(dataframe)
     # Deal with optional semi-confined top layer.
-    hstar = dataframe.loc[0, "head_topboundary"]
+    hstar = dataframe.loc[0, "topboundary_head"]
     semi = pd.notnull(hstar)
-    kaq = dataframe["conductivity"].values
+    kaq = dataframe["aquifer_conductivity"].values
 
     if semi:
-        c = dataframe["resistance"].values
+        c = dataframe["aquitard_resistance"].values
         porosity = np.empty(nlayer * 2)
         z = np.empty(nlayer * 2 + 1)
-        z[0] = dataframe.loc[0, "z_topboundary"]
-        z[1::2] = dataframe["z_top"].values
-        z[2::2] = dataframe["z_bottom"].values
-        porosity[::2] = dataframe["porosity_aquitard"].values
-        porosity[1::2] = dataframe["porosity_aquifer"].values
+        z[0] = dataframe.loc[0, "topboundary_top"]
+        z[1::2] = dataframe["aquifer_top"].values
+        z[2::2] = dataframe["aquifer_bottom"].values
+        porosity[::2] = dataframe["aquitard_porosity"].values
+        porosity[1::2] = dataframe["aquifer_porosity"].values
         topboundary = "semi"
+        storage_aquifer = dataframe["aquifer_storage"].values
+        storage_aquitard = dataframe["aquitard_storage"].values
     else:
-        c = dataframe["resistance"].values[1:]
+        c = dataframe["aquitard_resistance"].values[1:]
         z = np.empty(nlayer * 2)
-        z[::2] = dataframe["z_top"].values
-        z[1::2] = dataframe["z_bottom"].values
+        z[::2] = dataframe["aquifer_top"].values
+        z[1::2] = dataframe["aquifer_bottom"].values
         porosity = np.empty(nlayer * 2 - 1)
-        porosity[::2] = dataframe["porosity_aquifer"].values
-        porosity[1::2] = dataframe["porosity_aquitard"].values[1:]
+        porosity[::2] = dataframe["aquifer_porosity"].values
+        porosity[1::2] = dataframe["aquitard_porosity"].values[1:]
         topboundary = "conf"
-
-    return {
+        storage_aquifer = dataframe["aquifer_storage"].values
+        storage_aquitard = dataframe["aquifer_storage"].values[1:]
+        
+    d = {
         "kaq": kaq,
         "z": z,
         "c": c,
-        "npor": porosity,
         "topboundary": topboundary,
-        "hstar": hstar,
     }
+    if transient:
+        d["Sll"] = storage_aquitard
+        d["Saq"] = storage_aquifer
+        # TODO: for now, assume there is always at least one specific yield
+        # this is the aquifer if conf, the aquitard if semi
+        d["phreatictop"] = True
+    else:
+        d["npor"] = porosity
+        d["hstar"] = hstar
+    return d
+
+
+def parse_name(layername: str) -> Tuple[str, str]:
+    prefix, name = layername.split(":")
+    element_type = re.split("timml |ttim ", prefix)[1]
+    mapping = {
+        "Computation Times": "Domain",
+        "Temporal Settings": "Aquifer",
+        "Polygon Inhomogeneity Properties": "Polygon Inhomogeneity",
+        "Building Pit Properties": "Building Pit",
+    }
+    element_type = mapping.get(element_type, element_type)
+    if "timml" in prefix:
+        if "Properties" in prefix:
+            tim_type = "timml_assoc"
+        else:
+            tim_type = "timml"
+    elif "ttim" in prefix:
+        tim_type = "ttim"
+    else:
+        raise ValueError("Neither timml nor ttim in layername")
+    return tim_type, element_type, name
+
+
+def model_specification(path, active_elements):
+    gpkg_names = fiona.listlayers(path)
+    dd = defaultdict
+    grouped_names = dd(partial(dd, partial(dd, list)))
+    for layername in gpkg_names:
+        tim_type, element_type, name = parse_name(layername)
+        grouped_names[element_type][name][tim_type] = layername
+
+    aquifer_entry = grouped_names.pop("Aquifer")["Aquifer"]
+    aquifer = gpd.read_file(path, layer=aquifer_entry["timml"])
+    temporal_settings = gpd.read_file(path, layer=aquifer_entry["ttim"])
+    domain_entry = grouped_names.pop("Domain")["Domain"]
+    domain = gpd.read_file(path, layer=domain_entry["timml"])
+    output_times = gpd.read_file(path, layer=domain_entry["ttim"])
+
+    ttim_elements = {}
+    timml_elements = {}
+    for element_type, element_group in grouped_names.items():
+        for name, group in element_group.items():
+            timml_name = group["timml"]
+            timml_assoc_name = group.get("timml_assoc", None)
+            ttim_name = group.get("ttim", None)
+
+            timml_df = gpd.read_file(path, layer=timml_name)
+            timml_assoc_df = (
+                gpd.read_file(path, layer=timml_assoc_name)
+                if timml_assoc_name is not None
+                else None
+            )
+            ttim_df = (
+                gpd.read_file(path, layer=ttim_name) if ttim_name is not None else None
+            )
+            print(ttim_df)
+            timml_spec = ElementSpecification(
+                elementtype=element_type,
+                active=active_elements[timml_name],
+                dataframe=timml_df,
+                associated_dataframe=timml_assoc_df,
+            )
+            ttim_spec = TransientElementSpecification(
+                elementtype=element_type,
+                active=active_elements[ttim_name],
+                dataframe=ttim_df,
+                steady_spec=timml_spec,
+            )
+            timml_elements[timml_name] = timml_spec
+            ttim_elements[ttim_name] = ttim_spec
+
+    return (
+        TimmlModelSpecification(aquifer, timml_elements, domain),
+        TtimModelSpecification(
+            aquifer,
+            temporal_settings,
+            ttim_elements,
+            domain,
+            output_times["time"].values,
+        ),
+    )
 
 
 # Output methods
@@ -166,7 +278,7 @@ def gridspec(
     crs: Any
         Coordinate Reference System
     """
-    domain = gpd.read_file(path, layer="timml Domain")
+    domain = gpd.read_file(path, layer="timml Domain:Domain")
     xmin, ymin, xmax, ymax = domain.bounds.iloc[0]
     extent = (xmin, xmax, ymin, ymax)
     return round_extent(extent, cellsize), domain.crs
