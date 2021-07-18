@@ -480,11 +480,13 @@ class QgisTimmlWidget(QWidget):
 
         cellsize = self.cellsize_spin_box.value()
         path = Path(self.path).absolute()
+        mode = self.transient_combo_box.currentText().lower()
         data = json.dumps(
             {
                 "operation": "compute",
                 "path": str(path),
                 "cellsize": cellsize,
+                "mode": mode,
                 "active_elements": active_elements,
             }
         )
