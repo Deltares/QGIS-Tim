@@ -3,13 +3,16 @@ This module contains the logic connecting the buttons of the plugin dockwidget
 to the actual functionality.
 """
 import json
+import re
+import tempfile
 from functools import partial
 from pathlib import Path
-from typing import Any, List, Tuple
+from typing import Any, Tuple
 
 from PyQt5.QtCore import Qt
-from PyQt5.QtGui import QDoubleValidator, QHeaderView, QMessageBox
+from PyQt5.QtGui import QMessageBox
 from PyQt5.QtWidgets import (
+    QCheckBox,
     QComboBox,
     QDoubleSpinBox,
     QFileDialog,
@@ -23,29 +26,42 @@ from PyQt5.QtWidgets import (
     QVBoxLayout,
     QWidget,
 )
-from xarray.core.common import T
 from qgis.core import (
     Qgis,
+    QgsMapLayerProxyModel,
+    QgsMeshDatasetIndex,
+    QgsMeshLayer,
     QgsProject,
     QgsRasterLayer,
 )
+from qgis.gui import QgsMapLayerComboBox
 from qgistim import layer_styling
 from qgistim.server_handler import ServerHandler
+from xarray.core.common import T
 
 from .dataset_tree_widget import DatasetTreeWidget
+from .dummy_ugrid import write_dummy_ugrid
 from .extraction_widget import DataExtractionWidget
-from .tim_elements import (
-    Aquifer,
-    Domain,
-    ELEMENTS,
-    load_elements_from_geopackage,
-)
+from .processing import mesh_contours
+from .tim_elements import ELEMENTS, Aquifer, Domain, load_elements_from_geopackage
+
+# Keys for the storing and retrieving plugin state.
+# State is written to the QGIS file under these entries.
+PROJECT_SCOPE = "QgisTim"
+GPGK_PATH_ENTRY = "tim_geopackage_path"
+GPKG_LAYERS_ENTRY = "tim_geopackage_layers"
+TIM_GROUP_ENTRY = "tim_group"
+TIMML_GROUP_ENTRY = "timml_group"
+TTIM_GROUP_ENTRY = "ttim_group"
+TIMOUTPUT_GROUP_ENTRY = "timoutput_group"
 
 
 class QgisTimmlWidget(QWidget):
     def __init__(self, parent, iface):
         super(QgisTimmlWidget, self).__init__(parent)
         self.iface = iface
+        self.dummy_ugrid_path = Path(tempfile.mkdtemp()) / "qgistim-dummy-ugrid.nc"
+        write_dummy_ugrid(self.dummy_ugrid_path)
         # Data extraction
         self.extraction_widget = DataExtractionWidget(iface)
         self.extraction_widget.extract_button.clicked.connect(self.extract)
@@ -60,7 +76,12 @@ class QgisTimmlWidget(QWidget):
         self.open_geopackage_button.clicked.connect(self.open_geopackage)
         self.remove_button.clicked.connect(self.remove_geopackage_layer)
         self.add_button.clicked.connect(self.add_selection_to_qgis)
+        self.suppress_popup_checkbox = QCheckBox("Suppress attribute form pop-up")
+        self.suppress_popup_checkbox.stateChanged.connect(self.suppress_popup_changed)
         self.group = None
+        self.timml_group = None
+        self.ttim_group = None
+        self.output_group = None
         self.dataset_tree = DatasetTreeWidget()
         self.dataset_tree.setSizePolicy(QSizePolicy.Preferred, QSizePolicy.Expanding)
         # Connect to reading of project file
@@ -94,7 +115,24 @@ class QgisTimmlWidget(QWidget):
         self.cellsize_spin_box.setSingleStep(1.0)
         self.cellsize_spin_box.setValue(25.0)
         self.domain_button.clicked.connect(self.domain)
+        self.mesh_checkbox = QCheckBox("Trimesh")
         self.compute_button.clicked.connect(self.compute)
+        self.contour_checkbox = QCheckBox("Contour")
+        self.contour_button = QPushButton("Export contours")
+        self.contour_button.clicked.connect(self.export_contours)
+        self.contour_layer = QgsMapLayerComboBox()
+        self.contour_layer.setFilters(QgsMapLayerProxyModel.MeshLayer)
+        self.contour_min_box = QDoubleSpinBox()
+        self.contour_max_box = QDoubleSpinBox()
+        self.contour_step_box = QDoubleSpinBox()
+        self.contour_min_box.setMinimum(-1000.0)
+        self.contour_min_box.setMaximum(1000.0)
+        self.contour_min_box.setValue(-5.0)
+        self.contour_max_box.setMinimum(-1000.0)
+        self.contour_max_box.setMaximum(1000.0)
+        self.contour_max_box.setValue(5.0)
+        self.contour_step_box.setSingleStep(0.1)
+        self.contour_step_box.setValue(0.5)
         # Layout
         # External interpreter
         interpreter_groupbox = QGroupBox("Interpreter")
@@ -124,6 +162,7 @@ class QgisTimmlWidget(QWidget):
         layer_row.addWidget(self.add_button)
         layer_row.addWidget(self.remove_button)
         dataset_layout.addLayout(layer_row)
+        dataset_layout.addWidget(self.suppress_popup_checkbox)
         dataset_groupbox.setLayout(dataset_layout)
         # Elements
         element_groupbox = QGroupBox("Elements")
@@ -140,12 +179,28 @@ class QgisTimmlWidget(QWidget):
         solution_groupbox.setMaximumHeight(150)
         solution_grid = QGridLayout()
         solution_grid.addWidget(self.domain_button, 0, 0)
-        label = QLabel("Cellsize:")
-        label.setFixedWidth(45)
-        solution_grid.addWidget(label, 0, 1)
-        solution_grid.addWidget(self.cellsize_spin_box, 0, 2)
-        solution_grid.addWidget(self.transient_combo_box, 1, 0)
-        solution_grid.addWidget(self.compute_button, 1, 2)
+        cellsize_row = QHBoxLayout()
+        cellsize_row.addWidget(QLabel("Cellsize:"))
+        cellsize_row.addWidget(self.cellsize_spin_box)
+        # label.setFixedWidth(45)
+        solution_grid.addLayout(cellsize_row, 0, 1)
+        contour_row = QHBoxLayout()
+        contour_row2 = QHBoxLayout()
+        contour_row.addWidget(self.contour_checkbox)
+        contour_row.addWidget(self.contour_min_box)
+        contour_row.addWidget(QLabel("to"))
+        contour_row.addWidget(self.contour_max_box)
+        contour_row2.addWidget(QLabel("Increment:"))
+        contour_row2.addWidget(self.contour_step_box)
+        solution_grid.addLayout(contour_row, 1, 0)
+        solution_grid.addLayout(contour_row2, 1, 1)
+        solution_grid.addWidget(self.transient_combo_box, 2, 0)
+        compute_row = QHBoxLayout()
+        compute_row.addWidget(self.mesh_checkbox)
+        compute_row.addWidget(self.compute_button)
+        solution_grid.addLayout(compute_row, 2, 1)
+        solution_grid.addWidget(self.contour_layer, 3, 0)
+        solution_grid.addWidget(self.contour_button, 3, 1)
         solution_groupbox.setLayout(solution_grid)
         # Set for the dock widget
         layout = QVBoxLayout()
@@ -179,7 +234,9 @@ class QgisTimmlWidget(QWidget):
         """Returns coordinate reference system of current mapview"""
         return self.iface.mapCanvas().mapSettings().destinationCrs()
 
-    def add_layer(self, layer: Any, renderer: Any = None) -> None:
+    def add_layer(
+        self, layer: Any, destination: Any, renderer: Any = None, suppress: bool = None
+    ) -> None:
         """
         Add a layer to the Layers Panel
 
@@ -187,13 +244,34 @@ class QgisTimmlWidget(QWidget):
         ----------
         layer:
             QGIS map layer, raster or vector layer
+        destination:
+            Legend group
         renderer:
             QGIS layer renderer, optional
+        suppress:
+            optional, bool. Default value is None.
+            This controls whether attribute form popup is suppressed or not.
+            Only relevant for vector (input) layers.
         """
-        maplayer = QgsProject.instance().addMapLayer(layer, False)
+        if layer is None:
+            return
+        add_to_legend = self.group is None
+        maplayer = QgsProject.instance().addMapLayer(layer, add_to_legend)
+        if suppress is not None:
+            config = maplayer.editFormConfig()
+            config.setSuppress(1)
+            maplayer.setEditFormConfig(config)
         if renderer is not None:
             maplayer.setRenderer(renderer)
-        self.group.addLayer(maplayer)
+        if destination is not None:
+            destination.addLayer(maplayer)
+
+    def create_groups(self, name: str) -> None:
+        root = QgsProject.instance().layerTreeRoot()
+        self.group = root.addGroup(name)
+        self.timml_group = self.group.addGroup(f"{name}-timml")
+        self.ttim_group = self.group.addGroup(f"{name}-ttim")
+        self.output_group = self.group.addGroup(f"{name}-output")
 
     def load_geopackage(self) -> None:
         """
@@ -207,18 +285,12 @@ class QgisTimmlWidget(QWidget):
             print(element.assoc_name)
             self.dataset_tree.add_element(element)
         path = self.path
-        root = QgsProject.instance().layerTreeRoot()
-        self.group = root.addGroup(str(Path(path).stem))
+        name = str(Path(path).stem)
+        self.create_groups(name)
         for item in self.dataset_tree.items():
             self.add_item_to_qgis(item)
 
     def write_plugin_state_to_project(self) -> None:
-        print("storing state")
-        PROJECT_SCOPE = "QgisTim"
-        GPGK_PATH_ENTRY = "tim_geopackage_path"
-        GPKG_LAYERS_ENTRY = "tim_geopackage_layers"
-        TIMML_GROUP_ENTRY = "tim_group"
-
         project = QgsProject().instance()
         # Store geopackage path
         project.writeEntry(PROJECT_SCOPE, GPGK_PATH_ENTRY, self.path)
@@ -230,32 +302,46 @@ class QgisTimmlWidget(QWidget):
         project.writeEntry(PROJECT_SCOPE, GPKG_LAYERS_ENTRY, entry)
 
         # Store root group
-        try:
-            group_name = self.group.name()
-        except (RuntimeError, AttributeError):
-            group_name = ""
-        project.writeEntry(PROJECT_SCOPE, TIMML_GROUP_ENTRY, group_name)
+        for (group, entry) in (
+            (self.group, TIM_GROUP_ENTRY),
+            (self.timml_group, TIMML_GROUP_ENTRY),
+            (self.ttim_group, TTIM_GROUP_ENTRY),
+            (self.output_group, TIMOUTPUT_GROUP_ENTRY),
+        ):
+            try:
+                group_name = group.name()
+            except (RuntimeError, AttributeError):
+                group_name = ""
+            project.writeEntry(PROJECT_SCOPE, entry, group_name)
 
         project.blockSignals(True)
         project.write()
         project.blockSignals(False)
 
     def read_plugin_state_from_project(self) -> None:
-        PROJECT_SCOPE = "QgisTim"
-        GPGK_PATH_ENTRY = "tim_geopackage_path"
-        GPKG_LAYERS_ENTRY = "tim_geopackage_layers"
-        TIMML_GROUP_ENTRY = "tim_group"
-
         project = QgsProject().instance()
         path, _ = project.readEntry(PROJECT_SCOPE, GPGK_PATH_ENTRY)
         if path == "":
             return
 
-        group_name, _ = project.readEntry(PROJECT_SCOPE, TIMML_GROUP_ENTRY)
+        group_name, _ = project.readEntry(PROJECT_SCOPE, TIM_GROUP_ENTRY)
+        timml_group_name, _ = project.readEntry(PROJECT_SCOPE, TIMML_GROUP_ENTRY)
+        ttim_group_name, _ = project.readEntry(PROJECT_SCOPE, TTIM_GROUP_ENTRY)
+        output_group_name, _ = project.readEntry(PROJECT_SCOPE, TIMOUTPUT_GROUP_ENTRY)
         root = QgsProject.instance().layerTreeRoot()
         self.group = root.findGroup(group_name)
         if self.group is None:
-            self.group = root.addGroup(str(Path(path).stem))
+            self.create_groups()
+        if self.group is not None:
+            self.timml_group = self.group.findGroup(timml_group_name)
+            self.ttim_group_name = self.group.findGroup(ttim_group_name)
+            self.output_group_name = self.group.findGroup(output_group_name)
+            if self.timml_group is None:
+                self.timml_group = self.group.addGroup(f"{group_name}-timml")
+            if self.ttim_group is None:
+                self.ttim_group = self.group.addGroup(f"{group_name}-ttim")
+            if self.output_group is None:
+                self.output_group = self.group.addGroup(f"{group_name}-output")
 
         entry, success = project.readEntry(PROJECT_SCOPE, GPKG_LAYERS_ENTRY)
         if success:
@@ -359,8 +445,11 @@ class QgisTimmlWidget(QWidget):
 
     def add_item_to_qgis(self, item) -> None:
         layers = item.element.from_geopackage()
-        for layer, renderer in layers:
-            self.add_layer(layer, renderer)
+        suppress = self.suppress_popup_checkbox.isChecked()
+        timml_layer, renderer = layers[0]
+        self.add_layer(timml_layer, self.timml_group, renderer, suppress)
+        self.add_layer(layers[1][0], self.ttim_group)
+        self.add_layer(layers[2][0], self.timml_group)
 
     def add_selection_to_qgis(self) -> None:
         selection = self.dataset_tree.selectedItems()
@@ -378,18 +467,14 @@ class QgisTimmlWidget(QWidget):
         """
         klass = ELEMENTS[element_type]
         element = klass.dialog(self.path, self.crs, self.iface, klass)
-        if element is None:  # cancelled
+        if element is None:  # dialog cancelled
             return
         # Write to geopackage
         element.write()
         # Add to QGIS
-        self.add_layer(element.timml_layer, element.renderer())
-        for layer in [
-            element.ttim_layer,
-            element.assoc_layer,
-        ]:
-            if layer is not None:
-                self.add_layer(layer)
+        self.add_layer(element.timml_layer, self.timml_group, element.renderer())
+        self.add_layer(element.ttim_layer, self.ttim_group)
+        self.add_layer(element.assoc_layer, self.timml_group)
         # Add to dataset tree
         self.dataset_tree.add_element(element)
 
@@ -424,7 +509,14 @@ class QgisTimmlWidget(QWidget):
         transient = self.transient_combo_box.currentText() == "Transient"
         self.dataset_tree.on_transient_changed(transient)
 
-    def load_result(self, path: Path, cellsize: float) -> None:
+    def contour_range(self) -> Tuple[float, float, float]:
+        return (
+            float(self.contour_min_box.value()),
+            float(self.contour_max_box.value()),
+            float(self.contour_step_box.value()),
+        )
+
+    def load_raster_result(self, path: Path, cellsize: float) -> None:
         """
         Load the result of a compute call into the Layers panel.
 
@@ -445,9 +537,6 @@ class QgisTimmlWidget(QWidget):
             if Path(netcdf_path) == Path(layer.source()):
                 QgsProject.instance().removeMapLayer(layer.id())
 
-        # For a Mesh Layer, use:
-        # layer = QgsMeshLayer(str(netcdf_path), f"{path.stem}-{cellsize}", "mdal")
-
         # Check layer for number of bands
         layer = QgsRasterLayer(netcdf_path, "", "gdal")
         bandcount = layer.bandCount()
@@ -458,7 +547,78 @@ class QgisTimmlWidget(QWidget):
             renderer = layer_styling.pseudocolor_renderer(
                 layer, band, colormap="Magma", nclass=10
             )
-            self.add_layer(layer, renderer)
+            self.add_layer(layer, self.output_group, renderer)
+
+    def load_mesh_result(self, path: Path, cellsize: float) -> None:
+        netcdf_path = str(
+            (path.parent / f"{path.stem}-{cellsize}".replace(".", "_")).with_suffix(
+                ".ugrid.nc"
+            )
+        )
+        # Loop through layers first. If the path already exists as a layer source, remove it.
+        # Otherwise QGIS will not the load the new result (this feels like a bug?).
+        for layer in QgsProject.instance().mapLayers().values():
+            if Path(netcdf_path) == Path(layer.source()):
+                QgsProject.instance().removeMapLayer(layer.id())
+        # Ensure the file is properly released by loading a dummy
+        QgsMeshLayer(str(self.dummy_ugrid_path), "", "mdal")
+
+        layer = QgsMeshLayer(str(netcdf_path), f"{path.stem}-{cellsize}", "mdal")
+        indexes = layer.datasetGroupsIndexes()
+
+        contour = self.contour_checkbox.isChecked()
+        start, stop, step = self.contour_range()
+
+        for index in indexes:
+            qgs_index = QgsMeshDatasetIndex(group=index, dataset=0)
+            name = layer.datasetGroupMetadata(qgs_index).name()
+            if "head_layer_" not in name:
+                continue
+            index_layer = QgsMeshLayer(
+                str(netcdf_path), f"{path.stem}-{cellsize}-{name}", "mdal"
+            )
+            renderer = index_layer.rendererSettings()
+            renderer.setActiveScalarDatasetGroup(index)
+            index_layer.setRendererSettings(renderer)
+            self.add_layer(index_layer, self.output_group)
+
+            if contour:
+                contour_layer = mesh_contours(
+                    layer=index_layer,
+                    index=index,
+                    name=name,
+                    start=start,
+                    stop=stop,
+                    step=step,
+                )
+                self.add_layer(contour_layer, self.output_group)
+
+    def export_contours(self) -> None:
+        layer = self.contour_layer.currentLayer()
+        renderer = layer.rendererSettings()
+        index = renderer.activeScalarDatasetGroup()
+        qgs_index = QgsMeshDatasetIndex(group=index, dataset=0)
+        name = layer.datasetGroupMetadata(qgs_index).name()
+        start, stop, step = self.contour_range()
+        print("exporting_contours", start, stop, step)
+        contour_layer = mesh_contours(
+            layer=layer,
+            index=index,
+            name=name,
+            start=start,
+            stop=stop,
+            step=step,
+        )
+        self.add_layer(contour_layer, self.output_group)
+
+    def suppress_popup_changed(self):
+        suppress = self.suppress_popup_checkbox.isChecked()
+        for item in self.dataset_tree.items():
+            layer = item.element.timml_layer
+            if layer is not None:
+                config = layer.editFormConfig()
+                config.setSuppress(suppress)
+                layer.setEditFormConfig(config)
 
     def start_server(self) -> None:
         """Start an external interpreter running gistim"""
@@ -485,6 +645,7 @@ class QgisTimmlWidget(QWidget):
         cellsize = self.cellsize_spin_box.value()
         path = Path(self.path).absolute()
         mode = self.transient_combo_box.currentText().lower()
+        as_trimesh = self.mesh_checkbox.isChecked()
         data = json.dumps(
             {
                 "operation": "compute",
@@ -492,13 +653,15 @@ class QgisTimmlWidget(QWidget):
                 "cellsize": cellsize,
                 "mode": mode,
                 "active_elements": active_elements,
+                "as_trimesh": as_trimesh,
             }
         )
         handler = self.server_handler
         received = handler.send(data)
 
         if received == "0":
-            self.load_result(path, cellsize)
+            self.load_mesh_result(path, cellsize)
+            # self.load_raster_result(path, cellsize)
         else:
             self.iface.messageBar().pushMessage(
                 "Error",

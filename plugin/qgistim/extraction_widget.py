@@ -3,7 +3,6 @@ import subprocess
 from pathlib import Path
 
 import gdal
-
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QColor
 from PyQt5.QtWidgets import (
@@ -11,22 +10,22 @@ from PyQt5.QtWidgets import (
     QCheckBox,
     QFileDialog,
     QHBoxLayout,
+    QLineEdit,
     QPushButton,
     QVBoxLayout,
     QWidget,
-    QLineEdit,
 )
 from qgis.core import (
     Qgis,
     QgsGeometry,
+    QgsLayerTreeGroup,
     QgsMapLayerType,
     QgsProject,
-    QgsWkbTypes,
     QgsRasterLayer,
-    QgsLayerTreeGroup,
+    QgsWkbTypes,
 )
-from qgistim import layer_styling
 from qgis.gui import QgsMapLayerComboBox, QgsMapTool, QgsRubberBand
+from qgistim import layer_styling
 
 RUBBER_BAND_COLOR = QColor(Qt.yellow)
 

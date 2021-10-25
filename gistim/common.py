@@ -1,19 +1,20 @@
 """
 Common utilities 
 """
-from collections import defaultdict
-from functools import partial
 import pathlib
 import re
+from collections import defaultdict
+from functools import partial
 from typing import Any, Callable, Dict, NamedTuple, Tuple, Union
 
 import fiona
+import geomesh
 import geopandas as gpd
 import numpy as np
 import pandas as pd
 import xarray as xr
 
-
+gpd.options.use_pygeos = False
 FloatArray = np.ndarray
 
 
@@ -207,13 +208,13 @@ def model_specification(path, active_elements):
             print(ttim_df)
             timml_spec = ElementSpecification(
                 elementtype=element_type,
-                active=active_elements[timml_name],
+                active=active_elements.get(timml_name, False),
                 dataframe=timml_df,
                 associated_dataframe=timml_assoc_df,
             )
             ttim_spec = TransientElementSpecification(
                 elementtype=element_type,
-                active=active_elements[ttim_name],
+                active=active_elements.get(ttim_name, False),
                 dataframe=ttim_df,
                 steady_spec=timml_spec,
             )
@@ -227,7 +228,7 @@ def model_specification(path, active_elements):
             temporal_settings,
             ttim_elements,
             domain,
-            output_times["time"].values,
+            np.sort(output_times["time"].values),
         ),
     )
 
@@ -263,7 +264,7 @@ def gridspec(
     path: Union[pathlib.Path, str], cellsize: float
 ) -> Tuple[Tuple[float], Any]:
     """
-    Infer the grid specification from the geopackage ``timmlDomain``  layer and
+    Infer the grid specification from the geopackage ``timmlDomain`` layer and
     the provided cellsize.
 
     Parameters
@@ -284,3 +285,30 @@ def gridspec(
     xmin, ymin, xmax, ymax = domain.bounds.iloc[0]
     extent = (xmin, xmax, ymin, ymax)
     return round_extent(extent, cellsize), domain.crs
+
+
+def trimesh(spec: TimmlModelSpecification, cellsize: float):
+    domain = spec.domain
+
+    geometry = []
+    for spec in spec.elements.values():
+        df = spec.dataframe
+        if spec.elementtype in ["Well", "HeadWell"]:
+            df.geometry = df.buffer(cellsize, resolution=2)
+        if spec.elementtype in ["PolygonInhomogeneity", "Building Pit"]:
+            pass
+        elif spec.elementtype in ["Impermeable Line Doublet", "Leaky Line Doublet"]:
+            df.geometry = df.buffer(cellsize * 0.01, cap_style=2, join_style=2)
+        geometry.append(
+            gpd.overlay(df, domain, how="intersection").loc[:, ["geometry"]]
+        )
+
+    gdf = pd.concat([domain.loc[:, ["geometry"]], *geometry])
+    gdf["cellsize"] = cellsize
+    # intersect bounding box with elements
+    mesher = geomesh.TriangleMesher(gdf)
+    mesher.minimum_angle = 0.01
+    mesher.conforming_delaunay = False
+    nodes, face_nodes = mesher.generate()
+    centroids = nodes[face_nodes].mean(axis=1)
+    return nodes, face_nodes, centroids

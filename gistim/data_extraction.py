@@ -232,16 +232,17 @@ def as_aquifer_aquitard(dataframe: pd.DataFrame, statistic: str = "mean"):
     out = pd.DataFrame()
     out["fid"] = np.arange(n_layer)
     out["layer"] = np.arange(n_layer)
-    out["resistance"] = np.nan
-    out["resistance"].values[1:] = dataframe[f"c-{statistic}"].values[:-1]
-    out["conductivity"] = dataframe[f"kh-{statistic}"].values
-    out["z_top"] = dataframe[f"top-{statistic}"]
-    out["z_bottom"] = dataframe[f"bottom-{statistic}"]
-    out["porosity_aquifer"] = 0.30
-    out["porosity_aquitard"] = np.nan
-    out["porosity_aquitard"].values[1:] = 0.30
-    out["head_topboundary"] = np.full(n_layer, np.nan)
-    out["z_topboundary"] = np.full(n_layer, np.nan)
+    out["aquitard_resistance"] = np.nan
+    out["aquitard_resistance"].values[1:] = dataframe[f"c-{statistic}"].values[:-1]
+    out["aquitard_porosity"] = np.nan
+    out["aquitard_storage"] = np.nan
+    out["aquifer_conductivity"] = dataframe[f"kh-{statistic}"].values
+    out["aquifer_porosity"] = np.nan
+    out["aquifer_storage"] = np.nan
+    out["aquifer_top"] = dataframe[f"top-{statistic}"]
+    out["aquifer_bottom"] = dataframe[f"bottom-{statistic}"]
+    out["topboundary_top"] = np.nan
+    out["topboundary_head"] = np.nan
     return out
 
 

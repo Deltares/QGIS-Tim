@@ -1,21 +1,22 @@
-import pathlib
-import re
-from typing import Any, Callable, Dict, List, NamedTuple, Tuple, Union
+from typing import Dict, List, Tuple
 
-import fiona
+import geomesh
 import geopandas as gpd
 import numpy as np
 import pandas as pd
 import timml
+import tqdm
 import xarray as xr
 
+from . import ugrid
 from .common import (
     ElementSpecification,
     TimmlModelSpecification,
-    point_coordinates,
-    linestring_coordinates,
-    polygon_coordinates,
     aquifer_data,
+    linestring_coordinates,
+    point_coordinates,
+    polygon_coordinates,
+    trimesh,
 )
 
 
@@ -356,8 +357,10 @@ def initialize_model(spec: TimmlModelSpecification) -> timml.Model:
     elements = {}
 
     for name, element_spec in spec.elements.items():
+        if not element_spec.active:
+            continue
         elementtype = element_spec.elementtype
-
+        print(f"adding {name} as {elementtype}")
         # Grab conversion function
         try:
             element = MAPPING[elementtype]
@@ -395,15 +398,43 @@ def headgrid(model: timml.Model, extent: Tuple[float], cellsize: float) -> xr.Da
     x = np.arange(xmin, xmax, cellsize) + 0.5 * cellsize
     # In geospatial rasters, y is DECREASING with row number
     y = np.arange(ymax, ymin, -cellsize) - 0.5 * cellsize
-    head = model.headgrid(x, y)
-    nlayer = head.shape[0]
-    out = xr.DataArray(
+    nlayer = model.aq.find_aquifer_data(x[0], y[0]).naq
+    layer = [i for i in range(nlayer)]
+    head = np.empty((nlayer, y.size, x.size), dtype=np.float64)
+    for i in tqdm.tqdm(range(y.size)):
+        for j in range(x.size):
+            head[:, i, j] = model.head(x[j], y[i], layer)
+
+    return xr.DataArray(
         data=head,
         name="head",
-        coords={"layer": range(nlayer), "y": y, "x": x},
+        coords={"layer": layer, "y": y, "x": x},
         dims=("layer", "y", "x"),
     )
-    return out
+
+
+def headmesh(
+    model: timml.Model, spec: TimmlModelSpecification, cellsize: float
+) -> xr.Dataset:
+    nodes, face_nodes, centroids = trimesh(spec, cellsize)
+    nlayer = model.aq.find_aquifer_data(nodes[0, 0], nodes[0, 0]).naq
+    layer = [i for i in range(nlayer)]
+    head = np.empty((nlayer, len(nodes)), dtype=np.float64)
+    # for i in tqdm.tqdm(range(nface)):
+    #    x = centroids[i, 0]
+    #    y = centroids[i, 1]
+    for i, (x, y) in enumerate(tqdm.tqdm(nodes)):
+        head[:, i] = model.head(x, y, layer)
+        head[:, i] = model.head(x, y, layer)
+    uds = ugrid._ugrid2d_dataset(
+        node_x=nodes[:, 0],
+        node_y=nodes[:, 1],
+        face_nodes=face_nodes,
+        face_x=centroids[:, 0],
+        face_y=centroids[:, 1],
+    )
+    uds["head"] = xr.DataArray(head, dims=("layer", "node"))
+    return ugrid._unstack_layers(uds)
 
 
 def discharge(model: timml.Model, elements: Dict) -> Tuple[List[gpd.GeoDataFrame]]:

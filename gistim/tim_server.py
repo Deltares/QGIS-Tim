@@ -4,9 +4,10 @@ import os
 import pathlib
 import socketserver
 import sys
-from typing import NamedTuple, Union, Dict
+from typing import Dict, NamedTuple, Union
 
 import rioxarray
+import xarray as xr
 
 import gistim
 
@@ -70,6 +71,7 @@ class TimHandler(socketserver.BaseRequestHandler):
         mode: str,
         cellsize: float,
         active_elements: Dict[str, bool],
+        as_trimesh: bool = False,
     ) -> None:
         """
         Compute the results of TimML model.
@@ -111,29 +113,49 @@ class TimHandler(socketserver.BaseRequestHandler):
         name = path.stem
         extent, crs = gistim.gridspec(path, cellsize)
         if mode == "steady-state":
-            head = gistim.timml_elements.headgrid(
-                self.server.timml_model, extent, cellsize
-            )
+            if as_trimesh:
+                ugrid_head = gistim.timml_elements.headmesh(
+                    self.server.timml_model, timml_spec, cellsize
+                )
+            else:
+                head = gistim.timml_elements.headgrid(
+                    self.server.timml_model, extent, cellsize
+                )
+                head = head.rio.write_crs(crs)
+                outpath = (
+                    path.parent / f"{name}-{cellsize}".replace(".", "_")
+                ).with_suffix(".nc")
+                head.to_netcdf(outpath)
+                ugrid_head = gistim.to_ugrid2d(head)
         elif mode == "transient":
             self.server.ttim_model.solve()
-            head = gistim.ttim_elements.headgrid(
-                self.server.ttim_model,
-                extent,
-                cellsize,
-                ttim_spec.output_times,
-                ttim_spec.temporal_settings["reference_date"].iloc[0],
-            )
+            if as_trimesh:
+                ugrid_head = gistim.ttim_elements.headmesh(
+                    self.server.ttim_model, timml_spec, cellsize
+                )
+            else:
+                head = gistim.ttim_elements.headgrid(
+                    self.server.ttim_model,
+                    extent,
+                    cellsize,
+                    ttim_spec.output_times,
+                    ttim_spec.temporal_settings["reference_date"].iloc[0],
+                )
+                head = head.rio.write_crs(crs)
+                outpath = (
+                    path.parent / f"{name}-{cellsize}".replace(".", "_")
+                ).with_suffix(".nc")
+                head.to_netcdf(outpath)
+                ugrid_head = gistim.to_ugrid2d(head)
         else:
             raise ValueError(
                 f'Mode should be "steady-state" or "transient". Received: {mode}'
             )
-        head = head.rio.write_crs(crs)
-
-        outpath = (path.parent / f"{name}-{cellsize}".replace(".", "_")).with_suffix(
-            ".nc"
-        )
-        print("Writing result to:", outpath)
-        head.to_netcdf(outpath)
+        ugrid_outpath = (
+            path.parent / f"{name}-{cellsize}".replace(".", "_")
+        ).with_suffix(".ugrid.nc")
+        print("Writing result to:", ugrid_outpath)
+        ugrid_head.to_netcdf(ugrid_outpath)
 
     def handle(self) -> None:
         """
@@ -152,6 +174,7 @@ class TimHandler(socketserver.BaseRequestHandler):
                 cellsize=data["cellsize"],
                 mode=data["mode"],
                 active_elements=data["active_elements"],
+                as_trimesh=data["as_trimesh"],
             )
             print("Computation succesful")
             # Send error code 0: all okay

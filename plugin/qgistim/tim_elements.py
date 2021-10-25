@@ -36,31 +36,30 @@ associated with each other is by comparing names. Names must therefore be
 unique within a group of the same type of elements.
 """
 
+import re
 from collections import defaultdict
 from functools import partial
-import re
 from typing import Any, List, Tuple
 
-from PyQt5.QtWidgets import (
-    QDialog,
-    QPushButton,
-    QLineEdit,
-    QHBoxLayout,
-    QVBoxLayout,
-    QLabel,
-)
 from PyQt5.QtCore import QVariant
 from PyQt5.QtGui import QDoubleValidator
+from PyQt5.QtWidgets import (
+    QDialog,
+    QHBoxLayout,
+    QLabel,
+    QLineEdit,
+    QPushButton,
+    QVBoxLayout,
+)
 from qgis.core import (
-    QgsVectorLayer,
-    QgsField,
-    QgsSingleSymbolRenderer,
-    QgsFillSymbol,
     QgsFeature,
+    QgsField,
+    QgsFillSymbol,
     QgsGeometry,
     QgsPointXY,
+    QgsSingleSymbolRenderer,
+    QgsVectorLayer,
 )
-
 from qgistim import geopackage
 
 # These columns are reused by Aquifer and Polygon Inhom, Building pit
@@ -80,16 +79,7 @@ AQUIFER_ATTRIBUTES = [
 ]
 INHOM_ATTRIBUTES = [
     QgsField("geometry_id", QVariant.Int),
-    QgsField("layer", QVariant.Int),
-    QgsField("aquitard_resistance", QVariant.Double),
-    QgsField("aquitard_porosity", QVariant.Double),
-    QgsField("aquifer_conductivity", QVariant.Double),
-    QgsField("aquifer_porosity", QVariant.Double),
-    QgsField("aquifer_top", QVariant.Double),
-    QgsField("aquifer_bottom", QVariant.Double),
-    QgsField("topboundary_top", QVariant.Double),
-    QgsField("topboundary_head", QVariant.Double),
-]
+] + AQUIFER_ATTRIBUTES
 
 
 class NameDialog(QDialog):
@@ -219,12 +209,11 @@ class Element:
         self.timml_layer_from_geopackage()
         self.ttim_layer_from_geopackage()
         self.assoc_layer_from_geopackage()
-        layers = [
+        return [
             (self.timml_layer, self.renderer()),
             (self.ttim_layer, None),
             (self.assoc_layer, None),
         ]
-        return [pair for pair in layers if pair[0] is not None]
 
     def write(self):
         self.timml_layer = geopackage.write_layer(
@@ -349,7 +338,7 @@ class Domain(TransientElement):
         feature = QgsFeature()
         feature.setGeometry(QgsGeometry.fromPolygonXY([points]))
         provider.addFeatures([feature])
-        # canvas.refresh()
+        canvas.refresh()
         return ymax, ymin
 
 

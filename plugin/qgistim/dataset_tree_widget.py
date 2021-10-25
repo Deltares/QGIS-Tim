@@ -1,14 +1,12 @@
 from typing import List
 
+from PyQt5.QtGui import QHeaderView
 from PyQt5.QtWidgets import (
     QAbstractItemView,
     QCheckBox,
+    QSizePolicy,
     QTreeWidget,
     QTreeWidgetItem,
-)
-from PyQt5.QtGui import QHeaderView
-from PyQt5.QtWidgets import (
-    QSizePolicy,
 )
 
 from .tim_elements import Aquifer, BuildingPit, Domain, PolygonInhomogeneity
@@ -79,3 +77,11 @@ class DatasetTreeWidget(QTreeWidget):
     def on_transient_changed(self, transient: bool) -> None:
         self.setColumnHidden(2, not transient)
         self.setColumnHidden(3, not transient)
+        # Disable unsupported ttim items, such as inhomogeneities
+        for item in self.items():
+            if item.text(3) == "":
+                if transient:
+                    item.timml_checkbox.setChecked(False)
+                    item.timml_checkbox.setEnabled(False)
+                else:
+                    item.timml_checkbox.setEnabled(True)
