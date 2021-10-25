@@ -10,7 +10,6 @@ from pathlib import Path
 from typing import Any, Tuple
 
 from PyQt5.QtCore import Qt
-from PyQt5.QtGui import QMessageBox
 from PyQt5.QtWidgets import (
     QCheckBox,
     QComboBox,
@@ -21,6 +20,7 @@ from PyQt5.QtWidgets import (
     QHBoxLayout,
     QLabel,
     QLineEdit,
+    QMessageBox,
     QPushButton,
     QSizePolicy,
     QVBoxLayout,

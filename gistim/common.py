@@ -193,7 +193,7 @@ def model_specification(path, active_elements):
         for name, group in element_group.items():
             timml_name = group["timml"]
             timml_assoc_name = group.get("timml_assoc", None)
-            ttim_name = group.get("ttim", None)
+            ttim_name = group.get("ttim", timml_name)
 
             timml_df = gpd.read_file(path, layer=timml_name)
             timml_assoc_df = (
@@ -204,16 +204,21 @@ def model_specification(path, active_elements):
             ttim_df = (
                 gpd.read_file(path, layer=ttim_name) if ttim_name is not None else None
             )
-            print(ttim_df)
             timml_spec = ElementSpecification(
                 elementtype=element_type,
                 active=active_elements.get(timml_name, False),
                 dataframe=timml_df,
                 associated_dataframe=timml_assoc_df,
             )
+
+            if element_type in ("Uniform Flow", "Constant"):
+                ttim_active = False
+            else:
+                ttim_active = (active_elements.get(ttim_name, False),)
+
             ttim_spec = TransientElementSpecification(
                 elementtype=element_type,
-                active=active_elements.get(ttim_name, False),
+                active=ttim_active,
                 dataframe=ttim_df,
                 steady_spec=timml_spec,
             )

@@ -128,6 +128,7 @@ class TimHandler(socketserver.BaseRequestHandler):
                 head.to_netcdf(outpath)
                 ugrid_head = gistim.to_ugrid2d(head)
         elif mode == "transient":
+            print("Solving transient model")
             self.server.ttim_model.solve()
             if as_trimesh:
                 ugrid_head = gistim.ttim_elements.headmesh(

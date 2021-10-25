@@ -1,15 +1,31 @@
 from typing import List
 
-from PyQt5.QtGui import QHeaderView
 from PyQt5.QtWidgets import (
     QAbstractItemView,
     QCheckBox,
+    QHeaderView,
     QSizePolicy,
     QTreeWidget,
     QTreeWidgetItem,
 )
 
 from .tim_elements import Aquifer, BuildingPit, Domain, PolygonInhomogeneity
+
+SUPPORTED_TTIM_ELEMENTS = set(
+    [
+        "Aquifer",
+        "Domain",
+        "Constant",
+        "Uniform Flow",
+        "Well",
+        "Head Well",
+        "Head Line Sink",
+        "Line Sink Ditch",
+        "Circular Area Sink",
+        "Impermeable Line Doublet",
+        "Leaky Line Doublet",
+    ]
+)
 
 
 class DatasetTreeWidget(QTreeWidget):
@@ -79,7 +95,7 @@ class DatasetTreeWidget(QTreeWidget):
         self.setColumnHidden(3, not transient)
         # Disable unsupported ttim items, such as inhomogeneities
         for item in self.items():
-            if item.text(3) == "":
+            if item.text(1).split(":")[0] in SUPPORTED_TTIM_ELEMENTS:
                 if transient:
                     item.timml_checkbox.setChecked(False)
                     item.timml_checkbox.setEnabled(False)

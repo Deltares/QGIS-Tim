@@ -175,11 +175,18 @@ def ugrid2d_data(da: xr.DataArray) -> xr.DataArray:
     extra_dims = list(set(da.dims) - set(["y", "x"]))
     shape = da.data.shape
     new_shape = shape[:-2] + (np.product(shape[-2:]),)
-    return xr.DataArray(
-        data=da.data.reshape(new_shape),
-        coords={k: da[k] for k in da.coords if k not in ("y", "x", "dy", "dx")},
-        dims=extra_dims + ["face"],
-    )
+    try:
+        return xr.DataArray(
+            data=da.data.reshape(new_shape),
+            coords={k: da[k] for k in da.coords if k not in ("y", "x", "dy", "dx")},
+            dims=extra_dims + ["face"],
+        )
+    except ValueError:
+        return xr.DataArray(
+            data=da.data.reshape(new_shape),
+            coords={k: da[k] for k in da.coords if k not in ("y", "x", "dy", "dx")},
+            dims=extra_dims[::-1] + ["face"],
+        )
 
 
 def _unstack_layers(ds: xr.Dataset) -> xr.Dataset:
