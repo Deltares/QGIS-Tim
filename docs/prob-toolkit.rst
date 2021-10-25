@@ -77,7 +77,7 @@ example running in the PTK.
     model_spec = gistim.model_specification(path)
 
     # Grab the aquifer data
-    aquifer_data = model_spec.aquifer.dataframe
+    aquifer_data = model_spec.aquifer
     # Set the values in the DataFrames
     aquifer_data["resistance"].iloc[3] = fictitious_c
     aquifer_data["conductivity"].iloc[2] = peelo_conductivity 

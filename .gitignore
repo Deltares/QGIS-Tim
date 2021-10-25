@@ -82,3 +82,4 @@ venv.bak/
 
 # sphinx gallery output
 docs/auto_examples
+gistim/examples/data/

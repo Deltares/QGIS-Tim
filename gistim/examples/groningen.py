@@ -42,7 +42,7 @@ model_spec = gistim.model_specification(path)
 ###############################################################################
 # Grab the aquifer data, stored in the dataframe:
 
-aquifer_data = model_spec.aquifer.dataframe
+aquifer_data = model_spec.aquifer
 aquifer_data
 
 ###############################################################################
@@ -63,7 +63,7 @@ sheetpile_data.loc[0, "resistance"] = sheetpile_resistance
 ###############################################################################
 # The model specification can be turned into a TimML model as follows:
 
-model = gistim.initialize_model(model_spec)
+model, _ = gistim.initialize_model(model_spec)
 
 ###############################################################################
 # This will initially both the model, as well as add all elements to it. In this
@@ -80,7 +80,7 @@ print("Head is:", control_head)
 
 ###############################################################################
 # To extract an extent in which to compute heads, the extent is extracted from
-# the "timmlDomain" layer in the GeoPackage:
+# the "timml Domain" layer in the GeoPackage:
 
 cellsize = 2.0
 extent, crs = gistim.gridspec(path, cellsize)
