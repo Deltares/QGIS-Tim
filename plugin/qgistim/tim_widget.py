@@ -28,6 +28,7 @@ from PyQt5.QtWidgets import (
 )
 from qgis.core import (
     Qgis,
+    QgsApplication,
     QgsMapLayerProxyModel,
     QgsMeshDatasetIndex,
     QgsMeshLayer,
@@ -37,7 +38,6 @@ from qgis.core import (
 from qgis.gui import QgsMapLayerComboBox
 from qgistim import layer_styling
 from qgistim.server_handler import ServerHandler
-from xarray.core.common import T
 
 from .dataset_tree_widget import DatasetTreeWidget
 from .dummy_ugrid import write_dummy_ugrid
@@ -103,6 +103,9 @@ class QgisTimmlWidget(QWidget):
         self.interpreter_combo_box.insertItems(0, ServerHandler.interpreters())
         self.interpreter_button = QPushButton("Start")
         self.interpreter_button.clicked.connect(self.start_server)
+        self.config_button = QPushButton()
+        self.config_button.clicked.connect(self.configure_server)
+        self.config_button.setIcon(QgsApplication.getThemeIcon("/mActionOptions.svg"))
         # Solution
         self.domain_button = QPushButton("Domain")
         self.transient_combo_box = QComboBox()
@@ -141,6 +144,7 @@ class QgisTimmlWidget(QWidget):
         interpreter_row = QHBoxLayout()
         interpreter_row.addWidget(self.interpreter_combo_box)
         interpreter_row.addWidget(self.interpreter_button)
+        interpreter_row.addWidget(self.config_button)
         interpreter_layout.addLayout(interpreter_row)
         interpreter_groupbox.setLayout(interpreter_layout)
         # Data extraction
@@ -619,6 +623,9 @@ class QgisTimmlWidget(QWidget):
                 config = layer.editFormConfig()
                 config.setSuppress(suppress)
                 layer.setEditFormConfig(config)
+
+    def configure_server(self) -> None:
+        return
 
     def start_server(self) -> None:
         """Start an external interpreter running gistim"""

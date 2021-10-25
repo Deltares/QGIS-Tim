@@ -2,7 +2,7 @@ import json
 import subprocess
 from pathlib import Path
 
-import gdal
+from osgeo import gdal
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QColor
 from PyQt5.QtWidgets import (

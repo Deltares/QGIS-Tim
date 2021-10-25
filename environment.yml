@@ -19,7 +19,7 @@ dependencies:
   - pytest
   - pytest-benchmark
   - pytest-cov
-  - python>=3.6
+  - python>=3.7
   - rasterio>=1.0
   - rioxarray
   - scipy
@@ -28,5 +28,6 @@ dependencies:
   - sphinx-gallery
   - sphinx_rtd_theme
   - timml
+  - ttim
   - twine
   - xarray>=0.15

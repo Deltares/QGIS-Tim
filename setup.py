@@ -26,6 +26,7 @@ setup(
         "pandas",
         "scipy",
         "timml",
+        "ttim",
         "xarray>=0.15",
     ],
     extras_require={
