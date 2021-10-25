@@ -8,7 +8,6 @@ from functools import partial
 from typing import Any, Callable, Dict, NamedTuple, Tuple, Union
 
 import fiona
-import geomesh
 import geopandas as gpd
 import numpy as np
 import pandas as pd
@@ -288,6 +287,9 @@ def gridspec(
 
 
 def trimesh(spec: TimmlModelSpecification, cellsize: float):
+    # Only import it if needed
+    import geomesh
+
     domain = spec.domain
 
     geometry = []
