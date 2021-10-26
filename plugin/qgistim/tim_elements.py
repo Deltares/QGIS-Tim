@@ -154,13 +154,19 @@ class Element:
         self.timml_name = f"timml {self.element_type}:{name}"
 
     @staticmethod
-    def dialog(path: str, crs: Any, iface: Any, klass: type) -> Tuple[Any]:
+    def dialog(
+        path: str, crs: Any, iface: Any, klass: type, names: List[str]
+    ) -> Tuple[Any]:
         dialog = NameDialog()
         dialog.show()
         ok = dialog.exec_()
         if not ok:
             return
+
         name = dialog.name_line_edit.text()
+        if name in names:
+            raise ValueError(f"Name already exists in geopackage: {name}")
+
         instance = klass(path, name)
         instance.create_layers(crs)
         return instance
@@ -562,13 +568,19 @@ class CircularAreaSink(TransientElement):
         ]
 
     @staticmethod
-    def dialog(path: str, crs: Any, iface: Any, klass: type) -> Tuple[Any]:
+    def dialog(
+        path: str, crs: Any, iface: Any, klass: type, names: List[str]
+    ) -> Tuple[Any]:
         dialog = RadiusDialog()
         dialog.show()
         ok = dialog.exec_()
         if not ok:
             return
+
         name = dialog.name_line_edit.text()
+        if name in names:
+            raise ValueError(f"Name already exists in geopackage: {name}")
+
         radius = float(dialog.radius_line_edit.text())
         instance = klass(path, name)
         instance.create_layers(crs)
@@ -692,5 +704,4 @@ def load_elements_from_geopackage(path: str) -> List[Element]:
     for element_type, group in grouped_names.items():
         for name in group:
             elements.append(ELEMENTS[element_type](path, name))
-    print(elements)
     return elements

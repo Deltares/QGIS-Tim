@@ -483,7 +483,15 @@ class QgisTimmlWidget(QWidget):
             Name of the element type.
         """
         klass = ELEMENTS[element_type]
-        element = klass.dialog(self.path, self.crs, self.iface, klass)
+
+        selection = self.dataset_tree.items()
+        # Append associated items
+        for item in selection:
+            if item.assoc_item is not None and item.assoc_item not in selection:
+                selection.append(item.assoc_item)
+        names = set([item.element.name for item in selection])
+
+        element = klass.dialog(self.path, self.crs, self.iface, klass, names)
         if element is None:  # dialog cancelled
             return
         # Write to geopackage
