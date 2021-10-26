@@ -239,7 +239,12 @@ class QgisTimmlWidget(QWidget):
         return self.iface.mapCanvas().mapSettings().destinationCrs()
 
     def add_layer(
-        self, layer: Any, destination: Any, renderer: Any = None, suppress: bool = None
+        self,
+        layer: Any,
+        destination: Any,
+        renderer: Any = None,
+        suppress: bool = None,
+        on_top: bool = False,
     ) -> None:
         """
         Add a layer to the Layers Panel
@@ -256,6 +261,9 @@ class QgisTimmlWidget(QWidget):
             optional, bool. Default value is None.
             This controls whether attribute form popup is suppressed or not.
             Only relevant for vector (input) layers.
+        on_top: optional, bool. Default value is False.
+            Whether to place the layer on top in the destination legend group.
+            Handy for transparent layers such as contours.
         """
         if layer is None:
             return
@@ -268,7 +276,10 @@ class QgisTimmlWidget(QWidget):
         if renderer is not None:
             maplayer.setRenderer(renderer)
         if destination is not None:
-            destination.addLayer(maplayer)
+            if on_top:
+                destination.insertLayer(0, maplayer)
+            else:
+                destination.addLayer(maplayer)
 
     def create_groups(self, name: str) -> None:
         root = QgsProject.instance().layerTreeRoot()
@@ -595,7 +606,7 @@ class QgisTimmlWidget(QWidget):
                     stop=stop,
                     step=step,
                 )
-                self.add_layer(contour_layer, self.output_group)
+                self.add_layer(contour_layer, self.output_group, on_top=True)
 
     def export_contours(self) -> None:
         layer = self.contour_layer.currentLayer()
@@ -613,7 +624,7 @@ class QgisTimmlWidget(QWidget):
             stop=stop,
             step=step,
         )
-        self.add_layer(contour_layer, self.output_group)
+        self.add_layer(contour_layer, self.output_group, on_top=True)
 
     def suppress_popup_changed(self):
         suppress = self.suppress_popup_checkbox.isChecked()
