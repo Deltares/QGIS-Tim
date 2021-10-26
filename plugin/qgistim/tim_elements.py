@@ -501,7 +501,7 @@ class LineSinkDitch(TransientElement):
         return QgsSingleSymbolRenderer(symbol)
 
 
-class ImpermeableLineDoublet(TransientElement):
+class ImpermeableLineDoublet(Element):
     def _initialize(self, path, name):
         self._initialize_default(path, name)
         self.element_type = "Impermeable Line Doublet"
