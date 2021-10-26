@@ -211,14 +211,9 @@ def model_specification(path, active_elements):
                 associated_dataframe=timml_assoc_df,
             )
 
-            if element_type in ("Uniform Flow", "Constant"):
-                ttim_active = False
-            else:
-                ttim_active = (active_elements.get(ttim_name, False),)
-
             ttim_spec = TransientElementSpecification(
                 elementtype=element_type,
-                active=ttim_active,
+                active=active_elements.get(ttim_name, False),
                 dataframe=ttim_df,
                 steady_spec=timml_spec,
             )
