@@ -66,16 +66,16 @@ from qgistim import geopackage
 # Aquitards are on top of the aquifer, so it comes first
 AQUIFER_ATTRIBUTES = [
     QgsField("layer", QVariant.Int),
-    QgsField("aquitard_resistance", QVariant.Double),
-    QgsField("aquitard_porosity", QVariant.Double),
-    QgsField("aquitard_storage", QVariant.Double),
-    QgsField("aquifer_conductivity", QVariant.Double),
-    QgsField("aquifer_porosity", QVariant.Double),
-    QgsField("aquifer_storage", QVariant.Double),
+    QgsField("aquitard_c", QVariant.Double),
+    QgsField("aquitard_npor", QVariant.Double),
+    QgsField("aquitard_s", QVariant.Double),
+    QgsField("aquifer_k", QVariant.Double),
+    QgsField("aquifer_npor", QVariant.Double),
+    QgsField("aquifer_s", QVariant.Double),
     QgsField("aquifer_top", QVariant.Double),
     QgsField("aquifer_bottom", QVariant.Double),
-    QgsField("topboundary_top", QVariant.Double),
-    QgsField("topboundary_head", QVariant.Double),
+    QgsField("semiconf_top", QVariant.Double),
+    QgsField("semiconf_head", QVariant.Double),
 ]
 INHOM_ATTRIBUTES = [
     QgsField("geometry_id", QVariant.Int),

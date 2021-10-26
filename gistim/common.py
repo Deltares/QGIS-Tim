@@ -104,33 +104,33 @@ def aquifer_data(
     dataframe = dataframe.sort_values(by="layer").set_index("layer")
     nlayer = len(dataframe)
     # Deal with optional semi-confined top layer.
-    hstar = dataframe.loc[0, "topboundary_head"]
+    hstar = dataframe.loc[0, "semiconf_head"]
     semi = pd.notnull(hstar)
-    kaq = dataframe["aquifer_conductivity"].values
+    kaq = dataframe["aquifer_k"].values
 
     if semi:
-        c = dataframe["aquitard_resistance"].values
+        c = dataframe["aquitard_c"].values
         porosity = np.empty(nlayer * 2)
         z = np.empty(nlayer * 2 + 1)
-        z[0] = dataframe.loc[0, "topboundary_top"]
+        z[0] = dataframe.loc[0, "semiconf_top"]
         z[1::2] = dataframe["aquifer_top"].values
         z[2::2] = dataframe["aquifer_bottom"].values
-        porosity[::2] = dataframe["aquitard_porosity"].values
-        porosity[1::2] = dataframe["aquifer_porosity"].values
+        porosity[::2] = dataframe["aquitard_npor"].values
+        porosity[1::2] = dataframe["aquifer_npor"].values
         topboundary = "semi"
-        storage_aquifer = dataframe["aquifer_storage"].values
-        storage_aquitard = dataframe["aquitard_storage"].values
+        storage_aquifer = dataframe["aquifer_s"].values
+        storage_aquitard = dataframe["aquitard_s"].values
     else:
-        c = dataframe["aquitard_resistance"].values[1:]
+        c = dataframe["aquitard_c"].values[1:]
         z = np.empty(nlayer * 2)
         z[::2] = dataframe["aquifer_top"].values
         z[1::2] = dataframe["aquifer_bottom"].values
         porosity = np.empty(nlayer * 2 - 1)
-        porosity[::2] = dataframe["aquifer_porosity"].values
-        porosity[1::2] = dataframe["aquitard_porosity"].values[1:]
+        porosity[::2] = dataframe["aquifer_npor"].values
+        porosity[1::2] = dataframe["aquitard_npor"].values[1:]
         topboundary = "conf"
-        storage_aquifer = dataframe["aquifer_storage"].values
-        storage_aquitard = dataframe["aquifer_storage"].values[1:]
+        storage_aquifer = dataframe["aquifer_s"].values
+        storage_aquitard = dataframe["aquifer_s"].values[1:]
 
     d = {
         "kaq": kaq,
