@@ -23,16 +23,15 @@ class QgisTimPlugin:
         self.tim_widget = None
         self.plugin_dir = Path(__file__).parent
         self.pluginIsActive = False
-        self.menu = u"Qgis-Tim"
-        self.actions = []
+        self.toolbar = iface.addToolBar(u"Qgis-Tim")
+        self.toolbar.setObjectName(u"Qgis-Tim")
 
     def add_action(self, icon_name, text="", callback=None, add_to_menu=False):
         icon = QIcon(str(self.plugin_dir / icon_name))
         action = QAction(icon, text, self.iface.mainWindow())
         action.triggered.connect(callback)
         if add_to_menu:
-            self.iface.addPluginToMenu(self.menu, action)
-        self.actions.append(action)
+            self.toolbar.addAction(action)
         return action
 
     def initGui(self):
@@ -54,5 +53,4 @@ class QgisTimPlugin:
         self.tim_widget.setVisible(not self.tim_widget.isVisible())
 
     def unload(self):
-        for action in self.actions:
-            self.iface.removePluginMenu("Qgis-Tim", action)
+        self.toolbar.deleteLater()
