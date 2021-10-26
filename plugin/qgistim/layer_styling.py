@@ -10,6 +10,7 @@ from typing import List
 from qgis.core import (
     QgsColorRampShader,
     QgsFillSymbol,
+    QgsLineSymbol,
     QgsRasterBandStats,
     QgsRasterShader,
     QgsSingleBandPseudoColorRenderer,
@@ -94,15 +95,11 @@ def domain_renderer() -> QgsSingleSymbolRenderer:
     return QgsSingleSymbolRenderer(symbol)
 
 
-def circareasink_renderer() -> QgsSingleSymbolRenderer:
-    """
-    Results in transparent fill, with a thick blue border line.
-    """
-    symbol = QgsFillSymbol.createSimple(
+def contour_renderer() -> QgsSingleSymbolRenderer:
+    symbol = QgsLineSymbol.createSimple(
         {
-            "color": "255,0,0,0",  # transparent
-            "color_border": "#3182bd",  # blue
-            "width_border": "0.75",
+            "color": "#000000#",  # black
+            "width": "0.25",
         }
     )
     return QgsSingleSymbolRenderer(symbol)

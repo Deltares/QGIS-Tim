@@ -56,6 +56,7 @@ from qgis.core import (
     QgsField,
     QgsFillSymbol,
     QgsGeometry,
+    QgsLineSymbol,
     QgsPointXY,
     QgsSingleSymbolRenderer,
     QgsVectorLayer,
@@ -460,6 +461,15 @@ class HeadLineSink(TransientElement):
             QgsField("head", QVariant.Double),
         ]
 
+    def renderer(self) -> QgsSingleSymbolRenderer:
+        symbol = QgsLineSymbol.createSimple(
+            {
+                "color": "#3690c0",  # lighter blue
+                "width": "0.5",
+            }
+        )
+        return QgsSingleSymbolRenderer(symbol)
+
 
 class LineSinkDitch(TransientElement):
     def _initialize(self, path, name):
@@ -481,6 +491,15 @@ class LineSinkDitch(TransientElement):
             QgsField("discharge", QVariant.Double),
         ]
 
+    def renderer(self) -> QgsSingleSymbolRenderer:
+        symbol = QgsLineSymbol.createSimple(
+            {
+                "color": "#034e7b",  # blue
+                "width": "0.5",
+            }
+        )
+        return QgsSingleSymbolRenderer(symbol)
+
 
 class ImpermeableLineDoublet(TransientElement):
     def _initialize(self, path, name):
@@ -492,6 +511,15 @@ class ImpermeableLineDoublet(TransientElement):
             QgsField("layer", QVariant.Int),
             QgsField("label", QVariant.String),
         ]
+
+    def renderer(self) -> QgsSingleSymbolRenderer:
+        symbol = QgsLineSymbol.createSimple(
+            {
+                "color": "#993404",  # dark orange / brown
+                "width": "0.5",
+            }
+        )
+        return QgsSingleSymbolRenderer(symbol)
 
 
 class LeakyLineDoublet(Element):
@@ -505,6 +533,15 @@ class LeakyLineDoublet(Element):
             QgsField("layer", QVariant.Int),
             QgsField("label", QVariant.String),
         ]
+
+    def renderer(self) -> QgsSingleSymbolRenderer:
+        symbol = QgsLineSymbol.createSimple(
+            {
+                "color": "#ec7014",  # orange
+                "width": "0.5",
+            }
+        )
+        return QgsSingleSymbolRenderer(symbol)
 
 
 class CircularAreaSink(TransientElement):
@@ -570,6 +607,16 @@ class PolygonInhomogeneity(AssociatedElement):
         ]
         self.assoc_attributes = INHOM_ATTRIBUTES.copy()
 
+    def renderer(self) -> QgsSingleSymbolRenderer:
+        symbol = QgsFillSymbol.createSimple(
+            {
+                "color": "255,0,0,0",  # transparent
+                "color_border": "#878787",  # grey
+                "width_border": "0.75",
+            }
+        )
+        return QgsSingleSymbolRenderer(symbol)
+
 
 class BuildingPit(AssociatedElement):
     def _initialize(self, path, name):
@@ -583,6 +630,16 @@ class BuildingPit(AssociatedElement):
             QgsField("layer", QVariant.Int),
         ]
         self.assoc_attributes = INHOM_ATTRIBUTES.copy()
+
+    def renderer(self) -> QgsSingleSymbolRenderer:
+        symbol = QgsFillSymbol.createSimple(
+            {
+                "color": "255,0,0,0",  # transparent
+                "color_border": "#d73027",  # red
+                "width_border": "0.5",
+            }
+        )
+        return QgsSingleSymbolRenderer(symbol)
 
 
 ELEMENTS = {

@@ -32,8 +32,10 @@ from qgis.core import (
     QgsMapLayerProxyModel,
     QgsMeshDatasetIndex,
     QgsMeshLayer,
+    QgsPalLayerSettings,
     QgsProject,
     QgsRasterLayer,
+    QgsVectorLayerSimpleLabeling,
 )
 from qgis.gui import QgsMapLayerComboBox
 from qgistim import layer_styling
@@ -564,7 +566,7 @@ class QgisTimmlWidget(QWidget):
             )
             self.add_layer(layer, self.output_group, renderer)
 
-    def load_mesh_result(self, path: Path, cellsize: float) -> None:
+    def load_mesh_result(self, path: Path, cellsize: float, as_trimesh: bool) -> None:
         netcdf_path = str(
             (path.parent / f"{path.stem}-{cellsize}".replace(".", "_")).with_suffix(
                 ".ugrid.nc"
@@ -594,6 +596,13 @@ class QgisTimmlWidget(QWidget):
             )
             renderer = index_layer.rendererSettings()
             renderer.setActiveScalarDatasetGroup(index)
+
+            if not as_trimesh:
+                scalar_settings = renderer.scalarSettings(index)
+                # Set renderer to DataResamplingMethod.None = 0
+                scalar_settings.setDataResamplingMethod(0)
+                renderer.setScalarSettings(index, scalar_settings)
+
             index_layer.setRendererSettings(renderer)
             self.add_layer(index_layer, self.output_group)
 
@@ -624,7 +633,17 @@ class QgisTimmlWidget(QWidget):
             stop=stop,
             step=step,
         )
-        self.add_layer(contour_layer, self.output_group, on_top=True)
+        # Labeling
+        pal_layer = QgsPalLayerSettings()
+        pal_layer.fieldName = "head"
+        pal_layer.enabled = True
+        pal_layer.placement = QgsPalLayerSettings.Line
+        labels = QgsVectorLayerSimpleLabeling(pal_layer)
+        contour_layer.setLabeling(labels)
+        contour_layer.setLabelsEnabled(True)
+        # Renderer: simple black lines
+        renderer = layer_styling.contour_renderer()
+        self.add_layer(contour_layer, self.output_group, renderer=renderer, on_top=True)
 
     def suppress_popup_changed(self):
         suppress = self.suppress_popup_checkbox.isChecked()
@@ -678,7 +697,7 @@ class QgisTimmlWidget(QWidget):
         received = handler.send(data)
 
         if received == "0":
-            self.load_mesh_result(path, cellsize)
+            self.load_mesh_result(path, cellsize, as_trimesh)
             # self.load_raster_result(path, cellsize)
         else:
             self.iface.messageBar().pushMessage(
