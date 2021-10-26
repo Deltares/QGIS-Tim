@@ -29,6 +29,7 @@ from PyQt5.QtWidgets import (
 from qgis.core import (
     Qgis,
     QgsApplication,
+    QgsMapLayer,
     QgsMapLayerProxyModel,
     QgsMeshDatasetIndex,
     QgsMeshLayer,
@@ -247,7 +248,7 @@ class QgisTimmlWidget(QWidget):
         renderer: Any = None,
         suppress: bool = None,
         on_top: bool = False,
-    ) -> None:
+    ) -> QgsMapLayer:
         """
         Add a layer to the Layers Panel
 
@@ -266,6 +267,10 @@ class QgisTimmlWidget(QWidget):
         on_top: optional, bool. Default value is False.
             Whether to place the layer on top in the destination legend group.
             Handy for transparent layers such as contours.
+
+        Returns
+        -------
+        maplayer: QgsMapLayer or None
         """
         if layer is None:
             return
@@ -282,6 +287,7 @@ class QgisTimmlWidget(QWidget):
                 destination.insertLayer(0, maplayer)
             else:
                 destination.addLayer(maplayer)
+        return maplayer
 
     def create_groups(self, name: str) -> None:
         root = QgsProject.instance().layerTreeRoot()
@@ -297,9 +303,6 @@ class QgisTimmlWidget(QWidget):
         self.dataset_tree.clear()
         elements = load_elements_from_geopackage(self.path)
         for element in elements:
-            print(element.timml_name)
-            print(element.ttim_name)
-            print(element.assoc_name)
             self.dataset_tree.add_element(element)
         path = self.path
         name = str(Path(path).stem)
@@ -464,9 +467,15 @@ class QgisTimmlWidget(QWidget):
         layers = item.element.from_geopackage()
         suppress = self.suppress_popup_checkbox.isChecked()
         timml_layer, renderer = layers[0]
-        self.add_layer(timml_layer, self.timml_group, renderer, suppress)
+        maplayer = self.add_layer(timml_layer, self.timml_group, renderer, suppress)
         self.add_layer(layers[1][0], self.ttim_group)
         self.add_layer(layers[2][0], self.timml_group)
+        # Set cell size if the item is a domain layer
+        if item.element.timml_name.split(":")[0] == "timml Domain":
+            extent = maplayer.extent()
+            ymax = extent.yMaximum()
+            ymin = extent.yMinimum()
+            self.set_cellsize_from_domain(ymax, ymin)
 
     def add_selection_to_qgis(self) -> None:
         selection = self.dataset_tree.selectedItems()
