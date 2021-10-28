@@ -85,6 +85,19 @@ def transient_contours(
     ref_time = layer.datasetGroupMetadata(first_index).referenceTime().toPyDateTime()
     contourer = QgsMeshContours(layer)
 
+    # Setup output layer
+    contour_layer = QgsVectorLayer("Linestring", f"contours-{name}", "memory")
+    contour_layer.setCrs(layer.crs())
+    provider = contour_layer.dataProvider()
+    provider.addAttributes(
+        [
+            QgsField("head", QVariant.Double),
+            QgsField("datetime_start", QVariant.DateTime),
+            QgsField("datetime_end", QVariant.DateTime),
+        ]
+    )
+    contour_layer.updateFields()
+
     # Collect contours from mesh layer
     feature_data = []
     for time_index in range(ntime):
@@ -102,6 +115,9 @@ def transient_contours(
                 date = ref_time + datetime.timedelta(hours=mdal_time)
                 feature_data.append(TransientContourData(geom, value, date))
 
+    if len(feature_data) == 0:
+        return contour_layer
+
     # Create a dictionary to find the end date to accompany every
     # starting date
     dates = sorted(list(set(item.datetime for item in feature_data)))
@@ -109,19 +125,6 @@ def transient_contours(
         a: b - datetime.timedelta(minutes=1) for a, b in zip(dates[:-1], dates[1:])
     }
     end_dates[dates[-1]] = dates[-1] + datetime.timedelta(days=1)
-
-    # Setup output layer
-    contour_layer = QgsVectorLayer("Linestring", f"contours-{name}", "memory")
-    contour_layer.setCrs(layer.crs())
-    provider = contour_layer.dataProvider()
-    provider.addAttributes(
-        [
-            QgsField("head", QVariant.Double),
-            QgsField("datetime_start", QVariant.DateTime),
-            QgsField("datetime_end", QVariant.DateTime),
-        ]
-    )
-    contour_layer.updateFields()
 
     # Add items to layer
     for item in feature_data:
