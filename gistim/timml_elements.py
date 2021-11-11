@@ -1,5 +1,7 @@
 from typing import Dict, List, Tuple
+import textwrap
 
+import black
 import geopandas as gpd
 import numpy as np
 import pandas as pd
@@ -12,6 +14,7 @@ from .common import (
     ElementSpecification,
     TimmlModelSpecification,
     aquifer_data,
+    round_extent,
     linestring_coordinates,
     point_coordinates,
     polygon_coordinates,
@@ -19,9 +22,47 @@ from .common import (
 )
 
 
+def dict_to_kwargs_code(data: dict) -> str:
+    strings = []
+    for key, value in data.items():
+        if isinstance(value, np.ndarray):
+            value = value.tolist()
+        elif isinstance(value, str):
+            value = f'"{value}"'
+        if key == "model":
+            value = "model"
+        strings.append(f"{key}={value}")
+    return ",".join(strings)
+
+
+def sanitize(name: str):
+    return name.split(":")[-1].replace(" ", "_")
+
+
+def headgrid_code(domain: gpd.GeoDataFrame) -> str:
+    xmin, ymin, xmax, ymax = domain.bounds.iloc[0]
+    dy = (ymax - ymin) / 50.0
+    if dy > 500.0:
+        dy = round(dy / 500.0) * 500.0
+    elif dy > 50.0:
+        dy = round(dy / 50.0) * 50.0
+    elif dy > 5.0:  # round to five
+        dy = round(dy / 5.0) * 5.0
+    elif dy > 1.0:
+        dy = round(dy)
+    (xmin, xmax, ymin, ymax) = round_extent((xmin, xmax, ymin, ymax), dy)
+    xmin += 0.5 * dy
+    xmax += 0.5 * dy
+    ymax -= 0.5 * dy
+    xmin -= 0.5 * dy
+    xg = f"np.arange({xmin}, {xmax}, {dy})"
+    yg = f"np.arange({ymax}, {ymin}, -{dy})"
+    return f"head = model.headgrid(xg={xg}, yg={yg})"
+
+
 # Dataframe to TimML element
 # --------------------------
-def aquifer(dataframe: gpd.GeoDataFrame) -> timml.Model:
+def aquifer(dataframe: gpd.GeoDataFrame, code: bool) -> timml.Model:
     """
     Parameters
     ----------
@@ -31,11 +72,20 @@ def aquifer(dataframe: gpd.GeoDataFrame) -> timml.Model:
     -------
     timml.Model
     """
-    return timml.ModelMaq(**aquifer_data(dataframe))
+    kwargs = aquifer_data(dataframe)
+    if code:
+        kwargs = dict_to_kwargs_code(aquifer_data(dataframe))
+        return f"model = timml.ModelMaq({kwargs})"
+    else:
+        return timml.ModelMaq()
 
 
 def constant(
-    spec: ElementSpecification, model: timml.Model, name: str, elements: Dict
+    spec: ElementSpecification,
+    model: timml.Model,
+    name: str,
+    elements: Dict,
+    code: bool,
 ) -> None:
     """
     Parameters
@@ -48,16 +98,20 @@ def constant(
     """
     firstrow = spec.dataframe.iloc[0]
     x, y = point_coordinates(firstrow)
-    elements[name] = timml.Constant(
-        model=model,
-        xr=x,
-        yr=y,
-        hr=firstrow["head"],
-    )
+    kwargs = {"model": model, "xr": x, "yr": y}
+    if code:
+        kwargs = dict_to_kwargs_code(kwargs)
+        return f"constant = timml.Constant({kwargs})"
+    else:
+        elements[name] = timml.Constant(**kwargs)
 
 
 def uflow(
-    spec: ElementSpecification, model: timml.Model, name: str, elements: Dict
+    spec: ElementSpecification,
+    model: timml.Model,
+    name: str,
+    elements: Dict,
+    code: bool,
 ) -> None:
     """
     Parameters
@@ -68,17 +122,26 @@ def uflow(
     -------
     None
     """
-    for i, row in spec.dataframe.iterrows():
-        elements[f"{name}_{i}"] = timml.Uflow(
-            model=model,
-            slope=row["slope"],
-            angle=row["angle"],
-            label=row["label"],
-        )
+    row = spec.dataframe.iloc[0]
+    kwargs = {
+        "model": model,
+        "slope": row["slope"],
+        "angle": row["angle"],
+        "label": row["label"],
+    }
+    if code:
+        kwargs = dict_to_kwargs_code(kwargs)
+        return f"{name} = timml.Uflow({kwargs})"
+    else:
+        elements[f"{name}"] = timml.Uflow(**kwargs)
 
 
 def well(
-    spec: ElementSpecification, model: timml.Model, name: str, elements: Dict
+    spec: ElementSpecification,
+    model: timml.Model,
+    name: str,
+    elements: Dict,
+    code: bool,
 ) -> None:
     """
     Parameters
@@ -91,21 +154,34 @@ def well(
     """
     dataframe = spec.dataframe
     X, Y = point_coordinates(dataframe)
+    strings = []
     for ((i, row), x, y) in zip(dataframe.iterrows(), X, Y):
-        elements[f"{name}_{i}"] = timml.Well(
-            model=model,
-            xw=x,
-            yw=y,
-            Qw=row["discharge"],
-            rw=row["radius"],
-            res=row["resistance"],
-            layers=row["layer"],
-            label=row["label"],
-        )
+        kwargs = {
+            "model": model,
+            "xw": x,
+            "yw": y,
+            "Qw": row["discharge"],
+            "rw": row["radius"],
+            "res": row["resistance"],
+            "layers": row["layer"],
+            "label": row["label"],
+        }
+        if code:
+            kwargs = dict_to_kwargs_code(kwargs)
+            strings.append(f"{name}_{i} = timml.Well({kwargs})")
+        else:
+            elements[f"{name}_{i}"] = timml.Well(**kwargs)
+
+    if code:
+        return "\n".join(strings)
 
 
 def headwell(
-    spec: ElementSpecification, model: timml.Model, name: str, elements: Dict
+    spec: ElementSpecification,
+    model: timml.Model,
+    name: str,
+    elements: Dict,
+    code: bool,
 ) -> None:
     """
     Parameters
@@ -118,21 +194,34 @@ def headwell(
     """
     dataframe = spec.dataframe
     X, Y = point_coordinates(dataframe)
+    strings = []
     for ((i, row), x, y) in zip(dataframe.iterrows(), X, Y):
-        elements[f"{name}_{i}"] = timml.HeadWell(
-            xw=x,
-            yw=y,
-            hw=row["head"],
-            rw=row["radius"],
-            res=row["resistance"],
-            layers=row["layer"],
-            label=row["label"],
-            model=model,
-        )
+        kwargs = {
+            "model": model,
+            "xw": x,
+            "yw": y,
+            "hw": row["head"],
+            "rw": row["radius"],
+            "res": row["resistance"],
+            "layers": row["layer"],
+            "label": row["label"],
+        }
+        if code:
+            kwargs = dict_to_kwargs_code(kwargs)
+            strings.append(f"{name}_{i} = timml.HeadWell({kwargs})")
+        else:
+            elements[f"{name}_{i}"] = timml.HeadWell(**kwargs)
+
+    if code:
+        return "\n".join(strings)
 
 
 def polygoninhom(
-    spec: ElementSpecification, model: timml.Model, name: str, elements: Dict
+    spec: ElementSpecification,
+    model: timml.Model,
+    name: str,
+    elements: Dict,
+    code: bool,
 ) -> None:
     """
     Parameters
@@ -147,18 +236,31 @@ def polygoninhom(
     properties = spec.associated_dataframe.set_index("geometry_id")
     # Iterate through the row containing the geometry
     # and iterate through the associated table containing k properties.
+    strings = []
     for i, row in geometry.iterrows():
         dataframe = properties.loc[[row["geometry_id"]]]
-        data = aquifer_data(dataframe)
-        data["model"] = model
-        data["xy"] = polygon_coordinates(row)
-        data["order"] = row["order"]
-        data["ndeg"] = row["ndegrees"]
-        elements[f"{name}_{i}"] = timml.PolygonInhomMaq(**data)
+        kwargs = aquifer_data(dataframe)
+        kwargs["model"] = model
+        kwargs["xy"] = polygon_coordinates(row)
+        kwargs["order"] = row["order"]
+        kwargs["ndeg"] = row["ndegrees"]
+
+        if code:
+            kwargs = dict_to_kwargs_code(kwargs)
+            strings.append(f"{name}_{i} = timml.PolygonInhomMaq({kwargs})")
+        else:
+            elements[f"{name}_{i}"] = timml.PolygonInhomMaq(**kwargs)
+
+    if code:
+        return "\n".join(strings)
 
 
 def buildingpit(
-    spec: ElementSpecification, model: timml.Model, name: str, elements: Dict
+    spec: ElementSpecification,
+    model: timml.Model,
+    name: str,
+    elements: Dict,
+    code: bool,
 ) -> None:
     """
     Parameters
@@ -173,19 +275,32 @@ def buildingpit(
     properties = spec.associated_dataframe.set_index("geometry_id")
     # Iterate through the row containing the geometry
     # and iterate through the associated table containing k properties.
+    strings = []
     for i, row in geometry.iterrows():
         dataframe = properties.loc[row["geometry_id"]]
-        data = aquifer_data(dataframe)
-        data["model"] = model
-        data["xy"] = polygon_coordinates(row)
-        data["order"] = row["order"]
-        data["ndeg"] = row["ndegrees"]
-        data["layers"] = np.atleast_1d(row["layer"])
-        elements[f"{name}_{i}"] = timml.BuildingPit(**data)
+        kwargs = aquifer_data(dataframe)
+        kwargs["model"] = model
+        kwargs["xy"] = polygon_coordinates(row)
+        kwargs["order"] = row["order"]
+        kwargs["ndeg"] = row["ndegrees"]
+        kwargs["layers"] = np.atleast_1d(row["layer"])
+
+        if code:
+            kwargs = dict_to_kwargs_code(kwargs)
+            strings.append(f"{name}_{i} = timml.BuildingPit({kwargs})")
+        else:
+            elements[f"{name}_{i}"] = timml.BuildingPit(**kwargs)
+
+    if code:
+        return "\n".join(strings)
 
 
 def headlinesink(
-    spec: ElementSpecification, model: timml.Model, name: str, elements: Dict
+    spec: ElementSpecification,
+    model: timml.Model,
+    name: str,
+    elements: Dict,
+    code: bool,
 ) -> None:
     """
     Parameters
@@ -196,21 +311,35 @@ def headlinesink(
     -------
     None
     """
+    strings = []
     for i, row in spec.dataframe.iterrows():
-        elements[f"{name}_{i}"] = timml.HeadLineSinkString(
-            model=model,
-            xy=linestring_coordinates(row),
-            hls=row["head"],
-            res=row["resistance"],
-            wh=row["width"],
-            order=row["order"],
-            layers=row["layer"],
-            label=row["label"],
-        )
+        kwargs = {
+            "model": model,
+            "xy": linestring_coordinates(row),
+            "hls": row["head"],
+            "res": row["resistance"],
+            "wh": row["width"],
+            "order": row["order"],
+            "layers": row["layer"],
+            "label": row["label"],
+        }
+
+        if code:
+            kwargs = dict_to_kwargs_code(kwargs)
+            strings.append(f"{name}_{i} = timml.HeadLineSinkString({kwargs})")
+        else:
+            elements[f"{name}_{i}"] = timml.HeadLineSinkString(**kwargs)
+
+    if code:
+        return "\n".join(strings)
 
 
 def linesinkditch(
-    spec: ElementSpecification, model: timml.Model, name: str, elements: Dict
+    spec: ElementSpecification,
+    model: timml.Model,
+    name: str,
+    elements: Dict,
+    code: bool,
 ) -> None:
     """
     Parameters
@@ -221,21 +350,35 @@ def linesinkditch(
     -------
     None
     """
+    strings = []
     for i, row in spec.dataframe.iterrows():
-        elements[f"{name}_{i}"] = timml.LineSinkDitchString(
-            model=model,
-            xy=linestring_coordinates(row),
-            Qls=row["discharge"],
-            res=row["resistance"],
-            wh=row["width"],
-            order=row["order"],
-            layers=row["layer"],
-            label=row["label"],
-        )
+        kwargs = {
+            "model": model,
+            "xy": linestring_coordinates(row),
+            "Qls": row["discharge"],
+            "res": row["resistance"],
+            "wh": row["width"],
+            "order": row["order"],
+            "layers": row["layer"],
+            "label": row["label"],
+        }
+
+        if code:
+            kwargs = dict_to_kwargs_code(kwargs)
+            strings.append(f"{name}_{i} = timml.LineSinkDitchString({kwargs})")
+        else:
+            elements[f"{name}_{i}"] = timml.LineSinkDitchString(**kwargs)
+
+    if code:
+        return "\n".join(strings)
 
 
 def leakylinedoublet(
-    spec: ElementSpecification, model: timml.Model, name: str, elements: Dict
+    spec: ElementSpecification,
+    model: timml.Model,
+    name: str,
+    elements: Dict,
+    code: bool,
 ) -> None:
     """
     Parameters
@@ -246,19 +389,33 @@ def leakylinedoublet(
     -------
     None
     """
+    strings = []
     for i, row in spec.dataframe.iterrows():
-        elements[f"{name}_{i}"] = timml.LeakyLineDoubletString(
-            model=model,
-            xy=linestring_coordinates(row),
-            res=row["resistance"],
-            layers=row["layer"],
-            order=row["order"],
-            label=row["label"],
-        )
+        kwargs = {
+            "model": model,
+            "xy": linestring_coordinates(row),
+            "res": row["resistance"],
+            "layers": row["layer"],
+            "order": row["order"],
+            "label": row["label"],
+        }
+
+        if code:
+            kwargs = dict_to_kwargs_code(kwargs)
+            strings.append(f"{name}_{i} = timml.LeakyLineDoubletString({kwargs})")
+        else:
+            elements[f"{name}_{i}"] = timml.LeakyLineDoubletString(**kwargs)
+
+    if code:
+        return "\n".join(strings)
 
 
 def implinedoublet(
-    spec: ElementSpecification, model: timml.Model, name: str, elements: Dict
+    spec: ElementSpecification,
+    model: timml.Model,
+    name: str,
+    elements: Dict,
+    code: bool,
 ) -> None:
     """
     Parameters
@@ -269,18 +426,31 @@ def implinedoublet(
     -------
     None
     """
+    strings = []
     for i, row in spec.dataframe.iterrows():
-        elements[f"{name}_{i}"] = timml.ImpLineDoubletString(
-            model=model,
-            xy=linestring_coordinates(row),
-            layers=row["layer"],
-            order=row["order"],
-            label=row["label"],
-        )
+        kwargs = {
+            "model": model,
+            "xy": linestring_coordinates(row),
+            "layers": row["layer"],
+            "order": row["order"],
+            "label": row["label"],
+        }
+        if code:
+            kwargs = dict_to_kwargs_code(kwargs)
+            strings.append(f"{name}_{i} = timml.ImpLineDoubletString({kwargs})")
+        else:
+            elements[f"{name}_{i}"] = timml.ImpLineDoubletString(**kwargs)
+
+    if code:
+        return "\n".join(strings)
 
 
 def circareasink(
-    spec: ElementSpecification, model: timml.Model, name: str, elements: Dict
+    spec: ElementSpecification,
+    model: timml.Model,
+    name: str,
+    elements: Dict,
+    code: bool,
 ) -> None:
     """
     Parameters
@@ -291,18 +461,29 @@ def circareasink(
     -------
     None
     """
+    strings = []
     for i, row in spec.dataframe.iterrows():
         x, y = row.geometry.centroid.xy
         coords = np.array(row.geometry.exterior.coords)
         x0, y0 = coords[0]
         radius = np.sqrt((x0 - x) ** 2 + (y0 - y) ** 2)
-        elements[f"{name}_{i}"] = timml.CircAreaSink(
-            model=model,
-            xc=x,
-            yc=y,
-            R=radius,
-            N=row["rate"],
-        )
+
+        kwargs = {
+            "model": model,
+            "xc": x,
+            "yc": y,
+            "R": radius,
+            "N": row["rate"],
+        }
+
+        if code:
+            kwargs = dict_to_kwargs_code(kwargs)
+            strings.append(f"{name}_{i} = timml.CircAreaSink({kwargs})")
+        else:
+            elements[f"{name}_{i}"] = timml.CircAreaSink(**kwargs)
+
+    if code:
+        return "\n".join(strings)
 
 
 # Map the names of the elements to their constructors
@@ -327,7 +508,7 @@ def validate(spec: TimmlModelSpecification) -> None:
     # TODO: more checks
 
 
-def initialize_model(spec: TimmlModelSpecification) -> timml.Model:
+def initialize_model(spec: TimmlModelSpecification, code: bool = False) -> timml.Model:
     """
     Initialize a TimML analytic model based on the data in a geopackage.
 
@@ -352,9 +533,10 @@ def initialize_model(spec: TimmlModelSpecification) -> timml.Model:
 
     """
     validate(spec)
-    model = aquifer(spec.aquifer)
+    model = aquifer(spec.aquifer, code)
     elements = {}
 
+    strings = ["from numpy import nan", "import numpy as np", "import timml", model]
     for name, element_spec in spec.elements.items():
         if not element_spec.active:
             continue
@@ -363,7 +545,13 @@ def initialize_model(spec: TimmlModelSpecification) -> timml.Model:
         # Grab conversion function
         try:
             element = MAPPING[elementtype]
-            element(element_spec, model, name, elements)
+            if code:
+                name = sanitize(name)
+                result = element(element_spec, model, name, elements, code)
+                strings.append(result)
+            else:
+                element(element_spec, model, name, elements, code)
+
         except KeyError as e:
             msg = (
                 f'Invalid element specification "{elementtype}". '
@@ -371,7 +559,12 @@ def initialize_model(spec: TimmlModelSpecification) -> timml.Model:
             )
             raise KeyError(msg) from e
 
-    return model, elements
+    if code:
+        strings.append("model.solve()")
+        strings.append(headgrid_code(spec.domain))
+        return black.format_str("\n".join(strings), mode=black.FileMode())
+    else:
+        return model, elements
 
 
 def headgrid(model: timml.Model, extent: Tuple[float], cellsize: float) -> xr.DataArray:
