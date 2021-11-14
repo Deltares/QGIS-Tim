@@ -246,6 +246,7 @@ class DataExtractionWidget(QWidget):
         self.select_polygon_button.clicked.connect(self.draw_selection)
         self.polygon_tool = SelectionMapTool(parent.iface)
         self.extract_button = QPushButton("Extract")
+        self.extract_button.clicked.connect(self.extract)
         # Layout
         netcdf_row.addWidget(self.netcdf_line_edit)
         netcdf_row.addWidget(self.open_netcdf_button)
@@ -295,7 +296,7 @@ class DataExtractionWidget(QWidget):
     def draw_selection(self):
         self.canvas.setMapTool(self.polygon_tool)
 
-    def extract(self, interpreter, env_vars, handler):
+    def extract(self):
         inpath = self.netcdf_line_edit.text()
         geometries = self.polygon_tool.selected_geometries
         if len(geometries) == 0:
@@ -306,25 +307,19 @@ class DataExtractionWidget(QWidget):
         if outpath == "":
             return
 
-        if handler is None:
-            subprocess.Popen(
-                f'{interpreter} -m gistim extract "{inpath}" "{outpath}" "{wkts}"',
-                env=env_vars[interpreter],
+        data = json.dumps(
+            {
+                "operation": "extract",
+                "inpath": inpath,
+                "outpath": outpath,
+                "wkt_geometry": wkts,
+            }
+        )
+        received = self.parent.execute(data)
+        if received != "0":
+            self.iface.messageBar().pushMessage(
+                "Error",
+                "Something seems to have gone wrong, "
+                "try checking the TimServer window...",
+                level=Qgis.Critical,
             )
-        else:
-            data = json.dumps(
-                {
-                    "operation": "extract",
-                    "inpath": inpath,
-                    "outpath": outpath,
-                    "wkt_geometry": wkts,
-                }
-            )
-            received = handler.send(data)
-            if received != "0":
-                self.iface.messageBar().pushMessage(
-                    "Error",
-                    "Something seems to have gone wrong, "
-                    "try checking the TimServer window...",
-                    level=Qgis.Critical,
-                )

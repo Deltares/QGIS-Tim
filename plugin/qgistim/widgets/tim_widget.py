@@ -37,9 +37,6 @@ class QgisTimmlWidget(QWidget):
         self.interpreter_widget = InterpreterWidget(self)
         self.compute_widget = ComputeWidget(self)
 
-        # Connect this one outside of the widget
-        self.extraction_widget.extract_button.clicked.connect(self.extract)
-
         # Layout
         self.layout = QVBoxLayout()
         self.layout.addWidget(self.interpreter_widget)
@@ -50,7 +47,10 @@ class QgisTimmlWidget(QWidget):
         self.tabwidget.addTab(self.elements_widget, "Elements")
         self.tabwidget.addTab(self.compute_widget, "Compute")
         self.setLayout(self.layout)
-
+    
+        # Default to the GeoPackage tab
+        self.tabwidget.setCurrentWidget(self.tabwidget.findChild(QWidget, "GeoPackage"))
+ 
         # QGIS Layers Panel groups
         self.group = None
         self.timml_group = None
