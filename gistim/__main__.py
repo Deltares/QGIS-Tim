@@ -5,12 +5,8 @@ import argparse
 import json
 import os
 import platform
-import socket
-import socketserver
 import sys
 from pathlib import Path
-
-import rioxarray
 
 import gistim
 
@@ -64,6 +60,23 @@ def extract(args) -> None:
     gistim.data_extraction.netcdf_to_table(inpath, outpath, wkt_geometry)
 
 
+def convert(args) -> None:
+    """
+    Convert a Geopackage into a Python script.
+    """
+    inpath = args.inpath[0]
+    outpath = args.outpath[0]
+
+    timml_spec, ttim_spec = gistim.model_specification(inpath, {})
+    timml_script = gistim.timml_elements.convert_to_script(timml_spec)
+    ttim_script = gistim.ttim_elements.convert_to_script(ttim_spec)
+
+    with open(outpath, "w") as f:
+        f.write(timml_script)
+        f.write("\n")
+        f.write(ttim_script)
+
+
 if __name__ == "__main__":
     # Setup argparsers
     parser = argparse.ArgumentParser(prog="GisTim")
@@ -71,6 +84,7 @@ if __name__ == "__main__":
     parser_configure = subparsers.add_parser("configure", help="configure help")
     parser_serve = subparsers.add_parser("serve", help="serve help")
     parser_extract = subparsers.add_parser("extract", help="extract help")
+    parser_convert = subparsers.add_parser("convert", help="convert help")
 
     parser_configure.set_defaults(func=configure)
     parser_configure.add_argument("append", type=bool, nargs=1, help="append")
@@ -88,6 +102,10 @@ if __name__ == "__main__":
     parser_extract.add_argument("inpath", type=str, nargs=1, help="inpath")
     parser_extract.add_argument("outpath", type=str, nargs=1, help="outpath")
     parser_extract.add_argument("wkt", type=str, nargs=1, help="wkt")
+
+    parser_convert.set_defaults(func=convert)
+    parser_convert.add_argument("inpath", type=str, nargs=1, help="inpath")
+    parser_convert.add_argument("outpath", type=str, nargs=1, help="outpath")
 
     # Parse and call the appropriate function
     args = parser.parse_args()

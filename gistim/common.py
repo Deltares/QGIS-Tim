@@ -5,13 +5,12 @@ import pathlib
 import re
 from collections import defaultdict
 from functools import partial
-from typing import Any, Callable, Dict, NamedTuple, Tuple, Union
+from typing import Any, Dict, NamedTuple, Tuple, Union
 
 import fiona
 import geopandas as gpd
 import numpy as np
 import pandas as pd
-import xarray as xr
 
 gpd.options.use_pygeos = False
 FloatArray = np.ndarray
@@ -43,6 +42,46 @@ class TtimModelSpecification(NamedTuple):
     elements: Dict[str, ElementSpecification]
     domain: gpd.GeoDataFrame
     output_times: FloatArray
+
+
+# Three helpers for convertin to Python scripts
+# ---------------------------------------------
+
+
+def dict_to_kwargs_code(data: dict) -> str:
+    strings = []
+    for key, value in data.items():
+        if isinstance(value, np.ndarray):
+            value = value.tolist()
+        elif isinstance(value, str) and key not in ("model", "timmlmodel"):
+            value = f'"{value}"'
+        strings.append(f"{key}={value}")
+    return ",".join(strings)
+
+
+def sanitized(name: str) -> str:
+    return name.split(":")[-1].replace(" ", "_")
+
+
+def headgrid_code(domain: gpd.GeoDataFrame) -> str:
+    xmin, ymin, xmax, ymax = domain.bounds.iloc[0]
+    dy = (ymax - ymin) / 50.0
+    if dy > 500.0:
+        dy = round(dy / 500.0) * 500.0
+    elif dy > 50.0:
+        dy = round(dy / 50.0) * 50.0
+    elif dy > 5.0:  # round to five
+        dy = round(dy / 5.0) * 5.0
+    elif dy > 1.0:
+        dy = round(dy)
+    (xmin, xmax, ymin, ymax) = round_extent((xmin, xmax, ymin, ymax), dy)
+    xmin += 0.5 * dy
+    xmax += 0.5 * dy
+    ymax -= 0.5 * dy
+    xmin -= 0.5 * dy
+    xg = f"np.arange({xmin}, {xmax}, {dy})"
+    yg = f"np.arange({ymax}, {ymin}, -{dy})"
+    return xg, yg
 
 
 # Some geometry helpers
