@@ -1,3 +1,11 @@
+"""
+This widget enables drawing of a polygon, which is then used to sample from a
+netCDF dataset. Most of the drawing logic comes from this plugin:
+https://github.com/lutraconsulting/serval
+
+Apart from the drawing logic, it contains some logic to add all the different
+layers of the dataset with some default styling.
+"""
 import json
 import subprocess
 from pathlib import Path
@@ -24,7 +32,7 @@ from qgis.core import (
     QgsRasterLayer,
     QgsWkbTypes,
 )
-from qgis.gui import QgsMapLayerComboBox, QgsMapTool, QgsRubberBand
+from qgis.gui import QgsMapTool, QgsRubberBand
 from qgistim import layer_styling
 
 RUBBER_BAND_COLOR = QColor(Qt.yellow)
@@ -220,10 +228,10 @@ def is_netcdf_layer(layer):
 
 
 class DataExtractionWidget(QWidget):
-    def __init__(self, iface, parent=None):
+    def __init__(self, parent):
         super(DataExtractionWidget, self).__init__(parent)
-        self.iface = iface
-        self.canvas = iface.mapCanvas()
+        self.parent = parent
+        self.canvas = parent.iface.mapCanvas()
         layout = QVBoxLayout()
         netcdf_row = QHBoxLayout()
         extraction_row = QHBoxLayout()
@@ -235,8 +243,9 @@ class DataExtractionWidget(QWidget):
         self.add_to_qgis_checkbox.setChecked(True)
         self.select_polygon_button = QPushButton("Select by Polygon")
         self.select_polygon_button.clicked.connect(self.draw_selection)
-        self.polygon_tool = SelectionMapTool(iface)
+        self.polygon_tool = SelectionMapTool(parent.iface)
         self.extract_button = QPushButton("Extract")
+        # Layout
         netcdf_row.addWidget(self.netcdf_line_edit)
         netcdf_row.addWidget(self.open_netcdf_button)
         netcdf_row.addWidget(self.add_to_qgis_checkbox)
@@ -244,6 +253,7 @@ class DataExtractionWidget(QWidget):
         extraction_row.addWidget(self.extract_button)
         layout.addLayout(netcdf_row)
         layout.addLayout(extraction_row)
+        layout.addStretch()
         self.setLayout(layout)
 
     def open_netcdf(self):
@@ -289,6 +299,7 @@ class DataExtractionWidget(QWidget):
         geometries = self.polygon_tool.selected_geometries
         if len(geometries) == 0:
             return
+
         wkts = ";".join([geom.asWkt() for geom in geometries])
         outpath, _ = QFileDialog.getSaveFileName(self, "New file", "", "*.csv")
         if outpath == "":

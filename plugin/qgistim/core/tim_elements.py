@@ -132,6 +132,10 @@ class RadiusDialog(QDialog):
 
 
 class Element:
+    """
+    Abstract base class for "ordinary" timml elements.
+    """
+
     element_type = None
     geometry_type = None
     timml_attributes = []
@@ -232,6 +236,10 @@ class Element:
 
 
 class TransientElement(Element):
+    """
+    Abstract base class for transient (ttim) elements.
+    """
+
     def __init__(self, path: str, name: str):
         self._initialize(path, name)
         self.timml_name = f"timml {self.element_type}:{name}"
@@ -265,6 +273,11 @@ class TransientElement(Element):
 
 
 class AssociatedElement(Element):
+    """
+    Abstract class for elements that require associated tables such as
+    Inhomogenities.
+    """
+
     def __init__(self, path: str, name: str):
         self._initialize(path, name)
         self.timml_name = f"timml {self.element_type}:{name}"
@@ -671,7 +684,19 @@ ELEMENTS = {
 }
 
 
-def parse_name(layername: str) -> Tuple[str, str]:
+def parse_name(layername: str) -> Tuple[str, str, str]:
+    """
+    Based on the layer name find out:
+
+    * whether it's a timml or ttim element;
+    * which element type it is;
+    * what the user provided name is.
+
+    For example:
+    parse_name("timml Headwell: drainage") -> ("timml", "Head Well", "drainage")
+
+    This function can also be found in gistim.common
+    """
     prefix, name = layername.split(":")
     element_type = re.split("timml |ttim ", prefix)[1]
     mapping = {
@@ -694,14 +719,19 @@ def parse_name(layername: str) -> Tuple[str, str]:
 
 
 def load_elements_from_geopackage(path: str) -> List[Element]:
+    # List the names in the geopackage
     gpkg_names = geopackage.layers(path)
+
+    # Group them on the basis of name
     dd = defaultdict
     grouped_names = dd(partial(dd, partial(dd, list)))
     for layername in gpkg_names:
         tim_type, element_type, name = parse_name(layername)
         grouped_names[element_type][name][tim_type] = layername
+
     elements = []
     for element_type, group in grouped_names.items():
         for name in group:
             elements.append(ELEMENTS[element_type](path, name))
+
     return elements

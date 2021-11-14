@@ -1,5 +1,8 @@
 """
-Utilities for processing input or output
+Utilities for processing input or output.
+
+Currently wraps the QGIS functions for turning grids / meshes of head results
+into line contours.
 """
 import datetime
 from typing import NamedTuple
@@ -38,7 +41,9 @@ def steady_contours(
     stop: float,
     step: float,
 ) -> QgsVectorLayer:
+
     contourer = QgsMeshContours(layer)
+
     # Collect contours from mesh layer
     feature_data = []
     qgs_index = QgsMeshDatasetIndex(group=index, dataset=0)
@@ -50,6 +55,7 @@ def steady_contours(
         )
         if not geom.isNull():
             feature_data.append(SteadyContourData(geom, value))
+
     # Setup output layer
     contour_layer = QgsVectorLayer("Linestring", f"contours-{name}", "memory")
     contour_layer.setCrs(layer.crs())
@@ -60,6 +66,7 @@ def steady_contours(
         ]
     )
     contour_layer.updateFields()
+
     # Add items to layer
     for item in feature_data:
         f = QgsFeature()
@@ -69,6 +76,7 @@ def steady_contours(
         f.setAttributes([float(item.head)])
         provider.addFeature(f)
     contour_layer.updateExtents()
+
     return contour_layer
 
 

@@ -1,9 +1,9 @@
 """
-Some layer styling for analytical elements.
+Some layer styling for output.
 
-Rationale:
-By default, a layer like a domain or circular area sink will create an untransparent
-polygon fill, which then obscures all the other elements.
+We'd like contours to look the same consistently. A Domain should be
+transparent, not obscuring the view. A head grid should have pseudocoloring,
+ideally with a legend stretching from minimum to maximum.
 """
 from typing import List
 

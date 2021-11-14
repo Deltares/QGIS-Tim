@@ -1,6 +1,6 @@
 """
 This module contains the logic for starting, communicating with, and killing a
-separate conda interpreter, which is running TimML.
+separate (conda) interpreter, which is running TimML.
 """
 import json
 import os

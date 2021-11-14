@@ -1,5 +1,12 @@
 """
-Geopackage management utilities
+Geopackage management utilities.
+
+This module lightly wraps a few QGIS built in functions to:
+    
+    * List the layers of a geopackage
+    * Write a layer to a geopackage
+    * Remove a layer from a geopackage
+
 """
 from typing import List
 
@@ -28,7 +35,7 @@ def layers(path: str) -> List[str]:
 
 def write_layer(
     path: str, layer: QgsVectorLayer, layername: str, newfile: bool = False
-) -> None:
+) -> QgsVectorLayer:
     """
     Writes a QgsVectorLayer to a GeoPackage file.
 
@@ -37,16 +44,17 @@ def write_layer(
     path: str
         Path to the GeoPackage file
     layer: QgsVectorLayer
-        QGIS map layer
+        QGIS map layer (in-memory)
     layername: str
         Layer name to write in the GeoPackage
     newfile: bool, optional
-        Defaults to false.
+        Whether to write a new GPGK file. Defaults to false.
 
     Returns
     -------
-    None
-        Writes a vector layer to a GeoPackage file.
+    layer: QgsVectorLayer
+        The layer, now associated with the both GeoPackage and its QGIS
+        representation.
     """
     options = QgsVectorFileWriter.SaveVectorOptions()
     options.driverName = "gpkg"
