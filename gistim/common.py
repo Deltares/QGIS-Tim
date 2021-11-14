@@ -1,5 +1,26 @@
 """
-Common utilities 
+Common utilities used by conversions from GeoPackage (GPKG) layers to TimML and
+TTim elements.
+
+The relation between a GPKG layer and the elements is not perfect. A GPGK layer
+consists of a table, with optionally an associated geometry for every row. This
+matches one to one for elements such as HeadLineSinkStrings, Wells, etc: for
+these elements, one row equals one element.
+
+For elements such as PolygonImhomogenities, this is not the case. Every geometry
+(a polygon) requires a table of its own. These tables are stored in associated
+tables; their association is by name. 
+
+For transient (TTim) elements, the same is true: elements require an additional
+table for their timeseries data, which should require repeating the geometry
+for every time step. In this package, we assume that any ttim element is
+accompanied by a timml element; the QGIS plugin always sets up the layer ih
+that manner.
+
+When processing a GPKG, we first parse the names, and group the different
+tables together in the ElementSpecifications below. The ``timml_elements`` and
+``ttim_elements`` then convert these grouped tables into ``timml`` and ``ttim``
+models.
 """
 import pathlib
 import re
@@ -44,101 +65,29 @@ class TtimModelSpecification(NamedTuple):
     output_times: FloatArray
 
 
-# Three helpers for convertin to Python scripts
-# ---------------------------------------------
-
-
-def dict_to_kwargs_code(data: dict) -> str:
-    strings = []
-    for key, value in data.items():
-        if isinstance(value, np.ndarray):
-            value = value.tolist()
-        elif isinstance(value, str) and key not in ("model", "timmlmodel"):
-            value = f'"{value}"'
-        strings.append(f"{key}={value}")
-    return ",".join(strings)
-
-
-def sanitized(name: str) -> str:
-    return name.split(":")[-1].replace(" ", "_")
-
-
-def headgrid_code(domain: gpd.GeoDataFrame) -> str:
-    xmin, ymin, xmax, ymax = domain.bounds.iloc[0]
-    dy = (ymax - ymin) / 50.0
-    if dy > 500.0:
-        dy = round(dy / 500.0) * 500.0
-    elif dy > 50.0:
-        dy = round(dy / 50.0) * 50.0
-    elif dy > 5.0:  # round to five
-        dy = round(dy / 5.0) * 5.0
-    elif dy > 1.0:
-        dy = round(dy)
-    (xmin, xmax, ymin, ymax) = round_extent((xmin, xmax, ymin, ymax), dy)
-    xmin += 0.5 * dy
-    xmax += 0.5 * dy
-    ymax -= 0.5 * dy
-    xmin -= 0.5 * dy
-    xg = f"np.arange({xmin}, {xmax}, {dy})"
-    yg = f"np.arange({ymax}, {ymin}, -{dy})"
-    return xg, yg
-
-
-# Some geometry helpers
-# ---------------------
+# Extract coordinates from geodataframe
+# -------------------------------------
 def point_coordinates(dataframe) -> Tuple[FloatArray, FloatArray]:
-    """
-    Get the x and y coordinates from a GeoDataFrame of points.
-
-    Parameters
-    ----------
-    dataframe: geopandas.GeoDataFrame
-
-    Returns
-    -------
-    x: np.array
-    y: np.array
-    """
     return dataframe["geometry"].x, dataframe["geometry"].y
 
 
 def linestring_coordinates(row) -> Tuple[FloatArray, FloatArray]:
-    """
-    Get the x and y coordinates from a single LineString feature,
-    which is one row in a GeoDataFrame.
-
-    Parameters
-    ----------
-    row: geopandas.GeoSeries
-
-    Returns
-    -------
-    x: np.array
-    y: np.array
-    """
     return np.array(row["geometry"].coords)
 
 
 def polygon_coordinates(row) -> Tuple[FloatArray, FloatArray]:
-    """
-    Get the x and y coordinates from a single Polygon feature,
-    which is one row in a GeoDataFrame.
-
-    Parameters
-    ----------
-    row: geopandas.GeoSeries
-
-    Returns
-    -------
-    x: np.array
-    y: np.array
-    """
     return np.array(row["geometry"].exterior.coords)
 
 
+# Parse GPKG content to Tim input
+# -------------------------------
 def aquifer_data(
     dataframe: gpd.GeoDataFrame, transient: bool = False
 ) -> Dict[str, Any]:
+    """
+    Convert a table created by the QGIS plugin to the layer configuration and
+    keywords arguments as expected by TimML or TTim.
+    """
     # Make sure the layers are in the right order.
     dataframe = dataframe.sort_values(by="layer").set_index("layer")
     nlayer = len(dataframe)
@@ -186,10 +135,23 @@ def aquifer_data(
     else:
         d["npor"] = porosity
         d["hstar"] = hstar
+
     return d
 
 
-def parse_name(layername: str) -> Tuple[str, str]:
+def parse_name(layername: str) -> Tuple[str, str, str]:
+    """
+    Based on the layer name find out:
+
+    * whether it's a timml or ttim element;
+    * which element type it is;
+    * what the user provided name is.
+
+    For example:
+    parse_name("timml Headwell: drainage") -> ("timml", "Head Well", "drainage")
+
+    Some grouping of tables occurs here.
+    """
     prefix, name = layername.split(":")
     element_type = re.split("timml |ttim ", prefix)[1]
     mapping = {
@@ -207,18 +169,28 @@ def parse_name(layername: str) -> Tuple[str, str]:
     elif "ttim" in prefix:
         tim_type = "ttim"
     else:
-        raise ValueError("Neither timml nor ttim in layername")
+        raise ValueError(f"Neither timml nor ttim in layername: {layername}")
     return tim_type, element_type, name
 
 
-def model_specification(path, active_elements):
+def model_specification(
+    path: Union[str, pathlib.Path], active_elements: Dict[str, bool]
+) -> Tuple[TimmlModelSpecification, TtimModelSpecification]:
+    """
+    Group the different layers of a GPKG into model specifications for timml
+    and ttim. The grouping occurs solely on the basis of layer names.
+    """
+    # Start by listing all layers
     gpkg_names = fiona.listlayers(path)
+    # Group all these names together (using a defaultdict)
     dd = defaultdict
     grouped_names = dd(partial(dd, partial(dd, list)))
     for layername in gpkg_names:
         tim_type, element_type, name = parse_name(layername)
         grouped_names[element_type][name][tim_type] = layername
 
+    # Grab the names of the required elements and load the data into
+    # geodataframes.
     aquifer_entry = grouped_names.pop("Aquifer")["Aquifer"]
     aquifer = gpd.read_file(path, layer=aquifer_entry["timml"])
     temporal_settings = gpd.read_file(path, layer=aquifer_entry["ttim"])
@@ -226,6 +198,7 @@ def model_specification(path, active_elements):
     domain = gpd.read_file(path, layer=domain_entry["timml"])
     output_times = gpd.read_file(path, layer=domain_entry["ttim"])
 
+    # Load the data all other elements into geodataframes.
     ttim_elements = {}
     timml_elements = {}
     for element_type, element_group in grouped_names.items():
@@ -269,6 +242,44 @@ def model_specification(path, active_elements):
             np.sort(output_times["time"].values),
         ),
     )
+
+
+# Three helpers for conversion to Python scripts
+# ----------------------------------------------
+def dict_to_kwargs_code(data: dict) -> str:
+    strings = []
+    for key, value in data.items():
+        if isinstance(value, np.ndarray):
+            value = value.tolist()
+        elif isinstance(value, str) and key not in ("model", "timmlmodel"):
+            value = f'"{value}"'
+        strings.append(f"{key}={value}")
+    return ",".join(strings)
+
+
+def sanitized(name: str) -> str:
+    return name.split(":")[-1].replace(" ", "_")
+
+
+def headgrid_code(domain: gpd.GeoDataFrame) -> Tuple[str, str]:
+    xmin, ymin, xmax, ymax = domain.bounds.iloc[0]
+    dy = (ymax - ymin) / 50.0
+    if dy > 500.0:
+        dy = round(dy / 500.0) * 500.0
+    elif dy > 50.0:
+        dy = round(dy / 50.0) * 50.0
+    elif dy > 5.0:  # round to five
+        dy = round(dy / 5.0) * 5.0
+    elif dy > 1.0:
+        dy = round(dy)
+    (xmin, xmax, ymin, ymax) = round_extent((xmin, xmax, ymin, ymax), dy)
+    xmin += 0.5 * dy
+    xmax += 0.5 * dy
+    ymax -= 0.5 * dy
+    xmin -= 0.5 * dy
+    xg = f"np.arange({xmin}, {xmax}, {dy})"
+    yg = f"np.arange({ymax}, {ymin}, -{dy})"
+    return xg, yg
 
 
 # Output methods

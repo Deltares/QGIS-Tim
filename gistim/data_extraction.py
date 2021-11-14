@@ -1,3 +1,11 @@
+"""
+This functions in this module extract data from a (specially prepared) netCDF
+for a given polygon and compute a number of statistics, which is presented in
+table form.
+
+These statistics can also be formatted so they maybe pasted into QGIS, as a
+ready made aquifer-aquitard parametrization.
+"""
 import pathlib
 from typing import List, Union
 

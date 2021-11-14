@@ -1,30 +1,10 @@
-import hashlib
 import json
 import os
 import pathlib
 import socketserver
-import sys
-from typing import Dict, NamedTuple, Union
-
-import rioxarray
-import xarray as xr
+from typing import Dict, Union
 
 import gistim
-
-
-# If the geopackage has changed, reinitialize the model.
-#  If elements are added piecemeal, hashing per element (maybe via pickle?) could be nicer.
-def hash_file(path: Union[pathlib.Path, str]) -> int:
-    """Compute an MD5 hash of a file to check if it has changed"""
-    md5 = hashlib.md5()
-    with open(path, "rb") as f:
-        while True:
-            # 64kb chunks
-            chunk = f.read(65536)
-            if not chunk:
-                break
-            md5.update(chunk)
-    return md5.hexdigest()
 
 
 class StatefulTimServer(socketserver.ThreadingTCPServer):
@@ -52,18 +32,6 @@ class TimHandler(socketserver.BaseRequestHandler):
     It will initialize the model, compute the results for a given domain
     and cellsize, and write the result to a 3D (layer, y, x) netCDF file.
     """
-
-    def initialize(
-        self, path: Union[pathlib.Path, str], active_elements: Dict[str, bool]
-    ) -> None:
-        """
-        Convert the contents of the GeoPackage into a TimML model.
-
-        Parameters
-        ----------
-        path: Union[pathlib.Path, str]
-            Path to the GeoPackage file containing the full model input.
-        """
 
     def compute(
         self,
@@ -95,16 +63,10 @@ class TimHandler(socketserver.BaseRequestHandler):
             the geopackage name, and the requested grid cell size.
         """
         path = pathlib.Path(path)
-        # TODO: this currently gives issues, where md5 hashes are the same
-        # even after changes?
-        # Probably due to Write-Ahead-Logging (WAL) from the geopackage?
-        # if gpkg_hash != self.server.geopackage_hash:
-        #    self.initialize(path)
-        #    self.server.geopackage_hash = gpkg_hash
-        #    self.server.solved = False
         timml_spec, ttim_spec = gistim.model_specification(path, active_elements)
         self.server.timml_model, _ = gistim.timml_elements.initialize_model(timml_spec)
         self.server.timml_model.solve()
+
         if mode == "transient":
             self.server.ttim_model, _ = gistim.ttim_elements.initialize_model(
                 ttim_spec, self.server.timml_model
@@ -112,6 +74,7 @@ class TimHandler(socketserver.BaseRequestHandler):
 
         name = path.stem
         extent, crs = gistim.gridspec(path, cellsize)
+
         if mode == "steady-state":
             if as_trimesh:
                 ugrid_head = gistim.timml_elements.headmesh(
@@ -127,6 +90,7 @@ class TimHandler(socketserver.BaseRequestHandler):
                 ).with_suffix(".nc")
                 head.to_netcdf(outpath)
                 ugrid_head = gistim.to_ugrid2d(head)
+
         elif mode == "transient":
             print("Solving transient model")
             self.server.ttim_model.solve()
@@ -148,10 +112,12 @@ class TimHandler(socketserver.BaseRequestHandler):
                 ).with_suffix(".nc")
                 head.to_netcdf(outpath)
                 ugrid_head = gistim.to_ugrid2d(head)
+
         else:
             raise ValueError(
                 f'Mode should be "steady-state" or "transient". Received: {mode}'
             )
+
         ugrid_outpath = (
             path.parent / f"{name}-{cellsize}".replace(".", "_")
         ).with_suffix(".ugrid.nc")
@@ -169,6 +135,7 @@ class TimHandler(socketserver.BaseRequestHandler):
         print(message)
         data = json.loads(message)
         operation = data.pop("operation")
+
         if operation == "compute":
             self.compute(
                 path=data["path"],
@@ -180,8 +147,10 @@ class TimHandler(socketserver.BaseRequestHandler):
             print("Computation succesful")
             # Send error code 0: all okay
             self.request.sendall(bytes("0", "utf-8"))
+
         elif operation == "process_ID":
             self.request.sendall(bytes(str(os.getpid()), "utf-8"))
+
         elif operation == "extract":
             inpath = data["inpath"]
             outpath = data["outpath"]
@@ -194,5 +163,6 @@ class TimHandler(socketserver.BaseRequestHandler):
             print(f"Extraction from {inpath} to {outpath} succesful")
             # Send error code 0: all okay
             self.request.sendall(bytes("0", "utf-8"))
+
         else:
             print('Invalid operation. Valid options are: "compute", "process_ID".')

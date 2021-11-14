@@ -1,3 +1,14 @@
+"""
+Functions to create UGRID compliant netCDFs that can be read by QGIS via MDAL.
+While regular structured netCDFs are also supported by QGIS, especially the
+temporal controller works a lot better via MDAL.
+
+This does come at some cost: the UGRID netCDFs are more complicated, and MDAL
+can be a little frail. Furthermore, contouring for unstructured grids uses a
+different algorithm which generates minor "knickpoints" which do not occur with
+the contouring algorithm for structured data (likely because interpolation is
+simpler). However, sliding through different timesteps works out of the box.
+"""
 from typing import Union
 
 import numpy as np

@@ -1,6 +1,3 @@
-"""
-Turns a geopackage into a TimML model result
-"""
 import argparse
 import json
 import os
