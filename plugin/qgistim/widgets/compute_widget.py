@@ -172,6 +172,7 @@ class ComputeWidget(QWidget):
         item = self.parent.domain_item()
         ymax, ymin = item.element.update_extent(self.parent.iface)
         self.set_cellsize_from_domain(ymax, ymin)
+        self.parent.iface.mapCanvas().refreshAllLayers()
 
     def set_cellsize_from_domain(self, ymax: float, ymin: float) -> None:
         # Guess a reasonable value for the cellsize: about 50 rows
