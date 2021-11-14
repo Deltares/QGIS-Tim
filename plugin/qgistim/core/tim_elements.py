@@ -61,7 +61,8 @@ from qgis.core import (
     QgsSingleSymbolRenderer,
     QgsVectorLayer,
 )
-from qgistim import geopackage
+
+from . import geopackage
 
 # These columns are reused by Aquifer and Polygon Inhom, Building pit
 # Aquitards are on top of the aquifer, so it comes first

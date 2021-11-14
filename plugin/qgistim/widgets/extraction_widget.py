@@ -33,7 +33,8 @@ from qgis.core import (
     QgsWkbTypes,
 )
 from qgis.gui import QgsMapTool, QgsRubberBand
-from qgistim import layer_styling
+
+from ..core import layer_styling
 
 RUBBER_BAND_COLOR = QColor(Qt.yellow)
 

@@ -1,7 +1,8 @@
 from functools import partial
 
-from core.tim_elements import ELEMENTS, Domain
 from PyQt5.QtWidgets import QGridLayout, QPushButton, QVBoxLayout, QWidget
+
+from ..core.tim_elements import ELEMENTS
 
 
 class ElementsWidget(QWidget):
@@ -51,14 +52,7 @@ class ElementsWidget(QWidget):
             Name of the element type.
         """
         klass = ELEMENTS[element_type]
-
-        selection = self.dataset_tree.items()
-        # Append associated items
-        for item in selection:
-            if item.assoc_item is not None and item.assoc_item not in selection:
-                selection.append(item.assoc_item)
-        names = set([item.element.name for item in selection])
-
+        names = self.parent.selection_names()
         element = klass.dialog(
             self.parent.path, self.parent.crs, self.parent.iface, klass, names
         )
@@ -67,7 +61,7 @@ class ElementsWidget(QWidget):
         # Write to geopackage
         element.write()
         # Add to QGIS
-        self.add_layer(element.timml_layer, self.timml_group, element.renderer())
-        self.add_layer(element.ttim_layer, self.ttim_group)
-        self.add_layer(element.assoc_layer, self.timml_group)
+        self.parent.add_layer(element.timml_layer, "timml", element.renderer())
+        self.parent.add_layer(element.ttim_layer, "ttim")
+        self.parent.add_layer(element.assoc_layer, "timml")
         # Add to dataset tree

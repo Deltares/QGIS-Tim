@@ -15,7 +15,7 @@ class TimDockWidget(QgsDockWidget):
         Make sure the external interpreter is shutdown as well.
         """
         widget = self.widget()
-        widget.shutdown_server()
+        widget.interpreter_widget.shutdown_server()
         event.accept()
 
 
@@ -45,7 +45,7 @@ class QgisTimPlugin:
 
     def toggle_timml(self):
         if self.tim_widget is None:
-            from .tim_widget import QgisTimmlWidget
+            from .widgets.tim_widget import QgisTimmlWidget
 
             self.tim_widget = TimDockWidget("Qgis-TimML")
             self.tim_widget.setObjectName("QgisTimmlDock")

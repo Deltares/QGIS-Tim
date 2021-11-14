@@ -7,18 +7,20 @@ layers there.
 """
 import tempfile
 from pathlib import Path
-from typing import Any, Tuple
+from typing import Any, Dict
 
-from PyQt5.QtWidgets import QTabWidget, QVBoxLayout, QWidget
+from PyQt5.QtWidgets import QTabWidget, QTreeWidgetItem, QVBoxLayout, QWidget
 from qgis.core import QgsMapLayer, QgsMeshDatasetIndex, QgsMeshLayer, QgsProject
 
-from .dataset_tree_widget import DatasetWidget
-from .dummy_ugrid import write_dummy_ugrid
+from ..core.dummy_ugrid import write_dummy_ugrid
+from ..core.processing import mesh_contours
+from .compute_widget import ComputeWidget
+from .dataset_widget import DatasetWidget
 from .elements_widget import ElementsWidget
 from .extraction_widget import DataExtractionWidget
 from .interpreter_widget import InterpreterWidget
-from .processing import mesh_contours
-from .solution_widget import SolutionWidget
+
+PYQT_DELETED_ERROR = "wrapped C/C++ object of type QgsLayerTreeGroup has been deleted"
 
 
 class QgisTimmlWidget(QWidget):
@@ -33,7 +35,7 @@ class QgisTimmlWidget(QWidget):
         self.dataset_widget = DatasetWidget(self)
         self.elements_widget = ElementsWidget(self)
         self.interpreter_widget = InterpreterWidget(self)
-        self.solution_widget = SolutionWidget(self)
+        self.compute_widget = ComputeWidget(self)
 
         # Connect this one outside of the widget
         self.extraction_widget.extract_button.clicked.connect(self.extract)
@@ -46,13 +48,20 @@ class QgisTimmlWidget(QWidget):
         self.tabwidget.addTab(self.extraction_widget, "Extract")
         self.tabwidget.addTab(self.dataset_widget, "GeoPackage")
         self.tabwidget.addTab(self.elements_widget, "Elements")
-        self.tabwidget.addTab(self.solution_widget, "Solution")
+        self.tabwidget.addTab(self.compute_widget, "Compute")
         self.setLayout(self.layout)
+
+        # QGIS Layers Panel groups
+        self.group = None
+        self.timml_group = None
+        self.ttim_group = None
+        self.output_group = None
 
     # Inter-widget communication
     # --------------------------
-    def on_transient_changed(self, transient) -> None:
-        self.dataset_widget.dataset_tree.on_transient_changed(transient)
+    def on_transient_changed(self) -> None:
+        transient = self.compute_widget.transient
+        self.dataset_widget.on_transient_changed(transient)
 
     @property
     def path(self) -> str:
@@ -63,6 +72,24 @@ class QgisTimmlWidget(QWidget):
         """Returns coordinate reference system of current mapview"""
         return self.iface.mapCanvas().mapSettings().destinationCrs()
 
+    def set_cellsize_from_domain(self, ymax: float, ymin: float) -> None:
+        self.compute_widget.set_cellsize_from_domain(ymax, ymin)
+
+    def toggle_element_buttons(self, state: bool) -> None:
+        self.elements_widget.toggle_element_buttons(state)
+
+    def active_elements(self) -> Dict[str, bool]:
+        return self.dataset_widget.active_elements()
+
+    def domain_item(self) -> QTreeWidgetItem:
+        return self.dataset_widget.domain_item()
+
+    def selection_names(self):
+        return self.dataset_widget.selection_names()
+
+    def execute(self, data: dict[str, str]) -> str:
+        return self.interpreter_widget.execute(data)
+
     def extract(self) -> None:
         interpreter = self.interpreter_combo_box.currentText()
         env_vars = self.server_handler.environmental_variables()
@@ -70,15 +97,45 @@ class QgisTimmlWidget(QWidget):
 
     # QGIS layers
     # -----------
+    def create_subgroup(self, name: str, part: str) -> None:
+        try:
+            value = self.group.addGroup(f"{name}-{part}")
+            setattr(self, f"{part}_group", value)
+        except RuntimeError as e:
+            if e.args[0] == PYQT_DELETED_ERROR:
+                # This means the main group has been deleted: recreate
+                # everything.
+                self.create_groups(name)
+
     def create_groups(self, name: str) -> None:
         """
         Create an empty legend group in the QGIS Layers Panel.
         """
         root = QgsProject.instance().layerTreeRoot()
         self.group = root.addGroup(name)
-        self.timml_group = self.group.addGroup(f"{name}-timml")
-        self.ttim_group = self.group.addGroup(f"{name}-ttim")
-        self.output_group = self.group.addGroup(f"{name}-output")
+        self.create_subgroup(name, "timml")
+        self.create_subgroup(name, "ttim")
+        self.create_subgroup(name, "output")
+
+    def add_to_group(self, maplayer: Any, destination: str, on_top: bool):
+        """
+        Try to add to a group; it might have been deleted. In that case, we add
+        as many groups as required.
+        """
+        group = getattr(self, f"{destination}_group")
+        try:
+            if on_top:
+                group.insertLayer(0, maplayer)
+            else:
+                group.addLayer(maplayer)
+        except RuntimeError as e:
+            if e.args[0] == PYQT_DELETED_ERROR:
+                # Then re-create groups and try again
+                name = str(Path(self.path).stem)
+                self.create_subgroup(name, destination)
+                self.add_to_group(maplayer, destination, on_top)
+            else:
+                raise e
 
     def add_layer(
         self,
@@ -122,10 +179,7 @@ class QgisTimmlWidget(QWidget):
         if renderer is not None:
             maplayer.setRenderer(renderer)
         if destination is not None:
-            if on_top:
-                destination.insertLayer(0, maplayer)
-            else:
-                destination.addLayer(maplayer)
+            self.add_to_group(maplayer, destination, on_top)
         return maplayer
 
     def load_mesh_result(self, path: Path, cellsize: float, as_trimesh: bool) -> None:
@@ -145,8 +199,7 @@ class QgisTimmlWidget(QWidget):
         layer = QgsMeshLayer(str(netcdf_path), f"{path.stem}-{cellsize}", "mdal")
         indexes = layer.datasetGroupsIndexes()
 
-        contour = self.contour_checkbox.isChecked()
-        start, stop, step = self.contour_range()
+        contour, start, stop, step = self.compute_widget.contouring()
 
         for index in indexes:
             qgs_index = QgsMeshDatasetIndex(group=index, dataset=0)
@@ -166,7 +219,7 @@ class QgisTimmlWidget(QWidget):
                 renderer.setScalarSettings(index, scalar_settings)
 
             index_layer.setRendererSettings(renderer)
-            self.add_layer(index_layer, self.output_group)
+            self.add_layer(index_layer, "output")
 
             if contour:
                 contour_layer = mesh_contours(
@@ -177,4 +230,4 @@ class QgisTimmlWidget(QWidget):
                     stop=stop,
                     step=step,
                 )
-                self.add_layer(contour_layer, self.output_group, on_top=True)
+                self.add_layer(contour_layer, "output", on_top=True)

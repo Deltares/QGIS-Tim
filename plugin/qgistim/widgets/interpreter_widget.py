@@ -1,6 +1,9 @@
+from typing import Dict
+
 from PyQt5.QtWidgets import QComboBox, QHBoxLayout, QPushButton, QVBoxLayout, QWidget
 from qgis.core import QgsApplication
-from qgistim.server_handler import ServerHandler
+
+from ..core.server_handler import ServerHandler
 
 
 class InterpreterWidget(QWidget):
@@ -37,3 +40,7 @@ class InterpreterWidget(QWidget):
         if self.server_handler is not None:
             self.server_handler.kill()
             self.server_handler = None
+
+    def execute(self, data: Dict[str, str]) -> str:
+        received = self.server_handler.send(data)
+        return received

@@ -4,6 +4,8 @@ import pathlib
 import socketserver
 from typing import Dict, Union
 
+import rioxarray
+
 import gistim
 
 
@@ -132,8 +134,11 @@ class TimHandler(socketserver.BaseRequestHandler):
         # TODO: rfile stream? Seems more robust than these 1024 bytes
         # TODO: try-except, and return error in return message
         message = self.request.recv(1024 * 1024).strip()
-        print(message)
         data = json.loads(message)
+
+        print("JSON received:")
+        print(json.dumps(data, indent=4))
+
         operation = data.pop("operation")
 
         if operation == "compute":
@@ -144,7 +149,7 @@ class TimHandler(socketserver.BaseRequestHandler):
                 active_elements=data["active_elements"],
                 as_trimesh=data["as_trimesh"],
             )
-            print("Computation succesful")
+            print("Computation succesful\n\n")
             # Send error code 0: all okay
             self.request.sendall(bytes("0", "utf-8"))
 
@@ -160,7 +165,7 @@ class TimHandler(socketserver.BaseRequestHandler):
                 outpath=outpath,
                 wkt_geometry=wkt_geometry,
             )
-            print(f"Extraction from {inpath} to {outpath} succesful")
+            print(f"Extraction from {inpath} to {outpath} succesful\n\n")
             # Send error code 0: all okay
             self.request.sendall(bytes("0", "utf-8"))
 

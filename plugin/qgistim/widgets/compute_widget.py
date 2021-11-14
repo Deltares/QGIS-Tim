@@ -21,15 +21,14 @@ from qgis.core import (
     QgsVectorLayerSimpleLabeling,
 )
 from qgis.gui import QgsMapLayerComboBox
-from qgistim import layer_styling
 
-from .processing import mesh_contours
-from .tim_elements import Domain
+from ..core import layer_styling
+from ..core.processing import mesh_contours
 
 
-class SolutionWidget(QWidget):
+class ComputeWidget(QWidget):
     def __init__(self, parent=None):
-        super(SolutionWidget, self).__init__(parent)
+        super(ComputeWidget, self).__init__(parent)
         self.parent = parent
         self.domain_button = QPushButton("Domain")
         self.transient_combo_box = QComboBox()
@@ -62,14 +61,14 @@ class SolutionWidget(QWidget):
         self.contour_step_box.setValue(0.5)
 
         # Layout
-        solution_layout = QVBoxLayout()
-        solution_grid = QGridLayout()
-        solution_grid.addWidget(self.domain_button, 0, 0)
+        compute_layout = QVBoxLayout()
+        compute_grid = QGridLayout()
+        compute_grid.addWidget(self.domain_button, 0, 0)
         cellsize_row = QHBoxLayout()
         cellsize_row.addWidget(QLabel("Cellsize:"))
         cellsize_row.addWidget(self.cellsize_spin_box)
         # label.setFixedWidth(45)
-        solution_grid.addLayout(cellsize_row, 0, 1)
+        compute_grid.addLayout(cellsize_row, 0, 1)
         contour_row = QHBoxLayout()
         contour_row2 = QHBoxLayout()
         contour_row.addWidget(self.contour_checkbox)
@@ -78,36 +77,25 @@ class SolutionWidget(QWidget):
         contour_row.addWidget(self.contour_max_box)
         contour_row2.addWidget(QLabel("Increment:"))
         contour_row2.addWidget(self.contour_step_box)
-        solution_grid.addLayout(contour_row, 1, 0)
-        solution_grid.addLayout(contour_row2, 1, 1)
-        solution_grid.addWidget(self.transient_combo_box, 2, 0)
+        compute_grid.addLayout(contour_row, 1, 0)
+        compute_grid.addLayout(contour_row2, 1, 1)
+        compute_grid.addWidget(self.transient_combo_box, 2, 0)
         compute_row = QHBoxLayout()
         # compute_row.addWidget(self.mesh_checkbox)
         compute_row.addWidget(self.compute_button)
-        solution_grid.addLayout(compute_row, 2, 1)
-        solution_grid.addWidget(self.contour_layer, 3, 0)
-        solution_grid.addWidget(self.contour_button, 3, 1)
-        solution_layout.addLayout(solution_grid)
-        solution_layout.addStretch()
-        self.setLayout(solution_layout)
+        compute_grid.addLayout(compute_row, 2, 1)
+        compute_grid.addWidget(self.contour_layer, 3, 0)
+        compute_grid.addWidget(self.contour_button, 3, 1)
+        compute_layout.addLayout(compute_grid)
+        compute_layout.addStretch()
+        self.setLayout(compute_layout)
 
-    def set_cellsize_from_domain(self, ymax: float, ymin: float) -> None:
-        # Guess a reasonable value for the cellsize: about 50 rows
-        dy = (ymax - ymin) / 50.0
-        if dy > 500.0:
-            dy = round(dy / 500.0) * 500.0
-        elif dy > 50.0:
-            dy = round(dy / 50.0) * 50.0
-        elif dy > 5.0:  # round to five
-            dy = round(dy / 5.0) * 5.0
-        elif dy > 1.0:
-            dy = round(dy)
-        self.cellsize_spin_box.setValue(dy)
+    @property
+    def transient(self) -> bool:
+        return self.transient_combo_box.currentText() == "Transient"
 
     def on_transient_changed(self) -> None:
-        transient = self.transient_combo_box.currentText() == "Transient"
-        # Requires communication between widgets:
-        self.parent.on_transient_changed(transient)
+        self.parent.on_transient_changed()
 
     def contour_range(self) -> Tuple[float, float, float]:
         return (
@@ -142,21 +130,14 @@ class SolutionWidget(QWidget):
         contour_layer.setLabelsEnabled(True)
         # Renderer: simple black lines
         renderer = layer_styling.contour_renderer()
-        self.parent.add_layer(
-            contour_layer, self.output_group, renderer=renderer, on_top=True
-        )
+        self.parent.add_layer(contour_layer, "output", renderer=renderer, on_top=True)
 
     def compute(self) -> None:
         """
         Run a TimML computation with the current state of the currently active
         GeoPackage dataset.
         """
-        # Collect checked elements
-        active_elements = {}
-        for item in self.dataset_tree.items():
-            active_elements[item.text(1)] = not (item.timml_checkbox.isChecked() == 0)
-            active_elements[item.text(3)] = not (item.ttim_checkbox.isChecked() == 0)
-
+        active_elements = self.parent.active_elements()
         cellsize = self.cellsize_spin_box.value()
         path = Path(self.parent.path).absolute()
         mode = self.transient_combo_box.currentText().lower()
@@ -171,8 +152,7 @@ class SolutionWidget(QWidget):
                 "as_trimesh": as_trimesh,
             }
         )
-        handler = self.server_handler
-        received = handler.send(data)
+        received = self.parent.execute(data)
 
         if received == "0":
             self.parent.load_mesh_result(path, cellsize, as_trimesh)
@@ -185,21 +165,11 @@ class SolutionWidget(QWidget):
                 level=Qgis.Critical,
             )
 
-    def on_transient_changed(self) -> None:
-        transient = self.transient_combo_box.currentText() == "Transient"
-        self.parent.on_transient_changed(transient)
-
     def domain(self) -> None:
         """
         Write the current viewing extent as rectangle to the GeoPackage.
         """
-        # Find domain entry
-        for item in self.dataset_tree.items():
-            if isinstance(item.element, Domain):
-                break
-        else:
-            # Create domain instead?
-            raise ValueError("Geopackage does not contain domain")
+        item = self.parent.domain_item()
         ymax, ymin = item.element.update_extent(self.parent.iface)
         self.set_cellsize_from_domain(ymax, ymin)
 
@@ -215,3 +185,8 @@ class SolutionWidget(QWidget):
         elif dy > 1.0:
             dy = round(dy)
         self.cellsize_spin_box.setValue(dy)
+
+    def contouring(self) -> Tuple[bool, float, float, float]:
+        contour = self.contour_checkbox.isChecked()
+        start, stop, step = self.contour_range()
+        return contour, start, stop, step

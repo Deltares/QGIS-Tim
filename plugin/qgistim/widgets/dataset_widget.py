@@ -11,7 +11,7 @@ user chooses the transient simulation mode, a number of elements must be
 disabled (such as inhomogeneities).
 """
 from pathlib import Path
-from typing import List
+from typing import Any, List, Set
 
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import (
@@ -29,9 +29,9 @@ from PyQt5.QtWidgets import (
     QVBoxLayout,
     QWidget,
 )
-from qgis.core import QgsProject
+from qgis.core import QgsMapLayer, QgsProject
 
-from .tim_elements import Aquifer, Domain, load_elements_from_geopackage
+from ..core.tim_elements import Aquifer, Domain, load_elements_from_geopackage
 
 SUPPORTED_TTIM_ELEMENTS = set(
     [
@@ -51,9 +51,8 @@ SUPPORTED_TTIM_ELEMENTS = set(
 
 
 class DatasetTreeWidget(QTreeWidget):
-    def __init__(self, parent):
+    def __init__(self, parent=None):
         super(DatasetTreeWidget, self).__init__(parent)
-        self.parent = parent
         self.setSelectionMode(QAbstractItemView.ExtendedSelection)
         self.setHeaderHidden(True)
         self.setSortingEnabled(True)
@@ -209,8 +208,9 @@ TIMOUTPUT_GROUP_ENTRY = "timoutput_group"
 
 
 class DatasetWidget(QWidget):
-    def __init__(self, parent=None):
+    def __init__(self, parent):
         super(DatasetWidget, self).__init__(parent)
+        self.parent = parent
         self.dataset_tree = DatasetTreeWidget()
         self.dataset_tree.setSizePolicy(QSizePolicy.Preferred, QSizePolicy.Expanding)
         self.dataset_line_edit = QLineEdit()
@@ -249,6 +249,42 @@ class DatasetWidget(QWidget):
         """Returns currently active path to GeoPackage"""
         return self.dataset_line_edit.text()
 
+    def add_layer(
+        self,
+        layer: Any,
+        destination: Any,
+        renderer: Any = None,
+        suppress: bool = None,
+        on_top: bool = False,
+    ) -> QgsMapLayer:
+        return self.parent.add_layer(
+            layer,
+            destination,
+            renderer,
+            suppress,
+            on_top,
+        )
+
+    def add_item_to_qgis(self, item) -> None:
+        layers = item.element.from_geopackage()
+        suppress = self.suppress_popup_checkbox.isChecked()
+        timml_layer, renderer = layers[0]
+        maplayer = self.add_layer(timml_layer, "timml", renderer, suppress)
+        self.add_layer(layers[1][0], "ttim")
+        self.add_layer(layers[2][0], "timml")
+        # Set cell size if the item is a domain layer
+        if item.element.timml_name.split(":")[0] == "timml Domain":
+            feature = next(iter(maplayer.getFeatures()))
+            extent = feature.geometry().boundingBox()
+            ymax = extent.yMaximum()
+            ymin = extent.yMinimum()
+            self.parent.set_cellsize_from_domain(ymax, ymin)
+
+    def add_selection_to_qgis(self) -> None:
+        selection = self.dataset_tree.selectedItems()
+        for item in selection:
+            self.add_item_to_qgis(item)
+
     def load_geopackage(self) -> None:
         """
         Load the layers of a GeoPackage into the Layers Panel
@@ -257,9 +293,8 @@ class DatasetWidget(QWidget):
         elements = load_elements_from_geopackage(self.path)
         for element in elements:
             self.dataset_tree.add_element(element)
-        path = self.path
-        name = str(Path(path).stem)
-        self.create_groups(name)
+        name = str(Path(self.path).stem)
+        self.parent.create_groups(name)
         for item in self.dataset_tree.items():
             self.add_item_to_qgis(item)
 
@@ -276,10 +311,10 @@ class DatasetWidget(QWidget):
 
         # Store root group
         for (group, entry) in (
-            (self.group, TIM_GROUP_ENTRY),
-            (self.timml_group, TIMML_GROUP_ENTRY),
-            (self.ttim_group, TTIM_GROUP_ENTRY),
-            (self.output_group, TIMOUTPUT_GROUP_ENTRY),
+            (self.parent.group, TIM_GROUP_ENTRY),
+            (self.parent.timml_group, TIMML_GROUP_ENTRY),
+            (self.parent.ttim_group, TTIM_GROUP_ENTRY),
+            (self.parent.output_group, TIMOUTPUT_GROUP_ENTRY),
         ):
             try:
                 group_name = group.name()
@@ -306,15 +341,15 @@ class DatasetWidget(QWidget):
         if self.group is None:
             self.create_groups()
         if self.group is not None:
-            self.timml_group = self.group.findGroup(timml_group_name)
-            self.ttim_group_name = self.group.findGroup(ttim_group_name)
-            self.output_group_name = self.group.findGroup(output_group_name)
-            if self.timml_group is None:
-                self.timml_group = self.group.addGroup(f"{group_name}-timml")
-            if self.ttim_group is None:
-                self.ttim_group = self.group.addGroup(f"{group_name}-ttim")
-            if self.output_group is None:
-                self.output_group = self.group.addGroup(f"{group_name}-output")
+            self.parent.timml_group = self.group.findGroup(timml_group_name)
+            self.parent.ttim_group_name = self.group.findGroup(ttim_group_name)
+            self.parent.output_group_name = self.group.findGroup(output_group_name)
+            if self.parent.timml_group is None:
+                self.parent.timml_group = self.group.addGroup(f"{group_name}-timml")
+            if self.parent.ttim_group is None:
+                self.parent.ttim_group = self.group.addGroup(f"{group_name}-ttim")
+            if self.parent.output_group is None:
+                self.parent.output_group = self.group.addGroup(f"{group_name}-output")
 
         entry, success = project.readEntry(PROJECT_SCOPE, GPKG_LAYERS_ENTRY)
         if success:
@@ -324,7 +359,7 @@ class DatasetWidget(QWidget):
 
         self.dataset_tree.clear()
         self.dataset_line_edit.setText(path)
-        self.toggle_element_buttons(True)
+        self.parent.toggle_element_buttons(True)
 
         maplayers_dict = QgsProject().instance().mapLayers()
         maplayers = {v.name(): v for k, v in maplayers_dict.items() if k in names}
@@ -347,7 +382,8 @@ class DatasetWidget(QWidget):
                 instance.create_layers(self.parent.crs)
                 instance.write()
             self.load_geopackage()
-            self.toggle_element_buttons(True)
+            self.parent.toggle_element_buttons(True)
+        self.parent.on_transient_changed()
 
     def open_geopackage(self) -> None:
         """
@@ -358,8 +394,9 @@ class DatasetWidget(QWidget):
         if path != "":  # Empty string in case of cancel button press
             self.dataset_line_edit.setText(path)
             self.load_geopackage()
-            self.toggle_element_buttons(True)
+            self.parent.toggle_element_buttons(True)
         self.dataset_tree.sortByColumn(0, Qt.SortOrder.AscendingOrder)
+        self.parent.on_transient_changed()
 
     def remove_geopackage_layer(self) -> None:
         """
@@ -370,25 +407,6 @@ class DatasetWidget(QWidget):
         """
         self.dataset_tree.remove_geopackage_layers()
 
-    def add_item_to_qgis(self, item) -> None:
-        layers = item.element.from_geopackage()
-        suppress = self.suppress_popup_checkbox.isChecked()
-        timml_layer, renderer = layers[0]
-        maplayer = self.add_layer(timml_layer, self.timml_group, renderer, suppress)
-        self.add_layer(layers[1][0], self.ttim_group)
-        self.add_layer(layers[2][0], self.timml_group)
-        # Set cell size if the item is a domain layer
-        if item.element.timml_name.split(":")[0] == "timml Domain":
-            extent = maplayer.extent()
-            ymax = extent.yMaximum()
-            ymin = extent.yMinimum()
-            self.set_cellsize_from_domain(ymax, ymin)
-
-    def add_selection_to_qgis(self) -> None:
-        selection = self.dataset_tree.selectedItems()
-        for item in selection:
-            self.add_item_to_qgis(item)
-
     def suppress_popup_changed(self):
         suppress = self.suppress_popup_checkbox.isChecked()
         for item in self.dataset_tree.items():
@@ -397,3 +415,30 @@ class DatasetWidget(QWidget):
                 config = layer.editFormConfig()
                 config.setSuppress(suppress)
                 layer.setEditFormConfig(config)
+
+    def active_elements(self):
+        active_elements = {}
+        for item in self.dataset_tree.items():
+            active_elements[item.text(1)] = not (item.timml_checkbox.isChecked() == 0)
+            active_elements[item.text(3)] = not (item.ttim_checkbox.isChecked() == 0)
+        return active_elements
+
+    def domain_item(self):
+        # Find domain entry
+        for item in self.dataset_tree.items():
+            if isinstance(item.element, Domain):
+                return item
+        else:
+            # Create domain instead?
+            raise ValueError("Geopackage does not contain domain")
+
+    def selection_names(self) -> Set[str]:
+        selection = self.dataset_tree.items()
+        # Append associated items
+        for item in selection:
+            if item.assoc_item is not None and item.assoc_item not in selection:
+                selection.append(item.assoc_item)
+        return set([item.element.name for item in selection])
+
+    def on_transient_changed(self, transient: bool) -> None:
+        self.dataset_tree.on_transient_changed(transient)

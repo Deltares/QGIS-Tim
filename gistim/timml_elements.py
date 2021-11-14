@@ -333,7 +333,7 @@ def initialize_model(spec: TimmlModelSpecification) -> timml.Model:
 
     """
     validate(spec)
-    model = timml.Model(**aquifer_data(spec.aquifer))
+    model = timml.ModelMaq(**aquifer_data(spec.aquifer))
     elements = {}
     for name, element_spec in spec.elements.items():
         if not element_spec.active:
