@@ -156,6 +156,12 @@ class TimHandler(socketserver.BaseRequestHandler):
         elif operation == "process_ID":
             self.request.sendall(bytes(str(os.getpid()), "utf-8"))
 
+        elif operation == "convert":
+            inpath = data["inpath"]
+            outpath = data["outpath"]
+            gistim.convert_to_script(inpath, outpath)
+            self.request.sendall(bytes("0", "utf-8"))
+
         elif operation == "extract":
             inpath = data["inpath"]
             outpath = data["outpath"]

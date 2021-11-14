@@ -1,14 +1,16 @@
+import json
 from typing import Dict
 
 from PyQt5.QtWidgets import QComboBox, QHBoxLayout, QPushButton, QVBoxLayout, QWidget
-from qgis.core import QgsApplication
+from qgis.core import Qgis, QgsApplication
 
 from ..core.server_handler import ServerHandler
 
 
 class InterpreterWidget(QWidget):
-    def __init__(self, parent=None):
+    def __init__(self, parent):
         super(InterpreterWidget, self).__init__(parent)
+        self.parent = parent
 
         self.server_handler = None  # ServerHandler()  # To connect with TimServer
         self.interpreter_combo_box = QComboBox()
@@ -42,5 +44,13 @@ class InterpreterWidget(QWidget):
             self.server_handler = None
 
     def execute(self, data: Dict[str, str]) -> str:
-        received = self.server_handler.send(data)
+        jsondata = json.dumps(data)
+        received = self.server_handler.send(jsondata)
+        if received != "0":
+            self.parent.iface.messageBar().pushMessage(
+                "Error",
+                "Something seems to have gone wrong, "
+                "try checking the TimServer window...",
+                level=Qgis.Critical,
+            )
         return received

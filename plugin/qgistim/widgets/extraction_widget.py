@@ -6,8 +6,6 @@ https://github.com/lutraconsulting/serval
 Apart from the drawing logic, it contains some logic to add all the different
 layers of the dataset with some default styling.
 """
-import json
-import subprocess
 from pathlib import Path
 
 from osgeo import gdal
@@ -24,7 +22,6 @@ from PyQt5.QtWidgets import (
     QWidget,
 )
 from qgis.core import (
-    Qgis,
     QgsGeometry,
     QgsLayerTreeGroup,
     QgsMapLayerType,
@@ -307,19 +304,10 @@ class DataExtractionWidget(QWidget):
         if outpath == "":
             return
 
-        data = json.dumps(
-            {
-                "operation": "extract",
-                "inpath": inpath,
-                "outpath": outpath,
-                "wkt_geometry": wkts,
-            }
-        )
-        received = self.parent.execute(data)
-        if received != "0":
-            self.iface.messageBar().pushMessage(
-                "Error",
-                "Something seems to have gone wrong, "
-                "try checking the TimServer window...",
-                level=Qgis.Critical,
-            )
+        data = {
+            "operation": "extract",
+            "inpath": inpath,
+            "outpath": outpath,
+            "wkt_geometry": wkts,
+        }
+        self.parent.execute(data)

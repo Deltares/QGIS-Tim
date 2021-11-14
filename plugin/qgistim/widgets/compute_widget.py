@@ -1,4 +1,3 @@
-import json
 from pathlib import Path
 from typing import Tuple
 
@@ -14,7 +13,6 @@ from PyQt5.QtWidgets import (
     QWidget,
 )
 from qgis.core import (
-    Qgis,
     QgsMapLayerProxyModel,
     QgsMeshDatasetIndex,
     QgsPalLayerSettings,
@@ -142,28 +140,19 @@ class ComputeWidget(QWidget):
         path = Path(self.parent.path).absolute()
         mode = self.transient_combo_box.currentText().lower()
         as_trimesh = False  # self.mesh_checkbox.isChecked()
-        data = json.dumps(
-            {
-                "operation": "compute",
-                "path": str(path),
-                "cellsize": cellsize,
-                "mode": mode,
-                "active_elements": active_elements,
-                "as_trimesh": as_trimesh,
-            }
-        )
+        data = {
+            "operation": "compute",
+            "path": str(path),
+            "cellsize": cellsize,
+            "mode": mode,
+            "active_elements": active_elements,
+            "as_trimesh": as_trimesh,
+        }
         received = self.parent.execute(data)
 
         if received == "0":
             self.parent.load_mesh_result(path, cellsize, as_trimesh)
             # self.load_raster_result(path, cellsize)
-        else:
-            self.parent.iface.messageBar().pushMessage(
-                "Error",
-                "Something seems to have gone wrong, "
-                "try checking the TimServer window...",
-                level=Qgis.Critical,
-            )
 
     def domain(self) -> None:
         """

@@ -49,7 +49,7 @@ class QgisTimmlWidget(QWidget):
         self.setLayout(self.layout)
 
         # Default to the GeoPackage tab
-        self.tabwidget.setCurrentWidget(self.tabwidget.findChild(QWidget, "GeoPackage"))
+        self.tabwidget.setCurrentIndex(1)
 
         # QGIS Layers Panel groups
         self.group = None

@@ -217,10 +217,12 @@ class DatasetWidget(QWidget):
         self.add_button = QPushButton("Add to QGIS")
         self.new_geopackage_button.clicked.connect(self.new_geopackage)
         self.open_geopackage_button.clicked.connect(self.open_geopackage)
-        self.remove_button.clicked.connect(self.remove_geopackage_layer)
-        self.add_button.clicked.connect(self.add_selection_to_qgis)
         self.suppress_popup_checkbox = QCheckBox("Suppress attribute form pop-up")
         self.suppress_popup_checkbox.stateChanged.connect(self.suppress_popup_changed)
+        self.remove_button.clicked.connect(self.remove_geopackage_layer)
+        self.add_button.clicked.connect(self.add_selection_to_qgis)
+        self.convert_button = QPushButton("Convert GeoPackage to Python script")
+        self.convert_button.clicked.connect(self.convert)
         # Layout
         dataset_layout = QVBoxLayout()
         dataset_row = QHBoxLayout()
@@ -230,10 +232,11 @@ class DatasetWidget(QWidget):
         dataset_row.addWidget(self.new_geopackage_button)
         dataset_layout.addLayout(dataset_row)
         dataset_layout.addWidget(self.dataset_tree)
+        dataset_layout.addWidget(self.suppress_popup_checkbox)
         layer_row.addWidget(self.add_button)
         layer_row.addWidget(self.remove_button)
         dataset_layout.addLayout(layer_row)
-        dataset_layout.addWidget(self.suppress_popup_checkbox)
+        dataset_layout.addWidget(self.convert_button)
         self.setLayout(dataset_layout)
         # Connect to reading of project file
         instance = QgsProject().instance()
@@ -443,3 +446,13 @@ class DatasetWidget(QWidget):
 
     def add_element(self, element) -> None:
         self.dataset_tree.add_element(element)
+
+    def convert(self) -> None:
+        outpath, _ = QFileDialog.getSaveFileName(self, "Select file", "", "*.py")
+        if outpath != "":  # Empty string in case of cancel button press
+            data = {
+                "operation": "convert",
+                "inpath": self.path,
+                "outpath": outpath,
+            }
+            self.parent.execute(data)
