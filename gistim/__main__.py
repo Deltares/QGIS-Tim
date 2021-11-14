@@ -66,15 +66,7 @@ def convert(args) -> None:
     """
     inpath = args.inpath[0]
     outpath = args.outpath[0]
-
-    timml_spec, ttim_spec = gistim.model_specification(inpath, {})
-    timml_script = gistim.timml_elements.convert_to_script(timml_spec)
-    ttim_script = gistim.ttim_elements.convert_to_script(ttim_spec)
-
-    with open(outpath, "w") as f:
-        f.write(timml_script)
-        f.write("\n")
-        f.write(ttim_script)
+    gistim.convert_to_script(inpath, outpath)
 
 
 if __name__ == "__main__":
