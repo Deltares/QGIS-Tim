@@ -97,20 +97,16 @@ class DatasetTreeWidget(QTreeWidget):
         return item
 
     def add_element(self, element) -> None:
+        # These are mandatory elements, cannot be unticked
         if isinstance(element, (Domain, Aquifer)):
             enabled = False
         else:
             enabled = True
+
         item = self.add_item(
             timml_name=element.timml_name, ttim_name=element.ttim_name, enabled=enabled
         )
         item.element = element
-        if element.assoc_layer is not None:
-            assoc_item = self.add_item(timml_name=element.assoc_name, enabled=enabled)
-            assoc_item.element = element
-            # Cross-reference items
-            item.assoc_item = assoc_item
-            assoc_item.assoc_item = item
 
     def on_transient_changed(self, transient: bool) -> None:
         """
@@ -274,6 +270,8 @@ class DatasetWidget(QWidget):
         self.add_layer(layers[2][0], "timml")
         # Set cell size if the item is a domain layer
         if item.element.timml_name.split(":")[0] == "timml Domain":
+            if maplayer.featureCount() <= 0:
+                return
             feature = next(iter(maplayer.getFeatures()))
             extent = feature.geometry().boundingBox()
             ymax = extent.yMaximum()
@@ -442,3 +440,6 @@ class DatasetWidget(QWidget):
 
     def on_transient_changed(self, transient: bool) -> None:
         self.dataset_tree.on_transient_changed(transient)
+
+    def add_element(self, element) -> None:
+        self.dataset_tree.add_element(element)

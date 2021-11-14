@@ -8,6 +8,7 @@ from ..core.tim_elements import ELEMENTS
 class ElementsWidget(QWidget):
     def __init__(self, parent):
         super(ElementsWidget, self).__init__(parent)
+        self.parent = parent
 
         self.element_buttons = {}
         for element in ELEMENTS:
@@ -65,3 +66,4 @@ class ElementsWidget(QWidget):
         self.parent.add_layer(element.ttim_layer, "ttim")
         self.parent.add_layer(element.assoc_layer, "timml")
         # Add to dataset tree
+        self.parent.add_element(element)

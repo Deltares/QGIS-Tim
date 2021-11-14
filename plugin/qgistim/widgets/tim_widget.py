@@ -90,10 +90,8 @@ class QgisTimmlWidget(QWidget):
     def execute(self, data: dict[str, str]) -> str:
         return self.interpreter_widget.execute(data)
 
-    def extract(self) -> None:
-        interpreter = self.interpreter_combo_box.currentText()
-        env_vars = self.server_handler.environmental_variables()
-        self.extraction_widget.extract(interpreter, env_vars, self.server_handler)
+    def add_element(self, element: Any):
+        self.dataset_widget.add_element(element)
 
     # QGIS layers
     # -----------
