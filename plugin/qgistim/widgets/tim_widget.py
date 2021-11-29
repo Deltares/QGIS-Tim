@@ -51,6 +51,11 @@ class QgisTimmlWidget(QWidget):
         # Default to the GeoPackage tab
         self.tabwidget.setCurrentIndex(1)
 
+        # Set a default output path and link with GeoPackage path change.
+        self.dataset_widget.dataset_line_edit.textChanged.connect(
+            self.compute_widget.set_default_path
+        )
+
         # QGIS Layers Panel groups
         self.group = None
         self.timml_group = None
@@ -180,12 +185,9 @@ class QgisTimmlWidget(QWidget):
             self.add_to_group(maplayer, destination, on_top)
         return maplayer
 
-    def load_mesh_result(self, path: Path, cellsize: float, as_trimesh: bool) -> None:
-        netcdf_path = str(
-            (path.parent / f"{path.stem}-{cellsize}".replace(".", "_")).with_suffix(
-                ".ugrid.nc"
-            )
-        )
+    def load_mesh_result(self, path: Path, as_trimesh: bool) -> None:
+        netcdf_path = str(path)
+
         # Loop through layers first. If the path already exists as a layer source, remove it.
         # Otherwise QGIS will not the load the new result (this feels like a bug?).
         for layer in QgsProject.instance().mapLayers().values():
@@ -194,7 +196,7 @@ class QgisTimmlWidget(QWidget):
         # Ensure the file is properly released by loading a dummy
         QgsMeshLayer(str(self.dummy_ugrid_path), "", "mdal")
 
-        layer = QgsMeshLayer(str(netcdf_path), f"{path.stem}-{cellsize}", "mdal")
+        layer = QgsMeshLayer(netcdf_path, f"{path.stem}", "mdal")
         indexes = layer.datasetGroupsIndexes()
 
         contour, start, stop, step = self.compute_widget.contouring()
@@ -204,9 +206,7 @@ class QgisTimmlWidget(QWidget):
             name = layer.datasetGroupMetadata(qgs_index).name()
             if "head_layer_" not in name:
                 continue
-            index_layer = QgsMeshLayer(
-                str(netcdf_path), f"{path.stem}-{cellsize}-{name}", "mdal"
-            )
+            index_layer = QgsMeshLayer(str(netcdf_path), f"{path.stem}-{name}", "mdal")
             renderer = index_layer.rendererSettings()
             renderer.setActiveScalarDatasetGroup(index)
 

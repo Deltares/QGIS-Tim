@@ -1,3 +1,4 @@
+import tempfile
 from pathlib import Path
 from typing import Tuple
 
@@ -5,9 +6,11 @@ from PyQt5.QtWidgets import (
     QCheckBox,
     QComboBox,
     QDoubleSpinBox,
+    QFileDialog,
     QGridLayout,
     QHBoxLayout,
     QLabel,
+    QLineEdit,
     QPushButton,
     QVBoxLayout,
     QWidget,
@@ -33,6 +36,7 @@ class ComputeWidget(QWidget):
         self.transient_combo_box.addItems(["Steady-state", "Transient"])
         self.transient_combo_box.currentTextChanged.connect(self.on_transient_changed)
         self.compute_button = QPushButton("Compute")
+        self.compute_button.clicked.connect(self.compute)
         self.cellsize_spin_box = QDoubleSpinBox()
         self.cellsize_spin_box.setMinimum(0.0)
         self.cellsize_spin_box.setMaximum(10_000.0)
@@ -40,7 +44,9 @@ class ComputeWidget(QWidget):
         self.cellsize_spin_box.setValue(25.0)
         self.domain_button.clicked.connect(self.domain)
         # self.mesh_checkbox = QCheckBox("Trimesh")
-        self.compute_button.clicked.connect(self.compute)
+        self.output_line_edit = QLineEdit()
+        self.output_button = QPushButton("Save as ...")
+        self.output_button.clicked.connect(self.set_output_path)
         self.contour_checkbox = QCheckBox("Contour")
         self.contour_button = QPushButton("Export contours")
         self.contour_button.clicked.connect(self.export_contours)
@@ -77,13 +83,15 @@ class ComputeWidget(QWidget):
         contour_row2.addWidget(self.contour_step_box)
         compute_grid.addLayout(contour_row, 1, 0)
         compute_grid.addLayout(contour_row2, 1, 1)
-        compute_grid.addWidget(self.transient_combo_box, 2, 0)
+        compute_grid.addWidget(self.transient_combo_box, 3, 0)
+        compute_grid.addWidget(self.output_line_edit, 2, 0)
+        compute_grid.addWidget(self.output_button, 2, 1)
         compute_row = QHBoxLayout()
         # compute_row.addWidget(self.mesh_checkbox)
         compute_row.addWidget(self.compute_button)
-        compute_grid.addLayout(compute_row, 2, 1)
-        compute_grid.addWidget(self.contour_layer, 3, 0)
-        compute_grid.addWidget(self.contour_button, 3, 1)
+        compute_grid.addLayout(compute_row, 3, 1)
+        compute_grid.addWidget(self.contour_layer, 4, 0)
+        compute_grid.addWidget(self.contour_button, 4, 1)
         compute_layout.addLayout(compute_grid)
         compute_layout.addStretch()
         self.setLayout(compute_layout)
@@ -130,6 +138,28 @@ class ComputeWidget(QWidget):
         renderer = layer_styling.contour_renderer()
         self.parent.add_layer(contour_layer, "output", renderer=renderer, on_top=True)
 
+    def set_output_path(self) -> None:
+        current = self.output_line_edit.text()
+        path, _ = QFileDialog.getSaveFileName(
+            self, "Save output as...", current, "*.nc"
+        )
+        if path != "":  # Empty string in case of cancel button press
+            self.output_line_edit.setText(path)
+            # Note: Qt does pretty good validity checking of the Path in the
+            # Dialog, there is no real need to validate path here.
+
+    def set_default_path(self, text: str) -> None:
+        """
+        Called when different dataset path is chosen.
+        """
+        if text is None:
+            return
+        path = Path(text)
+        parent = path.parent
+        stem = path.stem
+        outpath = (parent / stem).with_suffix(".nc").absolute()
+        self.output_line_edit.setText(str(outpath))
+
     def compute(self) -> None:
         """
         Run a TimML computation with the current state of the currently active
@@ -137,12 +167,14 @@ class ComputeWidget(QWidget):
         """
         active_elements = self.parent.active_elements()
         cellsize = self.cellsize_spin_box.value()
-        path = Path(self.parent.path).absolute()
+        inpath = Path(self.parent.path).absolute()
+        outpath = Path(self.output_line_edit.text()).absolute()
         mode = self.transient_combo_box.currentText().lower()
         as_trimesh = False  # self.mesh_checkbox.isChecked()
         data = {
             "operation": "compute",
-            "path": str(path),
+            "inpath": str(inpath),
+            "outpath": str(outpath),
             "cellsize": cellsize,
             "mode": mode,
             "active_elements": active_elements,
@@ -151,7 +183,7 @@ class ComputeWidget(QWidget):
         received = self.parent.execute(data)
 
         if received == "0":
-            self.parent.load_mesh_result(path, cellsize, as_trimesh)
+            self.parent.load_mesh_result(outpath, as_trimesh)
             # self.load_raster_result(path, cellsize)
 
     def domain(self) -> None:

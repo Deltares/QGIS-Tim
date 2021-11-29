@@ -37,7 +37,8 @@ class TimHandler(socketserver.BaseRequestHandler):
 
     def compute(
         self,
-        path: Union[pathlib.Path, str],
+        inpath: Union[pathlib.Path, str],
+        outpath: Union[pathlib.Path, str],
         mode: str,
         cellsize: float,
         active_elements: Dict[str, bool],
@@ -64,7 +65,7 @@ class TimHandler(socketserver.BaseRequestHandler):
             The result is written to a netCDF file. Its name is generated from
             the geopackage name, and the requested grid cell size.
         """
-        path = pathlib.Path(path)
+        path = pathlib.Path(inpath)
         timml_spec, ttim_spec = gistim.model_specification(path, active_elements)
         self.server.timml_model, _ = gistim.timml_elements.initialize_model(timml_spec)
         self.server.timml_model.solve()
@@ -74,7 +75,6 @@ class TimHandler(socketserver.BaseRequestHandler):
                 ttim_spec, self.server.timml_model
             )
 
-        name = path.stem
         extent, crs = gistim.gridspec(path, cellsize)
 
         if mode == "steady-state":
@@ -87,10 +87,6 @@ class TimHandler(socketserver.BaseRequestHandler):
                     self.server.timml_model, extent, cellsize
                 )
                 head = head.rio.write_crs(crs)
-                outpath = (
-                    path.parent / f"{name}-{cellsize}".replace(".", "_")
-                ).with_suffix(".nc")
-                head.to_netcdf(outpath)
                 ugrid_head = gistim.to_ugrid2d(head)
 
         elif mode == "transient":
@@ -109,10 +105,6 @@ class TimHandler(socketserver.BaseRequestHandler):
                     ttim_spec.temporal_settings["reference_date"].iloc[0],
                 )
                 head = head.rio.write_crs(crs)
-                outpath = (
-                    path.parent / f"{name}-{cellsize}".replace(".", "_")
-                ).with_suffix(".nc")
-                head.to_netcdf(outpath)
                 ugrid_head = gistim.to_ugrid2d(head)
 
         else:
@@ -120,11 +112,8 @@ class TimHandler(socketserver.BaseRequestHandler):
                 f'Mode should be "steady-state" or "transient". Received: {mode}'
             )
 
-        ugrid_outpath = (
-            path.parent / f"{name}-{cellsize}".replace(".", "_")
-        ).with_suffix(".ugrid.nc")
-        print("Writing result to:", ugrid_outpath)
-        ugrid_head.to_netcdf(ugrid_outpath)
+        print("Writing result to:", outpath)
+        ugrid_head.to_netcdf(outpath)
 
     def handle(self) -> None:
         """
@@ -143,7 +132,8 @@ class TimHandler(socketserver.BaseRequestHandler):
 
         if operation == "compute":
             self.compute(
-                path=data["path"],
+                inpath=data["inpath"],
+                outpath=data["outpath"],
                 cellsize=data["cellsize"],
                 mode=data["mode"],
                 active_elements=data["active_elements"],
