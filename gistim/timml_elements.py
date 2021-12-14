@@ -32,7 +32,15 @@ from .common import (
 def constant(spec: ElementSpecification) -> List[Dict[str, Any]]:
     firstrow = spec.dataframe.iloc[0]
     x, y = point_coordinates(firstrow)
-    return [{"xr": x, "yr": y}]
+    return [
+        {
+            "xr": x,
+            "yr": y,
+            "hr": firstrow["head"],
+            "layer": firstrow["layer"],
+            "label": firstrow["label"],
+            }
+    ]
 
 
 def uflow(spec: ElementSpecification) -> List[Dict[str, Any]]:
