@@ -2,7 +2,6 @@ import subprocess
 
 import geopandas as gpd
 import pytest
-import rioxarray
 import shapely.geometry as sg
 import xarray as xr
 

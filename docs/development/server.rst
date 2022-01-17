@@ -71,61 +71,16 @@ environment must be "activated". From the the `conda docs
     set arbitrary environment variables that may be necessary for their
     operation. You can also use the config API to set environment variables.
 
-So to activate an environment, we can call the activate script. However, this
-script will not run when called from the QGIS interpreter (via ``subprocess``).
-This effectively means that one cannot start the server via a QGIS plugin button
-via this activate script.
-
-To work around this, I've chosen to export the environmental variables from the
-conda installation, and store them in a file. These variables are exported during
-installation of ``gistim``, and will write a file to ``%APPDATA%`` (on Windows).
-
-In the ``setup.py``, you'll find:
-
-.. code:: Python
-
-    env_vars = {key: value for key, value in os.environ.items()}
-    with open(configdir / "environmental-variables.json", "w") as f:
-        f.write(json.dumps(env_vars))
-
-During installation, this exports all the environmental variabless (at the moment
-of installation) to a JSON file.
-
-In the project root, you'll also find an ``activate.py`` script:
-
-.. code:: Python
-
-    import json
-    import os
-    import subprocess
-    import sys
-    
-    env_vars_json = sys.argv[1]
-    interpreter = sys.argv[2]
-    port = sys.argv[3]
-    
-    with open(env_vars_json, "r") as f:
-        env_vars = json.loads(f.read())
-    
-    for key in os.environ:
-        os.environ.pop(key)
-    
-    for key, value in env_vars.items():
-        os.environ[key] = value
-
-    subprocess.call(f"{interpreter} -m gistim {port}")
-
 This is copied to the ``%APPDATA%`` directory as well. It is called by the
 QGIS interpreter every time before it attempts to start the conda interpreter.
 
 In overview:
 
-1. During installation of ``gistim``, the environmental variables are stored in
+1. During configuration of ``gistim``, the environmental variables are stored in
    a configuration file.
-2. A script is copied to the same directory. which removes existing environmental
-   variables, and sets the one from the file.
-3. When the server is started form QGIS, this activate removes existing environmental
-   variables, and sets the one from the file.
-4. Finally the conda interpreter is called to start up the ``TimServer``.
-5. After a little setup (a few seconds), the server is ready to receive calls
+2. When the server is started from QGIS, the environmental variables are loaded
+   and a new subprocess is started with these variables.
+3. Finally the external (conda) interpreter is called to start up the
+   ``TimServer``.
+4. After a little setup (a few seconds), the server is ready to receive calls
    from the QGIS plugin.

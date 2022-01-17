@@ -1,14 +1,13 @@
-********
-Qgis-Tim
-********
+QGIS Plugin
+===========
 
-Qgis-Tim is a QGIS plugin to facilitate creating input for TimML analytic
-element models.
+.. note::
 
-This section briefly discusses the plugin functionality.
+  These instructions are not fully up-to-date. The look of some menus and
+  tables has changed. The high level logic remains the same, however.
 
 Dataset
-=======
+-------
 
 Analytic element input is typically a collection of points, lines, and polygons.
 Qgis-Tim represent a single model with a single GeoPackage. To quote wikipedia:
@@ -31,7 +30,7 @@ GeoPackage. Changes are immediately written to the geopackage file, which is
 thereby always kept up to date.
 
 Styling layers
-==============
+--------------
 
 The different elements are represented as layers in the GeoPackage, and also as
 ordinary vector layers in QGIS. Consequently, all the standard QGIS
@@ -39,7 +38,7 @@ functionality works on them, and layers can be styled via the Layers Panel, by
 right-clicking on a layer, clicking Properties, and finding the Symbology menu.
 
 Deleting element layers
-=======================
+-----------------------
 
 Deleting layers from the Layers panel will not actually delete a layer from the
 geopackage. The Layers panel is purely a representation of the layers that are
@@ -60,7 +59,7 @@ Layer...".
   :target: _static/qgis-geopackage-delete-layer.png
 
 Elements
-========
+--------
 
 By clicking on the button of one the elements, an empty layer will be added to
 the geopackage. The layer will also be added to the Layers Panel.
@@ -76,7 +75,7 @@ form can be disabled via the QGIS settings as follows:
 ``Settings > Options > Digitizing > Feature Creation > Suppress attribute form pop-up after feature creation``
 
 Aquifer
--------
+~~~~~~~
 
 The aquifer and aquitard properties are stored in this layer. Note that TimML
 has multiple Model constructors: ``ModelMaq``, ``Model3D``, and ``Model``. They
@@ -144,7 +143,7 @@ The Aquifer has the following columns:
 * headtop: float, ``hstar`` and ``topboundary``
 
 Constant
---------
+~~~~~~~~
 
 The following columns which correspond with the following TimML
 keyword arguments:
@@ -155,7 +154,7 @@ keyword arguments:
 * label: str, ``label``
 
 UniformFlow
------------
+~~~~~~~~~~~
 
 The following columns which correspond with the following TimML
 keyword arguments:
@@ -166,7 +165,7 @@ keyword arguments:
 * label: str, ``label``
 
 CircularAreaSink
-----------------
+~~~~~~~~~~~~~~~~
 
 The following columns which correspond with the following TimML
 keyword arguments:
@@ -177,7 +176,7 @@ keyword arguments:
 ``xc``, ``yc``, and ``R`` (radius) are inferred from the geometry.
 
 Well
-----
+~~~~
 
 The following columns which correspond with the following TimML
 keyword arguments:
@@ -192,7 +191,7 @@ keyword arguments:
 ``xw`` and ``yw`` are inferred from the geometry.
 
 Headwell
---------
+~~~~~~~~
 
 The following columns which correspond with the following TimML
 keyword arguments:
@@ -207,7 +206,7 @@ keyword arguments:
 ``xw`` and ``yw`` are inferred from the geometry.
 
 PolygonInhom
-------------
+~~~~~~~~~~~~
 
 A polygon inhomogeneity is defined by two layers: a layer containing the vector
 geometry (timmlPolygonInhom), and an associated table containing the aquifer
@@ -307,7 +306,7 @@ HeadLineSinkString keyword arguments:
 ``xy`` is inferred from the geometry (row by row).
 
 LineSinkDitch
--------------
+~~~~~~~~~~~~~
 
 The following columns which correspond with the following TimML
 keyword arguments:
@@ -323,7 +322,7 @@ keyword arguments:
 ``xy`` is inferred from the geometry (row by row).
 
 LeakyLineDoublet
-----------------
+~~~~~~~~~~~~~~~~
 
 The following columns which correspond with the following TimML
 keyword arguments:
@@ -337,7 +336,7 @@ keyword arguments:
 ``xy`` is inferred from the geometry (row by row).
 
 ImpLineDoublet
---------------
+~~~~~~~~~~~~~~
 
 The following columns which correspond with the following TimML
 keyword arguments:
@@ -350,7 +349,7 @@ keyword arguments:
 ``xy`` is inferred from the geometry (row by row).
 
 Start TimServer
-===============
+---------------
 
 For a number of technical reasons, TimML does not run in the QGIS interpreter.
 Instead, a server-client approach is used, where the client (the plugin) asks
@@ -395,7 +394,7 @@ window, which shows some information about the current status of the server.
     Computation succesful
 
 Domain
-======
+------
 
 The domain button creates a rectangular polygon, with its corners on the current
 viewing extent of the QGIS map view. This polygon determines the area in which
@@ -408,7 +407,7 @@ of the rectangle corners. Note that only the extent (xmin, xmax, ymin, ymax) of
 the domain polygon is used; the exact shape of the polygon does not matter.
 
 Cellsize
-========
+--------
 
 Defines the cellsize of the computed result.
 
@@ -419,7 +418,7 @@ system is set to WGS84 (latitudes and longitudes), cellsize is interpreted in
 degrees.
 
 Compute
-=======
+-------
 
 Makes the call to the TimServer to compute heads.
 
@@ -429,5 +428,5 @@ within the most recently created Domain polygon, at a cellsize provided
 by the cellsize spinbox.
 
 The computation result will be written to a netCDF file, in the same location
-as the model geopackage. The cellsize is included in the filename. Every layer
-of the result is automatically added to the QGIS Map View.
+as the model geopackage. Every layer of the result is automatically added to
+the QGIS Map View.

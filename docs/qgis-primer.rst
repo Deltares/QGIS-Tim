@@ -1,9 +1,9 @@
-A QGIS Primer
-=============
+QGIS Primer
+===========
 
 There are a number of QGIS functionalities and settings to be aware of before
-you can effectively setup an analytic element model. I highly recommend
-reading through the steps below and to configure QGIS accordingly.
+you can effectively setup an analytic element model. The steps below make a
+number of suggestions.
 
 Setting the "Browser" and "Layers" panel
 ----------------------------------------
@@ -28,7 +28,7 @@ A checkbox can be found at ``View > Panels > Layers``.
 Setting an appropriate projection
 ---------------------------------
 
-Be aware:
+Note:
 
 * A PC monitor is generally a flat surface;
 * The earth is not a flat surface.
@@ -54,6 +54,9 @@ coordinate reference system.
 
 .. image:: _static/qgis-project-crs.png
   :target: _static/qgis-project-crs.png
+  
+You can also access this menu via a button in the bottom right of the main
+screen, which states the currently active CRS.
 
 Setting a basemap background
 ----------------------------

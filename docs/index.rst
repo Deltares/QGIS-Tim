@@ -1,80 +1,27 @@
-Welcome to Qgis-Tim's documentation!
-------------------------------------
-
-.. toctree::
-   :maxdepth: 2
-   :caption: Contents:
-
-
-User Guide
-----------
-
-.. toctree::
-   :maxdepth: 1
-   :hidden:
-   :caption: User Guide
-
-   installation
-   gistim
-   qgis-primer
-   qgis-tim
-
-* :doc:`installation`
-* :doc:`gistim`
-* :doc:`qgis-primer`
-* :doc:`qgis-tim`
-
-
-Examples
+QGIS-Tim
 --------
 
-.. toctree::
-   :maxdepth: 1
-   :hidden:
-   :caption: Examples
+QGIS-Tim consists of two Python components:
 
-   auto_examples/index
-   prob-toolkit
-
-* :doc:`auto_examples/index`
-* :doc:`prob-toolkit`
-
-
-API Reference & Help
---------------------
+* A QGIS plugin to provide a limited graphical interface to setup a `GeoPackage` _
+  containing the vector data required by a `TimML`_ and  analytic element model
+  and read results.
+* The ``gistim`` package which contains the functions required to transform a
+  GeoPackage into a TimML model. It is fully independent of the plugin, relying
+  on packages such as ``geopandas`` instead of QGIS functions. The utilities it
+  provides can be used independently of QGIS, in a fully scripted workflow.
+  
+These pages document their combined use.
 
 .. toctree::
-   :maxdepth: 1
+   :titlesonly:
    :hidden:
-   :caption: API Reference & Help
+   
+   installing
+   qgis-primer
+   qgis-tim
+   development/index
 
-   api
-   changelog
-
-* :doc:`api`
-* :doc:`changelog`
-
-
-Developer's Documentation
--------------------------
-
-.. toctree::
-   :maxdepth: 1
-   :hidden:
-   :caption: Developer Documentation
-
-   dev-server
-   dev-plugin
-
-More details about the implementation regarding interpreter communication can be
-found in :doc:`dev-server`.
-
-Some requirements for developing the plugin can be found in :doc:`dev-plugin`.
-
-
-Indices and tables
-------------------
-
-* :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`
+.. _TimML: https://github.com/mbakker7/timml
+.. _TTim: https://github.com/mbakker7/ttim
+.. _GeoPackage: https://www.geopackage.org

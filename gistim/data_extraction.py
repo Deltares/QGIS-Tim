@@ -9,11 +9,9 @@ ready made aquifer-aquitard parametrization.
 import pathlib
 from typing import List, Union
 
-import affine
 import geopandas as gpd
 import numpy as np
 import pandas as pd
-import rasterio
 import shapely.wkt
 import xarray as xr
 
@@ -81,103 +79,6 @@ def coord_reference(da_coord):
         xmax = float(x.max()) + 0.5 * abs(dx)
 
     return dx, xmin, xmax
-
-
-def spatial_reference(a):
-    """
-    Extracts spatial reference from DataArray.
-
-    If the DataArray coordinates are nonequidistant, dx and dy will be returned
-    as 1D ndarray instead of float.
-
-    Parameters
-    ----------
-    a : xarray.DataArray
-
-    Returns
-    --------------
-    tuple
-        (dx, xmin, xmax, dy, ymin, ymax)
-
-    """
-    dx, xmin, xmax = coord_reference(a["x"])
-    dy, ymin, ymax = coord_reference(a["y"])
-    return dx, xmin, xmax, dy, ymin, ymax
-
-
-def transform(a):
-    """
-    Extract the spatial reference information from the DataArray coordinates,
-    into an affine.Affine object for writing to e.g. rasterio supported formats.
-
-    Parameters
-    ----------
-    a : xarray.DataArray
-
-    Returns
-    -------
-    affine.Affine
-
-    """
-    dx, xmin, _, dy, _, ymax = spatial_reference(a)
-
-    def equidistant(dx, name):
-        if isinstance(dx, np.ndarray):
-            if np.unique(dx).size == 1:
-                return dx[0]
-            else:
-                raise ValueError(f"DataArray is not equidistant along {name}")
-        else:
-            return dx
-
-    dx = equidistant(dx, "x")
-    dy = equidistant(dy, "y")
-
-    if dx < 0.0:
-        raise ValueError("dx must be positive")
-    if dy > 0.0:
-        raise ValueError("dy must be negative")
-    return affine.Affine(dx, 0.0, xmin, 0.0, dy, ymax)
-
-
-def rasterize(geodataframe, like, fill, **kwargs):
-    """
-    Rasterize a geopandas GeoDataFrame onto the given
-    xarray coordinates.
-
-    Parameters
-    ----------
-    geodataframe : geopandas.GeoDataFrame
-    column : str, int, float
-        column name of geodataframe to burn into raster
-    like : xarray.DataArray
-        Example DataArray. The rasterized result will match the shape and
-        coordinates of this DataArray.
-    fill : float, int
-        Fill value for nodata areas. Optional, default value is np.nan.
-    kwargs : additional keyword arguments for rasterio.features.rasterize.
-        See: https://rasterio.readthedocs.io/en/stable/api/rasterio.features.html#rasterio.features.rasterize
-
-    Returns
-    -------
-    rasterized : xarray.DataArray
-        Vector data rasterized. Matches shape and coordinates of ``like``.
-    """
-    shapes = [geom for geom in geodataframe.geometry]
-    # shapes must be an iterable
-    try:
-        iter(shapes)
-    except TypeError:
-        shapes = (shapes,)
-
-    raster = rasterio.features.rasterize(
-        shapes,
-        out_shape=like.shape,
-        fill=fill,
-        transform=transform(like),
-        **kwargs,
-    )
-    return xr.DataArray(raster, like.coords, like.dims)
 
 
 def layer_statistics(path: Union[pathlib.Path, str], gdf: gpd.GeoDataFrame):

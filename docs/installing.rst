@@ -1,17 +1,5 @@
-Installation
-============
-
-This repository contains two Python packages:
-
-* ``./plugin`` contains the source code for a QGIS plugin. This plugin provides a
-  limited graphical interface to setup a
-  `GeoPackage <https://www.geopackage.org/>`_ containing the vector data required
-  by a `TimML <https://github.com/mbakker7/timml>`_ analytic element model and
-  read results.
-* ``./gistim`` contains the functions required to transform a GeoPackage into a
-  TimML model. It is fully independent of the plugin, relying on packages such
-  as `rasterio` and `geopandas` instead of QGIS functions. The utilities it
-  provides can be used independently of QGIS, in a fully scripted workflow.
+Installing
+==========
 
 A modern (>=3.0) QGIS installation is required. A basic QGIS installation (as
 can be gotten `here <https://qgis.org/en/site/>`_) suffices to run the plugin,
@@ -29,22 +17,22 @@ in a different interpreter. This requires:
 * `GeoPandas <https://geopandas.org/>`_
 * `Xarray <https://xarray.pydata.org/en/stable/>`_, which in turn requires numpy
   and pandas
-* `Rasterio <https://rasterio.readthedocs.io/en/latest/>`_
-* `rioxarray <https://corteva.github.io/rioxarray/stable/index.html>`_
 * `netCDF4 <https://unidata.github.io/netcdf4-python/netCDF4/index.html>`_
 
-Rasterio, rioxarray, and netCDF4 are optional dependencies but output options
-are severely limited without them. Both geopandas and rasterio requires GDAL,
-which is a heavy and complex binary dependency. It is highly recommended to
-install these packages via `conda` in a separate environment -- the
-specification is included in the `environment.yml` of this repository.
+Both geopandas and netCDF4 requires complex binary dependencies. It is highly
+recommended to install these packages via ``conda`` in a separate environment.
+See this environment specification:
+
+.. literalinclude:: ../environment.yml
+   :language: yaml
+   :caption: imod-environment.yml
 
 Installing the Python package
 -----------------------------
 
 The recommended way of installing is using conda, in a separate conda
-environment. This environment (called `tim`) can be setup by downloading the
-`environment.yml` and running the following command in the anaconda prompt:
+environment. This environment (called ``tim``) can be setup by downloading the
+``environment.yml`` and running the following command in the anaconda prompt:
 
 .. code-block:: console
 
@@ -57,7 +45,23 @@ command in the anaconda prompt:
 
     conda activate tim
 
-See the installation instruction below.
+Next, install ``gistim`` using pip:
+
+.. code-block::
+
+    pip install gistim
+
+Once this environment is activated and the package is installed, we can
+configure ``gistim`` so the QGIS plugin will be able to find it:
+
+.. code-block::
+
+    python -m gistim configure append
+
+This "appends" the current environment to your user settings (a directory in
+``%APPDATA`` on Windows, ``$HOME`` on Linux and macOS). After starting the
+plugin in QGIS, you will be able to choose this environment to calculate with
+TimML and TTim at the top of the plugin screen.
 
 Installing the plugin in QGIS
 -----------------------------
@@ -69,7 +73,7 @@ There are a few ways to install this plugin:
 
   ``c:\Users\{username}\AppData\Roaming\QGIS\QGIS3\profiles\default\python\plugins``
 
-  The location can be found in the QGIS GUI via: 
+  The location can be found in the QGIS GUI via:
 
   ``QGIS menu > Settings > User Profiles > Open Active Profile Folder``
 

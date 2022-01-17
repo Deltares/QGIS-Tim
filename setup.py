@@ -16,11 +16,11 @@ setup(
     test_suite="gistim/test",
     use_scm_version=True,
     setup_requires=["setuptools_scm"],
-    python_requires=">=3.6",
+    python_requires=">=3.7",
     install_requires=[
-        "affine",
         "geopandas",
         "matplotlib",
+        "netCDF4",
         "numba",
         "numpy",
         "pandas",
@@ -32,16 +32,10 @@ setup(
     extras_require={
         "dev": [
             "black",
-            "nbstripout",
             "pytest",
             "pytest-cov",
-            "pytest-benchmark",
             "sphinx",
-            "sphinx_rtd_theme",
-        ],
-        "optional": [
-            "rasterio>=1",
-            "netCDF4",
+            "pydata_sphinx_theme",
         ],
     },
     classifiers=[
@@ -52,8 +46,9 @@ setup(
         "Topic :: Scientific/Engineering :: Hydrology",
         "License :: OSI Approved :: MIT License",
         "Programming Language :: Python :: 3",
-        "Programming Language :: Python :: 3.6",
         "Programming Language :: Python :: 3.7",
+        "Programming Language :: Python :: 3.8",
+        "Programming Language :: Python :: 3.9",
         "Programming Language :: Python :: Implementation :: CPython",
     ],
     keywords="groundwater modeling",
