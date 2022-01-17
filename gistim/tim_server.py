@@ -4,8 +4,6 @@ import pathlib
 import socketserver
 from typing import Dict, Union
 
-import rioxarray
-
 import gistim
 
 

@@ -1,2 +1,0 @@
-groningen.gpkg filter=lfs diff=lfs merge=lfs -text
-regional-data-groningen.nc filter=lfs diff=lfs merge=lfs -text
