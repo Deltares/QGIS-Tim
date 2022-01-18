@@ -84,7 +84,6 @@ class TimHandler(socketserver.BaseRequestHandler):
                 head = gistim.timml_elements.headgrid(
                     self.server.timml_model, extent, cellsize
                 )
-                head = head.rio.write_crs(crs)
                 ugrid_head = gistim.to_ugrid2d(head)
 
         elif mode == "transient":
@@ -102,7 +101,6 @@ class TimHandler(socketserver.BaseRequestHandler):
                     ttim_spec.output_times,
                     ttim_spec.temporal_settings["reference_date"].iloc[0],
                 )
-                head = head.rio.write_crs(crs)
                 ugrid_head = gistim.to_ugrid2d(head)
 
         else:

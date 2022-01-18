@@ -2,7 +2,7 @@
 Geopackage management utilities.
 
 This module lightly wraps a few QGIS built in functions to:
-    
+
     * List the layers of a geopackage
     * Write a layer to a geopackage
     * Remove a layer from a geopackage
@@ -78,5 +78,5 @@ def remove_layer(path: str, layer: str) -> None:
     print(query)
     try:
         processing.run("native:spatialiteexecutesql", query)
-    except Exception as e:
+    except Exception:
         raise RuntimeError(f"Failed to remove layer with {query}")

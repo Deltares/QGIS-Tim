@@ -9,7 +9,7 @@ these elements, one row equals one element.
 
 For elements such as PolygonImhomogenities, this is not the case. Every geometry
 (a polygon) requires a table of its own. These tables are stored in associated
-tables; their association is by name. 
+tables; their association is by name.
 
 For transient (TTim) elements, the same is true: elements require an additional
 table for their timeseries data, which should require repeating the geometry

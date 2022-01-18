@@ -8,7 +8,6 @@ Python script.
 from typing import Any, Dict, List, Tuple
 
 import black
-import geopandas as gpd
 import numpy as np
 import timml
 import tqdm
@@ -39,7 +38,7 @@ def constant(spec: ElementSpecification) -> List[Dict[str, Any]]:
             "hr": firstrow["head"],
             "layer": firstrow["layer"],
             "label": firstrow["label"],
-            }
+        }
     ]
 
 
@@ -281,23 +280,6 @@ def headmesh(
     )
     uds["head"] = xr.DataArray(head, dims=("layer", "node"))
     return ugrid._unstack_layers(uds)
-
-
-def discharge(model: timml.Model, elements: Dict) -> Tuple[List[gpd.GeoDataFrame]]:
-    """
-    Extract the discharge for elements that have a discharge.
-
-    Do this twice: once for the integral elements, and once for the individual
-    line sections. Return this as two lists of geodataframes, which can be
-    written to geopackages.
-
-    Parameters
-    ---------
-    model: timml.Model
-    elements: dict
-    """
-
-    return f"head = model.headgrid(xg={xg}, yg={yg})"
 
 
 # Map the names of the elements to their constructors

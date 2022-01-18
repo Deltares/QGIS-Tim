@@ -2,20 +2,20 @@
 This module contains the classes to represent the TimML and TTim input layers.
 
 The classes specify:
-    
+
 * The (unabbreviated) name
 * The type of geometry (No geometry, point, linestring, polygon)
 * The required attributes of the attribute table
 
 They contain logic for setting up:
 
-* Simple input, requiring a single table, e.g. Uniform Flow or Constant 
+* Simple input, requiring a single table, e.g. Uniform Flow or Constant
 * Transient input, requiring two tables, one with geometry and steady-state
   properties, and one containing optional time series input e.g. Well, Head Line
   Sink.
 * Associated input, requiring two tables, one with geometry and one with input
   for layers, e.g. Polygon Inhomogeneity or Building Pit.
-  
+
 Each element is (optionally) represented in multiple places:
 
 * It always lives in a GeoPackage.
@@ -323,7 +323,7 @@ class Domain(TransientElement):
     def __init__(self, path: str, name: str):
         self._initialize(path, name)
         self.timml_name = f"timml {self.element_type}:Domain"
-        self.ttim_name = f"ttim Computation Times:Domain"
+        self.ttim_name = "ttim Computation Times:Domain"
 
     def renderer(self) -> QgsSingleSymbolRenderer:
         """
@@ -381,7 +381,7 @@ class Aquifer(TransientElement):
     def __init__(self, path: str, name: str):
         self._initialize(path, name)
         self.timml_name = f"timml {self.element_type}:Aquifer"
-        self.ttim_name = f"ttim Temporal Settings:Aquifer"
+        self.ttim_name = "ttim Temporal Settings:Aquifer"
 
     def write(self):
         self.timml_layer = geopackage.write_layer(

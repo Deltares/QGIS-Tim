@@ -220,7 +220,7 @@ class SelectionMapTool(QgsMapTool):
 def is_netcdf_layer(layer):
     if not (layer.type() == QgsMapLayerType.RasterLayer):
         return False
-    if not "NETCDF" in layer.name():
+    if "NETCDF" not in layer.name():
         return False
     return True
 

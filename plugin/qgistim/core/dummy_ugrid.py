@@ -11,7 +11,7 @@ This requires always carrying around a dummy netCDF file, or generating it
 with Python, then writing it. A netCDF is mostly easily generated using
 xarray, at the cost of xarray and netCDF4 as dependencies.
 
-Instead, this module contains the binary representation of a netCDF4 file 
+Instead, this module contains the binary representation of a netCDF4 file
 that has been generated with the following lines of code:
 
 ```python
