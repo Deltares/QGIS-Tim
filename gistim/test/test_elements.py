@@ -1,1 +1,5 @@
-import gistim  # noqa: F401
+import gistim
+
+
+def test_import():
+    assert gistim is not None
