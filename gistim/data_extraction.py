@@ -13,7 +13,7 @@ import affine
 import geopandas as gpd
 import numpy as np
 import pandas as pd
-import rasterio
+import rasterio.features
 import shapely.wkt
 import xarray as xr
 
