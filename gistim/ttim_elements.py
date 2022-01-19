@@ -14,9 +14,14 @@ import numpy as np
 import pandas as pd
 import timml
 import tqdm
-import ttim
 import xarray as xr
-from ttim.model import TimModel
+
+try:
+    import ttim
+    from ttim.model import TimModel
+except ImportError:
+    ttim = None
+    TimModel = None
 
 from . import ugrid
 from .common import (
@@ -271,15 +276,16 @@ def headmesh(
 
 
 # Map the names of the elements to their constructors
-MAPPING = {
-    "Circular Area Sink": (circareasink, ttim.CircAreaSink),
-    "Well": (well, ttim.Well),
-    "Head Well": (headwell, ttim.HeadWell),
-    "Head Line Sink": (headlinesink, ttim.HeadLineSinkString),
-    "Line Sink Ditch": (linesinkditch, ttim.LineSinkDitchString),
-    "Leaky Line Doublet": (leakylinedoublet, ttim.LeakyLineDoubletString),
-    "Impermeable Line Doublet": (implinedoublet, ttim.LeakyLineDoubletString),
-}
+if ttim is not None:
+    MAPPING = {
+        "Circular Area Sink": (circareasink, ttim.CircAreaSink),
+        "Well": (well, ttim.Well),
+        "Head Well": (headwell, ttim.HeadWell),
+        "Head Line Sink": (headlinesink, ttim.HeadLineSinkString),
+        "Line Sink Ditch": (linesinkditch, ttim.LineSinkDitchString),
+        "Leaky Line Doublet": (leakylinedoublet, ttim.LeakyLineDoubletString),
+        "Impermeable Line Doublet": (implinedoublet, ttim.LeakyLineDoubletString),
+    }
 
 
 def initialize_model(spec: TtimModelSpecification, timml_model) -> TimModel:
