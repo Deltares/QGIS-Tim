@@ -20,7 +20,7 @@ pages:
   stage: publish
   script:
   - tox -e docs
-  - mv .tox/docs/docs_out/ public/
+  - mv .tox/docs_out/ public/
   artifacts:
     paths:
     - public
