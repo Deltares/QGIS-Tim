@@ -92,7 +92,7 @@ class QgisTimmlWidget(QWidget):
     def selection_names(self):
         return self.dataset_widget.selection_names()
 
-    def execute(self, data: dict[str, str]) -> str:
+    def execute(self, data: Dict[str, str]) -> str:
         return self.interpreter_widget.execute(data)
 
     def add_element(self, element: Any):
