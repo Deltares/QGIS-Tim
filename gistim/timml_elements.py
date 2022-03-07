@@ -8,6 +8,7 @@ Python script.
 from typing import Any, Dict, List, Tuple
 
 import black
+import geopandas as gpd
 import numpy as np
 import timml
 import tqdm
@@ -51,6 +52,22 @@ def uflow(spec: ElementSpecification) -> List[Dict[str, Any]]:
             "label": row["label"],
         }
     ]
+
+
+def observation(spec: ElementSpecification) -> List[Dict[str, Any]]:
+    dataframe = spec.dataframe
+    X, Y = point_coordinates(dataframe)
+    kwargslist = []
+    kwargslist = []
+    for (row, x, y) in zip(dataframe.to_dict("records"), X, Y):
+        kwargslist.append(
+            {
+                "x": x,
+                "y": y,
+                "label": row["label"],
+            }
+        )
+    return kwargslist
 
 
 def well(spec: ElementSpecification) -> List[Dict[str, Any]]:
@@ -220,6 +237,26 @@ def validate(spec: TimmlModelSpecification) -> None:
     # TODO: more checks
 
 
+def head_observations(model: timml.Model, observations: Dict) -> gpd.GeoDataFrame:
+    heads = []
+    xx = []
+    yy = []
+    labels = []
+    for name, kwargs in observations.items():
+        x = kwargs["x"]
+        y = kwargs["y"]
+        heads.append(model.head(x=x, y=y))
+        xx.append(x)
+        yy.append(y)
+        labels.append(kwargs["label"])
+
+    d = {"geometry": gpd.points_from_xy(xx, yy), "label": labels}
+    for i, layerhead in enumerate(np.vstack(heads.T)):
+        d[f"head_layer{i}"] = layerhead
+
+    return gpd.GeoDataFrame(d)
+
+
 def headgrid(model: timml.Model, extent: Tuple[float], cellsize: float) -> xr.DataArray:
     """
     Compute the headgrid of the TimML model, and store the results
@@ -295,6 +332,7 @@ MAPPING = {
     "Leaky Line Doublet": (leakylinedoublet, timml.LeakyLineDoubletString),
     "Impermeable Line Doublet": (implinedoublet, timml.ImpLineDoubletString),
     "Building Pit": (buildingpit, timml.BuildingPit),
+    "Observation": (observation, None),
 }
 
 
@@ -325,6 +363,7 @@ def initialize_model(spec: TimmlModelSpecification) -> timml.Model:
     validate(spec)
     model = timml.ModelMaq(**aquifer_data(spec.aquifer))
     elements = {}
+    observations = {}
     for name, element_spec in spec.elements.items():
         if not element_spec.active:
             continue
@@ -333,10 +372,15 @@ def initialize_model(spec: TimmlModelSpecification) -> timml.Model:
         print(f"adding {name} as {elementtype}")
 
         try:
+
             f_to_kwargs, element = MAPPING[elementtype]
             for i, kwargs in enumerate(f_to_kwargs(element_spec)):
-                kwargs["model"] = model
-                elements[f"{name}_{i}"] = element(**kwargs)
+                if elementtype == "Observation":
+                    elements[f"{name}_{i}"] = kwargs
+                else:
+                    kwargs["model"] = model
+                    elements[f"{name}_{i}"] = element(**kwargs)
+
         except KeyError as e:
             msg = (
                 f'Invalid element specification "{elementtype}". '
@@ -344,7 +388,7 @@ def initialize_model(spec: TimmlModelSpecification) -> timml.Model:
             )
             raise KeyError(msg) from e
 
-    return model, elements
+    return model, elements, observations
 
 
 def convert_to_script(spec: TimmlModelSpecification) -> str:
@@ -352,6 +396,8 @@ def convert_to_script(spec: TimmlModelSpecification) -> str:
     Convert model specification to an equivalent Python script.
     """
     modelkwargs = dict_to_kwargs_code(aquifer_data(spec.aquifer))
+
+    observations = {}
     strings = [
         "from numpy import nan",
         "import numpy as np",
@@ -365,11 +411,14 @@ def convert_to_script(spec: TimmlModelSpecification) -> str:
         try:
             f_to_kwargs, element = MAPPING[elementtype]
             for i, kwargs in enumerate(f_to_kwargs(element_spec)):
-                kwargs["model"] = "model"
-                kwargs = dict_to_kwargs_code(kwargs)
-                strings.append(
-                    f"{sanitized(name)}_{i} = timml.{element.__name__}({kwargs})"
-                )
+                if elementtype == "Observation":
+                    observations[f"{observation}_{sanitized(name)}_{i}"] = kwargs
+                else:
+                    kwargs["model"] = "model"
+                    kwargs = dict_to_kwargs_code(kwargs)
+                    strings.append(
+                        f"{sanitized(name)}_{i} = timml.{element.__name__}({kwargs})"
+                    )
         except KeyError as e:
             msg = (
                 f'Invalid element specification "{elementtype}". '
@@ -381,5 +430,9 @@ def convert_to_script(spec: TimmlModelSpecification) -> str:
 
     xg, yg = headgrid_code(spec.domain)
     strings.append(f"head = model.headgrid(xg={xg}, yg={yg})")
+
+    # Add all the individual observation points
+    for name, kwargs in observations.items():
+        strings.append(f"{name} = model.head({kwargs})")
 
     return black.format_str("\n".join(strings), mode=black.FileMode())

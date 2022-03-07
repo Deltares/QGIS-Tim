@@ -80,6 +80,24 @@ def ttim_model(
     return data
 
 
+def observation(spec: TransientElementSpecification, _):
+    df = transient_dataframe(spec)
+    dataframe = spec.steady_spec.dataframe
+    X, Y = point_coordinates(dataframe)
+    kwargslist = []
+    for (row, x, y) in zip(dataframe.to_dict("records"), X, Y):
+        geometry_id = row["geometry_id"]
+        kwargslist.append(
+            {
+                "x": x,
+                "y": y,
+                "t": df.loc[geometry_id, "time"].values,
+                "label": row["label"],
+            }
+        )
+    return kwargslist
+
+
 def well(spec: TransientElementSpecification, tstart: float) -> List[Dict[str, Any]]:
     df = transient_dataframe(spec)
     dataframe = spec.steady_spec.dataframe
@@ -218,6 +236,41 @@ def circareasink(spec: TransientElementSpecification, tstart: float) -> None:
     return kwargslist
 
 
+def head_observations(
+    model: TimModel,
+    reference_date: pd.Timestamp,
+    observations: Dict,
+) -> gpd.GeoDataFrame:
+    # We'll duplicate all values in time, except head which is unique per time.
+    xx = []
+    yy = []
+    labels = []
+    heads = []
+    times = []
+
+    for name, kwargs in observations.items():
+        x = kwargs["x"]
+        y = kwargs["y"]
+        t = kwargs["t"]
+        time = pd.to_datetime(reference_date) + pd.to_timedelta(times, "D")
+
+        times.append(time)
+        heads.append(model.head(x=x, y=y, t=t))
+        xx.append(np.repeat(x, time.size))
+        yy.append(np.repeat(y, time.size))
+        labels.append(np.repeat(kwargs["label"], time.size))
+
+    d = {
+        "geometry": gpd.points_from_xy(np.hstack(xx), np.hstack(yy)),
+        "time": np.hstack(times),
+        "label": np.hstack(labels),
+    }
+    for i, layerhead in enumerate(np.vstack(heads).T):
+        d[f"head_layer{i}"] = layerhead
+
+    return gpd.GeoDataFrame(d)
+
+
 def headgrid(
     model: TimModel,
     extent: Tuple[float],
@@ -285,6 +338,7 @@ if ttim is not None:
         "Line Sink Ditch": (linesinkditch, ttim.LineSinkDitchString),
         "Leaky Line Doublet": (leakylinedoublet, ttim.LeakyLineDoubletString),
         "Impermeable Line Doublet": (implinedoublet, ttim.LeakyLineDoubletString),
+        "Observation": (observation, None),
     }
 
 
@@ -316,6 +370,7 @@ def initialize_model(spec: TtimModelSpecification, timml_model) -> TimModel:
         **ttim_model(spec.aquifer, spec.temporal_settings, timml_model)
     )
     elements = {}
+    observations = {}
     for name, element_spec in spec.elements.items():
         elementtype = element_spec.elementtype
         if not element_spec.active or elementtype not in MAPPING:
@@ -324,10 +379,13 @@ def initialize_model(spec: TtimModelSpecification, timml_model) -> TimModel:
         print(f"adding {name} as {elementtype}")
         f_to_kwargs, element = MAPPING[elementtype]
         for i, kwargs in enumerate(f_to_kwargs(element_spec, model.tstart)):
-            kwargs["model"] = model
-            elements[f"{name}_{i}"] = element(**kwargs)
+            if elementtype == "Observation":
+                observations[f"{name}_{i}"] = kwargs
+            else:
+                kwargs["model"] = model
+                elements[f"{name}_{i}"] = element(**kwargs)
 
-    return model, elements
+    return model, elements, observations
 
 
 def convert_to_script(spec: TtimModelSpecification) -> str:
@@ -336,6 +394,8 @@ def convert_to_script(spec: TtimModelSpecification) -> str:
     """
     modelkwargs = ttim_model(spec.aquifer, spec.temporal_settings, "model")
     strkwargs = dict_to_kwargs_code(modelkwargs)
+
+    observations = {}
     strings = ["import ttim", f"ttim_model = ttim.ModelMaq({strkwargs})"]
     for name, element_spec in spec.elements.items():
         elementtype = element_spec.elementtype
@@ -345,16 +405,23 @@ def convert_to_script(spec: TtimModelSpecification) -> str:
 
         f_to_kwargs, element = MAPPING[elementtype]
         for i, kwargs in enumerate(f_to_kwargs(element_spec, modelkwargs["tstart"])):
-            kwargs["model"] = "ttim_model"
-            kwargs = dict_to_kwargs_code(kwargs)
-            strings.append(
-                f"ttim_{sanitized(name)}_{i} = ttim.{element.__name__}({kwargs})"
-            )
+            if elementtype == "Observation":
+                observations[f"ttim_observation_{sanitized(name)}_{i}"] = kwargs
+            else:
+                kwargs["model"] = "ttim_model"
+                kwargs = dict_to_kwargs_code(kwargs)
+                strings.append(
+                    f"ttim_{sanitized(name)}_{i} = ttim.{element.__name__}({kwargs})"
+                )
 
     strings.append("ttim_model.solve()")
 
     xg, yg = headgrid_code(spec.domain)
     times = spec.output_times.tolist()
     strings.append(f"head = ttim_model.headgrid(xg={xg}, yg={yg}, t={times})")
+
+    # Add all the individual observation points
+    for name, kwargs in observations.items():
+        strings.append(f"{name} = ttim_model.head({kwargs})")
 
     return black.format_str("\n".join(strings), mode=black.FileMode())

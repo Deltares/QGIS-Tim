@@ -419,6 +419,21 @@ class Constant(Element):
         ]
 
 
+class Observation(TransientElement):
+    def _initialize(self, path, name):
+        self._initialize_default(path, name)
+        self.element_type = "Observation"
+        self.geometry_type = "Point"
+        self.timml_attributes = [
+            QgsField("label", QVariant.String),
+            QgsField("geometry_id", QVariant.Int),
+        ]
+        self.ttim_attributes = [
+            QgsField("geometry_id", QVariant.Int),
+            QgsField("time", QVariant.Double),
+        ]
+
+
 class Well(TransientElement):
     def _initialize(self, path, name):
         self._initialize_default(path, name)
@@ -682,6 +697,7 @@ ELEMENTS = {
     "Leaky Line Doublet": LeakyLineDoublet,
     "Polygon Inhomogeneity": PolygonInhomogeneity,
     "Building Pit": BuildingPit,
+    "Observation": Observation,
 }
 
 

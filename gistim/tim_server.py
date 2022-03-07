@@ -65,7 +65,11 @@ class TimHandler(socketserver.BaseRequestHandler):
         """
         path = pathlib.Path(inpath)
         timml_spec, ttim_spec = gistim.model_specification(path, active_elements)
-        self.server.timml_model, _ = gistim.timml_elements.initialize_model(timml_spec)
+        (
+            self.server.timml_model,
+            _,
+            observations,
+        ) = gistim.timml_elements.initialize_model(timml_spec)
         self.server.timml_model.solve()
 
         if mode == "transient":
@@ -76,6 +80,10 @@ class TimHandler(socketserver.BaseRequestHandler):
         extent, crs = gistim.gridspec(path, cellsize)
 
         if mode == "steady-state":
+            gdf_head = gistim.timml_elements.head_observations(
+                self.server.timml_model, observations
+            )
+
             if as_trimesh:
                 ugrid_head = gistim.timml_elements.headmesh(
                     self.server.timml_model, timml_spec, cellsize
@@ -84,11 +92,16 @@ class TimHandler(socketserver.BaseRequestHandler):
                 head = gistim.timml_elements.headgrid(
                     self.server.timml_model, extent, cellsize
                 )
-                ugrid_head = gistim.to_ugrid2d(head)
+            ugrid_head = gistim.to_ugrid2d(head)
 
         elif mode == "transient":
             print("Solving transient model")
             self.server.ttim_model.solve()
+
+            gdf_head = gistim.timml_elements.head_observations(
+                self.server.timml_model, observations
+            )
+
             if as_trimesh:
                 ugrid_head = gistim.ttim_elements.headmesh(
                     self.server.ttim_model, timml_spec, cellsize
@@ -110,6 +123,10 @@ class TimHandler(socketserver.BaseRequestHandler):
 
         print("Writing result to:", outpath)
         ugrid_head.to_netcdf(outpath)
+
+        if len(gdf_head.index) > 0:
+            vector_outpath = outpath.parent / f"{outpath.stem}-vector.gpkg"
+            gdf_head.to_file(vector_outpath, driver="GPKG")
 
     def handle(self) -> None:
         """
