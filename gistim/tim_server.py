@@ -4,7 +4,86 @@ import pathlib
 import socketserver
 from typing import Dict, Union
 
+import geopandas as gpd
+import xarray as xr
+
 import gistim
+
+
+def write_ugrid(
+    ugrid_head: xr.DataArray,
+    outpath: Union[pathlib.Path, str],
+) -> None:
+    print("Writing result to:", outpath)
+    ugrid_head.to_netcdf(outpath)
+
+
+def write_observations(
+    gdf_head: gpd.GeoDataFrame,
+    outpath: Union[pathlib.Path, str],
+) -> None:
+    if len(gdf_head.index) > 0:
+        outpath = pathlib.Path(outpath)
+        vector_outpath = outpath.parent / f"{outpath.stem}-vector.gpkg"
+        print("Writing observations to:", vector_outpath)
+        gdf_head.to_file(vector_outpath, driver="GPKG")
+
+
+def compute_steady(
+    inpath: Union[pathlib.Path, str],
+    outpath: Union[pathlib.Path, str],
+    cellsize: float,
+    active_elements: Dict[str, bool],
+    as_trimesh: bool = False,
+) -> None:
+    path = pathlib.Path(inpath)
+    timml_spec, ttim_spec = gistim.model_specification(path, active_elements)
+    timml_model, _, observations = gistim.timml_elements.initialize_model(timml_spec)
+    timml_model.solve()
+
+    gdf_head = gistim.timml_elements.head_observations(timml_model, observations)
+
+    extent, crs = gistim.gridspec(path, cellsize)
+    if as_trimesh:
+        ugrid_head = gistim.timml_elements.headmesh(timml_model, timml_spec, cellsize)
+    else:
+        head = gistim.timml_elements.headgrid(timml_model, extent, cellsize)
+        ugrid_head = gistim.to_ugrid2d(head)
+
+    write_ugrid(ugrid_head, outpath)
+    write_observations(gdf_head, outpath)
+
+
+def compute_transient(
+    inpath: Union[pathlib.Path, str],
+    outpath: Union[pathlib.Path, str],
+    cellsize: float,
+    active_elements: Dict[str, bool],
+    as_trimesh: bool = False,
+) -> None:
+    path = pathlib.Path(inpath)
+    timml_spec, ttim_spec = gistim.model_specification(path, active_elements)
+    timml_model, _, observations = gistim.timml_elements.initialize_model(timml_spec)
+    ttim_model, _ = gistim.ttim_elements.initialize_model(ttim_spec, timml_model)
+    timml_model.solve()
+    ttim_model.solve()
+
+    gdf_head = gistim.ttim_elements.head_observations(timml_model, observations)
+
+    extent, crs = gistim.gridspec(path, cellsize)
+    if as_trimesh:
+        ugrid_head = gistim.ttim_elements.headmesh(ttim_model, timml_spec, cellsize)
+    else:
+        head = gistim.ttim_elements.headgrid(
+            ttim_model,
+            extent,
+            cellsize,
+            ttim_spec.output_times,
+            ttim_spec.temporal_settings["reference_date"].iloc[0],
+        )
+        ugrid_head = gistim.to_ugrid2d(head)
+    write_ugrid(ugrid_head, outpath)
+    write_observations(gdf_head, outpath)
 
 
 class StatefulTimServer(socketserver.ThreadingTCPServer):
@@ -63,70 +142,14 @@ class TimHandler(socketserver.BaseRequestHandler):
             The result is written to a netCDF file. Its name is generated from
             the geopackage name, and the requested grid cell size.
         """
-        path = pathlib.Path(inpath)
-        timml_spec, ttim_spec = gistim.model_specification(path, active_elements)
-        (
-            self.server.timml_model,
-            _,
-            observations,
-        ) = gistim.timml_elements.initialize_model(timml_spec)
-        self.server.timml_model.solve()
-
-        if mode == "transient":
-            self.server.ttim_model, _ = gistim.ttim_elements.initialize_model(
-                ttim_spec, self.server.timml_model
-            )
-
-        extent, crs = gistim.gridspec(path, cellsize)
-
         if mode == "steady-state":
-            gdf_head = gistim.timml_elements.head_observations(
-                self.server.timml_model, observations
-            )
-
-            if as_trimesh:
-                ugrid_head = gistim.timml_elements.headmesh(
-                    self.server.timml_model, timml_spec, cellsize
-                )
-            else:
-                head = gistim.timml_elements.headgrid(
-                    self.server.timml_model, extent, cellsize
-                )
-            ugrid_head = gistim.to_ugrid2d(head)
-
+            compute_steady(inpath, outpath, cellsize, active_elements, as_trimesh)
         elif mode == "transient":
-            print("Solving transient model")
-            self.server.ttim_model.solve()
-
-            gdf_head = gistim.timml_elements.head_observations(
-                self.server.timml_model, observations
-            )
-
-            if as_trimesh:
-                ugrid_head = gistim.ttim_elements.headmesh(
-                    self.server.ttim_model, timml_spec, cellsize
-                )
-            else:
-                head = gistim.ttim_elements.headgrid(
-                    self.server.ttim_model,
-                    extent,
-                    cellsize,
-                    ttim_spec.output_times,
-                    ttim_spec.temporal_settings["reference_date"].iloc[0],
-                )
-                ugrid_head = gistim.to_ugrid2d(head)
-
+            compute_transient(inpath, outpath, cellsize, active_elements, as_trimesh)
         else:
             raise ValueError(
-                f'Mode should be "steady-state" or "transient". Received: {mode}'
+                f'Invalid mode: {mode}: should be "steady" or "transient".'
             )
-
-        print("Writing result to:", outpath)
-        ugrid_head.to_netcdf(outpath)
-
-        if len(gdf_head.index) > 0:
-            vector_outpath = outpath.parent / f"{outpath.stem}-vector.gpkg"
-            gdf_head.to_file(vector_outpath, driver="GPKG")
 
     def handle(self) -> None:
         """
