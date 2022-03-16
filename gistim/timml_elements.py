@@ -238,6 +238,9 @@ def validate(spec: TimmlModelSpecification) -> None:
 
 
 def head_observations(model: timml.Model, observations: Dict) -> gpd.GeoDataFrame:
+    if len(observations) == 0:
+        return gpd.GeoDataFrame()
+
     heads = []
     xx = []
     yy = []
@@ -251,7 +254,7 @@ def head_observations(model: timml.Model, observations: Dict) -> gpd.GeoDataFram
         labels.append(kwargs["label"])
 
     d = {"geometry": gpd.points_from_xy(xx, yy), "label": labels}
-    for i, layerhead in enumerate(np.vstack(heads.T)):
+    for i, layerhead in enumerate(np.vstack(heads).T):
         d[f"head_layer{i}"] = layerhead
 
     return gpd.GeoDataFrame(d)
@@ -376,7 +379,7 @@ def initialize_model(spec: TimmlModelSpecification) -> timml.Model:
             f_to_kwargs, element = MAPPING[elementtype]
             for i, kwargs in enumerate(f_to_kwargs(element_spec)):
                 if elementtype == "Observation":
-                    elements[f"{name}_{i}"] = kwargs
+                    observations[f"{name}_{i}"] = kwargs
                 else:
                     kwargs["model"] = model
                     elements[f"{name}_{i}"] = element(**kwargs)
