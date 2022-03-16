@@ -7,7 +7,7 @@ layers there.
 """
 import tempfile
 from pathlib import Path
-from typing import Any, Dict
+from typing import Any, Dict, Union
 
 from PyQt5.QtWidgets import QTabWidget, QTreeWidgetItem, QVBoxLayout, QWidget
 from qgis.core import QgsMapLayer, QgsMeshDatasetIndex, QgsMeshLayer, QgsProject
@@ -64,6 +64,11 @@ class QgisTimmlWidget(QWidget):
 
     # Inter-widget communication
     # --------------------------
+    def set_interpreter_interaction(self, value: bool) -> None:
+        self.compute_widget.compute_button.setEnabled(value)
+        self.dataset_widget.convert_button.setEnabled(value)
+        self.extraction_widget.extract_button.setEnabled(value)
+
     def on_transient_changed(self) -> None:
         transient = self.compute_widget.transient
         self.dataset_widget.on_transient_changed(transient)
@@ -185,9 +190,10 @@ class QgisTimmlWidget(QWidget):
             self.add_to_group(maplayer, destination, on_top)
         return maplayer
 
-    def load_mesh_result(self, path: Path, as_trimesh: bool) -> None:
+    def load_mesh_result(self, path: Union[Path, str], as_trimesh: bool) -> None:
+        path = Path(path)
+        # String for QGIS functions
         netcdf_path = str(path)
-
         # Loop through layers first. If the path already exists as a layer source, remove it.
         # Otherwise QGIS will not the load the new result (this feels like a bug?).
         for layer in QgsProject.instance().mapLayers().values():
