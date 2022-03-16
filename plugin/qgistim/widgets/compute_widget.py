@@ -1,3 +1,4 @@
+import datetime
 from pathlib import Path
 from typing import Tuple
 
@@ -15,15 +16,57 @@ from PyQt5.QtWidgets import (
     QWidget,
 )
 from qgis.core import (
+    QgsApplication,
     QgsMapLayerProxyModel,
     QgsMeshDatasetIndex,
+    QgsMessageLog,
     QgsPalLayerSettings,
+    QgsTask,
     QgsVectorLayerSimpleLabeling,
 )
 from qgis.gui import QgsMapLayerComboBox
 
 from ..core import layer_styling
 from ..core.processing import mesh_contours
+
+
+class ComputeTask(QgsTask):
+    def __init__(self, parent, data):
+        super().__init__("Tim computation", QgsTask.CanCancel)
+        self.parent = parent
+        self.data = data
+        self.starttime = None
+        self.exception = None
+
+    def run(self) -> bool:
+        self.starttime = datetime.datetime.now()
+        received = self.parent.execute(self.data)
+        if received == "0":
+            return True
+        else:
+            return False
+
+    def finished(self, result) -> None:
+        self.parent.set_interpreter_interaction(True)
+        if result:
+            runtime = datetime.datetime.now() - self.starttime
+            hours, remainder = divmod(runtime.total_seconds(), 3600)
+            minutes, seconds = divmod(remainder, 60)
+            QgsMessageLog.logMessage(
+                f"Tim computation completed in: {hours} hours, {minutes} minutes, "
+                f"and {round(seconds, 2)} seconds."
+            )
+            self.parent.load_mesh_result(
+                self.data["outpath"],
+                self.data["as_trimesh"],
+            )
+        else:
+            QgsMessageLog.logMessage(
+                "Tim computation has failed, check the interpreter window..."
+            )
+
+    def cancel(self) -> None:
+        return
 
 
 class ComputeWidget(QWidget):
@@ -179,11 +222,12 @@ class ComputeWidget(QWidget):
             "active_elements": active_elements,
             "as_trimesh": as_trimesh,
         }
-        received = self.parent.execute(data)
-
-        if received == "0":
-            self.parent.load_mesh_result(outpath, as_trimesh)
-            # self.load_raster_result(path, cellsize)
+        task = ComputeTask(self.parent, data)
+        self.parent.set_interpreter_interaction(False)
+        QgsApplication.taskManager().addTask(task)
+        # To run the tasks without the QGIS task manager:
+        # result = task.run()
+        # task.finished(result)
 
     def domain(self) -> None:
         """
