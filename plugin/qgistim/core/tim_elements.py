@@ -497,7 +497,7 @@ class LineSinkDitch(TransientElement):
         self.element_type = "Line Sink Ditch"
         self.geometry_type = "Linestring"
         self.timml_attributes = [
-            QgsField("discharge ", QVariant.Double),
+            QgsField("discharge", QVariant.Double),
             QgsField("resistance", QVariant.Double),
             QgsField("width", QVariant.Double),
             QgsField("order", QVariant.Int),
