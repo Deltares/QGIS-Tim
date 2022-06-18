@@ -9,7 +9,10 @@ from .ugrid import to_ugrid2d
 def convert_to_script(inpath: str, outpath: str) -> None:
     timml_spec, ttim_spec = model_specification(inpath, {})
     timml_script = timml_elements.convert_to_script(timml_spec)
-    ttim_script = ttim_elements.convert_to_script(ttim_spec)
+    if len(ttim_spec.temporal_settings) > 0:
+        ttim_script = ttim_elements.convert_to_script(ttim_spec)
+    else:
+        ttim_script = ""
 
     with open(outpath, "w") as f:
         f.write(timml_script)
