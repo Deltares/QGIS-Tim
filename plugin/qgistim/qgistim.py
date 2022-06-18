@@ -26,8 +26,8 @@ class QgisTimPlugin:
         self.tim_widget = None
         self.plugin_dir = Path(__file__).parent
         self.pluginIsActive = False
-        self.toolbar = iface.addToolBar(u"Qgis-Tim")
-        self.toolbar.setObjectName(u"Qgis-Tim")
+        self.toolbar = iface.addToolBar("Qgis-Tim")
+        self.toolbar.setObjectName("Qgis-Tim")
 
     def add_action(self, icon_name, text="", callback=None, add_to_menu=False):
         icon = QIcon(str(self.plugin_dir / icon_name))
