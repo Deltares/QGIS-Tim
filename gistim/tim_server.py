@@ -64,11 +64,15 @@ def compute_transient(
     path = pathlib.Path(inpath)
     timml_spec, ttim_spec = gistim.model_specification(path, active_elements)
     timml_model, _, observations = gistim.timml_elements.initialize_model(timml_spec)
-    ttim_model, _ = gistim.ttim_elements.initialize_model(ttim_spec, timml_model)
+    ttim_model, _, ttim_observations = gistim.ttim_elements.initialize_model(ttim_spec, timml_model)
     timml_model.solve()
     ttim_model.solve()
 
-    gdf_head = gistim.ttim_elements.head_observations(timml_model, observations)
+    gdf_head = gistim.ttim_elements.head_observations(
+        timml_model,
+        ttim_spec.temporal_settings["reference_date"].iloc[0],
+        observations,
+    )
 
     extent, crs = gistim.gridspec(path, cellsize)
     if as_trimesh:

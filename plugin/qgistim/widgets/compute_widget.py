@@ -224,10 +224,10 @@ class ComputeWidget(QWidget):
         }
         task = ComputeTask(self.parent, data)
         self.parent.set_interpreter_interaction(False)
-        QgsApplication.taskManager().addTask(task)
-        # To run the tasks without the QGIS task manager:
-        # result = task.run()
-        # task.finished(result)
+        #QgsApplication.taskManager().addTask(task)
+        #To run the tasks without the QGIS task manager:
+        result = task.run()
+        task.finished(result)
 
     def domain(self) -> None:
         """

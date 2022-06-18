@@ -242,6 +242,8 @@ def head_observations(
     observations: Dict,
 ) -> gpd.GeoDataFrame:
     # We'll duplicate all values in time, except head which is unique per time.
+    if len(observations) == 0:
+        return gpd.GeoDataFrame()
     xx = []
     yy = []
     labels = []
