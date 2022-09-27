@@ -216,8 +216,8 @@ def implinedoublet(spec: ElementSpecification) -> List[Dict[str, Any]]:
 def circareasink(spec: ElementSpecification) -> List[Dict[str, Any]]:
     kwargslist = []
     for row in spec.dataframe.to_dict("records"):
-        x, y = row.geometry.centroid.xy
-        coords = np.array(row.geometry.exterior.coords)
+        x, y = np.array(row["geometry"].centroid.coords)[0]
+        coords = np.array(row["geometry"].exterior.coords)
         x0, y0 = coords[0]
         radius = np.sqrt((x0 - x) ** 2 + (y0 - y) ** 2)
         kwargslist.append(
