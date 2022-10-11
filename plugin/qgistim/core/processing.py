@@ -8,6 +8,7 @@ import datetime
 from typing import NamedTuple
 
 import numpy as np
+import processing
 from PyQt5.QtCore import QDateTime, QVariant
 from qgis.analysis import QgsMeshContours
 from qgis.core import (
@@ -17,9 +18,45 @@ from qgis.core import (
     QgsMeshDatasetIndex,
     QgsMeshLayer,
     QgsMeshRendererScalarSettings,
+    QgsRasterLayer,
     QgsVectorLayer,
     QgsVectorLayerTemporalProperties,
 )
+
+
+def raster_steady_contours(
+    layer: QgsRasterLayer,
+    start: float,
+    stop: float,
+    step: float,
+) -> QgsVectorLayer:
+    # Seemingly cannot use stop in any way, unless filtering them away.
+    result = processing.run(
+        "gdal:contour",
+        {
+            "INPUT": layer,
+            "BAND": 1,
+            "INTERVAL": step,
+            "OFFSET": start,
+            "FIELD_NAME": "head",
+            "OUTPUT": "TEMPORARY_OUTPUT",
+        },
+    )
+
+    name = layer.name()
+    path = result["OUTPUT"]
+    vector_layer = QgsVectorLayer(path)
+
+    result = processing.run(
+        "qgis:extractbyexpression",
+        {
+            "INPUT": vector_layer,
+            "EXPRESSION": f'"head" >= {start} AND "head" <= {stop}',
+            "OUTPUT": "TEMPORARY_OUTPUT",
+        },
+    )
+    path = result["OUTPUT"]
+    return QgsVectorLayer(path, name)
 
 
 class SteadyContourData(NamedTuple):
