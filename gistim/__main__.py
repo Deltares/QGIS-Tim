@@ -3,9 +3,19 @@ import json
 import os
 import platform
 import sys
+from contextlib import contextmanager, redirect_stderr, redirect_stdout
+from os import devnull
 from pathlib import Path
 
 import gistim
+
+
+@contextmanager
+def suppress_stdout_stderr():
+    """A context manager that redirects stdout and stderr to devnull"""
+    with open(devnull, "w") as fnull:
+        with redirect_stderr(fnull) as err, redirect_stdout(fnull) as out:
+            yield (err, out)
 
 
 def write_json_stdout(data):
@@ -88,11 +98,15 @@ def serve(_) -> None:
         write_json_stdout({"success": True, "message": "Initialized Tim server"})
         for line in sys.stdin:
             try:
-                message = handle(line)
+                with suppress_stdout_stderr():
+                    message = handle(line)
                 response = {"success": True, "message": message}
+
             except Exception as error:
                 response = {"success": False, "message": str(error)}
+
             write_json_stdout(response)
+
     except Exception as error:
         write_json_stdout({"success": False, "message": str(error)})
 
