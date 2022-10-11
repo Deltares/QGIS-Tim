@@ -40,9 +40,9 @@ class BaseServerTask(QgsTask):
 
     def push_failure_message(self) -> None:
         if self.exception is not None:
-            message = str(self.exception)
+            message = "Exception: " + str(self.exception)
         elif self.response is not None:
-            message = self.response["message"]
+            message = "Response: " + self.response["message"]
         else:
             message = "Unknown failure"
 
