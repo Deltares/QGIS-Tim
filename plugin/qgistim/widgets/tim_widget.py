@@ -10,10 +10,18 @@ from pathlib import Path
 from typing import Any, Dict, Union
 
 from PyQt5.QtWidgets import QTabWidget, QTreeWidgetItem, QVBoxLayout, QWidget
-from qgis.core import QgsMapLayer, QgsMeshDatasetIndex, QgsMeshLayer, QgsProject
+from qgis.core import (
+    QgsMapLayer,
+    QgsMeshDatasetIndex,
+    QgsMeshLayer,
+    QgsProject,
+    QgsRasterLayer,
+)
 
+from ..core import geopackage
 from ..core.dummy_ugrid import write_dummy_ugrid
-from ..core.processing import mesh_contours
+from ..core.layer_styling import pseudocolor_renderer
+from ..core.processing import mesh_contours, raster_steady_contours
 from .compute_widget import ComputeWidget
 from .dataset_widget import DatasetWidget
 from .elements_widget import ElementsWidget
@@ -238,3 +246,42 @@ class QgisTimmlWidget(QWidget):
                     step=step,
                 )
                 self.add_layer(contour_layer, "output", on_top=True)
+
+        return
+
+    def load_raster_result(self, path: Union[Path, str]) -> None:
+        path = Path(path)
+        # String for QGIS functions
+        gpkg_path = str(path)
+        # Loop through layers first. If the path already exists as a layer source, remove it.
+        # Otherwise QGIS will not the load the new result (this feels like a bug?).
+        # for layer in QgsProject.instance().mapLayers().values():
+        #    if Path(gpkg_path) == Path(layer.source()):
+        #        QgsProject.instance().removeMapLayer(layer.id())
+
+        contour, start, stop, step = self.compute_widget.contouring()
+
+        renderer = None
+        for name in geopackage.layers(path):
+            if "head_layer_" not in name:
+                continue
+
+            layer = QgsRasterLayer(gpkg_path, name, "gdal")
+            # Create renderer based on first layer.
+            if renderer is None:
+                renderer = pseudocolor_renderer(
+                    layer, band=1, colormap="Plasma", nclass=10
+                )
+            self.add_layer(layer, "output", renderer)
+
+            if contour:
+                contour_layer = raster_steady_contours(
+                    layer=layer,
+                    name=name,
+                    start=start,
+                    stop=stop,
+                    step=step,
+                )
+                self.add_layer(contour_layer, "output", on_top=True)
+
+        return
