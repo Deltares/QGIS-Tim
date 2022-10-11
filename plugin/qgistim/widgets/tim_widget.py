@@ -6,7 +6,7 @@ connection to the QGIS Layers Panel, and ensures there is a group for the Tim
 layers there.
 """
 from pathlib import Path
-from typing import Any, Dict, Union
+from typing import Any, Dict
 
 from PyQt5.QtWidgets import QTabWidget, QTreeWidgetItem, QVBoxLayout, QWidget
 from qgis.core import QgsMapLayer, QgsProject
