@@ -22,16 +22,19 @@ from PyQt5.QtWidgets import (
     QWidget,
 )
 from qgis.core import (
+    QgsApplication,
     QgsGeometry,
     QgsLayerTreeGroup,
     QgsMapLayerType,
     QgsProject,
     QgsRasterLayer,
+    QgsTask,
     QgsWkbTypes,
 )
 from qgis.gui import QgsMapTool, QgsRubberBand
 
 from ..core import layer_styling
+from ..core.task import BaseServerTask
 
 RUBBER_BAND_COLOR = QColor(Qt.yellow)
 
@@ -217,6 +220,12 @@ class SelectionMapTool(QgsMapTool):
         # self.uc.bar_info("Selection created")
 
 
+class ExtractTask(BaseServerTask):
+    @property
+    def task_description(self):
+        return "extracting data"
+
+
 def is_netcdf_layer(layer):
     if not (layer.type() == QgsMapLayerType.RasterLayer):
         return False
@@ -230,6 +239,8 @@ class DataExtractionWidget(QWidget):
         super(DataExtractionWidget, self).__init__(parent)
         self.parent = parent
         self.canvas = parent.iface.mapCanvas()
+        self.start_task = None
+        self.extract_task = None
         layout = QVBoxLayout()
         netcdf_row = QHBoxLayout()
         extraction_row = QHBoxLayout()
@@ -310,4 +321,12 @@ class DataExtractionWidget(QWidget):
             "outpath": outpath,
             "wkt_geometry": wkts,
         }
-        self.parent.execute(data)
+
+        self.extract_task = ExtractTask(self, data)
+        self.start_task = self.parent.start_interpreter_task()
+        if self.start_task is not None:
+            self.extract_task.addSubTask(
+                self.start_task, [], QgsTask.ParentDependsOnSubTask
+            )
+        self.parent.set_interpreter_interaction(False)
+        QgsApplication.taskManager().addTask(self.extract_task)

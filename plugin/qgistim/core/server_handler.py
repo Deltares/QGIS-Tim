@@ -1,6 +1,8 @@
 """
 This module contains the logic for starting, communicating with, and killing a
 separate (conda) interpreter, which is running TimML and TTim.
+
+For thread safety: DO NOT INCLUDE QGIS CALLS HERE.
 """
 import json
 import os

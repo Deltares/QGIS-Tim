@@ -19,7 +19,6 @@ from qgis.core import (
     QgsApplication,
     QgsMapLayerProxyModel,
     QgsMeshDatasetIndex,
-    QgsMessageLog,
     QgsPalLayerSettings,
     QgsTask,
     QgsVectorLayerSimpleLabeling,
@@ -28,41 +27,37 @@ from qgis.gui import QgsMapLayerComboBox
 
 from ..core import layer_styling
 from ..core.processing import mesh_contours
+from ..core.task import BaseServerTask
 
 
-class ComputeTask(QgsTask):
-    def __init__(self, parent, data):
-        super().__init__("Tim computation", QgsTask.CanCancel)
-        self.parent = parent
-        self.data = data
-        self.starttime = None
-        self.exception = None
+class ComputeTask(BaseServerTask):
+    @property
+    def task_description(self):
+        return "Tim computation"
 
-    def run(self) -> bool:
+    def run(self):
         self.starttime = datetime.datetime.now()
-        return self.parent.execute(self.data)
+        return super().run()
 
-    def finished(self, result) -> None:
-        self.parent.set_interpreter_interaction(True)
+    def success_message(self):
+        runtime = datetime.datetime.now() - self.starttime
+        hours, remainder = divmod(runtime.total_seconds(), 3600)
+        minutes, seconds = divmod(remainder, 60)
+        return (
+            f"Tim computation completed in: {hours} hours, {minutes} minutes, "
+            f"and {round(seconds, 2)} seconds."
+        )
+
+    def finished(self, result):
+        self.parent.parent.set_interpreter_interaction(True)
         if result:
-            runtime = datetime.datetime.now() - self.starttime
-            hours, remainder = divmod(runtime.total_seconds(), 3600)
-            minutes, seconds = divmod(remainder, 60)
-            QgsMessageLog.logMessage(
-                f"Tim computation completed in: {hours} hours, {minutes} minutes, "
-                f"and {round(seconds, 2)} seconds."
-            )
-            self.parent.load_mesh_result(
+            self.push_success_message()
+            self.parent.parent.load_mesh_result(
                 self.data["outpath"],
                 self.data["as_trimesh"],
             )
         else:
-            QgsMessageLog.logMessage(
-                "Tim computation has failed, check the interpreter window..."
-            )
-        return
-
-    def cancel(self) -> None:
+            self.push_failure_message()
         return
 
 
@@ -70,6 +65,7 @@ class ComputeWidget(QWidget):
     def __init__(self, parent=None):
         super(ComputeWidget, self).__init__(parent)
         self.compute_task = None
+        self.start_task = None
         self.parent = parent
         self.domain_button = QPushButton("Domain")
         self.transient_combo_box = QComboBox()
@@ -226,12 +222,14 @@ class ComputeWidget(QWidget):
         # To run the tasks without the QGIS task manager:
         # result = task.run()
         # task.finished(result)
-        self.compute_task = ComputeTask(self.parent, data)
-        self.parent.set_interpreter_interaction(False)
 
-        start_task = self.parent.start_interpreter_task()
-        if start_task is not None:
-            self.compute_task.addSubTask(start_task, [], QgsTask.ParentDependsOnSubTask)
+        self.compute_task = ComputeTask(self, data)
+        self.start_task = self.parent.start_interpreter_task()
+        if self.start_task is not None:
+            self.compute_task.addSubTask(
+                self.start_task, [], QgsTask.ParentDependsOnSubTask
+            )
+        self.parent.set_interpreter_interaction(False)
         QgsApplication.taskManager().addTask(self.compute_task)
 
     def domain(self) -> None:

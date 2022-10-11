@@ -1,37 +1,29 @@
 import json
-from typing import Dict, Union
+from typing import Any, Dict, Union
 
 from PyQt5.QtWidgets import QComboBox, QHBoxLayout, QPushButton, QVBoxLayout, QWidget
-from qgis.core import Qgis, QgsApplication, QgsMessageLog, QgsTask
+from qgis.core import QgsApplication
 
 from ..core.server_handler import ServerHandler
+from ..core.task import BaseServerTask
 
 
-class StartTask(QgsTask):
-    def __init__(self, parent, interpreter):
-        super().__init__("Start Tim interpreter", QgsTask.CanCancel)
-        self.parent = parent
-        self.interpreter = interpreter
-        self.exception = None
-
-    def finished(self, result) -> None:
-        if not result:
-            QgsMessageLog.logMessage(
-                f"Could not start Python intepreter:\n{self.exception}"
-            )
-        self.parent.start_task = None
-        return
+class StartTask(BaseServerTask):
+    @property
+    def task_description(self):
+        return "starting server"
 
     def run(self):
         try:
-            self.parent.server_handler.start_server(self.interpreter)
+            self.response = self.parent.server_handler.start_server(
+                self.data["interpreter"]
+            )
+            if not self.response["success"]:
+                return False
             return True
         except Exception as exception:
             self.exception = exception
             return False
-
-    def cancel(self) -> None:
-        return
 
 
 class InterpreterWidget(QWidget):
@@ -63,7 +55,7 @@ class InterpreterWidget(QWidget):
     def start_interpreter_task(self) -> Union[StartTask, None]:
         if not self.server_handler.alive():
             interpreter = self.interpreter_combo_box.currentText()
-            self.start_task = StartTask(self, interpreter)
+            self.start_task = StartTask(self, {"interpreter": interpreter})
             return self.start_task
         else:
             return None
@@ -77,18 +69,9 @@ class InterpreterWidget(QWidget):
             self.server_handler.kill()
         return
 
-    def execute(self, data: Dict[str, str]) -> bool:
+    def execute(self, data: Dict[str, str]) -> Dict[str, Any]:
         """
         Execute a command, and check whether it executed succesfully.
         """
         response = self.server_handler.send(data)
-        if response["success"]:
-            return True
-        else:
-            message = response["message"]
-            self.parent.iface.messageBar().pushMessage(
-                "Error",
-                f"Server failed to execute task. Server error:\n{message}",
-                level=Qgis.Critical,
-            )
-            return False
+        return response
