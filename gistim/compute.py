@@ -1,11 +1,9 @@
-import json
-import os
 import pathlib
 from typing import Dict, Union
 
 import geopandas as gpd
 import numpy as np
-import rioxarray as xr
+import rioxarray  # noqa # pylint: disable=unused-import
 import xarray as xr
 
 import gistim

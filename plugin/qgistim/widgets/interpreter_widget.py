@@ -1,4 +1,3 @@
-import json
 from typing import Any, Dict, Union
 
 from PyQt5.QtWidgets import QComboBox, QHBoxLayout, QPushButton, QVBoxLayout, QWidget

@@ -11,11 +11,13 @@ from qgis.core import (
     QgsColorRampShader,
     QgsFillSymbol,
     QgsLineSymbol,
+    QgsPalLayerSettings,
     QgsRasterBandStats,
     QgsRasterShader,
     QgsSingleBandPseudoColorRenderer,
     QgsSingleSymbolRenderer,
     QgsStyle,
+    QgsVectorLayerSimpleLabeling,
 )
 
 
@@ -103,3 +105,12 @@ def contour_renderer() -> QgsSingleSymbolRenderer:
         }
     )
     return QgsSingleSymbolRenderer(symbol)
+
+
+def contour_labels():
+    pal_layer = QgsPalLayerSettings()
+    pal_layer.fieldName = "head"
+    pal_layer.enabled = True
+    pal_layer.placement = QgsPalLayerSettings.Line
+    labels = QgsVectorLayerSimpleLabeling(pal_layer)
+    return labels

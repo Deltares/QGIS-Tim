@@ -5,23 +5,12 @@ It ensures the underlying widgets can talk to each other.  It also manages the
 connection to the QGIS Layers Panel, and ensures there is a group for the Tim
 layers there.
 """
-import tempfile
 from pathlib import Path
-from typing import Any, Dict, Union
+from typing import Any, Dict
 
 from PyQt5.QtWidgets import QTabWidget, QTreeWidgetItem, QVBoxLayout, QWidget
-from qgis.core import (
-    QgsMapLayer,
-    QgsMeshDatasetIndex,
-    QgsMeshLayer,
-    QgsProject,
-    QgsRasterLayer,
-)
+from qgis.core import QgsMapLayer, QgsProject
 
-from ..core import geopackage
-from ..core.dummy_ugrid import write_dummy_ugrid
-from ..core.layer_styling import pseudocolor_renderer
-from ..core.processing import mesh_contours, raster_steady_contours
 from .compute_widget import ComputeWidget
 from .dataset_widget import DatasetWidget
 from .elements_widget import ElementsWidget
@@ -36,8 +25,6 @@ class QgisTimmlWidget(QWidget):
         super(QgisTimmlWidget, self).__init__(parent)
 
         self.iface = iface
-        self.dummy_ugrid_path = Path(tempfile.mkdtemp()) / "qgistim-dummy-ugrid.nc"
-        write_dummy_ugrid(self.dummy_ugrid_path)
 
         self.extraction_widget = DataExtractionWidget(self)
         self.dataset_widget = DatasetWidget(self)
@@ -200,88 +187,3 @@ class QgisTimmlWidget(QWidget):
         if destination is not None:
             self.add_to_group(maplayer, destination, on_top)
         return maplayer
-
-    def load_mesh_result(self, path: Union[Path, str], as_trimesh: bool) -> None:
-        path = Path(path)
-        # String for QGIS functions
-        netcdf_path = str(path)
-        # Loop through layers first. If the path already exists as a layer source, remove it.
-        # Otherwise QGIS will not the load the new result (this feels like a bug?).
-        for layer in QgsProject.instance().mapLayers().values():
-            if Path(netcdf_path) == Path(layer.source()):
-                QgsProject.instance().removeMapLayer(layer.id())
-        # Ensure the file is properly released by loading a dummy
-        QgsMeshLayer(str(self.dummy_ugrid_path), "", "mdal")
-
-        layer = QgsMeshLayer(netcdf_path, f"{path.stem}", "mdal")
-        indexes = layer.datasetGroupsIndexes()
-
-        contour, start, stop, step = self.compute_widget.contouring()
-
-        for index in indexes:
-            qgs_index = QgsMeshDatasetIndex(group=index, dataset=0)
-            name = layer.datasetGroupMetadata(qgs_index).name()
-            if "head_layer_" not in name:
-                continue
-            index_layer = QgsMeshLayer(str(netcdf_path), f"{path.stem}-{name}", "mdal")
-            renderer = index_layer.rendererSettings()
-            renderer.setActiveScalarDatasetGroup(index)
-
-            if not as_trimesh:
-                scalar_settings = renderer.scalarSettings(index)
-                # Set renderer to DataResamplingMethod.None = 0
-                scalar_settings.setDataResamplingMethod(0)
-                renderer.setScalarSettings(index, scalar_settings)
-
-            index_layer.setRendererSettings(renderer)
-            self.add_layer(index_layer, "output")
-
-            if contour:
-                contour_layer = mesh_contours(
-                    layer=index_layer,
-                    index=index,
-                    name=name,
-                    start=start,
-                    stop=stop,
-                    step=step,
-                )
-                self.add_layer(contour_layer, "output", on_top=True)
-
-        return
-
-    def load_raster_result(self, path: Union[Path, str]) -> None:
-        path = Path(path)
-        # String for QGIS functions
-        gpkg_path = str(path)
-        # Loop through layers first. If the path already exists as a layer source, remove it.
-        # Otherwise QGIS will not the load the new result (this feels like a bug?).
-        # for layer in QgsProject.instance().mapLayers().values():
-        #    if Path(gpkg_path) == Path(layer.source()):
-        #        QgsProject.instance().removeMapLayer(layer.id())
-
-        contour, start, stop, step = self.compute_widget.contouring()
-
-        renderer = None
-        for name in geopackage.layers(path):
-            if "head_layer_" not in name:
-                continue
-
-            layer = QgsRasterLayer(gpkg_path, name, "gdal")
-            # Create renderer based on first layer.
-            if renderer is None:
-                renderer = pseudocolor_renderer(
-                    layer, band=1, colormap="Plasma", nclass=10
-                )
-            self.add_layer(layer, "output", renderer)
-
-            if contour:
-                contour_layer = raster_steady_contours(
-                    layer=layer,
-                    name=name,
-                    start=start,
-                    stop=stop,
-                    step=step,
-                )
-                self.add_layer(contour_layer, "output", on_top=True)
-
-        return
