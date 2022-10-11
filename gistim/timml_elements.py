@@ -372,7 +372,7 @@ def initialize_model(spec: TimmlModelSpecification) -> timml.Model:
             continue
 
         elementtype = element_spec.elementtype
-        print(f"adding {name} as {elementtype}")
+        # print(f"adding {name} as {elementtype}")
 
         try:
 
@@ -409,7 +409,7 @@ def convert_to_script(spec: TimmlModelSpecification) -> str:
     ]
     for name, element_spec in spec.elements.items():
         elementtype = element_spec.elementtype
-        print(f"adding {name} as {elementtype}")
+        # print(f"adding {name} as {elementtype}")
 
         try:
             f_to_kwargs, element = MAPPING[elementtype]

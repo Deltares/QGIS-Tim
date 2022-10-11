@@ -40,11 +40,7 @@ class ComputeTask(QgsTask):
 
     def run(self) -> bool:
         self.starttime = datetime.datetime.now()
-        received = self.parent.execute(self.data)
-        if received == "0":
-            return True
-        else:
-            return False
+        return self.parent.execute(self.data)
 
     def finished(self, result) -> None:
         self.parent.set_interpreter_interaction(True)
@@ -64,6 +60,7 @@ class ComputeTask(QgsTask):
             QgsMessageLog.logMessage(
                 "Tim computation has failed, check the interpreter window..."
             )
+        return
 
     def cancel(self) -> None:
         return
@@ -72,6 +69,7 @@ class ComputeTask(QgsTask):
 class ComputeWidget(QWidget):
     def __init__(self, parent=None):
         super(ComputeWidget, self).__init__(parent)
+        self.compute_task = None
         self.parent = parent
         self.domain_button = QPushButton("Domain")
         self.transient_combo_box = QComboBox()
@@ -159,7 +157,6 @@ class ComputeWidget(QWidget):
         qgs_index = QgsMeshDatasetIndex(group=index, dataset=0)
         name = layer.datasetGroupMetadata(qgs_index).name()
         start, stop, step = self.contour_range()
-        print("exporting_contours", start, stop, step)
         contour_layer = mesh_contours(
             layer=layer,
             index=index,
@@ -222,12 +219,20 @@ class ComputeWidget(QWidget):
             "active_elements": active_elements,
             "as_trimesh": as_trimesh,
         }
-        task = ComputeTask(self.parent, data)
-        self.parent.set_interpreter_interaction(False)
-        QgsApplication.taskManager().addTask(task)
+        # https://gis.stackexchange.com/questions/296175/issues-with-qgstask-and-task-manager
+        # It seems the task goes awry when not associated with a Python object!
+        # -- we just assign it to the widget here.
+        #
         # To run the tasks without the QGIS task manager:
         # result = task.run()
         # task.finished(result)
+        self.compute_task = ComputeTask(self.parent, data)
+        self.parent.set_interpreter_interaction(False)
+
+        start_task = self.parent.start_interpreter_task()
+        if start_task is not None:
+            self.compute_task.addSubTask(start_task, [], QgsTask.ParentDependsOnSubTask)
+        QgsApplication.taskManager().addTask(self.compute_task)
 
     def domain(self) -> None:
         """

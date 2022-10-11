@@ -8,6 +8,12 @@ from pathlib import Path
 import gistim
 
 
+def write_json_stdout(data):
+    sys.stdout.write(json.dumps(data))
+    sys.stdout.write("\n")
+    sys.stdout.flush()
+
+
 def configure(args) -> None:
     """
     Write all the environmental variables so the QGIS interpreter
@@ -32,19 +38,63 @@ def configure(args) -> None:
         f.write(json.dumps(content))
 
 
-def serve(args) -> None:
+def handle(line) -> None:
+    data = json.loads(line)
+    # print("JSON received:")
+    # print(json.dumps(data, indent=4))
+
+    operation = data.pop("operation")
+
+    if operation == "compute":
+        gistim.compute(
+            inpath=data["inpath"],
+            outpath=data["outpath"],
+            cellsize=data["cellsize"],
+            mode=data["mode"],
+            active_elements=data["active_elements"],
+            as_trimesh=data["as_trimesh"],
+        )
+        response = "Computation of {inpath} to {outpath}".format(**data)
+    elif operation == "convert":
+        inpath = data["inpath"]
+        outpath = data["outpath"]
+        gistim.convert_to_script(inpath, outpath)
+        response = "Conversion of {inpath} to {outpath}".format(**data)
+    elif operation == "extract":
+        inpath = data["inpath"]
+        outpath = data["outpath"]
+        wkt_geometry = data["wkt_geometry"].split(";")
+        gistim.data_extraction.netcdf_to_table(
+            inpath=inpath,
+            outpath=outpath,
+            wkt_geometry=wkt_geometry,
+        )
+        response = "Extraction of {inpath} to {outpath}".format(**data)
+    elif operation == "process_ID":
+        response = os.getpid()
+    else:
+        response = (
+            'Invalid operation. Valid options are: "compute", "convert", "process_ID".'
+        )
+
+    return response
+
+
+def serve(_) -> None:
     """
     Spin up a process listening for calls messages from the QGIS plugin.
     """
-    HOST = "localhost"
-    PORT = args.port[0]
-    print(f"Starting TimServer on localhost, port: {PORT}")
-    print(f"Process ID: {os.getpid()}")
-    # Create the server, binding to localhost on port 9999
-    with gistim.StatefulTimServer((HOST, PORT), gistim.TimHandler) as server:
-        # Activate the server; this will keep running until you
-        # interrupt the program with Ctrl-C
-        server.serve_forever()
+    try:
+        write_json_stdout({"success": True, "message": "Initialized Tim server"})
+        for line in sys.stdin:
+            try:
+                message = handle(line)
+                response = {"success": True, "message": message}
+            except Exception as error:
+                response = {"success": False, "message": str(error)}
+            write_json_stdout(response)
+    except Exception as error:
+        write_json_stdout({"success": False, "message": str(error)})
 
 
 def extract(args) -> None:
@@ -80,12 +130,6 @@ if __name__ == "__main__":
 
     # Serve has a single argument: the port number
     parser_serve.set_defaults(func=serve)
-    parser_serve.add_argument(
-        "port",
-        type=int,
-        nargs=1,
-        help="localhost PORT number",
-    )
 
     parser_extract.set_defaults(func=extract)
     parser_extract.add_argument("inpath", type=str, nargs=1, help="inpath")

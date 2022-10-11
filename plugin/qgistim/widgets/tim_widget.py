@@ -39,13 +39,13 @@ class QgisTimmlWidget(QWidget):
 
         # Layout
         self.layout = QVBoxLayout()
-        self.layout.addWidget(self.interpreter_widget)
         self.tabwidget = QTabWidget()
         self.layout.addWidget(self.tabwidget)
         self.tabwidget.addTab(self.extraction_widget, "Extract")
         self.tabwidget.addTab(self.dataset_widget, "GeoPackage")
         self.tabwidget.addTab(self.elements_widget, "Elements")
         self.tabwidget.addTab(self.compute_widget, "Compute")
+        self.layout.addWidget(self.interpreter_widget)
         self.setLayout(self.layout)
 
         # Default to the GeoPackage tab
@@ -64,6 +64,9 @@ class QgisTimmlWidget(QWidget):
 
     # Inter-widget communication
     # --------------------------
+    def start_interpreter_task(self):
+        return self.interpreter_widget.start_interpreter_task()
+
     def set_interpreter_interaction(self, value: bool) -> None:
         self.compute_widget.compute_button.setEnabled(value)
         self.dataset_widget.convert_button.setEnabled(value)
