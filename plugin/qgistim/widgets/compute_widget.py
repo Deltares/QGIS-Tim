@@ -64,6 +64,45 @@ class ComputeTask(BaseServerTask):
         return
 
 
+class ComputeTask(QgsTask):
+    def __init__(self, parent, data):
+        super().__init__("Tim computation", QgsTask.CanCancel)
+        self.parent = parent
+        self.data = data
+        self.starttime = None
+        self.exception = None
+
+    def run(self) -> bool:
+        self.starttime = datetime.datetime.now()
+        received = self.parent.execute(self.data)
+        if received == "0":
+            return True
+        else:
+            return False
+
+    def finished(self, result) -> None:
+        self.parent.set_interpreter_interaction(True)
+        if result:
+            runtime = datetime.datetime.now() - self.starttime
+            hours, remainder = divmod(runtime.total_seconds(), 3600)
+            minutes, seconds = divmod(remainder, 60)
+            QgsMessageLog.logMessage(
+                f"Tim computation completed in: {hours} hours, {minutes} minutes, "
+                f"and {round(seconds, 2)} seconds."
+            )
+            self.parent.load_mesh_result(
+                self.data["outpath"],
+                self.data["as_trimesh"],
+            )
+        else:
+            QgsMessageLog.logMessage(
+                "Tim computation has failed, check the interpreter window..."
+            )
+
+    def cancel(self) -> None:
+        return
+
+
 class ComputeWidget(QWidget):
     def __init__(self, parent=None):
         super(ComputeWidget, self).__init__(parent)
