@@ -112,5 +112,7 @@ def contour_labels():
     pal_layer.fieldName = "head"
     pal_layer.enabled = True
     pal_layer.placement = QgsPalLayerSettings.Line
+    pal_layer.formatNumbers = True
+    pal_layer.decimals = 3
     labels = QgsVectorLayerSimpleLabeling(pal_layer)
     return labels
