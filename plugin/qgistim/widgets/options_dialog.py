@@ -16,7 +16,6 @@ from PyQt5.QtWidgets import (
 
 from ..core.server_handler import ServerHandler
 
-
 INSTALL_COMMANDS = {
     "Git": "{interpreter} -m pip install git+{repo_url} {package}",
     "conda-forge": "mamba install -c conda-forge {package}",
@@ -34,13 +33,13 @@ REPOSITORY_URLS = {
 
 
 class NotSupportedDialog(QMessageBox):
-    def __init__(self, parent=None, command: str=""):
+    def __init__(self, parent=None, command: str = ""):
         QMessageBox.__init__(self, parent)
         self.setWindowTitle("Install unsupported")
         self.setIcon(QMessageBox.Information)
         self.setText(
             "Installing new versions via this menu is not (yet) supported for "
-            "this operating system. Please run the following command in the " 
+            "this operating system. Please run the following command in the "
             f"appropriate command line:\n\n{command}"
         )
         return
@@ -100,13 +99,16 @@ class OptionsDialog(QDialog):
         lowered_version = version.lower().strip()
         url = REPOSITORY_URLS[package]
         if lowered_version in ("latest", ""):
-            command = INSTALL_COMMANDS[origin].format(
-                interpreter=interpreter, package=package, repo_url=url,
-            )
+            command = INSTALL_COMMANDS[origin]
         else:
-            command = INSTALL_VERSION_COMMANDS[origin].format(
-                interpreter=interpreter, package=package, version=version, repo_url=url,
-            )
+            command = INSTALL_VERSION_COMMANDS[origin]
+
+        command = command.format(
+                interpreter=interpreter,
+                package=package,
+                version=version,
+                repo_url=url,
+        )
         env_vars = ServerHandler.environmental_variables()[interpreter]
 
         if sys.platform == "win32":
