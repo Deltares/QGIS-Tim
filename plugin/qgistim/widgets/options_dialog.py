@@ -1,4 +1,5 @@
 import subprocess
+import sys
 from functools import partial
 
 from PyQt5.QtCore import Qt
@@ -8,13 +9,13 @@ from PyQt5.QtWidgets import (
     QGridLayout,
     QLabel,
     QLineEdit,
+    QMessageBox,
     QPushButton,
     QVBoxLayout,
 )
-from qgis.core import QgsApplication
 
 from ..core.server_handler import ServerHandler
-from ..core.task import BaseServerTask
+
 
 INSTALL_COMMANDS = {
     "Git": "{interpreter} -m pip install git+{repo_url} {package}",
@@ -25,28 +26,28 @@ INSTALL_VERSION_COMMANDS = {
     "conda-forge": INSTALL_COMMANDS["conda-forge"] + "={version}",
 }
 
+REPOSITORY_URLS = {
+    "timml": "https://github.com/mbakker7/timml.git",
+    "ttim": "https://github.com/mbakker7/ttim.git",
+    "gistim": "https://gitlab.com/deltares/imod/qgis-tim.git",
+}
 
-class InstallTask(BaseServerTask):
-    @property
-    def task_description(self):
-        return "Updating package"
 
-    def run(self):
-        try:
-            self.response = subprocess.run(
-                self.data["command"],
-                check=True,
-                creationflags=subprocess.CREATE_NEW_CONSOLE,
-                env=self.data["env_vars"],
-            )
-            return True
-        except Exception as exception:
-            self.exception = exception
-            return False
+class NotSupportedDialog(QMessageBox):
+    def __init__(self, parent=None, command: str=""):
+        QMessageBox.__init__(self, parent)
+        self.setWindowTitle("Install unsupported")
+        self.setIcon(QMessageBox.Information)
+        self.setText(
+            "Installing new versions via this menu is not (yet) supported for "
+            "this operating system. Please run the following command in the " 
+            f"appropriate command line:\n\n{command}"
+        )
+        return
 
 
 class OptionsDialog(QDialog):
-    def __init__(self, parent=None) -> None:
+    def __init__(self, parent=None):
         QDialog.__init__(self, parent)
         self.setWindowTitle("QGIS-Tim Options")
 
@@ -97,21 +98,27 @@ class OptionsDialog(QDialog):
         version = version_line_edit.text()
 
         lowered_version = version.lower().strip()
+        url = REPOSITORY_URLS[package]
         if lowered_version in ("latest", ""):
             command = INSTALL_COMMANDS[origin].format(
-                interpreter=interpreter, package=package
+                interpreter=interpreter, package=package, repo_url=url,
             )
         else:
             command = INSTALL_VERSION_COMMANDS[origin].format(
-                interpreter=interpreter, package=package, version=version
+                interpreter=interpreter, package=package, version=version, repo_url=url,
             )
+        env_vars = ServerHandler.environmental_variables()[interpreter]
 
-        env_vars = ServerHandler.environmental_variables[interpreter]
-        self.install_task = InstallTask(
-            self, data={"command": command, "env_vars": env_vars}
-        )
-        self.parent.set_interpreter_interaction(False)
-        QgsApplication.taskManager().addTask(self.install_task)
+        if sys.platform == "win32":
+            subprocess.Popen(
+                f"cmd.exe \k {command}",
+                creationflags=subprocess.CREATE_NEW_CONSOLE,
+                env=env_vars,
+                text=True,
+            )
+        else:
+            NotSupportedDialog(self, command).show()
+
         return
 
     def on_interpreter_changed(self):
