@@ -8,7 +8,7 @@ from PyQt5.QtWidgets import (
     QComboBox,
     QDoubleSpinBox,
     QFileDialog,
-    QGridLayout,
+    QGroupBox,
     QHBoxLayout,
     QLabel,
     QLineEdit,
@@ -74,7 +74,7 @@ class ComputeWidget(QWidget):
         self.dummy_ugrid_path = Path(tempfile.mkdtemp()) / "qgistim-dummy-ugrid.nc"
         write_dummy_ugrid(self.dummy_ugrid_path)
 
-        self.domain_button = QPushButton("Domain")
+        self.domain_button = QPushButton("Set to current extent")
         self.transient_combo_box = QComboBox()
         self.transient_combo_box.addItems(["Steady-state", "Transient"])
         self.transient_combo_box.currentTextChanged.connect(self.on_transient_changed)
@@ -90,7 +90,7 @@ class ComputeWidget(QWidget):
         self.output_line_edit = QLineEdit()
         self.output_button = QPushButton("Save as ...")
         self.output_button.clicked.connect(self.set_output_path)
-        self.contour_checkbox = QCheckBox("Contour")
+        self.contour_checkbox = QCheckBox("Auto-generate contours")
         self.contour_button = QPushButton("Export contours")
         self.contour_button.clicked.connect(self.export_contours)
         self.contour_layer = QgsMapLayerComboBox()
@@ -108,37 +108,51 @@ class ComputeWidget(QWidget):
         self.contour_step_box.setValue(0.5)
 
         # Layout
-        compute_layout = QVBoxLayout()
-        compute_grid = QGridLayout()
-        compute_grid.addWidget(self.domain_button, 0, 0)
-        cellsize_row = QHBoxLayout()
-        cellsize_row.addWidget(QLabel("Cellsize:"))
-        cellsize_row.addWidget(self.cellsize_spin_box)
-        # label.setFixedWidth(45)
-        compute_grid.addLayout(cellsize_row, 0, 1)
-        contour_row = QHBoxLayout()
+        layout = QVBoxLayout()
+        domain_group = QGroupBox("Domain")
+        result_group = QGroupBox("Output")
+        contour_group = QGroupBox("Contour")
+        domain_layout = QVBoxLayout()
+        result_layout = QVBoxLayout()
+        contour_layout = QVBoxLayout()
+        domain_group.setLayout(domain_layout)
+        result_group.setLayout(result_layout)
+        contour_group.setLayout(contour_layout)
+
+        domain_row = QHBoxLayout()
+        domain_row.addWidget(QLabel("Grid spacing:"))
+        domain_row.addWidget(self.cellsize_spin_box)
+        domain_layout.addWidget(self.domain_button)
+        domain_layout.addLayout(domain_row)
+
+        result_row1 = QHBoxLayout()
+        result_row1.addWidget(self.transient_combo_box)
+        result_row1.addWidget(self.compute_button)
+        result_row2 = QHBoxLayout()
+        result_row2.addWidget(self.output_line_edit)
+        result_row2.addWidget(self.output_button)
+        result_layout.addLayout(result_row1)
+        result_layout.addLayout(result_row2)
+
+        contour_row1 = QHBoxLayout()
+        contour_row1.addWidget(self.contour_min_box)
+        contour_row1.addWidget(QLabel("to"))
+        contour_row1.addWidget(self.contour_max_box)
+        contour_row1.addWidget(QLabel("Increment:"))
+        contour_row1.addWidget(self.contour_step_box)
         contour_row2 = QHBoxLayout()
-        contour_row.addWidget(self.contour_checkbox)
-        contour_row.addWidget(self.contour_min_box)
-        contour_row.addWidget(QLabel("to"))
-        contour_row.addWidget(self.contour_max_box)
-        contour_row2.addWidget(QLabel("Increment:"))
-        contour_row2.addWidget(self.contour_step_box)
-        compute_grid.addLayout(contour_row, 1, 0)
-        compute_grid.addLayout(contour_row2, 1, 1)
-        compute_grid.addWidget(self.transient_combo_box, 3, 0)
-        compute_grid.addWidget(self.output_line_edit, 2, 0)
-        compute_grid.addWidget(self.output_button, 2, 1)
-        compute_row = QHBoxLayout()
-        # compute_row.addWidget(self.mesh_checkbox)
-        compute_row.addWidget(self.compute_button)
-        compute_grid.addLayout(compute_row, 3, 1)
-        compute_grid.addWidget(self.contour_layer, 4, 0)
-        compute_grid.addWidget(self.contour_button, 4, 1)
-        compute_layout.addLayout(compute_grid)
-        compute_layout.addStretch()
-        self.setLayout(compute_layout)
-        
+        contour_row2.addWidget(self.contour_layer)
+        contour_row2.addWidget(self.contour_button)
+        contour_layout.addWidget(self.contour_checkbox)
+        contour_layout.addLayout(contour_row1)
+        contour_layout.addLayout(contour_row2)
+
+        layout.addWidget(domain_group)
+        layout.addWidget(result_group)
+        layout.addWidget(contour_group)
+        layout.addStretch()
+        self.setLayout(layout)
+
     def set_interpreter_interaction(self, value: bool):
         self.parent.set_interpreter_interaction(value)
 
