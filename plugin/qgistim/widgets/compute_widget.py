@@ -52,7 +52,7 @@ class ComputeTask(BaseServerTask):
         )
 
     def finished(self, result):
-        self.parent.parent.set_interpreter_interaction(True)
+        self.parent.set_interpreter_interaction(True)
         if result:
             self.push_success_message()
             self.parent.load_mesh_result(
@@ -138,6 +138,9 @@ class ComputeWidget(QWidget):
         compute_layout.addLayout(compute_grid)
         compute_layout.addStretch()
         self.setLayout(compute_layout)
+        
+    def set_interpreter_interaction(self, value: bool):
+        self.parent.set_interpreter_interaction(value)
 
     @property
     def transient(self) -> bool:
@@ -235,7 +238,7 @@ class ComputeWidget(QWidget):
             self.compute_task.addSubTask(
                 self.start_task, [], QgsTask.ParentDependsOnSubTask
             )
-        self.parent.set_interpreter_interaction(False)
+        self.set_interpreter_interaction(False)
         QgsApplication.taskManager().addTask(self.compute_task)
 
     def domain(self) -> None:

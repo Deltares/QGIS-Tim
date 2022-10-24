@@ -53,6 +53,12 @@ class ServerHandler:
             env_vars = json.loads(f.read())
         return env_vars
 
+    @staticmethod
+    def versions():
+        with open(ServerHandler.get_configdir() / "tim-versions.json", "r") as f:
+            versions = json.loads(f.read())
+        return versions
+
     def start_server(self, interpreter: str) -> Dict[str, Any]:
         """
         Starts a new (conda) interpreter, based on the settings in the

@@ -6,6 +6,7 @@ import sys
 from contextlib import contextmanager, redirect_stderr, redirect_stdout
 from os import devnull
 from pathlib import Path
+from typing import Any
 
 import gistim
 
@@ -24,28 +25,60 @@ def write_json_stdout(data):
     sys.stdout.flush()
 
 
+def get_configdir() -> Path:
+    if platform.system() == "Windows":
+        configdir = Path(os.environ["APPDATA"]) / "qgis-tim"
+    else:
+        configdir = Path(os.environ["HOME"]) / ".qgis-tim"
+    return configdir
+
+
+def write_configjson(path: Path, data: dict[str, Any]) -> None:
+    """
+    Either:
+
+    * Write a new file if it does not exist.
+    * Append a new entry (with the interpreter as key).
+    * Overwrite an entry if already present.
+    """
+    if path.exists():
+        with open(path, "r") as f:
+            content = json.loads(f.read())
+        content[sys.executable] = data
+    else:
+        content = {sys.executable: data}
+
+    with open(path, "w") as f:
+        f.write(json.dumps(content))
+
+    return
+
+
 def configure(args) -> None:
     """
     Write all the environmental variables so the QGIS interpreter
     can (re)set them properly.
     """
-    if platform.system() == "Windows":
-        configdir = Path(os.environ["APPDATA"]) / "qgis-tim"
-    else:
-        configdir = Path(os.environ["HOME"]) / ".qgis-tim"
-    configdir.mkdir(exist_ok=True)
+    configdir = get_configdir()
 
+    # Store enviromental variables
+    configdir.mkdir(exist_ok=True)
     env = {key: value for key, value in os.environ.items()}
     path = configdir / "environmental-variables.json"
-    if path.exists():
-        with open(path, "r") as f:
-            content = json.loads(f.read())
-        content[sys.executable] = env
-    else:
-        content = {sys.executable: env}
+    write_configjson(path, env)
 
-    with open(configdir / "environmental-variables.json", "w") as f:
-        f.write(json.dumps(content))
+    # Store version numbers
+    import timml
+    import ttim
+
+    versions = {
+        "timml": timml.__version__,
+        "ttim": ttim.__version__,
+        "gistim": gistim.__version__,
+    }
+    path = configdir / "tim-versions.json"
+    write_configjson(path, versions)
+    return
 
 
 def handle(line) -> None:
@@ -130,19 +163,35 @@ def convert(args) -> None:
     gistim.convert_to_script(inpath, outpath)
 
 
+def compute(args) -> None:
+    jsonpath = args.jsonpath[0]
+
+    with open(jsonpath, "r") as f:
+        data = json.loads(f.read())
+
+    gistim.compute(
+        inpath=data["inpath"],
+        outpath=data["outpath"],
+        cellsize=data["cellsize"],
+        mode=data["mode"],
+        active_elements=data["active_elements"],
+        as_trimesh=data["as_trimesh"],
+    )
+    return
+
+
 if __name__ == "__main__":
     # Setup argparsers
-    parser = argparse.ArgumentParser(prog="GisTim")
+    parser = argparse.ArgumentParser(prog="gistim")
     subparsers = parser.add_subparsers(help="sub-command help")
     parser_configure = subparsers.add_parser("configure", help="configure help")
     parser_serve = subparsers.add_parser("serve", help="serve help")
     parser_extract = subparsers.add_parser("extract", help="extract help")
     parser_convert = subparsers.add_parser("convert", help="convert help")
+    parser_compute = subparsers.add_parser("compute", help="compute help")
 
     parser_configure.set_defaults(func=configure)
-    parser_configure.add_argument("append", type=bool, nargs=1, help="append")
 
-    # Serve has a single argument: the port number
     parser_serve.set_defaults(func=serve)
 
     parser_extract.set_defaults(func=extract)
@@ -153,6 +202,9 @@ if __name__ == "__main__":
     parser_convert.set_defaults(func=convert)
     parser_convert.add_argument("inpath", type=str, nargs=1, help="inpath")
     parser_convert.add_argument("outpath", type=str, nargs=1, help="outpath")
+
+    parser_compute.set_defaults(func=compute)
+    parser_compute.add_argument("jsonpath", type=str, nargs=1, help="jsonpath")
 
     # Parse and call the appropriate function
     args = parser.parse_args()

@@ -6,18 +6,45 @@ connection to the QGIS Layers Panel, and ensures there is a group for the Tim
 layers there.
 """
 from pathlib import Path
-from typing import Any, Dict
+from typing import Any, Dict, Union
 
-from PyQt5.QtWidgets import QTabWidget, QTreeWidgetItem, QVBoxLayout, QWidget
-from qgis.core import QgsMapLayer, QgsProject
+from PyQt5.QtCore import Qt
+from PyQt5.QtWidgets import (
+    QPushButton,
+    QTabWidget,
+    QTreeWidgetItem,
+    QVBoxLayout,
+    QWidget,
+)
+from qgis.core import QgsApplication, QgsMapLayer, QgsProject
 
+from ..core.server_handler import ServerHandler
+from ..core.task import BaseServerTask
 from .compute_widget import ComputeWidget
 from .dataset_widget import DatasetWidget
 from .elements_widget import ElementsWidget
 from .extraction_widget import DataExtractionWidget
-from .interpreter_widget import InterpreterWidget
+from .options_dialog import OptionsDialog
 
 PYQT_DELETED_ERROR = "wrapped C/C++ object of type QgsLayerTreeGroup has been deleted"
+
+
+class StartTask(BaseServerTask):
+    @property
+    def task_description(self):
+        return "starting server"
+
+    def run(self):
+        try:
+            self.response = self.parent.server_handler.start_server(
+                self.data["interpreter"]
+            )
+            if not self.response["success"]:
+                return False
+            return True
+        except Exception as exception:
+            self.exception = exception
+            return False
 
 
 class QgisTimmlWidget(QWidget):
@@ -25,12 +52,18 @@ class QgisTimmlWidget(QWidget):
         super(QgisTimmlWidget, self).__init__(parent)
 
         self.iface = iface
+        self.start_task = None
+        self.server_handler = ServerHandler()
 
         self.extraction_widget = DataExtractionWidget(self)
         self.dataset_widget = DatasetWidget(self)
         self.elements_widget = ElementsWidget(self)
-        self.interpreter_widget = InterpreterWidget(self)
         self.compute_widget = ComputeWidget(self)
+        self.options_dialog = OptionsDialog(self)
+
+        self.config_button = QPushButton("Options")
+        self.config_button.clicked.connect(self.options_dialog.show)
+        self.config_button.setIcon(QgsApplication.getThemeIcon("/mActionOptions.svg"))
 
         # Layout
         self.layout = QVBoxLayout()
@@ -40,7 +73,7 @@ class QgisTimmlWidget(QWidget):
         self.tabwidget.addTab(self.dataset_widget, "GeoPackage")
         self.tabwidget.addTab(self.elements_widget, "Elements")
         self.tabwidget.addTab(self.compute_widget, "Compute")
-        self.layout.addWidget(self.interpreter_widget)
+        self.layout.addWidget(self.config_button, stretch=0, alignment=Qt.AlignRight)
         self.setLayout(self.layout)
 
         # Default to the GeoPackage tab
@@ -57,15 +90,34 @@ class QgisTimmlWidget(QWidget):
         self.ttim_group = None
         self.output_group = None
 
+        return
+
     # Inter-widget communication
     # --------------------------
-    def start_interpreter_task(self):
-        return self.interpreter_widget.start_interpreter_task()
+    def start_interpreter_task(self) -> Union[StartTask, None]:
+        if not self.server_handler.alive():
+            interpreter = self.options_dialog.interpreter_combo_box.currentText()
+            self.start_task = StartTask(self, {"interpreter": interpreter})
+            return self.start_task
+        else:
+            return None
+
+    def execute(self, data: Dict[str, str]) -> Dict[str, Any]:
+        """
+        Execute a command, and check whether it executed succesfully.
+        """
+        response = self.server_handler.send(data)
+        return response
 
     def set_interpreter_interaction(self, value: bool) -> None:
         self.compute_widget.compute_button.setEnabled(value)
         self.dataset_widget.convert_button.setEnabled(value)
         self.extraction_widget.extract_button.setEnabled(value)
+
+    def shutdown_server(self) -> None:
+        if self.server_handler.process is not None:
+            self.server_handler.kill()
+        return
 
     def on_transient_changed(self) -> None:
         transient = self.compute_widget.transient
@@ -94,9 +146,6 @@ class QgisTimmlWidget(QWidget):
 
     def selection_names(self):
         return self.dataset_widget.selection_names()
-
-    def execute(self, data: Dict[str, str]) -> str:
-        return self.interpreter_widget.execute(data)
 
     def add_element(self, element: Any):
         self.dataset_widget.add_element(element)

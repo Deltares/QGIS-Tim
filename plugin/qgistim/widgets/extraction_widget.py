@@ -266,6 +266,9 @@ class DataExtractionWidget(QWidget):
         layout.addStretch()
         self.setLayout(layout)
 
+    def set_interpreter_interaction(self, value: bool):
+        self.parent.set_interpreter_interaction(value)
+
     def open_netcdf(self):
         netcdf_path, _ = QFileDialog.getOpenFileName(self, "Select file", "", "*.nc")
         if netcdf_path == "":  # Empty string in case of cancel button press
@@ -328,5 +331,5 @@ class DataExtractionWidget(QWidget):
             self.extract_task.addSubTask(
                 self.start_task, [], QgsTask.ParentDependsOnSubTask
             )
-        self.parent.set_interpreter_interaction(False)
+        self.set_interpreter_interaction(False)
         QgsApplication.taskManager().addTask(self.extract_task)

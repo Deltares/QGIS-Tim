@@ -15,7 +15,7 @@ class TimDockWidget(QgsDockWidget):
         Make sure the external interpreter is shutdown as well.
         """
         widget = self.widget()
-        widget.interpreter_widget.shutdown_server()
+        widget.shutdown_server()
         event.accept()
 
 

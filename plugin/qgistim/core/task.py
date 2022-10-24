@@ -54,7 +54,7 @@ class BaseServerTask(QgsTask):
         return
 
     def finished(self, result) -> None:
-        self.parent.parent.set_interpreter_interaction(True)
+        self.parent.set_interpreter_interaction(True)
         # Do not show a success message by default.
         if not result:
             self.push_failure_message()
