@@ -113,7 +113,7 @@ class OptionsDialog(QDialog):
 
         if sys.platform == "win32":
             subprocess.Popen(
-                f"cmd.exe \k {command}",
+                f"cmd.exe /k {command}",
                 creationflags=subprocess.CREATE_NEW_CONSOLE,
                 env=env_vars,
                 text=True,
