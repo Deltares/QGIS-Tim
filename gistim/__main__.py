@@ -54,6 +54,22 @@ def write_configjson(path: Path, data: dict[str, Any]) -> None:
     return
 
 
+def write_versions():
+    # Store version numbers
+    import timml
+    import ttim
+
+    versions = {
+        "timml": timml.__version__,
+        "ttim": ttim.__version__,
+        "gistim": gistim.__version__,
+    }
+    configdir = get_configdir()
+    path = configdir / "tim-versions.json"
+    write_configjson(path, versions)
+    return
+
+
 def configure(args) -> None:
     """
     Write all the environmental variables so the QGIS interpreter
@@ -66,18 +82,7 @@ def configure(args) -> None:
     env = {key: value for key, value in os.environ.items()}
     path = configdir / "environmental-variables.json"
     write_configjson(path, env)
-
-    # Store version numbers
-    import timml
-    import ttim
-
-    versions = {
-        "timml": timml.__version__,
-        "ttim": ttim.__version__,
-        "gistim": gistim.__version__,
-    }
-    path = configdir / "tim-versions.json"
-    write_configjson(path, versions)
+    write_versions()
     return
 
 
@@ -117,7 +122,8 @@ def handle(line) -> None:
         response = os.getpid()
     else:
         response = (
-            'Invalid operation. Valid options are: "compute", "convert", "process_ID".'
+            "Invalid operation. Valid options are: "
+            '"compute", "convert", "extract", "process_ID".'
         )
 
     return response

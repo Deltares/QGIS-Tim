@@ -104,10 +104,10 @@ class OptionsDialog(QDialog):
             command = INSTALL_VERSION_COMMANDS[origin]
 
         command = command.format(
-                interpreter=interpreter,
-                package=package,
-                version=version,
-                repo_url=url,
+            interpreter=interpreter,
+            package=package,
+            version=version,
+            repo_url=url,
         )
         env_vars = ServerHandler.environmental_variables()[interpreter]
 
