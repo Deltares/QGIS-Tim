@@ -51,6 +51,7 @@ from PyQt5.QtWidgets import (
     QVBoxLayout,
 )
 from qgis.core import (
+    QgsDefaultValue,
     QgsFeature,
     QgsField,
     QgsFillSymbol,
@@ -125,6 +126,9 @@ class Element:
         self.ttim_layer = None
         self.assoc_layer = None
         self.item = None
+        self.timml_defaults = {}
+        self.ttim_defaults = {}
+        self.assoc_defaults = {}
 
     def __init__(self, path: str, name: str):
         self._initialize(path, name)
@@ -175,6 +179,19 @@ class Element:
         self.create_ttim_layer(crs)
         self.create_assoc_layer(crs)
 
+    def set_defaults(self):
+        for layer, defaults in zip(
+            (self.timml_layer, self.ttim_layer, self.assoc_layer),
+            (self.timml_defaults, self.ttim_defaults, self.assoc_defaults),
+        ):
+            if layer is None:
+                continue
+            fields = layer.fields()
+            for name, definition in defaults.items():
+                index = fields.indexFromName(name)
+                layer.setDefaultValueDefinition(index, definition)
+        return
+
     def renderer(self):
         return None
 
@@ -193,6 +210,7 @@ class Element:
         self.timml_layer_from_geopackage()
         self.ttim_layer_from_geopackage()
         self.assoc_layer_from_geopackage()
+        self.set_defaults()
         return [
             (self.timml_layer, self.renderer()),
             (self.ttim_layer, None),
@@ -203,6 +221,7 @@ class Element:
         self.timml_layer = geopackage.write_layer(
             self.path, self.timml_layer, self.timml_name
         )
+        self.set_defaults()
 
     def remove_from_geopackage(self):
         geopackage.remove_layer(self.path, self.timml_name)
@@ -239,6 +258,7 @@ class TransientElement(Element):
         self.ttim_layer = geopackage.write_layer(
             self.path, self.ttim_layer, self.ttim_name
         )
+        self.set_defaults()
 
     def remove_from_geopackage(self):
         geopackage.remove_layer(self.path, self.timml_name)
@@ -277,6 +297,7 @@ class AssociatedElement(Element):
         self.assoc_layer = geopackage.write_layer(
             self.path, self.assoc_layer, self.assoc_name
         )
+        self.set_defaults()
 
     def remove_from_geopackage(self):
         geopackage.remove_layer(self.path, self.timml_name)
@@ -349,6 +370,12 @@ class Aquifer(TransientElement):
             QgsField("M", QVariant.Int),
             QgsField("reference_date", QVariant.DateTime),
         ]
+        self.ttim_defaults = {
+            "tmin": QgsDefaultValue("0.0"),
+            "tmax": QgsDefaultValue("10.0"),
+            "tstart": QgsDefaultValue("0.01"),
+            "M": QgsDefaultValue("10"),
+        }
 
     def __init__(self, path: str, name: str):
         self._initialize(path, name)
@@ -362,6 +389,7 @@ class Aquifer(TransientElement):
         self.ttim_layer = geopackage.write_layer(
             self.path, self.ttim_layer, self.ttim_name
         )
+        self.set_defaults()
 
     def remove_from_geopackage(self):
         pass
@@ -467,6 +495,9 @@ class HeadLineSink(TransientElement):
             QgsField("tstart", QVariant.Double),
             QgsField("head", QVariant.Double),
         ]
+        self.timml_defaults = {
+            "order": QgsDefaultValue("4"),
+        }
 
     def renderer(self) -> QgsSingleSymbolRenderer:
         symbol = QgsLineSymbol.createSimple(
@@ -497,6 +528,9 @@ class LineSinkDitch(TransientElement):
             QgsField("tstart", QVariant.Double),
             QgsField("discharge", QVariant.Double),
         ]
+        self.timml_defaults = {
+            "order": QgsDefaultValue("4"),
+        }
 
     def renderer(self) -> QgsSingleSymbolRenderer:
         symbol = QgsLineSymbol.createSimple(
@@ -518,6 +552,9 @@ class ImpermeableLineDoublet(Element):
             QgsField("layer", QVariant.Int),
             QgsField("label", QVariant.String),
         ]
+        self.timml_defaults = {
+            "order": QgsDefaultValue("4"),
+        }
 
     def renderer(self) -> QgsSingleSymbolRenderer:
         symbol = QgsLineSymbol.createSimple(
@@ -540,6 +577,10 @@ class LeakyLineDoublet(Element):
             QgsField("layer", QVariant.Int),
             QgsField("label", QVariant.String),
         ]
+        self.timml_defaults = {
+            "order",
+            QgsDefaultValue("4"),
+        }
 
     def renderer(self) -> QgsSingleSymbolRenderer:
         symbol = QgsLineSymbol.createSimple(
@@ -593,6 +634,10 @@ class PolygonInhomogeneity(AssociatedElement):
             QgsField("ndegrees", QVariant.Int),
         ]
         self.assoc_attributes = INHOM_ATTRIBUTES.copy()
+        self.timml_defaults = {
+            "order": QgsDefaultValue("4"),
+            "ndegrees": QgsDefaultValue("6"),
+        }
 
     def renderer(self) -> QgsSingleSymbolRenderer:
         symbol = QgsFillSymbol.createSimple(
