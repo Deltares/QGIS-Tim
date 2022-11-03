@@ -71,12 +71,20 @@ def point_coordinates(dataframe) -> Tuple[FloatArray, FloatArray]:
     return dataframe["geometry"].x, dataframe["geometry"].y
 
 
-def linestring_coordinates(row) -> Tuple[FloatArray, FloatArray]:
-    return np.array(row["geometry"].coords)
+def remove_zero_length(coords: FloatArray):
+    dx_dy = np.diff(coords, axis=0)
+    notzero = (dx_dy != 0).any(axis=1)
+    keep = np.full(len(coords), True)
+    keep[1:] = notzero
+    return coords[keep]
 
 
-def polygon_coordinates(row) -> Tuple[FloatArray, FloatArray]:
-    return np.array(row["geometry"].exterior.coords)
+def linestring_coordinates(row) -> FloatArray:
+    return remove_zero_length(np.array(row["geometry"].coords))
+
+
+def polygon_coordinates(row) -> FloatArray:
+    return remove_zero_length(np.array(row["geometry"].exterior.coords))
 
 
 # Parse GPKG content to Tim input
