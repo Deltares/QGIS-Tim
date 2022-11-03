@@ -105,7 +105,6 @@ class ServerHandler:
         """
         if self.alive():
             try:
-                # os.kill(os.getpgid(self.process.pid), signal.SIGTERM)
                 self.process.kill()
                 self.process = None
             except ConnectionRefusedError:
