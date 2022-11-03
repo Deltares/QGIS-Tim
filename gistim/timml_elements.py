@@ -368,7 +368,7 @@ def initialize_model(spec: TimmlModelSpecification) -> timml.Model:
     elements = {}
     observations = {}
     for name, element_spec in spec.elements.items():
-        if not element_spec.active:
+        if (not element_spec.active) or (len(element_spec.dataframe.index) == 0):
             continue
 
         elementtype = element_spec.elementtype

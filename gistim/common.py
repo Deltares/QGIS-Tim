@@ -204,6 +204,10 @@ def model_specification(
     temporal_settings = gpd.read_file(path, layer=aquifer_entry["ttim"])
     domain_entry = grouped_names.pop("Domain")["Domain"]
     domain = gpd.read_file(path, layer=domain_entry["timml"])
+
+    if len(domain.index) == 0:
+        raise ValueError("Domain not defined")
+
     output_times = gpd.read_file(path, layer=domain_entry["ttim"])
 
     # Load the data all other elements into geodataframes.

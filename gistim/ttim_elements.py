@@ -375,7 +375,11 @@ def initialize_model(spec: TtimModelSpecification, timml_model) -> TimModel:
     observations = {}
     for name, element_spec in spec.elements.items():
         elementtype = element_spec.elementtype
-        if not element_spec.active or elementtype not in MAPPING:
+        if (
+            (not element_spec.active)
+            or (elementtype not in MAPPING)
+            or (len(element_spec.dataframe.index) == 0)
+        ):
             continue
 
         # print(f"adding {name} as {elementtype}")

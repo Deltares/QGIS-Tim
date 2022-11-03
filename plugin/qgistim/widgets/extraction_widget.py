@@ -327,7 +327,7 @@ class DataExtractionWidget(QWidget):
             "outpath": outpath,
             "wkt_geometry": wkts,
         }
-        
+
         self.polygon_tool.reset()
 
         self.extract_task = ExtractTask(self, data, self.parent.message_bar)
