@@ -42,7 +42,6 @@ from functools import partial
 from typing import Any, List, Tuple
 
 from PyQt5.QtCore import QVariant
-from PyQt5.QtGui import QDoubleValidator
 from PyQt5.QtWidgets import (
     QDialog,
     QHBoxLayout,
@@ -102,33 +101,6 @@ class NameDialog(QDialog):
         layout = QVBoxLayout()
         layout.addLayout(first_row)
         layout.addLayout(second_row)
-        self.setLayout(layout)
-
-
-class RadiusDialog(QDialog):
-    def __init__(self, parent=None):
-        super(RadiusDialog, self).__init__(parent)
-        self.name_line_edit = QLineEdit()
-        self.radius_line_edit = QLineEdit()
-        self.radius_line_edit.setValidator(QDoubleValidator())
-        self.ok_button = QPushButton("OK")
-        self.cancel_button = QPushButton("Cancel")
-        self.ok_button.clicked.connect(self.accept)
-        self.cancel_button.clicked.connect(self.reject)
-        first_row = QHBoxLayout()
-        first_row.addWidget(QLabel("Layer name"))
-        first_row.addWidget(self.name_line_edit)
-        second_row = QHBoxLayout()
-        second_row.addWidget(QLabel("Radius"))
-        second_row.addWidget(self.radius_line_edit)
-        third_row = QHBoxLayout()
-        third_row.addStretch()
-        third_row.addWidget(self.ok_button)
-        third_row.addWidget(self.cancel_button)
-        layout = QVBoxLayout()
-        layout.addLayout(first_row)
-        layout.addLayout(second_row)
-        layout.addLayout(third_row)
         self.setLayout(layout)
 
 
@@ -595,32 +567,6 @@ class CircularAreaSink(TransientElement):
             QgsField("tstart", QVariant.Double),
             QgsField("rate", QVariant.Double),
         ]
-
-    @staticmethod
-    def dialog(
-        path: str, crs: Any, iface: Any, klass: type, names: List[str]
-    ) -> Tuple[Any]:
-        dialog = RadiusDialog()
-        dialog.show()
-        ok = dialog.exec_()
-        if not ok:
-            return
-
-        name = dialog.name_line_edit.text()
-        if name in names:
-            raise ValueError(f"Name already exists in geopackage: {name}")
-
-        radius = float(dialog.radius_line_edit.text())
-        instance = klass(path, name)
-        instance.create_layers(crs)
-        provider = instance.timml_layer.dataProvider()
-        feature = QgsFeature()
-        center = iface.mapCanvas().center()
-        feature.setGeometry(QgsGeometry.fromPointXY(center).buffer(radius, 5))
-        provider.addFeatures([feature])
-        instance.timml_layer.updateFields()
-
-        return instance
 
     def renderer(self):
         """

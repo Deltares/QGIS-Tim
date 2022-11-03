@@ -216,14 +216,23 @@ def implinedoublet(spec: ElementSpecification) -> List[Dict[str, Any]]:
 def circareasink(spec: ElementSpecification) -> List[Dict[str, Any]]:
     kwargslist = []
     for row in spec.dataframe.to_dict("records"):
-        x, y = np.array(row["geometry"].centroid.coords)[0]
+        xc, yc = np.array(row["geometry"].centroid.coords)[0]
         coords = np.array(row["geometry"].exterior.coords)
-        x0, y0 = coords[0]
-        radius = np.sqrt((x0 - x) ** 2 + (y0 - y) ** 2)
+        x, y = coords.T
+        # Use squared radii
+        radii2 = (x - xc) ** 2 + (y - yc) ** 2
+        radius2 = radii2[0]
+        # Check whether geometry is close enough to a circle.
+        # Accept 1% deviation.
+        tolerance = 0.01 * radius2
+        if not np.allclose(radii2, radius2, atol=tolerance):
+            raise ValueError("Circular Area Sink geometry is not circular")
+
+        radius = np.sqrt(radius2)
         kwargslist.append(
             {
-                "xc": x,
-                "yc": y,
+                "xc": xc,
+                "yc": yc,
                 "R": radius,
                 "N": row["rate"],
             }

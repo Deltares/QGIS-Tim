@@ -7,7 +7,6 @@ For thread safety: DO NOT INCLUDE QGIS CALLS HERE.
 import json
 import os
 import platform
-import signal
 import subprocess
 from pathlib import Path
 from typing import Any, Dict, List
