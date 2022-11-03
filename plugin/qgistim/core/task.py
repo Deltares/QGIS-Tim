@@ -4,10 +4,11 @@ from qgis.core import Qgis, QgsTask
 
 
 class BaseServerTask(QgsTask):
-    def __init__(self, parent, data):
+    def __init__(self, parent, data, message_bar):
         super().__init__(self.task_description, QgsTask.CanCancel)
         self.parent = parent
         self.data = data
+        self.message_bar = message_bar
         self.response = None
         self.exception = None
 
@@ -31,7 +32,7 @@ class BaseServerTask(QgsTask):
         return
 
     def push_success_message(self) -> None:
-        self.parent.parent.iface.messageBar().pushMessage(
+        self.message_bar.pushMessage(
             title="Info",
             text=self.success_message(),
             level=Qgis.Info,
@@ -46,7 +47,7 @@ class BaseServerTask(QgsTask):
         else:
             message = "Unknown failure"
 
-        self.parent.parent.iface.messageBar().pushMessage(
+        self.message_bar.pushMessage(
             title="Error",
             text=f"Failed {self.task_description}. Server error:\n{message}",
             level=Qgis.Critical,
@@ -61,4 +62,7 @@ class BaseServerTask(QgsTask):
         return
 
     def cancel(self) -> None:
+        self.parent.set_interpreter_interaction(True)
+        self.parent.shutdown_server()
+        super().cancel()
         return

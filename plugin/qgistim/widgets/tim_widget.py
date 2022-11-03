@@ -52,7 +52,7 @@ class QgisTimmlWidget(QWidget):
         super(QgisTimmlWidget, self).__init__(parent)
 
         self.iface = iface
-        self.start_task = None
+        self.message_bar = self.iface.messageBar()
         self.server_handler = ServerHandler()
 
         self.extraction_widget = DataExtractionWidget(self)
@@ -97,8 +97,8 @@ class QgisTimmlWidget(QWidget):
     def start_interpreter_task(self) -> Union[StartTask, None]:
         if not self.server_handler.alive():
             interpreter = self.options_dialog.interpreter_combo_box.currentText()
-            self.start_task = StartTask(self, {"interpreter": interpreter})
-            return self.start_task
+            start_task = StartTask(self, {"interpreter": interpreter}, self.message_bar)
+            return start_task
         else:
             return None
 

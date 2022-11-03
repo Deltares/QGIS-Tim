@@ -70,7 +70,6 @@ class ServerHandler:
             stdin=subprocess.PIPE,
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
-            creationflags=subprocess.CREATE_NEW_CONSOLE,
             env=env_vars[interpreter],
             text=True,
         )
@@ -106,12 +105,9 @@ class ServerHandler:
         closed.
         """
         if self.alive():
-            # Ask the process for its process_ID
             try:
-                response = self.send({"operation": "process_ID"})
-                process_ID = response["message"]
-                # Now kill it
-                os.kill(process_ID, signal.SIGTERM)
+                # os.kill(os.getpgid(self.process.pid), signal.SIGTERM)
+                self.process.kill()
                 self.process = None
             except ConnectionRefusedError:
                 # it's already dead

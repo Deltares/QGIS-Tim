@@ -269,6 +269,9 @@ class DataExtractionWidget(QWidget):
     def set_interpreter_interaction(self, value: bool):
         self.parent.set_interpreter_interaction(value)
 
+    def shutdown_server(self):
+        self.parent.shutdown_server()
+
     def open_netcdf(self):
         netcdf_path, _ = QFileDialog.getOpenFileName(self, "Select file", "", "*.nc")
         if netcdf_path == "":  # Empty string in case of cancel button press
@@ -325,7 +328,7 @@ class DataExtractionWidget(QWidget):
             "wkt_geometry": wkts,
         }
 
-        self.extract_task = ExtractTask(self, data)
+        self.extract_task = ExtractTask(self, data, self.parent.message_bar)
         self.start_task = self.parent.start_interpreter_task()
         if self.start_task is not None:
             self.extract_task.addSubTask(

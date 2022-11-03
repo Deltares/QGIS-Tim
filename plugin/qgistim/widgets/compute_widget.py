@@ -156,6 +156,9 @@ class ComputeWidget(QWidget):
     def set_interpreter_interaction(self, value: bool):
         self.parent.set_interpreter_interaction(value)
 
+    def shutdown_server(self):
+        self.parent.shutdown_server()
+
     @property
     def transient(self) -> bool:
         return self.transient_combo_box.currentText() == "Transient"
@@ -246,7 +249,7 @@ class ComputeWidget(QWidget):
         # result = task.run()
         # task.finished(result)
 
-        self.compute_task = ComputeTask(self, data)
+        self.compute_task = ComputeTask(self, data, self.parent.message_bar)
         self.start_task = self.parent.start_interpreter_task()
         if self.start_task is not None:
             self.compute_task.addSubTask(
