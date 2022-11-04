@@ -38,7 +38,6 @@ def compute(
     mode: str,
     cellsize: float,
     active_elements: Dict[str, bool],
-    as_trimesh: bool = False,
 ) -> None:
     """
     Compute the results of TimML model.
@@ -62,9 +61,9 @@ def compute(
         the geopackage name, and the requested grid cell size.
     """
     if mode == "steady-state":
-        compute_steady(inpath, outpath, cellsize, active_elements, as_trimesh)
+        compute_steady(inpath, outpath, cellsize, active_elements)
     elif mode == "transient":
-        compute_transient(inpath, outpath, cellsize, active_elements, as_trimesh)
+        compute_transient(inpath, outpath, cellsize, active_elements)
     else:
         raise ValueError(f'Invalid mode: {mode}: should be "steady" or "transient".')
     return

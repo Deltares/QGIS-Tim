@@ -27,9 +27,9 @@ from qgis.core import (
 )
 from qgis.gui import QgsMapLayerComboBox
 
-from ..core import geopackage, layer_styling
+from ..core import layer_styling
 from ..core.dummy_ugrid import write_dummy_ugrid
-from ..core.processing import mesh_contours, raster_steady_contours
+from ..core.processing import mesh_contours
 from ..core.task import BaseServerTask
 
 
@@ -55,10 +55,8 @@ class ComputeTask(BaseServerTask):
         self.parent.set_interpreter_interaction(True)
         if result:
             self.push_success_message()
-            self.parent.load_mesh_result(
-                self.data["outpath"],
-                self.data["as_trimesh"],
-            )
+            self.parent.load_mesh_result(self.data["outpath"])
+            self.parent.load_raster_result(self.data["outpath"])
         else:
             self.push_failure_message()
         return
@@ -88,7 +86,7 @@ class ComputeWidget(QWidget):
         self.domain_button.clicked.connect(self.domain)
         # self.mesh_checkbox = QCheckBox("Trimesh")
         self.output_line_edit = QLineEdit()
-        self.output_button = QPushButton("Save as ...")
+        self.output_button = QPushButton("Save in ...")
         self.output_button.clicked.connect(self.set_output_path)
         self.contour_checkbox = QCheckBox("Auto-generate contours")
         self.contour_button = QPushButton("Export contours")
@@ -180,7 +178,7 @@ class ComputeWidget(QWidget):
         layer.setLabelsEnabled(True)
         # Renderer: simple black lines
         renderer = layer_styling.contour_renderer()
-        self.parent.add_layer(layer, "output", renderer=renderer, on_top=True)
+        self.parent.add_layer(layer, "output:vector", renderer=renderer, on_top=True)
 
     def export_contours(self) -> None:
         layer = self.contour_layer.currentLayer()
@@ -201,9 +199,7 @@ class ComputeWidget(QWidget):
 
     def set_output_path(self) -> None:
         current = self.output_line_edit.text()
-        path, _ = QFileDialog.getSaveFileName(
-            self, "Save output as...", current, "*.nc"
-        )
+        path, _ = QFileDialog.getSaveFileName(self, "Save output as...", current, "*")
         if path != "":  # Empty string in case of cancel button press
             self.output_line_edit.setText(path)
             # Note: Qt does pretty good validity checking of the Path in the
@@ -216,10 +212,7 @@ class ComputeWidget(QWidget):
         if text is None:
             return
         path = Path(text)
-        parent = path.parent
-        stem = path.stem
-        outpath = (parent / stem).with_suffix(".nc").absolute()
-        self.output_line_edit.setText(str(outpath))
+        self.output_line_edit.setText(str(path.parent / path.stem))
 
     def compute(self) -> None:
         """
@@ -231,7 +224,6 @@ class ComputeWidget(QWidget):
         inpath = Path(self.parent.path).absolute()
         outpath = Path(self.output_line_edit.text()).absolute()
         mode = self.transient_combo_box.currentText().lower()
-        as_trimesh = False  # self.mesh_checkbox.isChecked()
         data = {
             "operation": "compute",
             "inpath": str(inpath),
@@ -239,8 +231,8 @@ class ComputeWidget(QWidget):
             "cellsize": cellsize,
             "mode": mode,
             "active_elements": active_elements,
-            "as_trimesh": as_trimesh,
         }
+        print(data)
         # https://gis.stackexchange.com/questions/296175/issues-with-qgstask-and-task-manager
         # It seems the task goes awry when not associated with a Python object!
         # -- we just assign it to the widget here.
@@ -248,6 +240,12 @@ class ComputeWidget(QWidget):
         # To run the tasks without the QGIS task manager:
         # result = task.run()
         # task.finished(result)
+
+        # Remove the output layers from QGIS, otherwise they cannot be overwritten.
+        gpkg_path = str(outpath)
+        for layer in QgsProject.instance().mapLayers().values():
+            if Path(gpkg_path) == Path(layer.source()):
+                QgsProject.instance().removeMapLayer(layer.id())
 
         self.compute_task = ComputeTask(self, data, self.parent.message_bar)
         self.start_task = self.parent.start_interpreter_task()
@@ -285,10 +283,10 @@ class ComputeWidget(QWidget):
         start, stop, step = self.contour_range()
         return contour, start, stop, step
 
-    def load_mesh_result(self, path: Union[Path, str], as_trimesh: bool) -> None:
+    def load_mesh_result(self, path: Union[Path, str]) -> None:
         path = Path(path)
         # String for QGIS functions
-        netcdf_path = str(path)
+        netcdf_path = str(path.with_suffix(".ugrid.nc"))
         # Loop through layers first. If the path already exists as a layer source, remove it.
         # Otherwise QGIS will not the load the new result (this feels like a bug?).
         for layer in QgsProject.instance().mapLayers().values():
@@ -312,14 +310,12 @@ class ComputeWidget(QWidget):
             renderer = index_layer.rendererSettings()
             renderer.setActiveScalarDatasetGroup(index)
 
-            if not as_trimesh:
-                scalar_settings = renderer.scalarSettings(index)
-                # Set renderer to DataResamplingMethod.None = 0
-                scalar_settings.setDataResamplingMethod(0)
-                renderer.setScalarSettings(index, scalar_settings)
+            scalar_settings = renderer.scalarSettings(index)
+            scalar_settings.setDataResamplingMethod(0)
+            renderer.setScalarSettings(index, scalar_settings)
 
             index_layer.setRendererSettings(renderer)
-            self.parent.add_layer(index_layer, "output")
+            self.parent.add_layer(index_layer, "output:mesh")
 
             if contour:
                 contour_layer = mesh_contours(
@@ -340,38 +336,44 @@ class ComputeWidget(QWidget):
         return
 
     def load_raster_result(self, path: Union[Path, str]) -> None:
-        path = Path(path)
+        def steady_or_first(name: str) -> bool:
+            if "time=" not in name:
+                return True
+            elif "time=0" in name:
+                return True
+            return False
+
         # String for QGIS functions
-        gpkg_path = str(path)
-        # Loop through layers first. If the path already exists as a layer source, remove it.
-        # Otherwise QGIS will not the load the new result (this feels like a bug?).
-        # for layer in QgsProject.instance().mapLayers().values():
-        #    if Path(gpkg_path) == Path(layer.source()):
-        #        QgsProject.instance().removeMapLayer(layer.id())
+        path = Path(path)
+        raster_path = str(path.with_suffix(".nc"))
+        for layer in QgsProject.instance().mapLayers().values():
+            if Path(raster_path) == Path(layer.source()):
+                QgsProject.instance().removeMapLayer(layer.id())
 
-        contour, start, stop, step = self.contouring()
+        #        contour, start, stop, step = self.contouring()
 
-        renderer = None
-        for name in geopackage.layers(path):
-            if "head_layer_" not in name:
-                continue
+        layer = QgsRasterLayer(raster_path, "", "gdal")
 
-            layer = QgsRasterLayer(gpkg_path, name, "gdal")
-            # Create renderer based on first layer.
-            if renderer is None:
-                renderer = layer_styling.pseudocolor_renderer(
-                    layer, band=1, colormap="Plasma", nclass=10
-                )
-            self.parent.add_layer(layer, "output", renderer)
+        bands = [i + 1 for i in range(layer.bandCount())]
+        bandnames = [layer.bandName(band) for band in bands]
+        bands = [band for band, name in zip(bands, bandnames) if steady_or_first(name)]
 
-            if contour:
-                contour_layer = raster_steady_contours(
-                    layer=layer,
-                    name=name,
-                    start=start,
-                    stop=stop,
-                    step=step,
-                )
-                self.add_contour_layer(contour_layer)
+        for i, band in enumerate(bands):
+            layer = QgsRasterLayer(raster_path, f"{path.stem}-head_layer_{i}", "gdal")
+            renderer = layer_styling.pseudocolor_renderer(
+                layer, band=band, colormap="Plasma", nclass=10
+            )
+            layer.setRenderer(renderer)
+            self.parent.add_layer(layer, "output:raster")
+
+        #            if contour:
+        #                contour_layer = raster_steady_contours(
+        #                    layer=layer,
+        #                    name=name,
+        #                    start=start,
+        #                    stop=stop,
+        #                    step=step,
+        #                )
+        #                self.add_contour_layer(contour_layer)
 
         return

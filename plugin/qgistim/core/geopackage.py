@@ -8,10 +8,23 @@ This module lightly wraps a few QGIS built in functions to:
     * Remove a layer from a geopackage
 
 """
+import sqlite3
+from contextlib import contextmanager
 from typing import List
 
 from qgis import processing
 from qgis.core import QgsVectorFileWriter, QgsVectorLayer
+
+
+@contextmanager
+def sqlite3_cursor(path):
+    connection = sqlite3.connect(path)
+    cursor = connection.cursor()
+    try:
+        yield cursor
+    finally:
+        cursor.close()
+        connection.close()
 
 
 def layers(path: str) -> List[str]:
@@ -27,10 +40,10 @@ def layers(path: str) -> List[str]:
     -------
     layernames: List[str]
     """
-    # Adapted from PyQGIS cheatsheet:
-    # https://docs.qgis.org/testing/en/docs/pyqgis_developer_cookbook/cheat_sheet.html#layers
-    layer = QgsVectorLayer(path, "", "ogr")
-    return [name.split("!!::!!")[1] for name in layer.dataProvider().subLayers()]
+    with sqlite3_cursor(path) as cursor:
+        cursor.execute("Select table_name from gpkg_contents")
+        layers = [item[0] for item in cursor.fetchall()]
+    return layers
 
 
 def write_layer(

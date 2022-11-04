@@ -100,7 +100,6 @@ def handle(line) -> None:
             cellsize=data["cellsize"],
             mode=data["mode"],
             active_elements=data["active_elements"],
-            as_trimesh=data["as_trimesh"],
         )
         response = "Computation of {inpath} to {outpath}".format(**data)
     elif operation == "convert":
@@ -181,7 +180,6 @@ def compute(args) -> None:
         cellsize=data["cellsize"],
         mode=data["mode"],
         active_elements=data["active_elements"],
-        as_trimesh=data["as_trimesh"],
     )
     return
 
