@@ -578,8 +578,7 @@ class LeakyLineDoublet(Element):
             QgsField("label", QVariant.String),
         ]
         self.timml_defaults = {
-            "order",
-            QgsDefaultValue("4"),
+            "order": QgsDefaultValue("4"),
         }
 
     def renderer(self) -> QgsSingleSymbolRenderer:
