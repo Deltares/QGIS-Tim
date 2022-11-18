@@ -2,6 +2,7 @@ import pathlib
 from typing import Dict, Union
 
 import geopandas as gpd
+import numpy as np
 import rioxarray  # noqa # pylint: disable=unused-import
 import xarray as xr
 
@@ -24,6 +25,10 @@ def write_ugrid(
     outpath: Union[pathlib.Path, str],
 ) -> None:
     ugrid_head = gistim.to_ugrid2d(head)
+    ugrid_head["projected_coordinate_system"] = xr.DataArray(
+        data=np.int32(0),
+        attrs={"epsg": np.int32(crs.to_epsg())},
+    )
     ugrid_head.to_netcdf(outpath.with_suffix(".ugrid.nc"))
     return
 
