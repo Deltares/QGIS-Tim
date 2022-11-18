@@ -371,9 +371,9 @@ class Aquifer(TransientElement):
             QgsField("reference_date", QVariant.DateTime),
         ]
         self.ttim_defaults = {
-            "tmin": QgsDefaultValue("0.0"),
+            "tmin": QgsDefaultValue("0.01"),
             "tmax": QgsDefaultValue("10.0"),
-            "tstart": QgsDefaultValue("0.01"),
+            "tstart": QgsDefaultValue("0.0"),
             "M": QgsDefaultValue("10"),
         }
 
