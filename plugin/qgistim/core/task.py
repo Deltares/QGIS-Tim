@@ -29,7 +29,7 @@ class BaseServerTask(QgsTask):
 
     @abc.abstractmethod
     def success_message(self):
-        return
+        return f"Completed {self.task_description}"
 
     def push_success_message(self) -> None:
         self.message_bar.pushMessage(
@@ -56,8 +56,9 @@ class BaseServerTask(QgsTask):
 
     def finished(self, result) -> None:
         self.parent.set_interpreter_interaction(True)
-        # Do not show a success message by default.
-        if not result:
+        if result:
+            self.push_success_message()
+        else:
             self.push_failure_message()
         return
 
