@@ -89,9 +89,7 @@ def compute_transient(
 
     extent, crs = gistim.gridspec(inpath, cellsize)
     refdate = ttim_spec.temporal_settings["reference_date"].iloc[0]
-    gdf_head = gistim.ttim_elements.head_observations(
-        timml_model, refdate, observations
-    )
+    gdf_head = gistim.ttim_elements.head_observations(ttim_model, refdate, observations)
     head = gistim.ttim_elements.headgrid(
         ttim_model,
         extent,

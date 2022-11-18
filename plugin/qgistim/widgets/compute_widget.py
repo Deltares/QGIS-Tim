@@ -25,6 +25,7 @@ from qgis.core import (
     QgsRasterLayer,
     QgsTask,
     QgsVectorLayer,
+    QgsVectorLayerTemporalProperties,
 )
 from qgis.gui import QgsMapLayerComboBox
 
@@ -390,14 +391,33 @@ class ComputeWidget(QWidget):
             return
 
         for layername in geopackage.layers(str(gpkg_path)):
+            add = False
             project_layer = project_layers.get(layername)
-            if project_layer is not None:  # So name exists
-                if Path(project_layer.source().partition("|")[0]) == gpkg_path:
-                    # Shares name and source. Just reload the layer.
-                    project_layer.reload()
-                    continue
+            if (
+                project_layer is not None
+                and Path(project_layer.source().partition("|")[0]) == gpkg_path
+            ):
+                # Shares name and source. Just reload the layer.
+                layer = project_layer
+                layer.reload()
+            else:
+                layer = QgsVectorLayer(f"{gpkg_path}|layername={layername}", layername)
+                add = True
 
-            layer = QgsVectorLayer(f"{gpkg_path}|layername={layername}", layername)
-            self.parent.add_layer(layer, "output:vector")
+            # Set the temporal properties if it's a temporal layer
+            temporal_properties = layer.temporalProperties()
+            fields = [field.name() for field in layer.fields()]
+            if ("datetime_start" in fields) and ("datetime_end" in fields):
+                temporal_properties.setStartField("datetime_start")
+                temporal_properties.setEndField("datetime_end")
+                temporal_properties.setMode(
+                    QgsVectorLayerTemporalProperties.ModeFeatureDateTimeStartAndEndFromFields
+                )
+                temporal_properties.setIsActive(True)
+            else:
+                temporal_properties.setIsActive(False)
+
+            if add:
+                self.parent.add_layer(layer, "output:vector")
 
         return

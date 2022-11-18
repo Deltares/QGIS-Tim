@@ -424,7 +424,9 @@ def convert_to_script(spec: TimmlModelSpecification) -> str:
             f_to_kwargs, element = MAPPING[elementtype]
             for i, kwargs in enumerate(f_to_kwargs(element_spec)):
                 if elementtype == "Observation":
-                    observations[f"{observation}_{sanitized(name)}_{i}"] = kwargs
+                    kwargs.pop("label")
+                    kwargs = dict_to_kwargs_code(kwargs)
+                    observations[f"observation_{sanitized(name)}_{i}"] = kwargs
                 else:
                     kwargs["model"] = "model"
                     kwargs = dict_to_kwargs_code(kwargs)

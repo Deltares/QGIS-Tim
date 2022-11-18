@@ -244,30 +244,35 @@ def head_observations(
     # We'll duplicate all values in time, except head which is unique per time.
     if len(observations) == 0:
         return gpd.GeoDataFrame()
+
+    refdate = pd.to_datetime(reference_date)
     xx = []
     yy = []
     labels = []
     heads = []
-    times = []
-
-    for name, kwargs in observations.items():
+    starts = []
+    ends = []
+    for kwargs in observations.values():
         x = kwargs["x"]
         y = kwargs["y"]
         t = kwargs["t"]
-        time = pd.to_datetime(reference_date) + pd.to_timedelta(times, "D")
+        end = refdate + pd.to_timedelta(t, "D")
+        start = np.insert(end[:-1], 0, refdate)
 
-        times.append(time)
+        starts.append(start)
+        ends.append(end)
         heads.append(model.head(x=x, y=y, t=t))
-        xx.append(np.repeat(x, time.size))
-        yy.append(np.repeat(y, time.size))
-        labels.append(np.repeat(kwargs["label"], time.size))
+        xx.append(np.repeat(x, len(t)))
+        yy.append(np.repeat(y, len(t)))
+        labels.append(np.repeat(kwargs["label"], len(t)))
 
     d = {
-        "geometry": gpd.points_from_xy(np.hstack(xx), np.hstack(yy)),
-        "time": np.hstack(times),
-        "label": np.hstack(labels),
+        "geometry": gpd.points_from_xy(np.concatenate(xx), np.concatenate(yy)),
+        "datetime_start": np.concatenate(starts),
+        "datetime_end": np.concatenate(ends),
+        "label": np.concatenate(labels),
     }
-    for i, layerhead in enumerate(np.vstack(heads).T):
+    for i, layerhead in enumerate(np.hstack(heads)):
         d[f"head_layer{i}"] = layerhead
 
     return gpd.GeoDataFrame(d)
@@ -412,6 +417,8 @@ def convert_to_script(spec: TtimModelSpecification) -> str:
         f_to_kwargs, element = MAPPING[elementtype]
         for i, kwargs in enumerate(f_to_kwargs(element_spec, modelkwargs["tstart"])):
             if elementtype == "Observation":
+                kwargs.pop("label")
+                kwargs = dict_to_kwargs_code(kwargs)
                 observations[f"ttim_observation_{sanitized(name)}_{i}"] = kwargs
             else:
                 kwargs["model"] = "ttim_model"
@@ -424,7 +431,7 @@ def convert_to_script(spec: TtimModelSpecification) -> str:
 
     xg, yg = headgrid_code(spec.domain)
     times = spec.output_times.tolist()
-    strings.append(f"head = ttim_model.headgrid(xg={xg}, yg={yg}, t={times})")
+    strings.append(f"ttim_head = ttim_model.headgrid(xg={xg}, yg={yg}, t={times})")
 
     # Add all the individual observation points
     for name, kwargs in observations.items():
