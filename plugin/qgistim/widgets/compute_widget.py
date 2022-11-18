@@ -24,10 +24,11 @@ from qgis.core import (
     QgsProject,
     QgsRasterLayer,
     QgsTask,
+    QgsVectorLayer,
 )
 from qgis.gui import QgsMapLayerComboBox
 
-from ..core import layer_styling
+from ..core import geopackage, layer_styling
 from ..core.dummy_ugrid import write_dummy_ugrid
 from ..core.processing import mesh_contours
 from ..core.task import BaseServerTask
@@ -57,6 +58,7 @@ class ComputeTask(BaseServerTask):
             self.push_success_message()
             self.parent.load_mesh_result(self.data["outpath"])
             self.parent.load_raster_result(self.data["outpath"])
+            self.parent.load_vector_result(self.data["outpath"])
         else:
             self.push_failure_message()
         return
@@ -86,7 +88,7 @@ class ComputeWidget(QWidget):
         self.domain_button.clicked.connect(self.domain)
         # self.mesh_checkbox = QCheckBox("Trimesh")
         self.output_line_edit = QLineEdit()
-        self.output_button = QPushButton("Save in ...")
+        self.output_button = QPushButton("Save as ...")
         self.output_button.clicked.connect(self.set_output_path)
         self.contour_checkbox = QCheckBox("Auto-generate contours")
         self.contour_button = QPushButton("Export contours")
@@ -350,7 +352,7 @@ class ComputeWidget(QWidget):
             if Path(raster_path) == Path(layer.source()):
                 QgsProject.instance().removeMapLayer(layer.id())
 
-        #        contour, start, stop, step = self.contouring()
+        # contour, start, stop, step = self.contouring()
 
         layer = QgsRasterLayer(raster_path, "", "gdal")
 
@@ -375,5 +377,27 @@ class ComputeWidget(QWidget):
         #                    step=step,
         #                )
         #                self.add_contour_layer(contour_layer)
+
+        return
+
+    def load_vector_result(self, path: Union[Path, str]) -> None:
+        project_layers = {
+            layer.name(): layer for layer in QgsProject.instance().mapLayers().values()
+        }
+        gpkg_path = Path(path).with_suffix(".output.gpkg")
+
+        if not gpkg_path.exists():
+            return
+
+        for layername in geopackage.layers(str(gpkg_path)):
+            project_layer = project_layers.get(layername)
+            if project_layer is not None:  # So name exists
+                if Path(project_layer.source().partition("|")[0]) == gpkg_path:
+                    # Shares name and source. Just reload the layer.
+                    project_layer.reload()
+                    continue
+
+            layer = QgsVectorLayer(f"{gpkg_path}|layername={layername}", layername)
+            self.parent.add_layer(layer, "output:vector")
 
         return
