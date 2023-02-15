@@ -21,9 +21,9 @@ except pkg_resources.DistributionNotFound:
 def convert_to_script(inpath: str, outpath: str) -> None:
     timml_spec, ttim_spec = model_specification(inpath, {})
     timml_script = timml_elements.convert_to_script(timml_spec)
-    if len(ttim_spec.temporal_settings) > 0:
+    try:
         ttim_script = ttim_elements.convert_to_script(ttim_spec)
-    else:
+    except Exception:
         ttim_script = ""
 
     with open(outpath, "w") as f:
