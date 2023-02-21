@@ -197,10 +197,14 @@ class DatasetTreeWidget(QTreeWidget):
 PROJECT_SCOPE = "QgisTim"
 GPGK_PATH_ENTRY = "tim_geopackage_path"
 GPKG_LAYERS_ENTRY = "tim_geopackage_layers"
-TIM_GROUP_ENTRY = "tim_group"
-TIMML_GROUP_ENTRY = "timml_group"
-TTIM_GROUP_ENTRY = "ttim_group"
-TIMOUTPUT_GROUP_ENTRY = "timoutput_group"
+PLUGIN_GROUP = "tim_group"
+GROUPS = {
+    "timml": "timml_group",
+    "ttim": "ttim_group",
+    "output:vector": "output_vector_group",
+    "output:mesh": "output_mesh_group",
+    "output:raster": "output_raster_group",
+}
 
 
 class DatasetWidget(QWidget):
@@ -300,6 +304,21 @@ class DatasetWidget(QWidget):
             self.add_item_to_qgis(item)
 
     def write_plugin_state_to_project(self) -> None:
+        """
+        QGIS project file supports reading and storing settings in the project file: 
+        https://docs.qgis.org/3.22/en/docs/pyqgis_developer_cookbook/settings.html
+        
+        We communicate (read & store) the following state: 
+            
+        * Which layers in the Layers panel are QGIS-Tim layers.
+        * In which geopackage these layers are stored.
+        * We connect these with Layer groups of the tim_widget.
+        * Connect the map layers with the elements of the DatasetWidget.
+        """
+
+        subgroups = self.parent.subgroups
+        if subgroups is None:
+            return
         project = QgsProject().instance()
         # Store geopackage path
         project.writeEntry(PROJECT_SCOPE, GPGK_PATH_ENTRY, self.path)
@@ -309,49 +328,66 @@ class DatasetWidget(QWidget):
         names = [layer for layer in maplayers]
         entry = "␞".join(names)
         project.writeEntry(PROJECT_SCOPE, GPKG_LAYERS_ENTRY, entry)
-
-        # Store root group
-        for (group, entry) in (
-            (self.parent.group, TIM_GROUP_ENTRY),
-            (self.parent.timml_group, TIMML_GROUP_ENTRY),
-            (self.parent.ttim_group, TTIM_GROUP_ENTRY),
-            (self.parent.output_group, TIMOUTPUT_GROUP_ENTRY),
-        ):
+        plugin_group_name = self.parent.group.name()
+        project.writeEntry(PROJECT_SCOPE, PLUGIN_GROUP, plugin_group_name)
+        
+        for key, entry_name in GROUPS.items():
+            group = subgroups[key]
             try:
                 group_name = group.name()
             except (RuntimeError, AttributeError):
                 group_name = ""
-            project.writeEntry(PROJECT_SCOPE, entry, group_name)
+            project.writeEntry(PROJECT_SCOPE, entry_name, group_name)
 
         project.blockSignals(True)
         project.write()
         project.blockSignals(False)
 
     def read_plugin_state_from_project(self) -> None:
+        """
+        Initialize the plugin state from the settings stored in the project
+        file, and the available groups and layers in the Layers Panel. 
+        
+        * Find the geopackage path.
+        * Find the plugin group in the Layers Panel
+        * Set the plugin group in the QgisTimWidget.group.
+        * Set the subgroups in the QgisTimWidget.subgroups dictionary.
+        * Attach the map layers to the DatasetItem elements.
+ 
+        Early return on failure to find the geopackage path or the plugin
+        group.
+        """
         project = QgsProject().instance()
-        path, _ = project.readEntry(PROJECT_SCOPE, GPGK_PATH_ENTRY)
-        if path == "":
+        path, success = project.readEntry(PROJECT_SCOPE, GPGK_PATH_ENTRY)
+        if not success or path == "":
+            return
+        
+        plugin_group_name, success = project.readEntry(PROJECT_SCOPE, PLUGIN_GROUP)
+        if not success:
             return
 
-        group_name, _ = project.readEntry(PROJECT_SCOPE, TIM_GROUP_ENTRY)
-        timml_group_name, _ = project.readEntry(PROJECT_SCOPE, TIMML_GROUP_ENTRY)
-        ttim_group_name, _ = project.readEntry(PROJECT_SCOPE, TTIM_GROUP_ENTRY)
-        output_group_name, _ = project.readEntry(PROJECT_SCOPE, TIMOUTPUT_GROUP_ENTRY)
         root = QgsProject.instance().layerTreeRoot()
-        self.group = root.findGroup(group_name)
-        if self.group is None:
-            self.create_groups()
-        if self.group is not None:
-            self.parent.timml_group = self.group.findGroup(timml_group_name)
-            self.parent.ttim_group_name = self.group.findGroup(ttim_group_name)
-            self.parent.output_group_name = self.group.findGroup(output_group_name)
-            if self.parent.timml_group is None:
-                self.parent.timml_group = self.group.addGroup(f"{group_name}-timml")
-            if self.parent.ttim_group is None:
-                self.parent.ttim_group = self.group.addGroup(f"{group_name}-ttim")
-            if self.parent.output_group is None:
-                self.parent.output_group = self.group.addGroup(f"{group_name}-output")
+        plugin_group = root.findGroup(plugin_group_name)
+        if plugin_group is None:
+            return
 
+        self.parent.group = plugin_group
+        subgroups = self.parent.subgroups
+
+        for key, entry_name in GROUPS.items():
+            name, success = project.readEntry(PROJECT_SCOPE, entry_name)
+            if success:
+                subgroup = plugin_group.findGroup(name)
+            else:
+                subgroup = None
+
+            if subgroup is None:
+                # If the subgroup doesn't exist, recreate it:
+                # and set the subgroup in tim_widget.group
+                subgroups[key] = plugin_group.addGroup(name)
+            else:
+                subgroups[key] = plugin_group.findGroup(name)
+    
         entry, success = project.readEntry(PROJECT_SCOPE, GPKG_LAYERS_ENTRY)
         if success:
             names = entry.split("␞")
@@ -371,6 +407,8 @@ class DatasetWidget(QWidget):
             element.assoc_layer = maplayers.get(element.assoc_name, None)
             self.dataset_tree.add_element(element)
 
+        return
+
     def new_geopackage(self) -> None:
         """
         Create a new GeoPackage file, and set it as the active dataset.
@@ -385,6 +423,7 @@ class DatasetWidget(QWidget):
             self.load_geopackage()
             self.parent.toggle_element_buttons(True)
         self.parent.on_transient_changed()
+        return
 
     def open_geopackage(self) -> None:
         """
@@ -398,6 +437,7 @@ class DatasetWidget(QWidget):
             self.parent.toggle_element_buttons(True)
         self.dataset_tree.sortByColumn(0, Qt.SortOrder.AscendingOrder)
         self.parent.on_transient_changed()
+        return
 
     def remove_geopackage_layer(self) -> None:
         """
@@ -407,6 +447,7 @@ class DatasetWidget(QWidget):
         * The geopackage
         """
         self.dataset_tree.remove_geopackage_layers()
+        return
 
     def suppress_popup_changed(self):
         suppress = self.suppress_popup_checkbox.isChecked()
@@ -416,6 +457,7 @@ class DatasetWidget(QWidget):
                 config = layer.editFormConfig()
                 config.setSuppress(suppress)
                 layer.setEditFormConfig(config)
+        return
 
     def active_elements(self):
         active_elements = {}
@@ -443,9 +485,11 @@ class DatasetWidget(QWidget):
 
     def on_transient_changed(self, transient: bool) -> None:
         self.dataset_tree.on_transient_changed(transient)
+        return
 
     def add_element(self, element) -> None:
         self.dataset_tree.add_element(element)
+        return
 
     def convert(self) -> None:
         outpath, _ = QFileDialog.getSaveFileName(self, "Select file", "", "*.py")
@@ -456,3 +500,4 @@ class DatasetWidget(QWidget):
                 "outpath": outpath,
             }
             self.parent.execute(data)
+        return
