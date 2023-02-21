@@ -47,7 +47,7 @@ class StartTask(BaseServerTask):
             return False
 
 
-class QgisTimmlWidget(QWidget):
+class QgisTimWidget(QWidget):
     def __init__(self, parent, iface):
         super().__init__(parent)
 

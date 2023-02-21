@@ -26,8 +26,8 @@ class QgisTimPlugin:
         self.tim_widget = None
         self.plugin_dir = Path(__file__).parent
         self.pluginIsActive = False
-        self.toolbar = iface.addToolBar("Qgis-Tim")
-        self.toolbar.setObjectName("Qgis-Tim")
+        self.toolbar = iface.addToolBar("QgisTim")
+        self.toolbar.setObjectName("QgisTim")
         return
 
     def add_action(self, icon_name, text="", callback=None, add_to_menu=False):
@@ -41,17 +41,17 @@ class QgisTimPlugin:
     def initGui(self):
         icon_name = "icon.png"
         self.action_timml = self.add_action(
-            icon_name, "Qgis-TimML", self.toggle_timml, True
+            icon_name, "QgisTim", self.toggle_timml, True
         )
 
     def toggle_timml(self):
         if self.tim_widget is None:
-            from .widgets.tim_widget import QgisTimmlWidget
+            from .widgets.tim_widget import QgisTimWidget
 
-            self.tim_widget = TimDockWidget("Qgis-TimML")
-            self.tim_widget.setObjectName("QgisTimmlDock")
+            self.tim_widget = TimDockWidget("QgisTim")
+            self.tim_widget.setObjectName("QgisTimDock")
             self.iface.addDockWidget(Qt.RightDockWidgetArea, self.tim_widget)
-            widget = QgisTimmlWidget(self.tim_widget, self.iface)
+            widget = QgisTimWidget(self.tim_widget, self.iface)
             self.tim_widget.setWidget(widget)
             self.tim_widget.hide()
         self.tim_widget.setVisible(not self.tim_widget.isVisible())
