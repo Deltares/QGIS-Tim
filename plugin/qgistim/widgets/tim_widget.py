@@ -86,7 +86,7 @@ class QgisTimmlWidget(QWidget):
 
         # QGIS Layers Panel groups
         self.group = None
-        self.groups = {}
+        self.subgroups = {}
 
         return
 
@@ -153,7 +153,7 @@ class QgisTimmlWidget(QWidget):
     def create_subgroup(self, name: str, part: str) -> None:
         try:
             value = self.group.addGroup(f"{name}-{part}")
-            self.groups[part] = value
+            self.subgroups[part] = value
         except RuntimeError as e:
             if e.args[0] == PYQT_DELETED_ERROR:
                 # This means the main group has been deleted: recreate
@@ -177,7 +177,7 @@ class QgisTimmlWidget(QWidget):
         Try to add to a group; it might have been deleted. In that case, we add
         as many groups as required.
         """
-        group = self.groups[destination]
+        group = self.subgroups[destination]
         try:
             if on_top:
                 group.insertLayer(0, maplayer)
