@@ -55,7 +55,7 @@ class ElementsWidget(QWidget):
         klass = ELEMENTS[element_type]
         names = self.parent.selection_names()
         element = klass.dialog(
-            self.parent.path, self.parent.crs, self.parent.iface, klass, names
+            self.parent.path, self.parent.crs, self.parent.iface, names
         )
         if element is None:  # dialog cancelled
             return
