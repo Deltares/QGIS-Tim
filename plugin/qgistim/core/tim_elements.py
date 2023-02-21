@@ -134,9 +134,9 @@ class Element:
         self._initialize(path, name)
         self.timml_name = f"timml {self.element_type}:{name}"
 
-    @staticmethod
+    @classmethod
     def dialog(
-        path: str, crs: Any, iface: Any, klass: type, names: List[str]
+        cls, path: str, crs: Any, iface: Any, names: List[str]
     ) -> Tuple[Any]:
         dialog = NameDialog()
         dialog.show()
@@ -148,7 +148,7 @@ class Element:
         if name in names:
             raise ValueError(f"Name already exists in geopackage: {name}")
 
-        instance = klass(path, name)
+        instance = cls(path, name)
         instance.create_layers(crs)
         return instance
 
