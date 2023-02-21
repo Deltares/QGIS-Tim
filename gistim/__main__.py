@@ -35,22 +35,11 @@ def get_configdir() -> Path:
 
 def write_configjson(path: Path, data: dict[str, Any]) -> None:
     """
-    Either:
-
-    * Write a new file if it does not exist.
-    * Append a new entry (with the interpreter as key).
-    * Overwrite an entry if already present.
+    Create, overwrite if needed.
     """
-    if path.exists():
-        with open(path, "r") as f:
-            content = json.loads(f.read())
-        content[sys.executable] = data
-    else:
-        content = {sys.executable: data}
-
+    content = {sys.executable: data}
     with open(path, "w") as f:
         f.write(json.dumps(content))
-
     return
 
 
