@@ -305,11 +305,11 @@ class DatasetWidget(QWidget):
 
     def write_plugin_state_to_project(self) -> None:
         """
-        QGIS project file supports reading and storing settings in the project file: 
+        QGIS project file supports reading and storing settings in the project file:
         https://docs.qgis.org/3.22/en/docs/pyqgis_developer_cookbook/settings.html
-        
-        We communicate (read & store) the following state: 
-            
+
+        We communicate (read & store) the following state:
+
         * Which layers in the Layers panel are QGIS-Tim layers.
         * In which geopackage these layers are stored.
         * We connect these with Layer groups of the tim_widget.
@@ -330,7 +330,7 @@ class DatasetWidget(QWidget):
         project.writeEntry(PROJECT_SCOPE, GPKG_LAYERS_ENTRY, entry)
         plugin_group_name = self.parent.group.name()
         project.writeEntry(PROJECT_SCOPE, PLUGIN_GROUP, plugin_group_name)
-        
+
         for key, entry_name in GROUPS.items():
             group = subgroups[key]
             try:
@@ -346,14 +346,14 @@ class DatasetWidget(QWidget):
     def read_plugin_state_from_project(self) -> None:
         """
         Initialize the plugin state from the settings stored in the project
-        file, and the available groups and layers in the Layers Panel. 
-        
+        file, and the available groups and layers in the Layers Panel.
+
         * Find the geopackage path.
         * Find the plugin group in the Layers Panel
         * Set the plugin group in the QgisTimWidget.group.
         * Set the subgroups in the QgisTimWidget.subgroups dictionary.
         * Attach the map layers to the DatasetItem elements.
- 
+
         Early return on failure to find the geopackage path or the plugin
         group.
         """
@@ -361,7 +361,7 @@ class DatasetWidget(QWidget):
         path, success = project.readEntry(PROJECT_SCOPE, GPGK_PATH_ENTRY)
         if not success or path == "":
             return
-        
+
         plugin_group_name, success = project.readEntry(PROJECT_SCOPE, PLUGIN_GROUP)
         if not success:
             return
@@ -387,7 +387,7 @@ class DatasetWidget(QWidget):
                 subgroups[key] = plugin_group.addGroup(name)
             else:
                 subgroups[key] = plugin_group.findGroup(name)
-    
+
         entry, success = project.readEntry(PROJECT_SCOPE, GPKG_LAYERS_ENTRY)
         if success:
             names = entry.split("␞")
