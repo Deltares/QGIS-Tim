@@ -380,7 +380,7 @@ class DatasetWidget(QWidget):
             self.dataset_line_edit.setText(path)
             for element in (Aquifer, Domain):
                 instance = element(self.path, "")
-                instance.create_layer(self.parent.crs)
+                instance.create_layers(self.parent.crs)
                 instance.write()
             self.load_geopackage()
             self.parent.toggle_element_buttons(True)
