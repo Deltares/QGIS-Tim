@@ -49,7 +49,7 @@ class StartTask(BaseServerTask):
 
 class QgisTimmlWidget(QWidget):
     def __init__(self, parent, iface):
-        super(QgisTimmlWidget, self).__init__(parent)
+        super().__init__(parent)
 
         self.iface = iface
         self.message_bar = self.iface.messageBar()

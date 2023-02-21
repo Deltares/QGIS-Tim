@@ -52,7 +52,7 @@ SUPPORTED_TTIM_ELEMENTS = set(
 
 class DatasetTreeWidget(QTreeWidget):
     def __init__(self, parent=None):
-        super(DatasetTreeWidget, self).__init__(parent)
+        super().__init__(parent)
         self.setSelectionMode(QAbstractItemView.ExtendedSelection)
         self.setHeaderHidden(True)
         self.setSortingEnabled(True)
@@ -205,7 +205,7 @@ TIMOUTPUT_GROUP_ENTRY = "timoutput_group"
 
 class DatasetWidget(QWidget):
     def __init__(self, parent):
-        super(DatasetWidget, self).__init__(parent)
+        super().__init__(parent)
         self.parent = parent
         self.dataset_tree = DatasetTreeWidget()
         self.dataset_tree.setSizePolicy(QSizePolicy.Preferred, QSizePolicy.Expanding)
@@ -380,7 +380,7 @@ class DatasetWidget(QWidget):
             self.dataset_line_edit.setText(path)
             for element in (Aquifer, Domain):
                 instance = element(self.path, "")
-                instance.create_layers(self.parent.crs)
+                instance.create_layer(self.parent.crs)
                 instance.write()
             self.load_geopackage()
             self.parent.toggle_element_buttons(True)

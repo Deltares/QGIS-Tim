@@ -49,7 +49,7 @@ class SelectionMapTool(QgsMapTool):
     REMOVE_FROM_SELECTION = "Remove from selection"
 
     def __init__(self, iface):
-        super(SelectionMapTool, self).__init__(iface.mapCanvas())
+        super().__init__(iface.mapCanvas())
         self.iface = iface
         self.mode = None
         self.geom_type = QgsWkbTypes.PolygonGeometry
@@ -236,7 +236,7 @@ def is_netcdf_layer(layer):
 
 class DataExtractionWidget(QWidget):
     def __init__(self, parent):
-        super(DataExtractionWidget, self).__init__(parent)
+        super().__init__(parent)
         self.parent = parent
         self.canvas = parent.iface.mapCanvas()
         self.start_task = None

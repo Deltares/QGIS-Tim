@@ -67,7 +67,7 @@ class ComputeTask(BaseServerTask):
 
 class ComputeWidget(QWidget):
     def __init__(self, parent=None):
-        super(ComputeWidget, self).__init__(parent)
+        super().__init__(parent)
         self.compute_task = None
         self.start_task = None
         self.parent = parent

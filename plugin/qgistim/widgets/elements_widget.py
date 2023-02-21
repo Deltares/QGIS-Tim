@@ -7,7 +7,7 @@ from ..core.tim_elements import ELEMENTS
 
 class ElementsWidget(QWidget):
     def __init__(self, parent):
-        super(ElementsWidget, self).__init__(parent)
+        super().__init__(parent)
         self.parent = parent
 
         self.element_buttons = {}

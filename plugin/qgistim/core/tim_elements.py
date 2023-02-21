@@ -86,7 +86,7 @@ INHOM_ATTRIBUTES = [
 
 class NameDialog(QDialog):
     def __init__(self, parent=None):
-        super(NameDialog, self).__init__(parent)
+        super().__init__(parent)
         self.name_line_edit = QLineEdit()
         self.ok_button = QPushButton("OK")
         self.cancel_button = QPushButton("Cancel")
