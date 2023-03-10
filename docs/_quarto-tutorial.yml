@@ -1,0 +1,13 @@
+project:
+  type: book
+
+book:
+  title: "QGIS-TIM Tutorial"
+  chapters:
+    - index.qmd
+    - tutorial-QGIS-TIM.qmd 
+    
+format:
+  pdf:
+    documentclass: scrreprt
+    top-level-division: chapter

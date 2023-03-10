@@ -1,0 +1,296 @@
+---
+title: "Tutorial QGIS-TimML <br> *[under construction]*"
+output-dir: ../_build
+format: html
+mainfont: Arial
+#monofont: Roboto
+---
+
+## Requirements
+- Be sure QGIS 3.22.00 or higher is installed. 
+- The installation of the necessary QGIS-TIMML plugin is part of this Tutorial. 
+- Download the tutorial material. [Follow this link.](https://deltares.thegood.cloud/s/MB94b7mLmpgNcbj).
+
+## Description
+In this tutorial, you will learn how to:
+
+- install the Qgis-Tim plugin;
+- use the basic of QGIS;
+- create a steady state and transient model in TIMML; 
+- analyse the results;
+- run scenario's.
+
+# Objective
+With the basic experience from this tutorial and the online documentation on TIM you are able to use TTIM in your daily work.
+
+# Introduction case *Rijsenhout*
+In one of the fields west of Rijsenhout industrial activities are planned, the construction of glass houses. From historical sources it is known that some bombs from World War 2 are still in the subsoil. Before building starts, these bombs are removed for safety reasons. The contractor plans to drill sheet piles for a closed building pit. Inside the pit, the excavation will take place, the groundwater level is lowerd with a set of wells just in the top of the aquifer. All drain water is infiltrated over a strech of wells near the existing buildings.  
+On the project location the top layer is 12 m thick and consist of low permeable combination of clay and peat. Below this toplayer we find an aquifer of 50 m. The Westeinderplassen, a lake system with a depth of 3 m., is located East of the project area. 
+
+![Verticale Doorsnede BRO GeoTOP v1.4.1](figures/tutorial/GeoTOP-Verticaledoorsnede.png){width=100% #fig-GeoTOP-Verticaledoorsnede}
+
+![Lifting the World War II bomb / crosssection ](figures/tutorial/photo-fieldwork-liftbomb-crosssection.jpg){width=100% #fig-photo-fieldwork-liftbomb-crosssection}
+
+
+# Getting Started 
+(@) Launch QGIS from your START menu, your desktop or click on
+…\\QGIS3.24.0\\bin\\qgis-bin.exe.
+
+---
+
+> **Intermezzo:** *QGIS language settings*
+> 
+> Perhaps your QGIS was installed in another language than English. While the Tutorial refers to the  English version, let’s change than to English. 
+> 
+> a. From the main menu click on *Settings* and select *Options*. (e.g. in Dutch *Extra* and *Opties*). 
+> a. In the new window go to the *General section* on the left. 
+> a. From the drop-down menu *“User interface translation”* select *American English* and click *OK*. 
+> a. Close QGIS and open it again to activate your language change.
+
+---
+
+We start with the creation of a new QGIS project.
+
+(@) From the main menu click on *Project* and select *New*. 
+
+The case in this turotial is located in the The Netherlands, so next we select the appropriate projection.
+
+(@) From the main menu click on *Project* and select *Properties*. 
+(@) In the *Properties* window select the category *CRS*, search for “EPSG:28992” and you find “Amersfoort / RD New”. Select this option and click the *Apply* button, followed by the OK button to close the window.
+
+### Install plugins
+This is the moment to download/import four plugins needed for this tutorial:
+
+- the TIM plugin. The development version imported from ZIP file.
+- the iMOD plugin. The development version imported from ZIP file.
+- the Value Tool. The official version installed via QGIS. 
+- the PDOK plugin. The official version installed via QGIS. This plugin gives access to a large database from which we will load the topographic maps and use the navigation option.
+
+(@) Go to *Plugins* from the main menu and select *Manage and Install Plugins…* to open the plugin window. 
+(@) On the left, section select *Install from ZIP*.
+(@) Click the Browse button (![](figures/tutorial/button-Qgis-browse.png){width=4%}) and from the tutorial dataset select the ZIP file "TIM-tutorial\\imod-plugin.zip". 
+(@) Click *Install Plugin*.
+(@) In the same way, install the QGIS-TIM plugin using the ZIP file "TIM-tutorial\\TIM-plugin.zip". 
+(@) From the left section, select the group *All* to see all available plugins. 
+(@) Search for “PValue Tool” and install it. 
+(@) Search for “PDOK services plugin” and install it. 
+(@) Make sure that under *Plugins > Manage and Install Plugins > Installed* now the 3 added plugins are checked.
+(@) *Close* the Plugins window. 
+
+See in the toolbar section of QGIS that the plugin are installed: 
+
+- iMOD Toolbar ![](figures/tutorial/button_iMOD-Toolbar.png){width=30%} 
+- QGIS-TimML ![](figures/tutorial/button-Qgis-tim.png){width=4%}
+- Value Tool ![](figures/tutorial/button_valuetool.png){width=4%}
+- PDOK Services Plugin ![](figures/tutorial/button-PDOK.png){width=4%}
+
+For navigation purposes, let us load a topographic map for The Netherlands from the PDOK database.
+
+(@) Click on the PDOK plugin button to open the "PDOK Services Plugin" window. 
+(@) From the tab *PDOK Services* search for "pastel" and you will find a WMTS type layer called "brtachtergrondkaart". 
+(@) Select the layer.
+(@) In the section "laag toevoegen" click the button *Onder*. 
+(@) Close the PDOK window.
+
+Our project area is near the town of Rijsenhout so let's navigate to that town using the PDOK plugin.  
+
+(@) Type "Rijsenhout" in the PDOK search field
+(@) PDOK will find "Rijsenhout, Haarlemmermeer, Noord-Holland". Click on it ans QGIS wil fly to the project location.
+
+Let's now open a shape file containing the locations and depths of the bombs.
+
+(@) Go to *Layer* in the main menu, go to *Add layer* and select *Add Vector layer*.
+(@) User the browse button (![](figures/tutorial/button-Qgis-browse.png){width=4%}) and from the tutorial material select “…\\TIM-training\\dbase\\bombs.shp”.
+(@) Click on *Add* and *Close* the window.
+(@) In the *Layers* panel on the left, select the layer "bombs".
+(@) Click your right mouse button and from the menu select *Show Labels*.
+(@) You can zoom in and out with the scroll button on your mouse or navigate with the buttons in the main menu: ![](figures/tutorial/button_zoom-menu.png){width=40%}
+(@) Use ![](figures/tutorial/button_zoomPan.png){width=4%} to pan the map with your left mouse button and use ![](figures/tutorial/button_zoomtolayer.png){width=4%} to zoom to the extend of the layers/groups selected in the *Layers* panel.
+
+### Start your TimML model
+Now we are ready to activate the QGIS-Tim plugin. 
+
+(@) Click on the QGIS-Tim plugin button (![](figures/tutorial/button-Qgis-tim.png){width=4%}) and the TimML panel appears, see also @fig-Panel-TimML.
+
+![QGIS-TimML panel](figures/tutorial/Panel-TimML.png){width=70% #fig-Panel-TimML}
+
+(@) Goto the tab *GeoPackage*. <br> Here we will create an empyt database (geopacakge) to store all elements and parameters for the model. 
+(@) Click the *New* button to create the GeoPackage and save it for instance in the folder with your training data "..\\TIM-Training\\dbase\\geopackage\\case-Rijsenhout.gpkg".
+(@) Check in the *Layers* panel on the left that your new geopackage is addedas a group. <br> A sub group **timml** for the steady state model input, the sub group **ttim** for the transient model input and a series of output formats (vector/mesh/raster). 
+
+If you had no introduction to the TIM plugin, read the Intermezzo below for a general explanation of the components. 
+
+---
+
+> **Interemezzo:** *introduction Tabs on the TimML panel* 
+> 
+> a. Extract: open an existing 3d geoydrologcal model (NC file) and extract the data for your project area. 
+> a. GeoPackage: an overview of the elements in you geopackage. In case you switch to transient modelling, an extra column with ttim elements is added. 
+> a. Elements: a list of 12 TimML elements from which you can build your model. 
+> a. Compute: here you can define your domain and cell size, decide if your model is transient or not and change the output name. 
+
+---
+
+Let us save this project to be able to return to it later or in case of a crash of QGIS.
+
+(@) Go to *Project* in the main menu, select *Save As* and select a folder and a file name for your project, e.g. “…\\TIM-training\\tutorial1.qgz”
+
+Now we are ready to define our first steady state model by parameterizing our Aquifer. <br>
+**NB.** All the editing of the parameter and elements we do in your geopackage in the *Layers* panel on the left!   
+
+(@) In your geopackage select the layer "timml Aquifer:Aquifer" and click your right mouse button.
+(@) Form the menu select *Attribute Tabel* and the table opens in a new window. 
+(@) Start the editing mode with a click on the *Toggle Edditing Mode* button (![](figures/tutorial/button-Qgis-AttributeTable-StartEditingMode.png ){width=4%}).
+(@) Add a new feature with the *Add feature* button (![](figures/tutorial/button-Qgis-AttributeTable-AddFeature.png){width=4%}). in this case a feature is a hydrological layer. 
+(@) Fill the feature with the values from the table below: 
+
+| parameter  | value |  
+|---          |---    |
+| Layer       | 0     |  
+| aquifer_k   | 5     |
+| aquifer_top | -10   | 
+| aquifer_top | -30   |
+
+(@) Save all changes with the *Save Edits* button (![](figures/tutorial/button-Qgis-AttributeTable-SaveEdits.png){width=4%}).
+(@) Stop the *Edditing Mode* with a click on the button (![](figures/tutorial/button-Qgis-AttributeTable-StartEditingMode.png ){width=4%}).
+(@) Close the *Attribute Table* window.
+(@) Go to the tab *compute* in TimML.
+(@) Click the button *Set to current extent*.
+(@) Start the calculation with a click on *Compute*.
+(@) Minimize the python.exe window. 
+
+After the calculation you see that the result is added to the geopackage as a mesh and raster layer. Although the layers are checked, the data is not visible. That is because the GeoPackage was added last, and QGIS adds layers at the and of the list. Let's move the layer "pastel" toe the background. 
+
+(@) Select the layer "pastel" and drag it with your left mouse button to the bottom of the list of layers.
+
+The calculation result is now visable and we see a raster with just the value 0, not a very exiting result. Let's now add a well element.
+
+(@) First hide the output layers by deselecting the raster and mesh layers.
+(@) Goto the tab *Elements* in TimML.
+(@) Click on "Well"
+(@) Give the layer a name, e.g. "DewateringWell".
+
+See that this layer is added to the timml sub-group in your geopackage with 'point' geometry. Also in the ttim sub-group an element with the same name is added. This is a tabel that can store transient well data while refering to the x/y locations in the timml layer. Next step is to add the well with its parameters.  
+
+(@) Select the layer "timml Well:DewateringWell"
+(@) Click your right mouse button and select the *Toggle Edditing Mode* (![](figures/tutorial/button-Qgis-AttributeTable-StartEditingMode.png ){width=4%}).
+(@) To add a new well (feature) to the layer click the *Add Point Feature* button (![](figures/tutorial/button_AddPointFeature.png){width=4%}).
+(@) With your mouse, click on a location just outside the group of bombs. 
+(@) Fill the feature with the values from the example below. 
+
+![](figures/tutorial/Figure_FeatureAttributes.png){width=50%}
+
+(@) Click *OK*.
+(@) Click the *Toggle Editing* button (![](figures/tutorial/button-Qgis-AttributeTable-StartEditingMode.png){width=4%}) and if you are asked to save changes select *Save*. <br> An alternative way to save your edits is to click the *Save Layer Edits* button (![](figures/tutorial/button_SavelayerEdits.png){width=4%} and that stop editing with the *Toggle Editing* button (![](figures/tutorial/button-Qgis-AttributeTable-StartEditingMode.png){width=4%}).
+
+Next step is to rerun the model including the new well. 
+
+(@) In TimML go to the tab GeoPackge and see that the Well is added.
+(@) Go to the tab *Compute* and click on *Compute*.
+
+The output in your Geopackage is directely overwritten with the new results.  
+
+(@) Unhide the output layer, probably named "case-Rijsenhout-head_layer_0".
+
+Do you like to see the values of the calculated Head under you mouse?
+
+(@) Select the *Value Tool* button (![](figures/tutorial/button_valuetool.png){width=4%}). 
+(@) Hover over the area and in the “Value Tool” panel you see the value at your mouse location. 
+
+![Example panel Value Tool](figures/tutorial/figure_ValueTool-in-QGIS.png){width=60% #fig-figure_ValueTool-in-QGIS fig-align="left"}  
+
+Do you like to see the values in a crossection? Deltares developed the Cross Section Tool, available in the iMOD Plugin.  
+
+(@) On the iMOD Toolbar select the *Cross section* button (![](figures/tutorial/button_iMOD-Cross-section.png){width=3%}) to start the iMOD Cross Section tool.
+In the empty cross-section we can add a selection of (geological) layers. For now, we only select the calculated heads.
+
+(@) On the iMOD Toolbar click on the button *Select location* and draw your cross-section line from north to south (right mouse button to close the line). 
+(@) From the dropdown menu on the left of this toolbar, select the raster (![](figures/tutorial/button_Raster.png){width=4%}) named case-Rijsenhout-head_layer_0.
+(@) Click the button *Add* to add this layer to the cross-section manager below. 
+(@) Click the button *Plot* to draw this layer in the cross section. 
+
+To complete the cross section, let us also add the digital elevation map to the cross-section manager. 
+
+(@) From the dropdown menu now select the layer Abbeyfeale DTM. We do not nead to select a Variable 
+(@) Click the button *Add* to add this layer to the cross-section manager below. 
+(@) Click the button *Plot* to draw both layers in the cross section. 
+
+Your screen might look like @fig-figure_HeadsInCrossection01. 
+
+![Cross section with calculated Head](figures/tutorial/figure_HeadsInCrossection01.png){width=100% #fig-figure_HeadsInCrossection01}
+
+
+---
+
+> **Intermezzo:** introduction main QGIS features (optional)  
+>
+> Navigate
+> 
+> - You can zoom in and out with the scroll button on your mouse or navigate with the buttons in the main menu: ![](figures/tutorial/button_zoom-menu.png){width=40%}
+> - Use ![](figures/tutorial/button_zoomPan.png){width=4%} to pan the map with your left mouse button and use ![](figures/tutorial/button_zoomtolayer.png){width=4%} to zoom to the extend of the layers/groups selected in the *Layers* panel.
+>
+> Manage layers (on off order etc..)
+>
+> - A fast alternative for opening a files: from the menu *View > Toolbar* add the *Manage Layers Toolbar* and use the button ![](figures/tutorial/button-Qgis-VectorLayer.png){width=4%}
+> 
+> Edit lines and polygons
+>
+> Edit (attribute) tables
+>
+> - Select the layer. Click your right mouse button and select *Attribute Tabel*.
+> - Alternatief is to press Shift + F6 or use the button (![](figures/tutorial/button-Qgis-OpenAttributeTabel.png){width=4%}).
+> - In the tabel window start the editing mode with a click on the *Toggle Edditing Mode* button (![](figures/tutorial/button-Qgis-AttributeTable-StartEditingMode.png ){width=4%}).
+> - Add a new row in the table with the *Add feature* button (![](figures/tutorial/button-Qgis-AttributeTable-AddFeature.png){width=4%}).
+> - Save all changes with the *Save Edits* button (![](figures/tutorial/button-Qgis-AttributeTable-SaveEdits.png){width=4%}).
+> - Close the *Attribute Table* window.
+ 
+
+---
+
+
+snapping moet aan
+als je IPF met uitvoer bekijkt, laten zien dat er klopje bij zit en dus tijdsafhankelijk
+beschrijven  hoe ID geometry gekoppeld is met tabel WEL invoer..... 
+
+steady state:
+* stap 1  onttrekking
+* stap 2  danmwand
+* stap 3 onderverdeling meerlaags
+tijd wordt ingevuld, alleen naar kijken
+NB discussie specific yield / storage goed in manual toelichten.....
+observatie wordt ingevuld, alleen naar kijken
+verschil in grids: gebruik Raster Calculator 
+NB  geopackage wordt altijd automatisch gesaved als je shape bewaart. wellicht proberen: alles verwijderen en dan opnieuw inlezen. 
+nb  show all features moet vaak aan....
+
+
+
+
+(@) Stap 1: 1 wvp, 1 put met filter die gehele laag doorsnijdt
+
+(@) Stap 2: Zelfde, maar met 2 damwanden
+
+
+(@) Stap 3: Meerlaags, zodat put niet gehele diepte doorsnijdt. Schijnweerstandslaagjes van 0 meter dikte en 1 dag weerstand aanbrengen
+
+(@) Stap 4: tijdsafhankelijke putten
+
+(@) Stap 5: steady-state, invloed van Westeinderplassen
+
+(@) Stap 6: transient, invloed van Westeinder plassen
+
+(@) Conceptuele cross-sectie
+
+(@) Stap 7: retourbemaling
+
+(@) Stap 8: lijn-element retour
+
+(@) Observatiepunt in de put
+
+(@) Stap 9: wat als de putten uitvallen?
+
+
+
+case 1 alleen steady state
+tijdsafhankelijk in case 2 (stad)
+
