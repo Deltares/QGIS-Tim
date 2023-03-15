@@ -12,9 +12,8 @@ from PyQt5.QtWidgets import (
     QVBoxLayout,
 )
 from qgis.core import QgsApplication
-
-from ..core.server_handler import ServerHandler
-from ..core.task import BaseServerTask
+from qgistim.core.server_handler import ServerHandler
+from qgistim.core.task import BaseServerTask
 
 INSTALL_COMMANDS = {
     "Git": "{interpreter} -m pip install git+{repo_url} {package}",

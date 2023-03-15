@@ -17,9 +17,9 @@ from qgis.core import (
     QgsRasterShader,
     QgsSingleBandPseudoColorRenderer,
     QgsSingleSymbolRenderer,
-    QgsTextFormat,
-    QgsTextBufferSettings,
     QgsStyle,
+    QgsTextBufferSettings,
+    QgsTextFormat,
     QgsVectorLayerSimpleLabeling,
 )
 
@@ -122,10 +122,10 @@ def number_labels(field: str) -> QgsVectorLayerSimpleLabeling:
     buffer_settings.setEnabled(True)
     buffer_settings.setSize(1)
     buffer_settings.setColor(QColor("white"))
-    
+
     text_format = QgsTextFormat()
     text_format.setBuffer(buffer_settings)
-    
-    pal_layer.set_format(text_format)
+
+    pal_layer.setFormat(text_format)
     labels = QgsVectorLayerSimpleLabeling(pal_layer)
     return labels

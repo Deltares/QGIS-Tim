@@ -28,11 +28,10 @@ from qgis.core import (
     QgsVectorLayerTemporalProperties,
 )
 from qgis.gui import QgsMapLayerComboBox
-
-from ..core import geopackage, layer_styling
-from ..core.dummy_ugrid import write_dummy_ugrid
-from ..core.processing import mesh_contours
-from ..core.task import BaseServerTask
+from qgistim.core import geopackage, layer_styling
+from qgistim.core.dummy_ugrid import write_dummy_ugrid
+from qgistim.core.processing import mesh_contours
+from qgistim.core.task import BaseServerTask
 
 
 class ComputeTask(BaseServerTask):

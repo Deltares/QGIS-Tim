@@ -16,15 +16,14 @@ from PyQt5.QtWidgets import (
     QVBoxLayout,
     QWidget,
 )
-from qgis.core import QgsApplication, QgsMapLayer, QgsProject
-
-from ..core.server_handler import ServerHandler
-from ..core.task import BaseServerTask
-from .compute_widget import ComputeWidget
-from .dataset_widget import DatasetWidget
-from .elements_widget import ElementsWidget
-from .extraction_widget import DataExtractionWidget
-from .options_dialog import OptionsDialog
+from qgis.core import Qgis, QgsApplication, QgsMapLayer, QgsProject, QgsUnitTypes
+from qgistim.core.server_handler import ServerHandler
+from qgistim.core.task import BaseServerTask
+from qgistim.widgets.compute_widget import ComputeWidget
+from qgistim.widgets.dataset_widget import DatasetWidget
+from qgistim.widgets.elements_widget import ElementsWidget
+from qgistim.widgets.extraction_widget import DataExtractionWidget
+from qgistim.widgets.options_dialog import OptionsDialog
 
 PYQT_DELETED_ERROR = "wrapped C/C++ object of type QgsLayerTreeGroup has been deleted"
 
@@ -69,10 +68,10 @@ class QgisTimWidget(QWidget):
         self.layout = QVBoxLayout()
         self.tabwidget = QTabWidget()
         self.layout.addWidget(self.tabwidget)
-        self.tabwidget.addTab(self.extraction_widget, "Extract")
         self.tabwidget.addTab(self.dataset_widget, "GeoPackage")
         self.tabwidget.addTab(self.elements_widget, "Elements")
         self.tabwidget.addTab(self.compute_widget, "Compute")
+        self.tabwidget.addTab(self.extraction_widget, "Extract")
         self.layout.addWidget(self.config_button, stretch=0, alignment=Qt.AlignRight)
         self.setLayout(self.layout)
 
@@ -104,6 +103,7 @@ class QgisTimWidget(QWidget):
         """
         Execute a command, and check whether it executed succesfully.
         """
+        print(data)
         response = self.server_handler.send(data)
         return response
 
@@ -127,8 +127,24 @@ class QgisTimWidget(QWidget):
 
     @property
     def crs(self) -> Any:
-        """Returns coordinate reference system of current mapview"""
-        return self.iface.mapCanvas().mapSettings().destinationCrs()
+        """
+        Returns coordinate reference system of current mapview
+
+        Returns None if the crs does not have meters as its units.
+        """
+        crs = self.iface.mapCanvas().mapSettings().destinationCrs()
+        if crs.mapUnits() not in (
+            QgsUnitTypes.DistanceMeters,
+            QgsUnitTypes.DistanceFeet,
+        ):
+            msg = "Project Coordinate Reference System map units are not meters or feet"
+            self.message_bar.pushMessage("Error", msg, level=Qgis.Critical)
+            raise ValueError(msg)
+        return crs
+
+    @property
+    def transient(self) -> bool:
+        return self.compute_widget.transient
 
     def set_cellsize_from_domain(self, ymax: float, ymin: float) -> None:
         self.compute_widget.set_cellsize_from_domain(ymax, ymin)

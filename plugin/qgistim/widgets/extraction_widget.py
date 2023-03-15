@@ -32,9 +32,8 @@ from qgis.core import (
     QgsWkbTypes,
 )
 from qgis.gui import QgsMapTool, QgsRubberBand
-
-from ..core import layer_styling
-from ..core.task import BaseServerTask
+from qgistim.core import layer_styling
+from qgistim.core.task import BaseServerTask
 
 RUBBER_BAND_COLOR = QColor(Qt.yellow)
 

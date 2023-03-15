@@ -23,19 +23,18 @@ except ImportError:
     ttim = None
     TimModel = None
 
-from . import ugrid
-from .common import (
+from gistim.common import (
     ElementSpecification,
     FloatArray,
     TransientElementSpecification,
     TtimModelSpecification,
     aquifer_data,
     dict_to_kwargs_code,
+    filter_nan,
     headgrid_code,
     linestring_coordinates,
     point_coordinates,
     sanitized,
-    trimesh,
 )
 
 
@@ -43,20 +42,28 @@ from .common import (
 # --------------------------
 def transient_dataframe(spec):
     if spec.dataframe is not None:
-        return spec.dataframe.set_index("geometry_id")
+        return spec.dataframe.set_index("timeseries_id")
     else:
         return None
 
 
-def transient_input(timeseries_df, row, field, tstart) -> List:
-    geometry_id = row["geometry_id"]
-    if timeseries_df is None or geometry_id not in timeseries_df.index:
-        return [(tstart, 0.0)]
+def transient_input(timeseries_df, row, field, time_start) -> List:
+    timeseries_id = row["timeseries_id"]
+    row_start = row.get("time_start")
+    row_end = row.get("time_end")
+    if row_start is not None and row_end is not None:
+        steady_value = row[field]
+        transient_value = row[f"{field}_transient"]
+        return [(row_start, transient_value - steady_value), (row_end, steady_value)]
+    elif timeseries_df is None or timeseries_id not in timeseries_df.index:
+        return [(time_start, 0.0)]
     else:
-        timeseries = timeseries_df.loc[[geometry_id]]
+        timeseries = timeseries_df.loc[[timeseries_id]]
         timeseries[field] -= row[field]
-        timeseries = timeseries.sort_values(by="tstart")
-        return list(timeseries[["tstart", field]].itertuples(index=False, name=None))
+        timeseries = timeseries.sort_values(by="time_start")
+        return list(
+            timeseries[["time_start", field]].itertuples(index=False, name=None)
+        )
 
 
 def ttim_model(
@@ -74,7 +81,7 @@ def ttim_model(
     ttim.TimModel
     """
     data = aquifer_data(dataframe, transient=True)
-    for arg in ("tstart", "tmin", "tmax", "M"):
+    for arg in ("time_start", "time_min", "time_max", "stehfest_M"):
         data[arg] = temporal_settings[arg].iloc[0]
     data["timmlmodel"] = timml_model
     return data
@@ -86,29 +93,33 @@ def observation(spec: TransientElementSpecification, _):
     X, Y = point_coordinates(dataframe)
     kwargslist = []
     for (row, x, y) in zip(dataframe.to_dict("records"), X, Y):
-        geometry_id = row["geometry_id"]
+        row = filter_nan(row)
+        timeseries_id = row["timeseries_id"]
         kwargslist.append(
             {
                 "x": x,
                 "y": y,
-                "t": df.loc[geometry_id, "time"].values,
+                "t": df.loc[timeseries_id, "time"].values,
                 "label": row["label"],
             }
         )
     return kwargslist
 
 
-def well(spec: TransientElementSpecification, tstart: float) -> List[Dict[str, Any]]:
+def well(
+    spec: TransientElementSpecification, time_start: float
+) -> List[Dict[str, Any]]:
     df = transient_dataframe(spec)
     dataframe = spec.steady_spec.dataframe
     X, Y = point_coordinates(dataframe)
     kwargslist = []
     for (row, x, y) in zip(dataframe.to_dict("records"), X, Y):
+        row = filter_nan(row)
         kwargslist.append(
             {
                 "xw": x,
                 "yw": y,
-                "tsandQ": transient_input(df, row, "discharge", tstart),
+                "tsandQ": transient_input(df, row, "discharge", time_start),
                 "rw": row["radius"],
                 "res": row["resistance"],
                 "layers": row["layer"],
@@ -121,18 +132,19 @@ def well(spec: TransientElementSpecification, tstart: float) -> List[Dict[str, A
 
 
 def headwell(
-    spec: TransientElementSpecification, tstart: float
+    spec: TransientElementSpecification, time_start: float
 ) -> List[Dict[str, Any]]:
     df = transient_dataframe(spec)
     dataframe = spec.steady_spec.dataframe
     X, Y = point_coordinates(dataframe)
     kwargslist = []
     for (row, x, y) in zip(dataframe.to_dict("records"), X, Y):
+        row = filter_nan(row)
         kwargslist.append(
             {
                 "xw": x,
                 "yw": y,
-                "tsandh": transient_input(df, row, "head", tstart),
+                "tsandh": transient_input(df, row, "head", time_start),
                 "rw": row["radius"],
                 "res": row["resistance"],
                 "layers": row["layer"],
@@ -143,15 +155,16 @@ def headwell(
 
 
 def headlinesink(
-    spec: TransientElementSpecification, tstart: float
+    spec: TransientElementSpecification, time_start: float
 ) -> List[Dict[str, Any]]:
     df = transient_dataframe(spec)
     kwargslist = []
     for row in spec.steady_spec.dataframe.to_dict("records"):
+        row = filter_nan(row)
         kwargslist.append(
             {
                 "xy": linestring_coordinates(row),
-                "tsandh": transient_input(df, row, "head", tstart),
+                "tsandh": transient_input(df, row, "head", time_start),
                 "res": row["resistance"],
                 "wh": row["width"],
                 "layers": row["layer"],
@@ -161,14 +174,17 @@ def headlinesink(
     return kwargslist
 
 
-def linesinkditch(spec: ElementSpecification, tstart: float) -> List[Dict[str, Any]]:
+def linesinkditch(
+    spec: ElementSpecification, time_start: float
+) -> List[Dict[str, Any]]:
     df = transient_dataframe(spec)
     kwargslist = []
     for row in spec.steady_spec.dataframe.to_dict("records"):
+        row = filter_nan(row)
         kwargslist.append(
             {
                 "xy": linestring_coordinates(row),
-                "tsandQ": transient_input(df, row, "discharge", tstart),
+                "tsandQ": transient_input(df, row, "discharge", time_start),
                 "res": row["resistance"],
                 "wh": row["width"],
                 "layers": row["layer"],
@@ -178,9 +194,12 @@ def linesinkditch(spec: ElementSpecification, tstart: float) -> List[Dict[str, A
     return kwargslist
 
 
-def leakylinedoublet(spec: ElementSpecification, tstart: float) -> List[Dict[str, Any]]:
+def leakylinedoublet(
+    spec: ElementSpecification, time_start: float
+) -> List[Dict[str, Any]]:
     kwargslist = []
     for row in spec.dataframe.to_dict("records"):
+        row = filter_nan(row)
         kwargslist.append(
             {
                 "xy": linestring_coordinates(row),
@@ -193,9 +212,12 @@ def leakylinedoublet(spec: ElementSpecification, tstart: float) -> List[Dict[str
     return kwargslist
 
 
-def implinedoublet(spec: ElementSpecification, tstart: float) -> List[Dict[str, Any]]:
+def implinedoublet(
+    spec: ElementSpecification, time_start: float
+) -> List[Dict[str, Any]]:
     kwargslist = []
     for row in spec.dataframe.to_dict("records"):
+        row = filter_nan(row)
         kwargslist.append(
             {
                 "xy": linestring_coordinates(row),
@@ -208,7 +230,7 @@ def implinedoublet(spec: ElementSpecification, tstart: float) -> List[Dict[str, 
     return kwargslist
 
 
-def circareasink(spec: TransientElementSpecification, tstart: float) -> None:
+def circareasink(spec: TransientElementSpecification, time_start: float) -> None:
     """
     Parameters
     ----------
@@ -221,6 +243,7 @@ def circareasink(spec: TransientElementSpecification, tstart: float) -> None:
     df = transient_dataframe(spec)
     kwargslist = []
     for row in spec.steady_spec.dataframe.to_dict("records"):
+        row = filter_nan(row)
         x, y = np.array(row["geometry"].centroid.coords)[0]
         coords = np.array(row["geometry"].exterior.coords)
         x0, y0 = coords[0]
@@ -230,7 +253,7 @@ def circareasink(spec: TransientElementSpecification, tstart: float) -> None:
                 "xc": x,
                 "yc": y,
                 "R": radius,
-                "tsandN": transient_input(df, row, "rate", tstart),
+                "tsandN": transient_input(df, row, "rate", time_start),
             }
         )
     return kwargslist
@@ -305,36 +328,6 @@ def headgrid(
     )
 
 
-def headmesh(
-    model: TimModel,
-    spec,
-    cellsize: float,
-    times: FloatArray,
-    reference_date: pd.Timestamp,
-) -> xr.Dataset:
-    nodes, face_nodes, centroids = trimesh(spec, cellsize)
-    nface = len(face_nodes)
-
-    nlayer = model.aq.find_aquifer_data(nodes[0, 0], nodes[0, 0]).naq
-    layer = [i for i in range(nlayer)]
-    head = np.empty((nlayer, times.size, nface), dtype=np.float64)
-    for i in tqdm.tqdm(range(nface)):
-        x = centroids[i, 0]
-        y = centroids[i, 1]
-        head[:, :, i] = model.head(x, y, times, layer)
-    uds = ugrid._ugrid2d_dataset(
-        node_x=nodes[:, 0],
-        node_y=nodes[:, 1],
-        face_x=centroids[:, 0],
-        face_y=centroids[:, 1],
-        face_nodes=face_nodes,
-    )
-    time = pd.to_datetime(reference_date) + pd.to_timedelta(times, "D")
-    uds = uds.assign_coords(time=time)
-    uds["head"] = xr.DataArray(head, dims=("layer", "time", "face"))
-    return ugrid._unstack_layers(uds)
-
-
 # Map the names of the elements to their constructors
 if ttim is not None:
     MAPPING = {
@@ -389,7 +382,7 @@ def initialize_model(spec: TtimModelSpecification, timml_model) -> TimModel:
 
         # print(f"adding {name} as {elementtype}")
         f_to_kwargs, element = MAPPING[elementtype]
-        for i, kwargs in enumerate(f_to_kwargs(element_spec, model.tstart)):
+        for i, kwargs in enumerate(f_to_kwargs(element_spec, model.time_start)):
             if elementtype == "Observation":
                 observations[f"{name}_{i}"] = kwargs
             else:
@@ -415,7 +408,9 @@ def convert_to_script(spec: TtimModelSpecification) -> str:
         # print(f"adding {name} as {elementtype}")
 
         f_to_kwargs, element = MAPPING[elementtype]
-        for i, kwargs in enumerate(f_to_kwargs(element_spec, modelkwargs["tstart"])):
+        for i, kwargs in enumerate(
+            f_to_kwargs(element_spec, modelkwargs["time_start"])
+        ):
             if elementtype == "Observation":
                 kwargs.pop("label")
                 kwargs = dict_to_kwargs_code(kwargs)

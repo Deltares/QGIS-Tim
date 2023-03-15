@@ -13,8 +13,7 @@ from PyQt5.QtWidgets import (
     QPushButton,
     QVBoxLayout,
 )
-
-from ..core.server_handler import ServerHandler
+from qgistim.core.server_handler import ServerHandler
 
 INSTALL_COMMANDS = {
     "Git": "{interpreter} -m pip install git+{repo_url} {package}",
