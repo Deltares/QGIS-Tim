@@ -250,29 +250,13 @@ class DatasetWidget(QWidget):
         """Returns currently active path to GeoPackage"""
         return self.dataset_line_edit.text()
 
-    def add_layer(
-        self,
-        layer: Any,
-        destination: Any,
-        renderer: Any = None,
-        suppress: bool = None,
-        on_top: bool = False,
-    ) -> QgsMapLayer:
-        return self.parent.add_layer(
-            layer,
-            destination,
-            renderer,
-            suppress,
-            on_top,
-        )
-
     def add_item_to_qgis(self, item) -> None:
         layers = item.element.from_geopackage()
         suppress = self.suppress_popup_checkbox.isChecked()
         timml_layer, renderer = layers[0]
-        maplayer = self.add_layer(timml_layer, "timml", renderer, suppress)
-        self.add_layer(layers[1][0], "ttim")
-        self.add_layer(layers[2][0], "timml")
+        maplayer = self.parent.add_layer(timml_layer, "timml", renderer, suppress)
+        self.parent.add_layer(layers[1][0], "ttim")
+        self.parent.add_layer(layers[2][0], "timml")
         # Set cell size if the item is a domain layer
         if item.element.timml_name.split(":")[0] == "timml Domain":
             if maplayer.featureCount() <= 0:
@@ -282,11 +266,13 @@ class DatasetWidget(QWidget):
             ymax = extent.yMaximum()
             ymin = extent.yMinimum()
             self.parent.set_cellsize_from_domain(ymax, ymin)
+        return
 
     def add_selection_to_qgis(self) -> None:
         selection = self.dataset_tree.selectedItems()
         for item in selection:
             self.add_item_to_qgis(item)
+        return
 
     def load_geopackage(self) -> None:
         """
@@ -360,7 +346,6 @@ class DatasetWidget(QWidget):
             self.parent.toggle_element_buttons(True)
             self.dataset_tree.sortByColumn(0, Qt.SortOrder.AscendingOrder)
             self.parent.on_transient_changed()
-
         return
 
     def remove_geopackage_layer(self) -> None:
