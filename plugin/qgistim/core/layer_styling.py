@@ -7,6 +7,7 @@ ideally with a legend stretching from minimum to maximum.
 """
 from typing import List
 
+from PyQt5.QtGui import QColor
 from qgis.core import (
     QgsColorRampShader,
     QgsFillSymbol,
@@ -16,6 +17,8 @@ from qgis.core import (
     QgsRasterShader,
     QgsSingleBandPseudoColorRenderer,
     QgsSingleSymbolRenderer,
+    QgsTextFormat,
+    QgsTextBufferSettings,
     QgsStyle,
     QgsVectorLayerSimpleLabeling,
 )
@@ -107,12 +110,22 @@ def contour_renderer() -> QgsSingleSymbolRenderer:
     return QgsSingleSymbolRenderer(symbol)
 
 
-def contour_labels():
+def number_labels(field: str) -> QgsVectorLayerSimpleLabeling:
     pal_layer = QgsPalLayerSettings()
-    pal_layer.fieldName = "head"
+    pal_layer.fieldName = field
     pal_layer.enabled = True
     pal_layer.placement = QgsPalLayerSettings.Line
     pal_layer.formatNumbers = True
     pal_layer.decimals = 2
+
+    buffer_settings = QgsTextBufferSettings()
+    buffer_settings.setEnabled(True)
+    buffer_settings.setSize(1)
+    buffer_settings.setColor(QColor("white"))
+    
+    text_format = QgsTextFormat()
+    text_format.setBuffer(buffer_settings)
+    
+    pal_layer.set_format(text_format)
     labels = QgsVectorLayerSimpleLabeling(pal_layer)
     return labels

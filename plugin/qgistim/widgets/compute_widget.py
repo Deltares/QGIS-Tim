@@ -89,7 +89,7 @@ class ComputeWidget(QWidget):
         self.domain_button.clicked.connect(self.domain)
         # self.mesh_checkbox = QCheckBox("Trimesh")
         self.output_line_edit = QLineEdit()
-        self.output_button = QPushButton("Save as ...")
+        self.output_button = QPushButton("Set path as ...")
         self.output_button.clicked.connect(self.set_output_path)
         self.contour_checkbox = QCheckBox("Auto-generate contours")
         self.contour_button = QPushButton("Export contours")
@@ -176,7 +176,7 @@ class ComputeWidget(QWidget):
 
     def add_contour_layer(self, layer) -> None:
         # Labeling
-        labels = layer_styling.contour_labels()
+        labels = layer_styling.number_labels("head")
         layer.setLabeling(labels)
         layer.setLabelsEnabled(True)
         # Renderer: simple black lines
