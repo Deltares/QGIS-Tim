@@ -24,7 +24,7 @@ In this tutorial, you will learn how to:
 With the basic experience from this tutorial and the online documentation on TIM you are able to use TIM in your daily work.
 
 # Introduction case *Rijsenhout*
-In one of the fields west of Rijsenhout industrial activities are planned, the construction of glass houses. From historical sources it is known that some bombs from World War 2 are still in the subsoil. Before building starts, these bombs are removed for safety reasons. The contractor plans to drill sheet piles for a closed building pit. Inside the pit, the excavation will take place, the groundwater level is lowerd with a set of wells just in the top of the aquifer. All drain water is infiltrated over a strech of wells near the existing buildings.  
+In one of the fields west of Rijsenhout industrial activities are planned, the construction of glass houses. From historical sources it is known that some bombs from World War 2 are still in the subsoil. Before building starts, these bombs are removed for safety reasons. The question is: what dewatering is necessary to be able to remove the bombs in dry conditions? The contractor plans to drill sheet piles to prevent the excavation from collapsing. The groundwater level inside the excavation is lowerd with a set of wells just in the top of the aquifer outside the sheet piles. All drain water is infiltrated over a strech of wells near the existing buildings.  
 On the project location the top layer is 12 m thick and consist of low permeable combination of clay and peat. Below this toplayer we find an aquifer of 50 m. The Westeinderplassen, a lake system with a depth of 3 m., is located East of the project area. 
 
 ![Verticale Doorsnede BRO GeoTOP v1.4.1](figures/tutorial/GeoTOP-Verticaledoorsnede.png){width=100% #fig-GeoTOP-Verticaledoorsnede}
@@ -53,7 +53,14 @@ We start with the creation of a new QGIS project.
 The case in this turotial is located in the The Netherlands, so next we select the appropriate projection.
 
 (@) From the main menu click on *Project* and select *Properties*. 
-(@) In the *Properties* window select the category *CRS*, search for “EPSG:28992” and you find “Amersfoort / RD New”. Select this option and click the *Apply* button, followed by the OK button to close the window.
+(@) In the *Properties* window select the category *CRS*, search for “EPSG:28992” and you find “Amersfoort / RD New”. Select this option and click the *Apply* button, followed by the *OK* button to close the window.
+
+
+> In case your work is mostely in The Netherlands and in the “Amersfoort / RD New” projection, consider to make this your default projection.
+> 
+> - From the main menu click on *Settings* and select *Options....*.
+> - In the section *CRS and Transforms* select *CRS*, pick the radio button *Use a default CRS* and select “EPSG:28992 -Amersfoort / RD New”.
+> - Close this window.
 
 ### Install plugins
 This is the moment to download/import four plugins needed for this tutorial:
@@ -99,6 +106,9 @@ Let's now open a shape file containing the locations and depths of the bombs.
 (@) Go to *Layer* in the main menu, go to *Add layer* and select *Add Vector layer*.
 (@) User the browse button (![](figures/tutorial/button-Qgis-browse.png){width=4%}) and from the tutorial material select “…\\TIM-training\\dbase\\bombs.shp”.
 (@) Click on *Add* and *Close* the window.
+
+![](figures/tutorial/emoji-tip.png){width=3%} **Tip:** a fast alternative for adding layers: from the menu *View > Toolbar* add the *Manage Layers Toolbar* and use the button ![](figures/tutorial/button-Qgis-VectorLayer.png){width=4%}.
+
 (@) In the *Layers* panel on the left, select the layer "bombs".
 (@) Click your right mouse button and from the menu select *Show Labels*.
 (@) You can zoom in and out with the scroll button on your mouse or navigate with the buttons in the main menu: ![](figures/tutorial/button_zoom-menu.png){width=40%}
@@ -109,7 +119,7 @@ Now we are ready to activate the QGIS-Tim plugin.
 
 (@) Click on the QGIS-Tim plugin button (![](figures/tutorial/button-Qgis-tim.png){width=4%}) and the QGIS-Tim panel appears, see also @fig-Panel-QGIS-Tim.
 
-![QGIS-Tim panel](figures/tutorial/Panel-QGIS-Tim.png){width=70% #fig-Panel-QGIS-Tim}
+![QGIS-Tim panel](figures/tutorial/Panel-QGIS-Tim.png){width=60% #fig-Panel-QGIS-Tim}
 
 (@) Goto the tab *GeoPackage*. <br> Here we will create an empyt database (geopacakge) to store all elements and parameters for the model. 
 (@) Click the *New* button to create the GeoPackage and save it for instance in the folder with your training data "..\\TIM-Training\\dbase\\geopackage\\case-Rijsenhout.gpkg".
@@ -133,7 +143,7 @@ Let us save this project to be able to return to it later or in case of a crash 
 (@) Go to *Project* in the main menu, select *Save As* and select a folder and a file name for your project, e.g. “…\\TIM-training\\tutorial1.qgz”
 
 Now we are ready to define our first steady state model by parameterizing our Aquifer. <br>
-**NB.** All the editing of the parameter and elements we do in your geopackage in the *Layers* panel on the left!   
+**NB!** All the editing of the parameters and elements we do in your geopackage in the *Layers* panel on the left!   
 
 ***Model 1: single aquifer*** <br>
 We start with a very simple 'model', only the parameters of a single aquifer. 
@@ -151,7 +161,7 @@ We start with a very simple 'model', only the parameters of a single aquifer.
 | aquifer_top | -10   | 
 | aquifer_top | -30   |
 
-\* **NB!** In de real world we always start counting with 1. However, TIM is programmed in Python and in Python couting starts with 0. 
+**NB!** In the real world counting starts with 1. However, TIM is programmed in Python and in Python counting starts with 0. You will get used to it.  
 
 (@) Save all changes with the *Save Edits* button (![](figures/tutorial/button-Qgis-AttributeTable-SaveEdits.png){width=4%}).
 (@) Stop the *Edditing Mode* with a click on the button (![](figures/tutorial/button-Qgis-AttributeTable-StartEditingMode.png ){width=4%}).
@@ -205,7 +215,7 @@ Do you like to see the values of the calculated Head under you mouse?
 
 Do you like to see the values in a crossection? Deltares developed the Cross Section Tool, available in the iMOD Plugin.  
 
-(@) On the iMOD Toolbar select the *Cross section* button (![](figures/tutorial/button_iMOD-Cross-section.png){width=3%}) to start the iMOD Cross Section tool.
+(@imodcrossection) On the iMOD Toolbar select the *Cross section* button (![](figures/tutorial/button_iMOD-Cross-section.png){width=3%}) to start the iMOD Cross Section tool.
 In the empty cross-section we can add a selection of (geological) layers. For now, we only select the calculated heads.
 
 (@) On the iMOD Toolbar click on the button *Select location* and draw your cross-section line from north to south (right mouse button to close the line). 
@@ -223,62 +233,111 @@ Your screen might look like @fig-figure_HeadsInCrossection01.
 
 ![Cross section with calculated Head](figures/tutorial/figure_HeadsInCrossection01.png){width=100% #fig-figure_HeadsInCrossection01}
 
----
-
-> **Intermezzo:** introduction main QGIS features (optional)  
->
-> Navigate
-> 
-> - You can zoom in and out with the scroll button on your mouse or navigate with the buttons in the main menu: ![](figures/tutorial/button_zoom-menu.png){width=40%}
-> - Use ![](figures/tutorial/button_zoomPan.png){width=4%} to pan the map with your left mouse button and use ![](figures/tutorial/button_zoomtolayer.png){width=4%} to zoom to the extend of the layers/groups selected in the *Layers* panel.
->
-> Manage layers (on off order etc..)
->
-> - A fast alternative for opening a files: from the menu *View > Toolbar* add the *Manage Layers Toolbar* and use the button ![](figures/tutorial/button-Qgis-VectorLayer.png){width=4%}
-> 
-> Edit lines and polygons
->
-> Edit (attribute) tables
->
-> - Select the layer. Click your right mouse button and select *Attribute Tabel*.
-> - Alternatief is to press Shift + F6 or use the button (![](figures/tutorial/button-Qgis-OpenAttributeTabel.png){width=4%}).
-> - In the tabel window start the editing mode with a click on the *Toggle Edditing Mode* button (![](figures/tutorial/button-Qgis-AttributeTable-StartEditingMode.png ){width=4%}).
-> - Add a new row in the table with the *Add feature* button (![](figures/tutorial/button-Qgis-AttributeTable-AddFeature.png){width=4%}).
-> - Save all changes with the *Save Edits* button (![](figures/tutorial/button-Qgis-AttributeTable-SaveEdits.png){width=4%}).
-> - Close the *Attribute Table* window.
-
----
-
 ***Model 3: multiple layers*** <br>
 A single aquifer is of course not enough to describe the geology of our project area. A simplyfication of the geology is given in de cross section in @fig-photo-fieldwork-liftbomb-crosssection. There is the Holocen toplayer with a resistance of 1500 days on top of an aquifer with a horizontal permeability of 30 m/d and a thickness of 50 m. The anisotropy factor is 3 resulting in a vertical resistance of 0.1 day per meter. TIM can handle multiple layers so the next step is to bring these parameters into the model.  
 
 ![Project area cross section / lifting the World War II bomb.](figures/tutorial/photo-fieldwork-liftbomb-crosssection.jpg){width=100% #fig-photo-fieldwork-liftbomb-crosssection}
 
 (@) In your geopackage select the layer "timml Aquifer:Aquifer" and click your right mouse button.
-(@) From the menu select *Attribute Tabel* and the table opens in a new window. <br> **NB** Alternatief is to press Shift + F6 or use the button *Open Attrribute Tabel* (![](figures/tutorial/button-Qgis-OpenAttributeTabel.png){width=4%}).
+(@) From the menu select *Attribute Tabel* and the table opens in a new window. <br> **NB** Alternative is to press Shift + F6 or use the button *Open Attrribute Tabel* (![](figures/tutorial/button-Qgis-OpenAttributeTabel.png){width=4%}).
 (@) Our existing single aquifer seems to be gone... That is not the case but a nasty habit of QGIS. To show the aquifer, click on the button ![](figures/tutorial/button_ShowSelectedFeatures.png){width=20%} on the bottom of the table and select *Show All Features*.
 (@) Start the editing mode with a click on the *Toggle Edditing Mode* button (![](figures/tutorial/button-Qgis-AttributeTable-StartEditingMode.png ){width=4%}).
 (@) Add 3 extra aquifers / features with the *Add feature* button (![](figures/tutorial/button-Qgis-AttributeTable-AddFeature.png){width=4%}).  
 
-The Holoceen toplayer is not a distinguished layer but a resistance on top of layer 0.  
+The Holocene toplayer is not a distinguished layer but a resistance on top of layer 0.  
 
 (@) Fill the features with the values from the table below: 
 
 |fid|layer|aquitard_c|aquifer_k|aquifer_top|aquifer_bottom|semiconf_top|semiconf_head|
 |---|---|---|---|---|---|---|---|
-|1|0|1500|0.01|-17|-22|-5|-6|
+|1|0|1500|30|-17|-22|-5|-6|
 |2|1|0.5|30|-22|-27|NULL|NULL|
 |3|2|1.25|30|-27|-47|NULL|NULL|
 |4|3|2|30|-47|-67|NULL|NULL|
 
-(@) Go to the tab *Compute* and run the new model by clicking *Compute*.
+(@) Go to the tab *Compute* and run the new model with a click on the button *Compute*.
 
+Let's now check the calculated heads for the 4 layers. <br>
+*Value Tool*
 
-damwand  (timml Leaky Line Doublet:damwand)
+(@) From the layers select the layer "case-Rijsenhout-output:raster" and deselect the "case-Rijsenhout-output:mesh".
+(@) Activate the *Value Tool* (![](figures/tutorial/button_valuetool.png){width=4%}).
+(@) In the *Value Tool* panel go to the tab *Options*.
+(@) For *Show Layers* choose "Visible layers" and for *Show bands* choose "Active bands". 
+(@) Return to the tab *Table* and hoover over the calculated values, especially near your well. 
+
+*Cross section*
+
+(@) Activate the *iMOD Cross section* widget (![](figures/tutorial/button_iMOD-Cross-section.png){width=3%}) to create your cross section with the four layers (Need instructions? Go back to step @imodcrossection for support).
+
+**NB** You don't need to 'add' all four layers separately. Just use the raster file "case-Rijsenhout-head_layer_0" and from the dropdown menu *Variable:* select the four bands/layers. 
+
+***Model 4: add a set of sheet piles*** <br>
+Now we introduce a new but frequently used element: the sheet pile. 
+
+(@) Return to the QGIS-TIM panel and goto the tab *Elements*.
+(@) Click on the element "Leaky Line Doublet".
+(@) Give the layer a name, e.g. "sheetpile". 
+(@) In your geopackage select the layer "timml Leaky Line Doublet:sheetpile" and start editing using the *Toggle Edditing Mode* button (![](figures/tutorial/button-Qgis-AttributeTable-StartEditingMode.png ){width=4%}).
+(@) In the editing mode, the *Add Line Feature* button (![](figures/tutorial/button_AddLineFeature.png){width=4%}) is available. Click the button and draw a box arround the 6 bombs (click left to start, click right to close). 
+(@) In the *Feature Attributes* window make resistance = 1500 and layer = 0.
+
+You probably tried to close the sheetpile box but either your lines cross or do not close actually when zooming in. To close the box, let's snap both start and end point together. 
+
+(@) First enable the snapping mode with a click on the button (![](figures/tutorial/button_EnableSnapping.png){width=4%}).
+(@) Then activate the *Vertex Tool* with a click on the button ![](figures/tutorial/button_VertexTool.png){width=4%}.
+(@) Move your mouse to the start point location and when it shows a small circle, click your left mouse button.  
+(@) Next, move your mouse towards the end point and you see the snapping active: the end point gets a small fuchsia box. 
+(@) Click your left mouse and you see that both vertices now connect. 
+
+Perhaps you are not satisfied with your created sheetpile pit. 
+
+(@) You can play around with other nice options in QGIS to move (![](figures/tutorial/button_MoveFeature.png){width=4%}), rotate (![](figures/tutorial/button_RotateFeature.png){width=4%}) or scale (![](figures/tutorial/button_ScaleFeature.png){width=4%}) your box. 
+(@) End the *Toggle Edditing Mode* with ![](figures/tutorial/button-Qgis-AttributeTable-StartEditingMode.png ){width=4%}.
+(@) Rerun your model and check the calculated heads.
+
+Disappointed in the effect of the sheet piles on the calculated head? You are right if you expected no major effect because of the shallow penetration in this high permeable thick aquifer. If we would increase the aquitard_c between layers 0 and 1, perhaps we would see more effect of the sheet piles. <br>
+
+(@) If you dare... try to rerun the model yourself with aquitard_c = 800 (layer 1) and see that the drawdawn is limited to the insite of the sheet pile box (@fig-figure_DrawdownSheetpileBox.)
+(@) Don't forget to undo this side path and make aquitard_c = 0.5 again.
+
+![Drawdown within the sheet pile box](figures/tutorial/figure_DrawdownSheetpileBox.png){width=60% #fig-figure_DrawdownSheetpileBox}
+
+![](figures/tutorial/emoji-exclamation.png){width=5%} **How to reopen TIM after closing QGIS.** <br>
+Before we introduce you a new TIM element we must explain you how to reopen your TIM project after a closure of QGIS. A crash might close QGIS or just a long day of work is a reason to shut down your laptop. Always remember two things:
+
+- your geopackage, the GPKG file, contains the complete set of model features and parameter values. Every time you change a model element, you remember you had to save the changes. So the GPKG file is always up to date. 
+- your QGIS project is saved in the QGZ file and contains al the added layers, including your PGKG file, and their format (legend, line color, labels etc.).
+
+Now let's experience what it is to close and open QGIS including your QGIS-TIM project.
+
+(@) Save your QGIS session (Ctrl+S).
+(@) Select *Project* from the main menu and choose *New*.
+(@) Again select *Project* but now choose *Open Recent* and find your own project in the list.
+(@) Open the QGIS-TIM plugin with a click on ![](figures/tutorial/button-Qgis-tim.png){width=4%}.
+ 
+The TIM panel is empty. *Why?* <br>
+It is not possible for the plugin to read the Geopackage in the list. To restart you TIM project you must open the Geopackage from the TIM panel. This will add the geopackage to the Layers panel on the left. The following steps are the right way to go: 
+ 
+(@) Select layer *case-Rijsenhout* in the panel on the left in order to remove it. 
+(@) Click your right mouse button and select *Remove Group...* and click *OK*. 
+(@) In the QGIS-Tim panel on the tab *Geopackage* click *Open* and open the PGKG file containing your model.
+(@) Your geopackage is now added to the TIM panel and the Layers list. Don't forget to move down the background layer "pastel".
+
+***Model 5: add infiltration of drainwater*** <br>
 retourbemaling (timml Line Sink Ditch:retour)
+
+***Model 6: add observation points*** <br>
+
 observatie (timml Observation:peilbuizen)
 
-snapping moet aan
+***Model 7: check the influence of the nearby lake*** <br>
+
+***Model 8: make the model transient*** <br>
+
+
+*Raster > Raster Calculator....*
+
 als je IPF met uitvoer bekijkt, laten zien dat er knopje bij zit en dus tijdsafhankelijk
 beschrijven  hoe ID geometry gekoppeld is met tabel WEL invoer..... 
 
@@ -289,30 +348,6 @@ NB  geopackage wordt altijd automatisch gesaved als je shape bewaart. wellicht p
 nb  show all features moet vaak aan....
 
 
-(@) Stap 1: 1 wvp, 1 put met filter die gehele laag doorsnijdt
-
-(@) Stap 2: Zelfde, maar met 2 damwanden
 
 
-(@) Stap 3: Meerlaags, zodat put niet gehele diepte doorsnijdt. Schijnweerstandslaagjes van 0 meter dikte en 1 dag weerstand aanbrengen
-
-(@) Stap 4: tijdsafhankelijke putten
-
-(@) Stap 5: steady-state, invloed van Westeinderplassen
-
-(@) Stap 6: transient, invloed van Westeinder plassen
-
-(@) Conceptuele cross-sectie
-
-(@) Stap 7: retourbemaling
-
-(@) Stap 8: lijn-element retour
-
-(@) Observatiepunt in de put
-
-(@) Stap 9: wat als de putten uitvallen?
-
-
-Case 1 alleen steady state
-tijdsafhankelijk in case 2 (stad)
 
