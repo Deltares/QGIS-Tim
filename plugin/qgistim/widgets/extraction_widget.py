@@ -338,3 +338,4 @@ class DataExtractionWidget(QWidget):
             )
         self.set_interpreter_interaction(False)
         QgsApplication.taskManager().addTask(self.extract_task)
+        return
