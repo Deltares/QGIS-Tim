@@ -25,6 +25,7 @@ In this tutorial, you will learn how to:
 With the basic experience from this tutorial and the online documentation on TIM you are able to use TIM in your daily work.
 
 ## Introduction case *Rijsenhout*
+
 In one of the fields west of Rijsenhout industrial activities are planned, the construction of glass houses. From historical sources it is known that some bombs from World War 2 are still in the subsoil. Before building starts, these bombs are removed for safety reasons. The question is: what dewatering is necessary to be able to remove the bombs in dry conditions? The contractor plans to drill sheet piles to prevent the excavation from collapsing. The groundwater level inside the construction pit is lowerd with a set of wells just in the top of the aquifer withing the construction pit. All drain water is infiltrated over a strech of wells near the existing buildings.<br> 
 On the project location the top layer is 12 m thick and consist of low permeable combination of clay and peat. Below this toplayer we find an aquifer of 50 m. The Westeinderplassen, a lake system with a depth of 3 m., is located East of the project area. 
 
@@ -391,13 +392,21 @@ A layer with your contours is saved in the group "case-Rijsenhout-output:vector"
 
 ***Model 7: determine the influence of the nearby lake*** <br>
 East of the projectare there is a large Lake. What will be the influence of this lake? Let's find out. <br>
-In TIM a lake is added as an inhomogeneity within the total model domain. This domain is described in tabel "timml Aquifer:Aquifer" we filled in with the first model. So we must make a copy of it an change the top.  
+In TIM a lake is added as an inhomogeneity within the total model domain. This domain is described in tabel "timml Aquifer:Aquifer" we filled in with the first model. 
 
-(@) On the tab *Elements* in QGIS-Tim click on the element "Polygon Inhomogeneity".
-(@) Give the layer a name, e.g. "Lake" and find out that layer "timml Polygon Inhomogeneity:lake" is added to the list.
+(@) On the tab *Elements* in QGIS-Tim click on the element "Polygon Semi-Confined Top".
+(@) Give the layer a name, e.g. "Lake" and find out that layer "timml Polygon Semi-Confined Top:Lake" is added to the geopackage.
 (@) Start editting with the *Toggle Edditing Mode* and use *Add Polygon Feature* button (![](figures/tutorial/button_AddPolygonFeature.png){width=4%}) to add the Lake contour. <br> **NB** Try to minimize the number of segments because each segment slows down the calculations. With QGIS it is tempting to use detail but the influence of detail on the outcome is small. 
-(@) fill in the tabel "timml Polygon Inhomogeneity Properties:lake".
+(@) Fill the Lake feature with the following parameters: aquitard_c = 300, semiconf_top = -10, semiconf_head=-5.
 (@) Save your changes and rerun the model. 
+(@) Analyse the results and perhaps create contour lines from the tab "Compute". 
+
+![Contour lines after adding the Lake element in the east](figures/tutorial/figure_Contourlines02.png){width=70% #fig-figure_Contourlines02}
+
+
+You can not miss the effect of the Lake in this calculation. In many cases you like to analyse or even save this difference. Let's see how we can use TIM and QGIS to isolate the effect.     
+
+(@) Analyse the results and perhaps create contour lines from the tab "Compute". 
 
 ***Model 8: Abstraction effect over time*** <br>
 
