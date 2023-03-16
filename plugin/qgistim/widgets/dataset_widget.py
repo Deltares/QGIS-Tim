@@ -47,6 +47,7 @@ SUPPORTED_TTIM_ELEMENTS = set(
         "Circular Area Sink",
         "Impermeable Line Doublet",
         "Leaky Line Doublet",
+        "Observation",
     ]
 )
 
@@ -64,15 +65,14 @@ class DatasetTreeWidget(QTreeWidget):
         self.setHeaderHidden(True)
         self.setSortingEnabled(True)
         self.setSizePolicy(QSizePolicy.Minimum, QSizePolicy.Preferred)
-        self.setHeaderLabels(["", "steady", "", "transient"])
+        self.setHeaderLabels(["", "steady", "transient"])
         self.setHeaderHidden(False)
         header = self.header()
         header.setSectionResizeMode(1, QHeaderView.Stretch)
-        header.setSectionResizeMode(3, QHeaderView.Stretch)
+        header.setSectionResizeMode(2, QHeaderView.Stretch)
         header.setSectionsMovable(False)
-        self.setColumnCount(4)
+        self.setColumnCount(3)
         self.setColumnWidth(0, 1)
-        self.setColumnWidth(2, 1)
         self.domain = None
 
     def items(self) -> List[QTreeWidgetItem]:
@@ -87,19 +87,7 @@ class DatasetTreeWidget(QTreeWidget):
         item.timml_checkbox.setEnabled(enabled)
         self.setItemWidget(item, 0, item.timml_checkbox)
         item.setText(1, timml_name)
-        item.ttim_checkbox = QCheckBox()
-        item.ttim_checkbox.setChecked(True)
-        item.ttim_checkbox.setEnabled(enabled)
-        if ttim_name is None:
-            item.ttim_checkbox.setChecked(False)
-            item.ttim_checkbox.setEnabled(False)
-        self.setItemWidget(item, 2, item.ttim_checkbox)
-        item.setText(3, ttim_name)
-        # Disable ttim layer when timml layer is unticked
-        # as timml layer is always required for ttim layer
-        item.timml_checkbox.toggled.connect(
-            lambda checked: not checked and item.ttim_checkbox.setChecked(False)
-        )
+        item.setText(2, ttim_name)
         item.assoc_item = None
         return item
 
@@ -122,15 +110,13 @@ class DatasetTreeWidget(QTreeWidget):
         Inhomogeneities, or switch them on again.
         """
         self.setColumnHidden(2, not transient)
-        self.setColumnHidden(3, not transient)
         # Disable unsupported ttim items, such as inhomogeneities
         for item in self.items():
-            if item.text(1).split(":")[0] in SUPPORTED_TTIM_ELEMENTS:
-                if transient:
-                    item.timml_checkbox.setChecked(False)
-                    item.timml_checkbox.setEnabled(False)
-                else:
-                    item.timml_checkbox.setEnabled(True)
+            prefix, _ = item.text(1).split(":")
+            _, elementtype = prefix.split("timml ")
+            if elementtype not in SUPPORTED_TTIM_ELEMENTS:
+                item.timml_checkbox.setChecked(not transient)
+                item.timml_checkbox.setEnabled(not transient)
 
             # Hide transient columns in the TimML layers:
             item.element.on_transient_changed(transient)
@@ -381,7 +367,7 @@ class DatasetWidget(QWidget):
         active_elements = {}
         for item in self.dataset_tree.items():
             active_elements[item.text(1)] = not (item.timml_checkbox.isChecked() == 0)
-            active_elements[item.text(3)] = not (item.ttim_checkbox.isChecked() == 0)
+            active_elements[item.text(2)] = not (item.timml_checkbox.isChecked() == 0)
         return active_elements
 
     def domain_item(self):
