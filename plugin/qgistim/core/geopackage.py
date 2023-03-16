@@ -61,7 +61,7 @@ def write_layer(
     layername: str
         Layer name to write in the GeoPackage
     newfile: bool, optional
-        Whether to write a new GPGK file. Defaults to false.
+        Whether to write a new GeoPackage file. Defaults to false.
 
     Returns
     -------
