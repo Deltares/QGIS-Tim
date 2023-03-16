@@ -127,7 +127,7 @@ class LayersPanelGroup:
         maplayer = QgsProject.instance().addMapLayer(layer, False)
         if suppress is not None:
             config = maplayer.editFormConfig()
-            config.setSuppress(1)
+            config.setSuppress(suppress)
             maplayer.setEditFormConfig(config)
         if renderer is not None:
             maplayer.setRenderer(renderer)
@@ -273,8 +273,14 @@ class QgisTimWidget(QWidget):
         return self.dataset_widget.selection_names()
 
     def add_element(self, element: Any):
+        suppress = self.dataset_widget.suppress_popup_checkbox.isChecked()
         self.dataset_widget.add_element(element)
-        self.input_group.add_layer(element.timml_layer, "timml", element.renderer)
+        self.input_group.add_layer(
+            element.timml_layer,
+            "timml",
+            renderer=element.renderer,
+            suppress=suppress,
+        )
         self.input_group.add_layer(element.ttim_layer, "ttim")
         self.input_group.add_layer(element.assoc_layer, "timml")
 

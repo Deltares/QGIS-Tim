@@ -55,7 +55,7 @@ SUPPORTED_TTIM_ELEMENTS = set(
 class ConvertTask(BaseServerTask):
     @property
     def task_description(self):
-        return "converting GPKG to Python script"
+        return "converting GeoPackage to Python script"
 
 
 class DatasetTreeWidget(QTreeWidget):

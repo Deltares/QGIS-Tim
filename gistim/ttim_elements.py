@@ -99,7 +99,7 @@ def observation(spec: TransientElementSpecification, _):
     dataframe = spec.steady_spec.dataframe
     X, Y = point_coordinates(dataframe)
     kwargslist = []
-    for (row, x, y) in zip(dataframe.to_dict("records"), X, Y):
+    for i, (row, x, y) in enumerate(zip(dataframe.to_dict("records"), X, Y)):
         row = filter_nan(row)
         timeseries_id = row["timeseries_id"]
         kwargslist.append(
@@ -108,6 +108,7 @@ def observation(spec: TransientElementSpecification, _):
                 "y": y,
                 "t": df.loc[timeseries_id, "time"].values,
                 "label": row["label"],
+                "observation_id": i,
             }
         )
     return kwargslist
@@ -281,6 +282,7 @@ def head_observations(
         heads = []
         starts = []
         ends = []
+        observation_ids = []
         for kwargs in kwargs_collections:
             x = kwargs["x"]
             y = kwargs["y"]
@@ -294,12 +296,14 @@ def head_observations(
             xx.append(np.repeat(x, len(t)))
             yy.append(np.repeat(y, len(t)))
             labels.append(np.repeat(kwargs["label"], len(t)))
+            observation_ids.append(np.repeat(kwargs["observation_id"], len(t)))
 
         d = {
             "geometry": gpd.points_from_xy(np.concatenate(xx), np.concatenate(yy)),
             "datetime_start": np.concatenate(starts),
             "datetime_end": np.concatenate(ends),
             "label": np.concatenate(labels),
+            "observation_id": np.concatenate(observation_ids),
         }
         for i, layerhead in enumerate(np.hstack(heads)):
             d[f"head_layer{i}"] = layerhead
@@ -407,13 +411,14 @@ def convert_to_script(spec: TtimModelSpecification) -> str:
     strings = ["import ttim", f"ttim_model = ttim.ModelMaq({strkwargs})"]
     for name, element_spec in spec.elements.items():
         elementtype = element_spec.elementtype
-        if (not element_spec.active) or (elementtype not in MAPPING):
+        if elementtype not in MAPPING:
             continue
 
         f_to_kwargs, element = MAPPING[elementtype]
         for i, kwargs in enumerate(f_to_kwargs(element_spec, modelkwargs["tstart"])):
             if elementtype == "Observation":
                 kwargs.pop("label")
+                kwargs.pop("observation_id")
                 kwargs = dict_to_kwargs_code(kwargs)
                 observations[f"ttim_observation_{sanitized(name)}_{i}"] = kwargs
             else:
