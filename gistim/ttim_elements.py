@@ -52,10 +52,10 @@ def transient_input(timeseries_df, row, field, time_start) -> List:
     timeseries_id = row["timeseries_id"]
     row_start = row.get("time_start")
     row_end = row.get("time_end")
-    if row_start is not None and row_end is not None:
+    transient_value = row.get(f"{field}_transient")
+    if row_start is not None and row_end is not None and transient_value is not None:
         steady_value = row[field]
-        transient_value = row[f"{field}_transient"]
-        return [(row_start, transient_value - steady_value), (row_end, steady_value)]
+        return [(row_start, transient_value - steady_value), (row_end, 0.0)]
     elif timeseries_df is None or timeseries_id not in timeseries_df.index:
         return [(time_start, 0.0)]
     else:
@@ -71,7 +71,7 @@ def ttim_model(
     dataframe: gpd.GeoDataFrame,
     temporal_settings: pd.DataFrame,
     timml_model: timml.Model,
-) -> TimModel:
+) -> Dict[str, Any]:
     """
     Parameters
     ----------
@@ -82,14 +82,20 @@ def ttim_model(
     ttim.TimModel
     """
     data = aquifer_data(dataframe, transient=True)
-    for arg in ("time_start", "time_min", "time_max", "stehfest_M"):
-        data[arg] = temporal_settings[arg].iloc[0]
+    row = temporal_settings.iloc[0].to_dict()
+    data["tstart"] = row["time_start"]
+    data["tmin"] = row["time_min"]
+    data["tmax"] = row["time_max"]
+    data["M"] = row["stehfest_M"]
     data["timmlmodel"] = timml_model
     return data
 
 
 def observation(spec: TransientElementSpecification, _):
     df = transient_dataframe(spec)
+    if len(df) == 0:
+        return {}
+
     dataframe = spec.steady_spec.dataframe
     X, Y = point_coordinates(dataframe)
     kwargslist = []
@@ -410,9 +416,7 @@ def convert_to_script(spec: TtimModelSpecification) -> str:
         # print(f"adding {name} as {elementtype}")
 
         f_to_kwargs, element = MAPPING[elementtype]
-        for i, kwargs in enumerate(
-            f_to_kwargs(element_spec, modelkwargs["time_start"])
-        ):
+        for i, kwargs in enumerate(f_to_kwargs(element_spec, modelkwargs["tstart"])):
             if elementtype == "Observation":
                 kwargs.pop("label")
                 kwargs = dict_to_kwargs_code(kwargs)
