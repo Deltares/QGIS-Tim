@@ -1,8 +1,7 @@
 from functools import partial
 
 from PyQt5.QtWidgets import QGridLayout, QPushButton, QVBoxLayout, QWidget
-
-from ..core.tim_elements import ELEMENTS
+from qgistim.core.tim_elements import ELEMENTS
 
 
 class ElementsWidget(QWidget):
@@ -54,16 +53,17 @@ class ElementsWidget(QWidget):
         """
         klass = ELEMENTS[element_type]
         names = self.parent.selection_names()
-        element = klass.dialog(
-            self.parent.path, self.parent.crs, self.parent.iface, klass, names
-        )
+
+        # Get the crs. If not a CRS in meters, abort.
+        try:
+            crs = self.parent.crs
+        except ValueError:
+            return
+
+        element = klass.dialog(self.parent.path, crs, self.parent.iface, names)
         if element is None:  # dialog cancelled
             return
         # Write to geopackage
         element.write()
-        # Add to QGIS
-        self.parent.add_layer(element.timml_layer, "timml", element.renderer())
-        self.parent.add_layer(element.ttim_layer, "ttim")
-        self.parent.add_layer(element.assoc_layer, "timml")
-        # Add to dataset tree
+        # Add to QGIS and dataset tree
         self.parent.add_element(element)

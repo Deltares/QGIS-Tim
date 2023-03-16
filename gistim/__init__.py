@@ -4,11 +4,10 @@ from typing import Dict, Union
 import pkg_resources
 
 from gistim import timml_elements, ttim_elements
-
-from .common import gridspec, model_specification
-from .compute import compute_steady, compute_transient
-from .data_extraction import as_aquifer_aquitard, layer_statistics
-from .ugrid import to_ugrid2d
+from gistim.common import gridspec, model_specification
+from gistim.compute import compute_steady, compute_transient
+from gistim.data_extraction import as_aquifer_aquitard, layer_statistics
+from gistim.ugrid import to_ugrid2d
 
 # version
 try:

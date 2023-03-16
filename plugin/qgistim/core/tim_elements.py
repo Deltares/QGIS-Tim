@@ -28,7 +28,7 @@ Each element is (optionally) represented in multiple places:
   and edit its data.
 
 Some elements require specific rendering in QGIS (e.g. no fill polygons), which
-are supplied by the `.renderer()` method.
+are supplied by the `.renderer` property.
 
 The coupling of separate tables (geometry table and time series table) is only
 explicit in the Dataset Tree. The only way of knowing that tables are
@@ -61,26 +61,28 @@ from qgis.core import (
     QgsSingleSymbolRenderer,
     QgsVectorLayer,
 )
+from qgistim.core import geopackage
 
-from . import geopackage
-
-# These columns are reused by Aquifer and Polygon Inhom, Building pit
-# Aquitards are on top of the aquifer, so it comes first
+# These columns are reused by Aquifer and Polygon Inhom, Building pit Aquitards
+# are on top of the aquifer, so it comes first Nota bene: the order of these is
+# important for hiding and showing the transient columns. QGIS has a bug which
+# causes it to show the wrong column if hidden columns appear before shown
+# ones. This only affects the attribute table when it has no features.
 AQUIFER_ATTRIBUTES = [
     QgsField("layer", QVariant.Int),
-    QgsField("aquitard_c", QVariant.Double),
-    QgsField("aquitard_npor", QVariant.Double),
-    QgsField("aquitard_s", QVariant.Double),
-    QgsField("aquifer_k", QVariant.Double),
-    QgsField("aquifer_npor", QVariant.Double),
-    QgsField("aquifer_s", QVariant.Double),
     QgsField("aquifer_top", QVariant.Double),
     QgsField("aquifer_bottom", QVariant.Double),
+    QgsField("aquitard_c", QVariant.Double),
+    QgsField("aquifer_k", QVariant.Double),
     QgsField("semiconf_top", QVariant.Double),
     QgsField("semiconf_head", QVariant.Double),
+    QgsField("aquitard_s", QVariant.Double),
+    QgsField("aquifer_s", QVariant.Double),
+    QgsField("aquitard_npor", QVariant.Double),
+    QgsField("aquifer_npor", QVariant.Double),
 ]
 INHOM_ATTRIBUTES = [
-    QgsField("geometry_id", QVariant.Int),
+    QgsField("inhomogeneity_id", QVariant.Int),
 ] + AQUIFER_ATTRIBUTES
 
 
@@ -112,9 +114,13 @@ class Element:
 
     element_type = None
     geometry_type = None
-    timml_attributes = []
-    ttim_attributes = []
-    assoc_attributes = []
+    timml_attributes = ()
+    ttim_attributes = ()
+    assoc_attributes = ()
+    transient_columns = ()
+    timml_defaults = {}
+    ttim_defaults = {}
+    assoc_defaults = {}
 
     def _initialize_default(self, path, name):
         self.name = name
@@ -126,18 +132,13 @@ class Element:
         self.ttim_layer = None
         self.assoc_layer = None
         self.item = None
-        self.timml_defaults = {}
-        self.ttim_defaults = {}
-        self.assoc_defaults = {}
 
     def __init__(self, path: str, name: str):
-        self._initialize(path, name)
+        self._initialize_default(path, name)
         self.timml_name = f"timml {self.element_type}:{name}"
 
-    @staticmethod
-    def dialog(
-        path: str, crs: Any, iface: Any, klass: type, names: List[str]
-    ) -> Tuple[Any]:
+    @classmethod
+    def dialog(cls, path: str, crs: Any, iface: Any, names: List[str]):
         dialog = NameDialog()
         dialog.show()
         ok = dialog.exec_()
@@ -148,11 +149,13 @@ class Element:
         if name in names:
             raise ValueError(f"Name already exists in geopackage: {name}")
 
-        instance = klass(path, name)
+        instance = cls(path, name)
         instance.create_layers(crs)
         return instance
 
-    def layer(self, crs: Any, geometry_type: str, name: str, attributes: List):
+    def create_layer(
+        self, crs: Any, geometry_type: str, name: str, attributes: List
+    ) -> QgsVectorLayer:
         layer = QgsVectorLayer(geometry_type, name, "memory")
         provider = layer.dataProvider()
         provider.addAttributes(attributes)
@@ -161,7 +164,7 @@ class Element:
         return layer
 
     def create_timml_layer(self, crs: Any):
-        self.timml_layer = self.layer(
+        self.timml_layer = self.create_layer(
             crs=crs,
             geometry_type=self.geometry_type,
             name=self.timml_name,
@@ -192,6 +195,7 @@ class Element:
                 layer.setDefaultValueDefinition(index, definition)
         return
 
+    @property
     def renderer(self):
         return None
 
@@ -201,21 +205,17 @@ class Element:
         )
 
     def ttim_layer_from_geopackage(self):
-        pass
+        return
 
     def assoc_layer_from_geopackage(self):
-        pass
+        return
 
-    def from_geopackage(self):
+    def load_layers_from_geopackage(self) -> None:
         self.timml_layer_from_geopackage()
         self.ttim_layer_from_geopackage()
         self.assoc_layer_from_geopackage()
         self.set_defaults()
-        return [
-            (self.timml_layer, self.renderer()),
-            (self.ttim_layer, None),
-            (self.assoc_layer, None),
-        ]
+        return
 
     def write(self):
         self.timml_layer = geopackage.write_layer(
@@ -226,6 +226,20 @@ class Element:
     def remove_from_geopackage(self):
         geopackage.remove_layer(self.path, self.timml_name)
 
+    def on_transient_changed(self, transient: bool):
+        if len(self.transient_columns) == 0:
+            return
+
+        config = self.timml_layer.attributeTableConfig()
+        columns = config.columns()
+
+        for i, column in enumerate(columns):
+            if column.name in self.transient_columns:
+                config.setColumnHidden(i, not transient)
+
+        self.timml_layer.setAttributeTableConfig(config)
+        return
+
 
 class TransientElement(Element):
     """
@@ -233,12 +247,12 @@ class TransientElement(Element):
     """
 
     def __init__(self, path: str, name: str):
-        self._initialize(path, name)
+        self._initialize_default(path, name)
         self.timml_name = f"timml {self.element_type}:{name}"
         self.ttim_name = f"ttim {self.element_type}:{name}"
 
     def create_ttim_layer(self, crs: Any):
-        self.ttim_layer = self.layer(
+        self.ttim_layer = self.create_layer(
             crs=crs,
             geometry_type="No Geometry",
             name=self.ttim_name,
@@ -272,12 +286,12 @@ class AssociatedElement(Element):
     """
 
     def __init__(self, path: str, name: str):
-        self._initialize(path, name)
+        self._initialize_default(path, name)
         self.timml_name = f"timml {self.element_type}:{name}"
         self.assoc_name = f"timml {self.element_type} Properties:{name}"
 
     def create_assoc_layer(self, crs: Any):
-        self.assoc_layer = self.layer(
+        self.assoc_layer = self.create_layer(
             crs=crs,
             geometry_type="No Geometry",
             name=self.assoc_name,
@@ -305,19 +319,16 @@ class AssociatedElement(Element):
 
 
 class Domain(TransientElement):
-    def _initialize(self, path, name):
-        self._initialize_default(path, name)
-        self.element_type = "Domain"
-        self.geometry_type = "Polygon"
-        self.ttim_attributes = [
-            QgsField("time", QVariant.Double),
-        ]
+    element_type = "Domain"
+    geometry_type = "Polygon"
+    ttim_attributes = (QgsField("time", QVariant.Double),)
 
     def __init__(self, path: str, name: str):
-        self._initialize(path, name)
+        self._initialize_default(path, name)
         self.timml_name = f"timml {self.element_type}:Domain"
         self.ttim_name = "ttim Computation Times:Domain"
 
+    @property
     def renderer(self) -> QgsSingleSymbolRenderer:
         """
         Results in transparent fill, with a medium thick black border line.
@@ -357,28 +368,31 @@ class Domain(TransientElement):
 
 
 class Aquifer(TransientElement):
-    def _initialize(self, path, name):
-        self._initialize_default(path, name)
-        self.name = "Aquifer"
-        self.element_type = "Aquifer"
-        self.geometry_type = "No geometry"
-        self.timml_attributes = AQUIFER_ATTRIBUTES.copy()
-        self.ttim_attributes = [
-            QgsField("tmin", QVariant.Double),
-            QgsField("tmax", QVariant.Double),
-            QgsField("tstart", QVariant.Double),
-            QgsField("M", QVariant.Int),
-            QgsField("reference_date", QVariant.DateTime),
-        ]
-        self.ttim_defaults = {
-            "tmin": QgsDefaultValue("0.01"),
-            "tmax": QgsDefaultValue("10.0"),
-            "tstart": QgsDefaultValue("0.0"),
-            "M": QgsDefaultValue("10"),
-        }
+    element_type = "Aquifer"
+    geometry_type = "No Geometry"
+    timml_attributes = AQUIFER_ATTRIBUTES.copy()
+    ttim_attributes = (
+        QgsField("time_min", QVariant.Double),
+        QgsField("time_max", QVariant.Double),
+        QgsField("time_start", QVariant.Double),
+        QgsField("stehfest_M", QVariant.Int),
+        QgsField("reference_date", QVariant.DateTime),
+    )
+    ttim_defaults = {
+        "time_min": QgsDefaultValue("0.01"),
+        "time_max": QgsDefaultValue("10.0"),
+        "time_start": QgsDefaultValue("0.0"),
+        "stehfest_M": QgsDefaultValue("10"),
+    }
+    transient_columns = (
+        "aquitard_s",
+        "aquifer_s",
+        "aquitard_npor",
+        "aquifer_npor",
+    )
 
     def __init__(self, path: str, name: str):
-        self._initialize(path, name)
+        self._initialize_default(path, name)
         self.timml_name = f"timml {self.element_type}:Aquifer"
         self.ttim_name = "ttim Temporal Settings:Aquifer"
 
@@ -392,113 +406,139 @@ class Aquifer(TransientElement):
         self.set_defaults()
 
     def remove_from_geopackage(self):
-        pass
+        """This element may not be removed."""
+        return
 
 
 class UniformFlow(Element):
-    def _initialize(self, path, name):
-        self._initialize_default(path, name)
-        self.element_type = "Uniform Flow"
-        self.geometry_type = "No geometry"
-        self.timml_attributes = [
-            QgsField("slope", QVariant.Double),
-            QgsField("angle", QVariant.Double),
-            QgsField("label", QVariant.String),
-        ]
+    element_type = "Uniform Flow"
+    geometry_type = "No geometry"
+    timml_attributes = (
+        QgsField("slope", QVariant.Double),
+        QgsField("angle", QVariant.Double),
+        QgsField("label", QVariant.String),
+    )
 
 
 class Constant(Element):
-    def _initialize(self, path, name):
-        self._initialize_default(path, name)
-        self.element_type = "Constant"
-        self.geometry_type = "Point"
-        self.timml_attributes = [
-            QgsField("head", QVariant.Double),
-            QgsField("layer", QVariant.Int),
-            QgsField("label", QVariant.String),
-        ]
+    element_type = "Constant"
+    geometry_type = "Point"
+    timml_attributes = (
+        QgsField("head", QVariant.Double),
+        QgsField("layer", QVariant.Int),
+        QgsField("label", QVariant.String),
+    )
 
 
 class Observation(TransientElement):
-    def _initialize(self, path, name):
-        self._initialize_default(path, name)
-        self.element_type = "Observation"
-        self.geometry_type = "Point"
-        self.timml_attributes = [
-            QgsField("label", QVariant.String),
-            QgsField("geometry_id", QVariant.Int),
-        ]
-        self.ttim_attributes = [
-            QgsField("geometry_id", QVariant.Int),
-            QgsField("time", QVariant.Double),
-        ]
+    element_type = "Observation"
+    geometry_type = "Point"
+    timml_attributes = (
+        QgsField("label", QVariant.String),
+        QgsField("timeseries_id", QVariant.Int),
+    )
+    ttim_attributes = (
+        QgsField("timeseries_id", QVariant.Int),
+        QgsField("time", QVariant.Double),
+    )
+    timml_defaults = {
+        "timeseries_id": QgsDefaultValue("1"),
+    }
+    ttim_defaults = {
+        "timeseries_id": QgsDefaultValue("1"),
+    }
+    transient_columns = ("timeseries_id",)
 
 
 class Well(TransientElement):
-    def _initialize(self, path, name):
-        self._initialize_default(path, name)
-        self.element_type = "Well"
-        self.geometry_type = "Point"
-        self.timml_attributes = [
-            QgsField("discharge", QVariant.Double),
-            QgsField("radius", QVariant.Double),
-            QgsField("resistance", QVariant.Double),
-            QgsField("layer", QVariant.Int),
-            QgsField("label", QVariant.String),
-            QgsField("caisson_radius", QVariant.Double),
-            QgsField("slug", QVariant.Bool),
-            QgsField("geometry_id", QVariant.Int),
-        ]
-        self.ttim_attributes = [
-            QgsField("geometry_id", QVariant.Int),
-            QgsField("tstart", QVariant.Double),
-            QgsField("discharge", QVariant.Double),
-        ]
+    element_type = "Well"
+    geometry_type = "Point"
+    timml_attributes = (
+        QgsField("discharge", QVariant.Double),
+        QgsField("radius", QVariant.Double),
+        QgsField("resistance", QVariant.Double),
+        QgsField("layer", QVariant.Int),
+        QgsField("label", QVariant.String),
+        QgsField("time_start", QVariant.Double),
+        QgsField("time_end", QVariant.Double),
+        QgsField("discharge_transient", QVariant.Double),
+        QgsField("caisson_radius", QVariant.Double),
+        QgsField("slug", QVariant.Bool),
+        QgsField("timeseries_id", QVariant.Int),
+    )
+    ttim_attributes = (
+        QgsField("timeseries_id", QVariant.Int),
+        QgsField("time_start", QVariant.Double),
+        QgsField("discharge", QVariant.Double),
+    )
+    transient_columns = (
+        "time_start",
+        "time_end",
+        "discharge_transient",
+        "caisson_radius",
+        "slug",
+        "timeseries_id",
+    )
 
 
 class HeadWell(TransientElement):
-    def _initialize(self, path, name):
-        self._initialize_default(path, name)
-        self.element_type = "Head Well"
-        self.geometry_type = "Point"
-        self.timml_attributes = [
-            QgsField("head", QVariant.Double),
-            QgsField("radius", QVariant.Double),
-            QgsField("resistance", QVariant.Double),
-            QgsField("layer", QVariant.Int),
-            QgsField("label", QVariant.String),
-            QgsField("geometry_id", QVariant.Int),
-        ]
-        self.ttim_attributes = [
-            QgsField("geometry_id", QVariant.Int),
-            QgsField("tstart", QVariant.Double),
-            QgsField("head", QVariant.Double),
-        ]
+    element_type = "Head Well"
+    geometry_type = "Point"
+    timml_attributes = (
+        QgsField("head", QVariant.Double),
+        QgsField("radius", QVariant.Double),
+        QgsField("resistance", QVariant.Double),
+        QgsField("layer", QVariant.Int),
+        QgsField("label", QVariant.String),
+        QgsField("time_start", QVariant.Double),
+        QgsField("time_end", QVariant.Double),
+        QgsField("head_transient", QVariant.Double),
+        QgsField("timeseries_id", QVariant.Int),
+    )
+    ttim_attributes = (
+        QgsField("timeseries_id", QVariant.Int),
+        QgsField("time_start", QVariant.Double),
+        QgsField("head", QVariant.Double),
+    )
+    transient_columns = (
+        "time_start",
+        "time_end",
+        "head_transient",
+        "timeseries_id",
+    )
 
 
 class HeadLineSink(TransientElement):
-    def _initialize(self, path, name):
-        self._initialize_default(path, name)
-        self.element_type = "Head Line Sink"
-        self.geometry_type = "Linestring"
-        self.timml_attributes = [
-            QgsField("head", QVariant.Double),
-            QgsField("resistance", QVariant.Double),
-            QgsField("width", QVariant.Double),
-            QgsField("order", QVariant.Int),
-            QgsField("layer", QVariant.Int),
-            QgsField("label", QVariant.String),
-            QgsField("geometry_id", QVariant.Int),
-        ]
-        self.ttim_attributes = [
-            QgsField("geometry_id", QVariant.Int),
-            QgsField("tstart", QVariant.Double),
-            QgsField("head", QVariant.Double),
-        ]
-        self.timml_defaults = {
-            "order": QgsDefaultValue("4"),
-        }
+    element_type = "Head Line Sink"
+    geometry_type = "Linestring"
+    timml_attributes = (
+        QgsField("head", QVariant.Double),
+        QgsField("resistance", QVariant.Double),
+        QgsField("width", QVariant.Double),
+        QgsField("order", QVariant.Int),
+        QgsField("layer", QVariant.Int),
+        QgsField("label", QVariant.String),
+        QgsField("time_start", QVariant.Double),
+        QgsField("time_end", QVariant.Double),
+        QgsField("head_transient", QVariant.Double),
+        QgsField("timeseries_id", QVariant.Int),
+    )
+    ttim_attributes = (
+        QgsField("timeseries_id", QVariant.Int),
+        QgsField("time_start", QVariant.Double),
+        QgsField("head", QVariant.Double),
+    )
+    timml_defaults = {
+        "order": QgsDefaultValue("4"),
+    }
+    transient_columns = (
+        "time_start",
+        "time_end",
+        "head_transient",
+        "timeseries_id",
+    )
 
+    @property
     def renderer(self) -> QgsSingleSymbolRenderer:
         symbol = QgsLineSymbol.createSimple(
             {
@@ -510,28 +550,36 @@ class HeadLineSink(TransientElement):
 
 
 class LineSinkDitch(TransientElement):
-    def _initialize(self, path, name):
-        self._initialize_default(path, name)
-        self.element_type = "Line Sink Ditch"
-        self.geometry_type = "Linestring"
-        self.timml_attributes = [
-            QgsField("discharge", QVariant.Double),
-            QgsField("resistance", QVariant.Double),
-            QgsField("width", QVariant.Double),
-            QgsField("order", QVariant.Int),
-            QgsField("layer", QVariant.Int),
-            QgsField("label", QVariant.String),
-            QgsField("geometry_id", QVariant.Int),
-        ]
-        self.ttim_attributes = [
-            QgsField("geometry_id", QVariant.Int),
-            QgsField("tstart", QVariant.Double),
-            QgsField("discharge", QVariant.Double),
-        ]
-        self.timml_defaults = {
-            "order": QgsDefaultValue("4"),
-        }
+    element_type = "Line Sink Ditch"
+    geometry_type = "Linestring"
+    timml_attributes = (
+        QgsField("discharge", QVariant.Double),
+        QgsField("resistance", QVariant.Double),
+        QgsField("width", QVariant.Double),
+        QgsField("order", QVariant.Int),
+        QgsField("layer", QVariant.Int),
+        QgsField("label", QVariant.String),
+        QgsField("time_start", QVariant.Double),
+        QgsField("time_end", QVariant.Double),
+        QgsField("discharge_transient", QVariant.Double),
+        QgsField("timeseries_id", QVariant.Int),
+    )
+    ttim_attributes = (
+        QgsField("timeseries_id", QVariant.Int),
+        QgsField("time_start", QVariant.Double),
+        QgsField("discharge", QVariant.Double),
+    )
+    timml_defaults = {
+        "order": QgsDefaultValue("4"),
+    }
+    transient_columns = (
+        "time_start",
+        "time_end",
+        "discharge_transient",
+        "timeseries_id",
+    )
 
+    @property
     def renderer(self) -> QgsSingleSymbolRenderer:
         symbol = QgsLineSymbol.createSimple(
             {
@@ -543,19 +591,18 @@ class LineSinkDitch(TransientElement):
 
 
 class ImpermeableLineDoublet(Element):
-    def _initialize(self, path, name):
-        self._initialize_default(path, name)
-        self.element_type = "Impermeable Line Doublet"
-        self.geometry_type = "Linestring"
-        self.timml_attributes = [
-            QgsField("order", QVariant.Int),
-            QgsField("layer", QVariant.Int),
-            QgsField("label", QVariant.String),
-        ]
-        self.timml_defaults = {
-            "order": QgsDefaultValue("4"),
-        }
+    element_type = "Impermeable Line Doublet"
+    geometry_type = "Linestring"
+    timml_attributes = (
+        QgsField("order", QVariant.Int),
+        QgsField("layer", QVariant.Int),
+        QgsField("label", QVariant.String),
+    )
+    timml_defaults = {
+        "order": QgsDefaultValue("4"),
+    }
 
+    @property
     def renderer(self) -> QgsSingleSymbolRenderer:
         symbol = QgsLineSymbol.createSimple(
             {
@@ -567,20 +614,19 @@ class ImpermeableLineDoublet(Element):
 
 
 class LeakyLineDoublet(Element):
-    def _initialize(self, path, name):
-        self._initialize_default(path, name)
-        self.element_type = "Leaky Line Doublet"
-        self.geometry_type = "Linestring"
-        self.timml_attributes = [
-            QgsField("resistance", QVariant.Double),
-            QgsField("order", QVariant.Int),
-            QgsField("layer", QVariant.Int),
-            QgsField("label", QVariant.String),
-        ]
-        self.timml_defaults = {
-            "order": QgsDefaultValue("4"),
-        }
+    element_type = "Leaky Line Doublet"
+    geometry_type = "Linestring"
+    timml_attributes = (
+        QgsField("resistance", QVariant.Double),
+        QgsField("order", QVariant.Int),
+        QgsField("layer", QVariant.Int),
+        QgsField("label", QVariant.String),
+    )
+    timml_defaults = {
+        "order": QgsDefaultValue("4"),
+    }
 
+    @property
     def renderer(self) -> QgsSingleSymbolRenderer:
         symbol = QgsLineSymbol.createSimple(
             {
@@ -592,22 +638,30 @@ class LeakyLineDoublet(Element):
 
 
 class CircularAreaSink(TransientElement):
-    def _initialize(self, path, name):
-        self._initialize_default(path, name)
-        self.element_type = "Circular Area Sink"
-        self.geometry_type = "Polygon"
-        self.timml_attributes = [
-            QgsField("rate", QVariant.Double),
-            QgsField("layer", QVariant.Int),
-            QgsField("label", QVariant.String),
-            QgsField("geometry_id", QVariant.Int),
-        ]
-        self.ttim_attributes = [
-            QgsField("geometry_id", QVariant.Int),
-            QgsField("tstart", QVariant.Double),
-            QgsField("rate", QVariant.Double),
-        ]
+    element_type = "Circular Area Sink"
+    geometry_type = "Polygon"
+    timml_attributes = (
+        QgsField("rate", QVariant.Double),
+        QgsField("layer", QVariant.Int),
+        QgsField("label", QVariant.String),
+        QgsField("time_start", QVariant.Double),
+        QgsField("time_end", QVariant.Double),
+        QgsField("rate_transient", QVariant.Double),
+        QgsField("timeseries_id", QVariant.Int),
+    )
+    ttim_attributes = (
+        QgsField("timeseries_id", QVariant.Int),
+        QgsField("time_start", QVariant.Double),
+        QgsField("rate", QVariant.Double),
+    )
+    transient_columns = (
+        "time_start",
+        "time_end",
+        "rate_transient",
+        "timeseries_id",
+    )
 
+    @property
     def renderer(self):
         """
         Results in transparent fill, with a thick blue border line.
@@ -622,22 +676,76 @@ class CircularAreaSink(TransientElement):
         return QgsSingleSymbolRenderer(symbol)
 
 
-class PolygonInhomogeneity(AssociatedElement):
-    def _initialize(self, path, name):
-        self._initialize_default(path, name)
-        self.element_type = "Polygon Inhomogeneity"
-        self.geometry_type = "Polygon"
-        self.timml_attributes = [
-            QgsField("geometry_id", QVariant.Int),
-            QgsField("order", QVariant.Int),
-            QgsField("ndegrees", QVariant.Int),
-        ]
-        self.assoc_attributes = INHOM_ATTRIBUTES.copy()
-        self.timml_defaults = {
-            "order": QgsDefaultValue("4"),
-            "ndegrees": QgsDefaultValue("6"),
-        }
+class PolygonSemiConfinedTop(Element):
+    element_type = "Polygon Semi-Confined Top"
+    geometry_type = "Polygon"
+    timml_attributes = (
+        QgsField("aquitard_c", QVariant.Double),
+        QgsField("semiconf_top", QVariant.Double),
+        QgsField("semiconf_head", QVariant.Double),
+        QgsField("order", QVariant.Int),
+        QgsField("ndegrees", QVariant.Int),
+    )
+    assoc_attributes = INHOM_ATTRIBUTES.copy()
+    timml_defaults = {
+        "order": QgsDefaultValue("4"),
+        "ndegrees": QgsDefaultValue("6"),
+    }
 
+    @property
+    def renderer(self) -> QgsSingleSymbolRenderer:
+        symbol = QgsFillSymbol.createSimple(
+            {
+                "color": "255,0,0,0",  # transparent
+                "color_border": "#878787",  # grey
+                "width_border": "0.75",
+            }
+        )
+        return QgsSingleSymbolRenderer(symbol)
+
+
+class PolygonAreaSink(Element):
+    element_type = "Polygon Area Sink"
+    geometry_type = "Polygon"
+    timml_attributes = (
+        QgsField("phreatic_top", QVariant.Int),
+        QgsField("phreatic_head", QVariant.Int),
+        QgsField("order", QVariant.Int),
+        QgsField("ndegrees", QVariant.Int),
+    )
+    assoc_attributes = INHOM_ATTRIBUTES.copy()
+    timml_defaults = {
+        "order": QgsDefaultValue("4"),
+        "ndegrees": QgsDefaultValue("6"),
+    }
+
+    @property
+    def renderer(self) -> QgsSingleSymbolRenderer:
+        symbol = QgsFillSymbol.createSimple(
+            {
+                "color": "255,0,0,0",  # transparent
+                "color_border": "#034e7b",  # blue
+                "width_border": "0.75",
+            }
+        )
+        return QgsSingleSymbolRenderer(symbol)
+
+
+class PolygonInhomogeneity(AssociatedElement):
+    element_type = "Polygon Inhomogeneity"
+    geometry_type = "Polygon"
+    timml_attributes = (
+        QgsField("inhomogeneity_id", QVariant.Int),
+        QgsField("order", QVariant.Int),
+        QgsField("ndegrees", QVariant.Int),
+    )
+    assoc_attributes = INHOM_ATTRIBUTES.copy()
+    timml_defaults = {
+        "order": QgsDefaultValue("4"),
+        "ndegrees": QgsDefaultValue("6"),
+    }
+
+    @property
     def renderer(self) -> QgsSingleSymbolRenderer:
         symbol = QgsFillSymbol.createSimple(
             {
@@ -650,18 +758,17 @@ class PolygonInhomogeneity(AssociatedElement):
 
 
 class BuildingPit(AssociatedElement):
-    def _initialize(self, path, name):
-        self._initialize_default(path, name)
-        self.element_type = "Building Pit"
-        self.geometry_type = "Polygon"
-        self.timml_attributes = [
-            QgsField("geometry_id", QVariant.Int),
-            QgsField("order", QVariant.Int),
-            QgsField("ndegrees", QVariant.Int),
-            QgsField("layer", QVariant.Int),
-        ]
-        self.assoc_attributes = INHOM_ATTRIBUTES.copy()
+    element_type = "Building Pit"
+    geometry_type = "Polygon"
+    timml_attributes = (
+        QgsField("timeseries_id", QVariant.Int),
+        QgsField("order", QVariant.Int),
+        QgsField("ndegrees", QVariant.Int),
+        QgsField("layer", QVariant.Int),
+    )
+    assoc_attributes = INHOM_ATTRIBUTES.copy()
 
+    @property
     def renderer(self) -> QgsSingleSymbolRenderer:
         symbol = QgsFillSymbol.createSimple(
             {
@@ -674,20 +781,25 @@ class BuildingPit(AssociatedElement):
 
 
 ELEMENTS = {
-    "Aquifer": Aquifer,
-    "Domain": Domain,
-    "Constant": Constant,
-    "Uniform Flow": UniformFlow,
-    "Well": Well,
-    "Head Well": HeadWell,
-    "Head Line Sink": HeadLineSink,
-    "Line Sink Ditch": LineSinkDitch,
-    "Circular Area Sink": CircularAreaSink,
-    "Impermeable Line Doublet": ImpermeableLineDoublet,
-    "Leaky Line Doublet": LeakyLineDoublet,
-    "Polygon Inhomogeneity": PolygonInhomogeneity,
-    "Building Pit": BuildingPit,
-    "Observation": Observation,
+    element.element_type: element
+    for element in (
+        Aquifer,
+        Domain,
+        Constant,
+        UniformFlow,
+        Well,
+        HeadWell,
+        HeadLineSink,
+        LineSinkDitch,
+        CircularAreaSink,
+        ImpermeableLineDoublet,
+        LeakyLineDoublet,
+        # PolygonAreaSink,  # not in pypi release yet
+        PolygonSemiConfinedTop,
+        PolygonInhomogeneity,
+        BuildingPit,
+        Observation,
+    )
 }
 
 

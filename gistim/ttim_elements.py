@@ -6,6 +6,7 @@ These keyword arguments are used to initialize a model, or used to generate a
 Python script.
 
 """
+from collections import defaultdict
 from typing import Any, Dict, List, Tuple
 
 import black
@@ -23,19 +24,18 @@ except ImportError:
     ttim = None
     TimModel = None
 
-from . import ugrid
-from .common import (
+from gistim.common import (
     ElementSpecification,
     FloatArray,
     TransientElementSpecification,
     TtimModelSpecification,
     aquifer_data,
     dict_to_kwargs_code,
+    filter_nan,
     headgrid_code,
     linestring_coordinates,
     point_coordinates,
     sanitized,
-    trimesh,
 )
 
 
@@ -43,27 +43,35 @@ from .common import (
 # --------------------------
 def transient_dataframe(spec):
     if spec.dataframe is not None:
-        return spec.dataframe.set_index("geometry_id")
+        return spec.dataframe.set_index("timeseries_id")
     else:
         return None
 
 
-def transient_input(timeseries_df, row, field, tstart) -> List:
-    geometry_id = row["geometry_id"]
-    if timeseries_df is None or geometry_id not in timeseries_df.index:
-        return [(tstart, 0.0)]
+def transient_input(timeseries_df, row, field, time_start) -> List:
+    timeseries_id = row["timeseries_id"]
+    row_start = row.get("time_start")
+    row_end = row.get("time_end")
+    transient_value = row.get(f"{field}_transient")
+    if row_start is not None and row_end is not None and transient_value is not None:
+        steady_value = row[field]
+        return [(row_start, transient_value - steady_value), (row_end, 0.0)]
+    elif timeseries_df is None or timeseries_id not in timeseries_df.index:
+        return [(time_start, 0.0)]
     else:
-        timeseries = timeseries_df.loc[[geometry_id]]
+        timeseries = timeseries_df.loc[[timeseries_id]]
         timeseries[field] -= row[field]
-        timeseries = timeseries.sort_values(by="tstart")
-        return list(timeseries[["tstart", field]].itertuples(index=False, name=None))
+        timeseries = timeseries.sort_values(by="time_start")
+        return list(
+            timeseries[["time_start", field]].itertuples(index=False, name=None)
+        )
 
 
 def ttim_model(
     dataframe: gpd.GeoDataFrame,
     temporal_settings: pd.DataFrame,
     timml_model: timml.Model,
-) -> TimModel:
+) -> Dict[str, Any]:
     """
     Parameters
     ----------
@@ -74,41 +82,51 @@ def ttim_model(
     ttim.TimModel
     """
     data = aquifer_data(dataframe, transient=True)
-    for arg in ("tstart", "tmin", "tmax", "M"):
-        data[arg] = temporal_settings[arg].iloc[0]
+    row = temporal_settings.iloc[0].to_dict()
+    data["tstart"] = row["time_start"]
+    data["tmin"] = row["time_min"]
+    data["tmax"] = row["time_max"]
+    data["M"] = row["stehfest_M"]
     data["timmlmodel"] = timml_model
     return data
 
 
 def observation(spec: TransientElementSpecification, _):
     df = transient_dataframe(spec)
+    if len(df) == 0:
+        return {}
+
     dataframe = spec.steady_spec.dataframe
     X, Y = point_coordinates(dataframe)
     kwargslist = []
     for (row, x, y) in zip(dataframe.to_dict("records"), X, Y):
-        geometry_id = row["geometry_id"]
+        row = filter_nan(row)
+        timeseries_id = row["timeseries_id"]
         kwargslist.append(
             {
                 "x": x,
                 "y": y,
-                "t": df.loc[geometry_id, "time"].values,
+                "t": df.loc[timeseries_id, "time"].values,
                 "label": row["label"],
             }
         )
     return kwargslist
 
 
-def well(spec: TransientElementSpecification, tstart: float) -> List[Dict[str, Any]]:
+def well(
+    spec: TransientElementSpecification, time_start: float
+) -> List[Dict[str, Any]]:
     df = transient_dataframe(spec)
     dataframe = spec.steady_spec.dataframe
     X, Y = point_coordinates(dataframe)
     kwargslist = []
     for (row, x, y) in zip(dataframe.to_dict("records"), X, Y):
+        row = filter_nan(row)
         kwargslist.append(
             {
                 "xw": x,
                 "yw": y,
-                "tsandQ": transient_input(df, row, "discharge", tstart),
+                "tsandQ": transient_input(df, row, "discharge", time_start),
                 "rw": row["radius"],
                 "res": row["resistance"],
                 "layers": row["layer"],
@@ -121,18 +139,19 @@ def well(spec: TransientElementSpecification, tstart: float) -> List[Dict[str, A
 
 
 def headwell(
-    spec: TransientElementSpecification, tstart: float
+    spec: TransientElementSpecification, time_start: float
 ) -> List[Dict[str, Any]]:
     df = transient_dataframe(spec)
     dataframe = spec.steady_spec.dataframe
     X, Y = point_coordinates(dataframe)
     kwargslist = []
     for (row, x, y) in zip(dataframe.to_dict("records"), X, Y):
+        row = filter_nan(row)
         kwargslist.append(
             {
                 "xw": x,
                 "yw": y,
-                "tsandh": transient_input(df, row, "head", tstart),
+                "tsandh": transient_input(df, row, "head", time_start),
                 "rw": row["radius"],
                 "res": row["resistance"],
                 "layers": row["layer"],
@@ -143,15 +162,16 @@ def headwell(
 
 
 def headlinesink(
-    spec: TransientElementSpecification, tstart: float
+    spec: TransientElementSpecification, time_start: float
 ) -> List[Dict[str, Any]]:
     df = transient_dataframe(spec)
     kwargslist = []
     for row in spec.steady_spec.dataframe.to_dict("records"):
+        row = filter_nan(row)
         kwargslist.append(
             {
                 "xy": linestring_coordinates(row),
-                "tsandh": transient_input(df, row, "head", tstart),
+                "tsandh": transient_input(df, row, "head", time_start),
                 "res": row["resistance"],
                 "wh": row["width"],
                 "layers": row["layer"],
@@ -161,14 +181,17 @@ def headlinesink(
     return kwargslist
 
 
-def linesinkditch(spec: ElementSpecification, tstart: float) -> List[Dict[str, Any]]:
+def linesinkditch(
+    spec: ElementSpecification, time_start: float
+) -> List[Dict[str, Any]]:
     df = transient_dataframe(spec)
     kwargslist = []
     for row in spec.steady_spec.dataframe.to_dict("records"):
+        row = filter_nan(row)
         kwargslist.append(
             {
                 "xy": linestring_coordinates(row),
-                "tsandQ": transient_input(df, row, "discharge", tstart),
+                "tsandQ": transient_input(df, row, "discharge", time_start),
                 "res": row["resistance"],
                 "wh": row["width"],
                 "layers": row["layer"],
@@ -178,9 +201,12 @@ def linesinkditch(spec: ElementSpecification, tstart: float) -> List[Dict[str, A
     return kwargslist
 
 
-def leakylinedoublet(spec: ElementSpecification, tstart: float) -> List[Dict[str, Any]]:
+def leakylinedoublet(
+    spec: ElementSpecification, time_start: float
+) -> List[Dict[str, Any]]:
     kwargslist = []
     for row in spec.dataframe.to_dict("records"):
+        row = filter_nan(row)
         kwargslist.append(
             {
                 "xy": linestring_coordinates(row),
@@ -193,9 +219,12 @@ def leakylinedoublet(spec: ElementSpecification, tstart: float) -> List[Dict[str
     return kwargslist
 
 
-def implinedoublet(spec: ElementSpecification, tstart: float) -> List[Dict[str, Any]]:
+def implinedoublet(
+    spec: ElementSpecification, time_start: float
+) -> List[Dict[str, Any]]:
     kwargslist = []
     for row in spec.dataframe.to_dict("records"):
+        row = filter_nan(row)
         kwargslist.append(
             {
                 "xy": linestring_coordinates(row),
@@ -208,7 +237,7 @@ def implinedoublet(spec: ElementSpecification, tstart: float) -> List[Dict[str, 
     return kwargslist
 
 
-def circareasink(spec: TransientElementSpecification, tstart: float) -> None:
+def circareasink(spec: TransientElementSpecification, time_start: float) -> None:
     """
     Parameters
     ----------
@@ -221,6 +250,7 @@ def circareasink(spec: TransientElementSpecification, tstart: float) -> None:
     df = transient_dataframe(spec)
     kwargslist = []
     for row in spec.steady_spec.dataframe.to_dict("records"):
+        row = filter_nan(row)
         x, y = np.array(row["geometry"].centroid.coords)[0]
         coords = np.array(row["geometry"].exterior.coords)
         x0, y0 = coords[0]
@@ -230,7 +260,7 @@ def circareasink(spec: TransientElementSpecification, tstart: float) -> None:
                 "xc": x,
                 "yc": y,
                 "R": radius,
-                "tsandN": transient_input(df, row, "rate", tstart),
+                "tsandN": transient_input(df, row, "rate", time_start),
             }
         )
     return kwargslist
@@ -242,40 +272,41 @@ def head_observations(
     observations: Dict,
 ) -> gpd.GeoDataFrame:
     # We'll duplicate all values in time, except head which is unique per time.
-    if len(observations) == 0:
-        return gpd.GeoDataFrame()
-
     refdate = pd.to_datetime(reference_date)
-    xx = []
-    yy = []
-    labels = []
-    heads = []
-    starts = []
-    ends = []
-    for kwargs in observations.values():
-        x = kwargs["x"]
-        y = kwargs["y"]
-        t = kwargs["t"]
-        end = refdate + pd.to_timedelta(t, "D")
-        start = np.insert(end[:-1], 0, refdate)
+    geodataframes = {}
+    for name, kwargs_collections in observations.items():
+        xx = []
+        yy = []
+        labels = []
+        heads = []
+        starts = []
+        ends = []
+        for kwargs in kwargs_collections:
+            x = kwargs["x"]
+            y = kwargs["y"]
+            t = kwargs["t"]
+            end = refdate + pd.to_timedelta(t, "D")
+            start = np.insert(end[:-1], 0, refdate)
 
-        starts.append(start)
-        ends.append(end)
-        heads.append(model.head(x=x, y=y, t=t))
-        xx.append(np.repeat(x, len(t)))
-        yy.append(np.repeat(y, len(t)))
-        labels.append(np.repeat(kwargs["label"], len(t)))
+            starts.append(start)
+            ends.append(end)
+            heads.append(model.head(x=x, y=y, t=t))
+            xx.append(np.repeat(x, len(t)))
+            yy.append(np.repeat(y, len(t)))
+            labels.append(np.repeat(kwargs["label"], len(t)))
 
-    d = {
-        "geometry": gpd.points_from_xy(np.concatenate(xx), np.concatenate(yy)),
-        "datetime_start": np.concatenate(starts),
-        "datetime_end": np.concatenate(ends),
-        "label": np.concatenate(labels),
-    }
-    for i, layerhead in enumerate(np.hstack(heads)):
-        d[f"head_layer{i}"] = layerhead
+        d = {
+            "geometry": gpd.points_from_xy(np.concatenate(xx), np.concatenate(yy)),
+            "datetime_start": np.concatenate(starts),
+            "datetime_end": np.concatenate(ends),
+            "label": np.concatenate(labels),
+        }
+        for i, layerhead in enumerate(np.hstack(heads)):
+            d[f"head_layer{i}"] = layerhead
 
-    return gpd.GeoDataFrame(d)
+        geodataframes[name] = gpd.GeoDataFrame(d)
+
+    return geodataframes
 
 
 def headgrid(
@@ -303,36 +334,6 @@ def headgrid(
         coords={"layer": layer, "time": time, "y": y, "x": x},
         dims=("layer", "time", "y", "x"),
     )
-
-
-def headmesh(
-    model: TimModel,
-    spec,
-    cellsize: float,
-    times: FloatArray,
-    reference_date: pd.Timestamp,
-) -> xr.Dataset:
-    nodes, face_nodes, centroids = trimesh(spec, cellsize)
-    nface = len(face_nodes)
-
-    nlayer = model.aq.find_aquifer_data(nodes[0, 0], nodes[0, 0]).naq
-    layer = [i for i in range(nlayer)]
-    head = np.empty((nlayer, times.size, nface), dtype=np.float64)
-    for i in tqdm.tqdm(range(nface)):
-        x = centroids[i, 0]
-        y = centroids[i, 1]
-        head[:, :, i] = model.head(x, y, times, layer)
-    uds = ugrid._ugrid2d_dataset(
-        node_x=nodes[:, 0],
-        node_y=nodes[:, 1],
-        face_x=centroids[:, 0],
-        face_y=centroids[:, 1],
-        face_nodes=face_nodes,
-    )
-    time = pd.to_datetime(reference_date) + pd.to_timedelta(times, "D")
-    uds = uds.assign_coords(time=time)
-    uds["head"] = xr.DataArray(head, dims=("layer", "time", "face"))
-    return ugrid._unstack_layers(uds)
 
 
 # Map the names of the elements to their constructors
@@ -377,21 +378,17 @@ def initialize_model(spec: TtimModelSpecification, timml_model) -> TimModel:
         **ttim_model(spec.aquifer, spec.temporal_settings, timml_model)
     )
     elements = {}
-    observations = {}
+    observations = defaultdict(list)
     for name, element_spec in spec.elements.items():
         elementtype = element_spec.elementtype
-        if (
-            (not element_spec.active)
-            or (elementtype not in MAPPING)
-            or (len(element_spec.dataframe.index) == 0)
-        ):
+        if (not element_spec.active) or (elementtype not in MAPPING):
             continue
 
         # print(f"adding {name} as {elementtype}")
         f_to_kwargs, element = MAPPING[elementtype]
         for i, kwargs in enumerate(f_to_kwargs(element_spec, model.tstart)):
             if elementtype == "Observation":
-                observations[f"{name}_{i}"] = kwargs
+                observations[name].append(kwargs)
             else:
                 kwargs["model"] = model
                 elements[f"{name}_{i}"] = element(**kwargs)
@@ -410,9 +407,8 @@ def convert_to_script(spec: TtimModelSpecification) -> str:
     strings = ["import ttim", f"ttim_model = ttim.ModelMaq({strkwargs})"]
     for name, element_spec in spec.elements.items():
         elementtype = element_spec.elementtype
-        if elementtype not in MAPPING:
+        if (not element_spec.active) or (elementtype not in MAPPING):
             continue
-        # print(f"adding {name} as {elementtype}")
 
         f_to_kwargs, element = MAPPING[elementtype]
         for i, kwargs in enumerate(f_to_kwargs(element_spec, modelkwargs["tstart"])):

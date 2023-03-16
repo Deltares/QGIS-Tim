@@ -37,12 +37,14 @@ def write_vector(
     gdf_head: gpd.GeoDataFrame,
     crs: int,
     outpath: Union[pathlib.Path, str],
+    layername: str,
 ) -> None:
     if len(gdf_head.index) > 0:
         gdf_head = gdf_head.set_crs(crs)
         gdf_head.to_file(
             outpath.with_suffix(".output.gpkg"),
             driver="GPKG",
+            layer=layername,
         )
     return
 
@@ -61,10 +63,11 @@ def compute_steady(
     timml_model.solve()
 
     extent, crs = gistim.gridspec(inpath, cellsize)
-    gdf_head = gistim.timml_elements.head_observations(timml_model, observations)
+    gdfs_obs = gistim.timml_elements.head_observations(timml_model, observations)
     head = gistim.timml_elements.headgrid(timml_model, extent, cellsize)
 
-    write_vector(gdf_head, crs, outpath)
+    for name, gdf in gdfs_obs.items():
+        write_vector(gdf, crs, outpath, layername=name)
     write_raster(head, crs, outpath)
     write_ugrid(head, crs, outpath)
     return
@@ -89,7 +92,7 @@ def compute_transient(
 
     extent, crs = gistim.gridspec(inpath, cellsize)
     refdate = ttim_spec.temporal_settings["reference_date"].iloc[0]
-    gdf_head = gistim.ttim_elements.head_observations(ttim_model, refdate, observations)
+    gdfs_obs = gistim.ttim_elements.head_observations(ttim_model, refdate, observations)
     head = gistim.ttim_elements.headgrid(
         ttim_model,
         extent,
@@ -98,7 +101,8 @@ def compute_transient(
         refdate,
     )
 
-    write_vector(gdf_head, crs, outpath)
+    for name, gdf in gdfs_obs.items():
+        write_vector(gdf, crs, outpath, layername=name)
     write_raster(head, crs, outpath)
     write_ugrid(head, crs, outpath)
     return

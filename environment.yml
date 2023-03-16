@@ -7,6 +7,7 @@ channels:
 dependencies:
   - black
   - geopandas
+  - git
   - matplotlib
   - netCDF4
   - numba>=0.50

@@ -28,11 +28,10 @@ from qgis.core import (
     QgsVectorLayerTemporalProperties,
 )
 from qgis.gui import QgsMapLayerComboBox
-
-from ..core import geopackage, layer_styling
-from ..core.dummy_ugrid import write_dummy_ugrid
-from ..core.processing import mesh_contours
-from ..core.task import BaseServerTask
+from qgistim.core import geopackage, layer_styling
+from qgistim.core.dummy_ugrid import write_dummy_ugrid
+from qgistim.core.processing import mesh_contours
+from qgistim.core.task import BaseServerTask
 
 
 class ComputeTask(BaseServerTask):
@@ -89,7 +88,7 @@ class ComputeWidget(QWidget):
         self.domain_button.clicked.connect(self.domain)
         # self.mesh_checkbox = QCheckBox("Trimesh")
         self.output_line_edit = QLineEdit()
-        self.output_button = QPushButton("Save as ...")
+        self.output_button = QPushButton("Set path as ...")
         self.output_button.clicked.connect(self.set_output_path)
         self.contour_checkbox = QCheckBox("Auto-generate contours")
         self.contour_button = QPushButton("Export contours")
@@ -176,12 +175,12 @@ class ComputeWidget(QWidget):
 
     def add_contour_layer(self, layer) -> None:
         # Labeling
-        labels = layer_styling.contour_labels()
-        layer.setLabeling(labels)
-        layer.setLabelsEnabled(True)
+        labels = layer_styling.number_labels("head")
         # Renderer: simple black lines
         renderer = layer_styling.contour_renderer()
-        self.parent.add_layer(layer, "output:vector", renderer=renderer, on_top=True)
+        self.parent.output_group.add_layer(
+            layer, "vector", renderer=renderer, on_top=True, labels=labels
+        )
 
     def export_contours(self) -> None:
         layer = self.contour_layer.currentLayer()
@@ -199,6 +198,7 @@ class ComputeWidget(QWidget):
             step=step,
         )
         self.add_contour_layer(layer)
+        return
 
     def set_output_path(self) -> None:
         current = self.output_line_edit.text()
@@ -235,7 +235,9 @@ class ComputeWidget(QWidget):
             "mode": mode,
             "active_elements": active_elements,
         }
-        print(data)
+        # import json
+        # print(json.dumps(data))
+        #
         # https://gis.stackexchange.com/questions/296175/issues-with-qgstask-and-task-manager
         # It seems the task goes awry when not associated with a Python object!
         # -- we just assign it to the widget here.
@@ -318,7 +320,7 @@ class ComputeWidget(QWidget):
             renderer.setScalarSettings(index, scalar_settings)
 
             index_layer.setRendererSettings(renderer)
-            self.parent.add_layer(index_layer, "output:mesh")
+            self.parent.output_group.add_layer(index_layer, "mesh")
 
             if contour:
                 contour_layer = mesh_contours(
@@ -367,7 +369,7 @@ class ComputeWidget(QWidget):
                 layer, band=band, colormap="Plasma", nclass=10
             )
             layer.setRenderer(renderer)
-            self.parent.add_layer(layer, "output:raster")
+            self.parent.output_group.add_layer(layer, "raster")
 
         #            if contour:
         #                contour_layer = raster_steady_contours(
@@ -382,17 +384,19 @@ class ComputeWidget(QWidget):
         return
 
     def load_vector_result(self, path: Union[Path, str]) -> None:
+        path = Path(path)
         project_layers = {
             layer.name(): layer for layer in QgsProject.instance().mapLayers().values()
         }
-        gpkg_path = Path(path).with_suffix(".output.gpkg")
+        gpkg_path = path.with_suffix(".output.gpkg")
 
         if not gpkg_path.exists():
             return
 
         for layername in geopackage.layers(str(gpkg_path)):
             add = False
-            project_layer = project_layers.get(layername)
+            layers_panel_name = f"{path.stem}-{layername}"
+            project_layer = project_layers.get(layers_panel_name)
             if (
                 project_layer is not None
                 and Path(project_layer.source().partition("|")[0]) == gpkg_path
@@ -401,7 +405,9 @@ class ComputeWidget(QWidget):
                 layer = project_layer
                 layer.reload()
             else:
-                layer = QgsVectorLayer(f"{gpkg_path}|layername={layername}", layername)
+                layer = QgsVectorLayer(
+                    f"{gpkg_path}|layername={layername}", layers_panel_name
+                )
                 add = True
 
             # Set the temporal properties if it's a temporal layer
@@ -418,6 +424,10 @@ class ComputeWidget(QWidget):
                 temporal_properties.setIsActive(False)
 
             if add:
-                self.parent.add_layer(layer, "output:vector")
+                if "timml Observation:" in layername or "ttim Observation" in layername:
+                    labels = layer_styling.number_labels("head_layer0")
+                else:
+                    labels = None
+                self.parent.output_group.add_layer(layer, "vector", labels=labels)
 
         return

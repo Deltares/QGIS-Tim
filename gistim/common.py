@@ -22,6 +22,7 @@ tables together in the ElementSpecifications below. The ``timml_elements`` and
 ``ttim_elements`` then convert these grouped tables into ``timml`` and ``ttim``
 models.
 """
+import numbers
 import pathlib
 import re
 from collections import defaultdict
@@ -33,8 +34,22 @@ import geopandas as gpd
 import numpy as np
 import pandas as pd
 
-gpd.options.use_pygeos = False
 FloatArray = np.ndarray
+
+
+def filter_scalar_nan(value: Any) -> Any:
+    if isinstance(value, numbers.Real) and np.isnan(value):
+        return None
+    else:
+        return value
+
+
+def filter_nan(row: Union[Dict, pd.Series]):
+    """
+    Newer versions of geopandas return NaN rather than None for columns.
+    TimML & TTim expect None for optional values.
+    """
+    return {k: filter_scalar_nan(v) for k, v in row.items()}
 
 
 class ElementSpecification(NamedTuple):
@@ -144,7 +159,14 @@ def aquifer_data(
         d["npor"] = porosity
         d["hstar"] = hstar
 
-    return d
+    filtered = {}
+    for k, value in d.items():
+        if isinstance(value, np.ndarray):
+            filtered[k] = [filter_scalar_nan(v) for v in value]
+        else:
+            filtered[k] = filter_scalar_nan(value)
+
+    return filtered
 
 
 def parse_name(layername: str) -> Tuple[str, str, str]:
@@ -228,6 +250,11 @@ def model_specification(
             ttim_df = (
                 gpd.read_file(path, layer=ttim_name) if ttim_name is not None else None
             )
+
+            # Use the background aquifer for a semi-confined top
+            if element_type == "Polygon Semi-Confined Top":
+                timml_assoc_df = aquifer
+
             timml_spec = ElementSpecification(
                 elementtype=element_type,
                 active=active_elements.get(timml_name, False),
@@ -346,33 +373,3 @@ def gridspec(
     xmin, ymin, xmax, ymax = domain.bounds.iloc[0]
     extent = (xmin, xmax, ymin, ymax)
     return round_extent(extent, cellsize), domain.crs
-
-
-def trimesh(spec: TimmlModelSpecification, cellsize: float):
-    # Only import it if needed
-    import geomesh
-
-    domain = spec.domain
-
-    geometry = []
-    for spec in spec.elements.values():
-        df = spec.dataframe
-        if spec.elementtype in ["Well", "HeadWell"]:
-            df.geometry = df.buffer(cellsize, resolution=2)
-        if spec.elementtype in ["PolygonInhomogeneity", "Building Pit"]:
-            pass
-        elif spec.elementtype in ["Impermeable Line Doublet", "Leaky Line Doublet"]:
-            df.geometry = df.buffer(cellsize * 0.01, cap_style=2, join_style=2)
-        geometry.append(
-            gpd.overlay(df, domain, how="intersection").loc[:, ["geometry"]]
-        )
-
-    gdf = pd.concat([domain.loc[:, ["geometry"]], *geometry])
-    gdf["cellsize"] = cellsize
-    # intersect bounding box with elements
-    mesher = geomesh.TriangleMesher(gdf)
-    mesher.minimum_angle = 0.01
-    mesher.conforming_delaunay = False
-    nodes, face_nodes = mesher.generate()
-    centroids = nodes[face_nodes].mean(axis=1)
-    return nodes, face_nodes, centroids
