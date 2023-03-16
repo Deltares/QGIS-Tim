@@ -381,16 +381,12 @@ def initialize_model(spec: TtimModelSpecification, timml_model) -> TimModel:
     observations = defaultdict(list)
     for name, element_spec in spec.elements.items():
         elementtype = element_spec.elementtype
-        if (
-            (not element_spec.active)
-            or (elementtype not in MAPPING)
-            or (len(element_spec.dataframe.index) == 0)
-        ):
+        if (not element_spec.active) or (elementtype not in MAPPING):
             continue
 
         # print(f"adding {name} as {elementtype}")
         f_to_kwargs, element = MAPPING[elementtype]
-        for i, kwargs in enumerate(f_to_kwargs(element_spec, model.time_start)):
+        for i, kwargs in enumerate(f_to_kwargs(element_spec, model.tstart)):
             if elementtype == "Observation":
                 observations[name].append(kwargs)
             else:
@@ -411,9 +407,8 @@ def convert_to_script(spec: TtimModelSpecification) -> str:
     strings = ["import ttim", f"ttim_model = ttim.ModelMaq({strkwargs})"]
     for name, element_spec in spec.elements.items():
         elementtype = element_spec.elementtype
-        if elementtype not in MAPPING:
+        if (not element_spec.active) or (elementtype not in MAPPING):
             continue
-        # print(f"adding {name} as {elementtype}")
 
         f_to_kwargs, element = MAPPING[elementtype]
         for i, kwargs in enumerate(f_to_kwargs(element_spec, modelkwargs["tstart"])):

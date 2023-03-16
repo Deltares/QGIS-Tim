@@ -424,7 +424,7 @@ class ComputeWidget(QWidget):
                 temporal_properties.setIsActive(False)
 
             if add:
-                if "timml Observation:" in layername:
+                if "timml Observation:" in layername or "ttim Observation" in layername:
                     labels = layer_styling.number_labels("head_layer0")
                 else:
                     labels = None
