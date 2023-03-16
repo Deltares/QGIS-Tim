@@ -302,6 +302,8 @@ class DatasetWidget(QWidget):
         self.parent.on_transient_changed()
         return
 
+        return
+
     def new_geopackage(self) -> None:
         """
         Create a new GeoPackage file, and set it as the active dataset.
