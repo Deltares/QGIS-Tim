@@ -65,9 +65,5 @@ class ElementsWidget(QWidget):
             return
         # Write to geopackage
         element.write()
-        # Add to QGIS
-        self.parent.add_layer(element.timml_layer, "timml", element.renderer())
-        self.parent.add_layer(element.ttim_layer, "ttim")
-        self.parent.add_layer(element.assoc_layer, "timml")
-        # Add to dataset tree
+        # Add to QGIS and dataset tree
         self.parent.add_element(element)

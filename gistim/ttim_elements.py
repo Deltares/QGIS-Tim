@@ -6,6 +6,7 @@ These keyword arguments are used to initialize a model, or used to generate a
 Python script.
 
 """
+from collections import defaultdict
 from typing import Any, Dict, List, Tuple
 
 import black
@@ -265,40 +266,41 @@ def head_observations(
     observations: Dict,
 ) -> gpd.GeoDataFrame:
     # We'll duplicate all values in time, except head which is unique per time.
-    if len(observations) == 0:
-        return gpd.GeoDataFrame()
-
     refdate = pd.to_datetime(reference_date)
-    xx = []
-    yy = []
-    labels = []
-    heads = []
-    starts = []
-    ends = []
-    for kwargs in observations.values():
-        x = kwargs["x"]
-        y = kwargs["y"]
-        t = kwargs["t"]
-        end = refdate + pd.to_timedelta(t, "D")
-        start = np.insert(end[:-1], 0, refdate)
+    geodataframes = {}
+    for name, kwargs_collections in observations.items():
+        xx = []
+        yy = []
+        labels = []
+        heads = []
+        starts = []
+        ends = []
+        for kwargs in kwargs_collections:
+            x = kwargs["x"]
+            y = kwargs["y"]
+            t = kwargs["t"]
+            end = refdate + pd.to_timedelta(t, "D")
+            start = np.insert(end[:-1], 0, refdate)
 
-        starts.append(start)
-        ends.append(end)
-        heads.append(model.head(x=x, y=y, t=t))
-        xx.append(np.repeat(x, len(t)))
-        yy.append(np.repeat(y, len(t)))
-        labels.append(np.repeat(kwargs["label"], len(t)))
+            starts.append(start)
+            ends.append(end)
+            heads.append(model.head(x=x, y=y, t=t))
+            xx.append(np.repeat(x, len(t)))
+            yy.append(np.repeat(y, len(t)))
+            labels.append(np.repeat(kwargs["label"], len(t)))
 
-    d = {
-        "geometry": gpd.points_from_xy(np.concatenate(xx), np.concatenate(yy)),
-        "datetime_start": np.concatenate(starts),
-        "datetime_end": np.concatenate(ends),
-        "label": np.concatenate(labels),
-    }
-    for i, layerhead in enumerate(np.hstack(heads)):
-        d[f"head_layer{i}"] = layerhead
+        d = {
+            "geometry": gpd.points_from_xy(np.concatenate(xx), np.concatenate(yy)),
+            "datetime_start": np.concatenate(starts),
+            "datetime_end": np.concatenate(ends),
+            "label": np.concatenate(labels),
+        }
+        for i, layerhead in enumerate(np.hstack(heads)):
+            d[f"head_layer{i}"] = layerhead
 
-    return gpd.GeoDataFrame(d)
+        geodataframes[name] = gpd.GeoDataFrame(d)
+
+    return geodataframes
 
 
 def headgrid(
@@ -370,7 +372,7 @@ def initialize_model(spec: TtimModelSpecification, timml_model) -> TimModel:
         **ttim_model(spec.aquifer, spec.temporal_settings, timml_model)
     )
     elements = {}
-    observations = {}
+    observations = defaultdict(list)
     for name, element_spec in spec.elements.items():
         elementtype = element_spec.elementtype
         if (
@@ -384,7 +386,7 @@ def initialize_model(spec: TtimModelSpecification, timml_model) -> TimModel:
         f_to_kwargs, element = MAPPING[elementtype]
         for i, kwargs in enumerate(f_to_kwargs(element_spec, model.time_start)):
             if elementtype == "Observation":
-                observations[f"{name}_{i}"] = kwargs
+                observations[name].append(kwargs)
             else:
                 kwargs["model"] = model
                 elements[f"{name}_{i}"] = element(**kwargs)

@@ -5,6 +5,7 @@ arguments for TimML.
 These keyword arguments are used to initialize a model, or used to generate a
 Python script.
 """
+from collections import defaultdict
 from typing import Any, Dict, List, Tuple
 
 import black
@@ -283,26 +284,27 @@ def validate(spec: TimmlModelSpecification) -> None:
 
 
 def head_observations(model: timml.Model, observations: Dict) -> gpd.GeoDataFrame:
-    if len(observations) == 0:
-        return gpd.GeoDataFrame()
+    geodataframes = {}
+    for name, kwargs_collection in observations.items():
+        heads = []
+        xx = []
+        yy = []
+        labels = []
+        for kwargs in kwargs_collection:
+            x = kwargs["x"]
+            y = kwargs["y"]
+            heads.append(model.head(x=x, y=y))
+            xx.append(x)
+            yy.append(y)
+            labels.append(kwargs["label"])
 
-    heads = []
-    xx = []
-    yy = []
-    labels = []
-    for name, kwargs in observations.items():
-        x = kwargs["x"]
-        y = kwargs["y"]
-        heads.append(model.head(x=x, y=y))
-        xx.append(x)
-        yy.append(y)
-        labels.append(kwargs["label"])
+        d = {"geometry": gpd.points_from_xy(xx, yy), "label": labels}
+        for i, layerhead in enumerate(np.vstack(heads).T):
+            d[f"head_layer{i}"] = layerhead
 
-    d = {"geometry": gpd.points_from_xy(xx, yy), "label": labels}
-    for i, layerhead in enumerate(np.vstack(heads).T):
-        d[f"head_layer{i}"] = layerhead
+        geodataframes[name] = gpd.GeoDataFrame(d)
 
-    return gpd.GeoDataFrame(d)
+    return geodataframes
 
 
 def headgrid(model: timml.Model, extent: Tuple[float], cellsize: float) -> xr.DataArray:
@@ -374,6 +376,8 @@ def initialize_model(spec: TimmlModelSpecification) -> timml.Model:
     Returns
     -------
     timml.Model
+    elements: Dict of number name to TimML element
+    observations: Dict of list
 
     Examples
     --------
@@ -388,7 +392,7 @@ def initialize_model(spec: TimmlModelSpecification) -> timml.Model:
     validate(spec)
     model = timml.ModelMaq(**aquifer_data(spec.aquifer))
     elements = {}
-    observations = {}
+    observations = defaultdict(list)
     for name, element_spec in spec.elements.items():
         if (not element_spec.active) or (len(element_spec.dataframe.index) == 0):
             continue
@@ -404,7 +408,7 @@ def initialize_model(spec: TimmlModelSpecification) -> timml.Model:
         f_to_kwargs, element = MAPPING[elementtype]
         for i, kwargs in enumerate(f_to_kwargs(element_spec)):
             if elementtype == "Observation":
-                observations[f"{name}_{i}"] = kwargs
+                observations[name].append(kwargs)
             else:
                 kwargs["model"] = model
                 elements[f"{name}_{i}"] = element(**kwargs)

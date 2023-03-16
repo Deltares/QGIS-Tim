@@ -12,7 +12,7 @@ disabled (such as inhomogeneities).
 """
 from pathlib import Path
 from shutil import copy
-from typing import Any, List, Set
+from typing import List, Set
 
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import (
@@ -30,7 +30,7 @@ from PyQt5.QtWidgets import (
     QVBoxLayout,
     QWidget,
 )
-from qgis.core import QgsApplication, QgsMapLayer, QgsProject, QgsTask
+from qgis.core import QgsApplication, QgsProject, QgsTask
 from qgistim.core.task import BaseServerTask
 from qgistim.core.tim_elements import Aquifer, Domain, load_elements_from_geopackage
 
@@ -114,6 +114,7 @@ class DatasetTreeWidget(QTreeWidget):
             timml_name=element.timml_name, ttim_name=element.ttim_name, enabled=enabled
         )
         item.element = element
+        return
 
     def on_transient_changed(self, transient: bool) -> None:
         """
@@ -251,12 +252,16 @@ class DatasetWidget(QWidget):
         return self.dataset_line_edit.text()
 
     def add_item_to_qgis(self, item) -> None:
-        layers = item.element.from_geopackage()
+        # Get all the relevant data.
+        element = item.element
+        element.load_layers_from_geopackage()
         suppress = self.suppress_popup_checkbox.isChecked()
-        timml_layer, renderer = layers[0]
-        maplayer = self.parent.add_layer(timml_layer, "timml", renderer, suppress)
-        self.parent.add_layer(layers[1][0], "ttim")
-        self.parent.add_layer(layers[2][0], "timml")
+        # Start adding the layers
+        maplayer = self.parent.input_group.add_layer(
+            element.timml_layer, "timml", element.renderer, suppress
+        )
+        self.parent.input_group.add_layer(element.ttim_layer, "ttim")
+        self.parent.input_group.add_layer(element.assoc_layer, "timml")
         # Set cell size if the item is a domain layer
         if item.element.timml_name.split(":")[0] == "timml Domain":
             if maplayer.featureCount() <= 0:
@@ -279,14 +284,22 @@ class DatasetWidget(QWidget):
         Load the layers of a GeoPackage into the Layers Panel
         """
         self.dataset_tree.clear()
+
+        name = str(Path(self.path).stem)
+        self.parent.create_input_group(name)
+        self.parent.create_output_group(name)
+
         elements = load_elements_from_geopackage(self.path)
         for element in elements:
             self.dataset_tree.add_element(element)
-        name = str(Path(self.path).stem)
-        self.parent.create_groups(name)
+
         for item in self.dataset_tree.items():
             self.add_item_to_qgis(item)
             item.element.on_transient_changed(self.parent.transient)
+
+        self.dataset_tree.sortByColumn(0, Qt.SortOrder.AscendingOrder)
+        self.parent.toggle_element_buttons(True)
+        self.parent.on_transient_changed()
         return
 
     def new_geopackage(self) -> None:
@@ -301,13 +314,13 @@ class DatasetWidget(QWidget):
         path, _ = QFileDialog.getSaveFileName(self, "Select file", "", "*.gpkg")
         if path != "":  # Empty string in case of cancel button press
             self.dataset_line_edit.setText(path)
+            # Writing here creates a new Geopackage.
             for element in (Aquifer, Domain):
                 instance = element(self.path, "")
                 instance.create_layers(crs)
                 instance.write()
+            # Next, we load the newly written layers.
             self.load_geopackage()
-            self.parent.toggle_element_buttons(True)
-        self.parent.on_transient_changed()
         return
 
     def open_geopackage(self) -> None:
@@ -319,9 +332,6 @@ class DatasetWidget(QWidget):
         if path != "":  # Empty string in case of cancel button press
             self.dataset_line_edit.setText(path)
             self.load_geopackage()
-            self.parent.toggle_element_buttons(True)
-            self.dataset_tree.sortByColumn(0, Qt.SortOrder.AscendingOrder)
-            self.parent.on_transient_changed()
         return
 
     def copy_geopackage(self) -> None:
@@ -343,9 +353,6 @@ class DatasetWidget(QWidget):
 
             self.dataset_line_edit.setText(str(target_path))
             self.load_geopackage()
-            self.parent.toggle_element_buttons(True)
-            self.dataset_tree.sortByColumn(0, Qt.SortOrder.AscendingOrder)
-            self.parent.on_transient_changed()
         return
 
     def remove_geopackage_layer(self) -> None:

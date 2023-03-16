@@ -28,7 +28,7 @@ Each element is (optionally) represented in multiple places:
   and edit its data.
 
 Some elements require specific rendering in QGIS (e.g. no fill polygons), which
-are supplied by the `.renderer()` method.
+are supplied by the `.renderer` property.
 
 The coupling of separate tables (geometry table and time series table) is only
 explicit in the Dataset Tree. The only way of knowing that tables are
@@ -62,7 +62,6 @@ from qgis.core import (
     QgsVectorLayer,
 )
 from qgistim.core import geopackage
-from qgistim.core.layer_styling import number_labels
 
 # These columns are reused by Aquifer and Polygon Inhom, Building pit Aquitards
 # are on top of the aquifer, so it comes first Nota bene: the order of these is
@@ -162,10 +161,6 @@ class Element:
         provider.addAttributes(attributes)
         layer.updateFields()
         layer.setCrs(crs)
-        labels = self.labels()
-        if labels is not None:
-            layer.setLabeling(labels)
-            layer.setLabelsEnabled(True)
         return layer
 
     def create_timml_layer(self, crs: Any):
@@ -200,9 +195,7 @@ class Element:
                 layer.setDefaultValueDefinition(index, definition)
         return
 
-    def labels(self):
-        return None
-
+    @property
     def renderer(self):
         return None
 
@@ -217,16 +210,12 @@ class Element:
     def assoc_layer_from_geopackage(self):
         return
 
-    def from_geopackage(self):
+    def load_layers_from_geopackage(self) -> None:
         self.timml_layer_from_geopackage()
         self.ttim_layer_from_geopackage()
         self.assoc_layer_from_geopackage()
         self.set_defaults()
-        return [
-            (self.timml_layer, self.renderer()),
-            (self.ttim_layer, None),
-            (self.assoc_layer, None),
-        ]
+        return
 
     def write(self):
         self.timml_layer = geopackage.write_layer(
@@ -339,6 +328,7 @@ class Domain(TransientElement):
         self.timml_name = f"timml {self.element_type}:Domain"
         self.ttim_name = "ttim Computation Times:Domain"
 
+    @property
     def renderer(self) -> QgsSingleSymbolRenderer:
         """
         Results in transparent fill, with a medium thick black border line.
@@ -459,9 +449,6 @@ class Observation(TransientElement):
     }
     transient_columns = ("timeseries_id",)
 
-    def labels(self):
-        return number_labels("head_layer0")
-
 
 class Well(TransientElement):
     element_type = "Well"
@@ -551,6 +538,7 @@ class HeadLineSink(TransientElement):
         "timeseries_id",
     )
 
+    @property
     def renderer(self) -> QgsSingleSymbolRenderer:
         symbol = QgsLineSymbol.createSimple(
             {
@@ -591,6 +579,7 @@ class LineSinkDitch(TransientElement):
         "timeseries_id",
     )
 
+    @property
     def renderer(self) -> QgsSingleSymbolRenderer:
         symbol = QgsLineSymbol.createSimple(
             {
@@ -613,6 +602,7 @@ class ImpermeableLineDoublet(Element):
         "order": QgsDefaultValue("4"),
     }
 
+    @property
     def renderer(self) -> QgsSingleSymbolRenderer:
         symbol = QgsLineSymbol.createSimple(
             {
@@ -636,6 +626,7 @@ class LeakyLineDoublet(Element):
         "order": QgsDefaultValue("4"),
     }
 
+    @property
     def renderer(self) -> QgsSingleSymbolRenderer:
         symbol = QgsLineSymbol.createSimple(
             {
@@ -670,6 +661,7 @@ class CircularAreaSink(TransientElement):
         "timeseries_id",
     )
 
+    @property
     def renderer(self):
         """
         Results in transparent fill, with a thick blue border line.
@@ -700,6 +692,7 @@ class PolygonSemiConfinedTop(Element):
         "ndegrees": QgsDefaultValue("6"),
     }
 
+    @property
     def renderer(self) -> QgsSingleSymbolRenderer:
         symbol = QgsFillSymbol.createSimple(
             {
@@ -726,6 +719,7 @@ class PolygonAreaSink(Element):
         "ndegrees": QgsDefaultValue("6"),
     }
 
+    @property
     def renderer(self) -> QgsSingleSymbolRenderer:
         symbol = QgsFillSymbol.createSimple(
             {
@@ -751,6 +745,7 @@ class PolygonInhomogeneity(AssociatedElement):
         "ndegrees": QgsDefaultValue("6"),
     }
 
+    @property
     def renderer(self) -> QgsSingleSymbolRenderer:
         symbol = QgsFillSymbol.createSimple(
             {
@@ -773,6 +768,7 @@ class BuildingPit(AssociatedElement):
     )
     assoc_attributes = INHOM_ATTRIBUTES.copy()
 
+    @property
     def renderer(self) -> QgsSingleSymbolRenderer:
         symbol = QgsFillSymbol.createSimple(
             {
