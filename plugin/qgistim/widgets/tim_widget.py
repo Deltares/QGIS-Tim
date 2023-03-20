@@ -78,8 +78,13 @@ class LayersPanelGroup:
                 group.addLayer(maplayer)
         except RuntimeError as e:
             if e.args[0] == PYQT_DELETED_ERROR:
-                # Then re-create groups and try again
-                self.create_subgroup(destination)
+                # Search first
+                group = self.root.findGroup(destination)
+                if group is not None:
+                    self.subgroups[destination] = group
+                else:
+                    # Then re-create groups and try again
+                    self.create_subgroup(destination)
                 self.add_to_group(maplayer, destination, on_top)
             else:
                 raise e
