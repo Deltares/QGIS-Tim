@@ -744,6 +744,12 @@ class PolygonInhomogeneity(AssociatedElement):
         "order": QgsDefaultValue("4"),
         "ndegrees": QgsDefaultValue("6"),
     }
+    transient_columns = (
+        "aquitard_s",
+        "aquifer_s",
+        "aquitard_npor",
+        "aquifer_npor",
+    )
 
     @property
     def renderer(self) -> QgsSingleSymbolRenderer:
@@ -755,6 +761,20 @@ class PolygonInhomogeneity(AssociatedElement):
             }
         )
         return QgsSingleSymbolRenderer(symbol)
+
+    def on_transient_changed(self, transient: bool):
+        if len(self.transient_columns) == 0:
+            return
+
+        config = self.assoc_layer.attributeTableConfig()
+        columns = config.columns()
+
+        for i, column in enumerate(columns):
+            if column.name in self.transient_columns:
+                config.setColumnHidden(i, not transient)
+
+        self.assoc_layer.setAttributeTableConfig(config)
+        return
 
 
 class BuildingPit(AssociatedElement):
