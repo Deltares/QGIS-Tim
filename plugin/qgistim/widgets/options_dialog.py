@@ -27,7 +27,7 @@ INSTALL_VERSION_COMMANDS = {
 REPOSITORY_URLS = {
     "timml": "https://github.com/mbakker7/timml.git",
     "ttim": "https://github.com/mbakker7/ttim.git",
-    "gistim": "https://gitlab.com/deltares/imod/qgis-tim.git",
+    "gistim": "https://github.com/Deltares/QGIS-Tim.git",
 }
 
 
