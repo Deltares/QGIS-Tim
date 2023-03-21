@@ -79,6 +79,12 @@ class DatasetTreeWidget(QTreeWidget):
         root = self.invisibleRootItem()
         return [root.child(i) for i in range(root.childCount())]
 
+    def reset(self):
+        for item in self.items():
+            index = self.indexOfTopLevelItem(item)
+            self.takeTopLevelItem(index)
+        return
+
     def add_item(self, timml_name: str, ttim_name: str = None, enabled: bool = True):
         item = QTreeWidgetItem()
         self.addTopLevelItem(item)
@@ -236,6 +242,14 @@ class DatasetWidget(QWidget):
     def path(self) -> str:
         """Returns currently active path to GeoPackage"""
         return self.dataset_line_edit.text()
+
+    def reset(self):
+        # Set state back to defaults
+        self.start_task = None
+        self.convert_task = None
+        self.dataset_line_edit.setText("")
+        self.dataset_tree.reset()
+        return
 
     def add_item_to_qgis(self, item) -> None:
         # Get all the relevant data.

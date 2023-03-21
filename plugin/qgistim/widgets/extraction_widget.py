@@ -265,6 +265,10 @@ class DataExtractionWidget(QWidget):
         layout.addStretch()
         self.setLayout(layout)
 
+    def reset(self):
+        self.netcdf_line_edit.setText("")
+        return
+
     def set_interpreter_interaction(self, value: bool):
         self.parent.set_interpreter_interaction(value)
 

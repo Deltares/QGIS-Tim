@@ -198,6 +198,9 @@ class QgisTimWidget(QWidget):
         self.dataset_widget.dataset_line_edit.textChanged.connect(
             self.compute_widget.set_default_path
         )
+        # Clear the plugin when a different project is loaded.
+        self.iface.projectRead.connect(self.reset)
+        self.iface.newProjectCreated.connect(self.reset)
 
         # QGIS Layers Panel groups
         self.input_group = None
@@ -206,6 +209,13 @@ class QgisTimWidget(QWidget):
 
     # Inter-widget communication
     # --------------------------
+    def reset(self):
+        self.shutdown_server()
+        self.dataset_widget.reset()
+        self.compute_widget.reset()
+        self.extraction_widget.reset()
+        return
+
     def start_interpreter_task(self) -> Union[StartTask, None]:
         if not self.server_handler.alive():
             interpreter = self.options_dialog.interpreter_combo_box.currentText()

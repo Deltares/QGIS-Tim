@@ -3,6 +3,7 @@ import tempfile
 from pathlib import Path
 from typing import Tuple, Union
 
+from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import (
     QCheckBox,
     QComboBox,
@@ -120,7 +121,7 @@ class ComputeWidget(QWidget):
         contour_group.setLayout(contour_layout)
 
         domain_row = QHBoxLayout()
-        domain_row.addWidget(QLabel("Grid spacing:"))
+        domain_row.addWidget(QLabel("Grid spacing"))
         domain_row.addWidget(self.cellsize_spin_box)
         domain_layout.addWidget(self.domain_button)
         domain_layout.addLayout(domain_row)
@@ -135,10 +136,14 @@ class ComputeWidget(QWidget):
         result_layout.addLayout(result_row2)
 
         contour_row1 = QHBoxLayout()
+        to_label = QLabel("to")
+        to_label.setAlignment(Qt.AlignCenter | Qt.AlignVCenter)
+        step_label = QLabel("Step")
+        step_label.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
         contour_row1.addWidget(self.contour_min_box)
-        contour_row1.addWidget(QLabel("to"))
+        contour_row1.addWidget(to_label)
         contour_row1.addWidget(self.contour_max_box)
-        contour_row1.addWidget(QLabel("Increment:"))
+        contour_row1.addWidget(step_label)
         contour_row1.addWidget(self.contour_step_box)
         contour_row2 = QHBoxLayout()
         contour_row2.addWidget(self.contour_layer)
@@ -152,6 +157,16 @@ class ComputeWidget(QWidget):
         layout.addWidget(contour_group)
         layout.addStretch()
         self.setLayout(layout)
+
+    def reset(self):
+        self.cellsize_spin_box.setValue(25.0)
+        self.contour_checkbox.setCheckState(False)
+        self.transient_combo_box.setCurrentIndex(0)
+        self.output_line_edit.setText("")
+        self.contour_min_box.setValue(-5.0)
+        self.contour_max_box.setValue(5.0)
+        self.contour_step_box.setValue(0.5)
+        return
 
     def set_interpreter_interaction(self, value: bool):
         self.parent.set_interpreter_interaction(value)
