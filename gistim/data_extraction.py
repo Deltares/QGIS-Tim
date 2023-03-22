@@ -240,17 +240,17 @@ def as_aquifer_aquitard(dataframe: pd.DataFrame, statistic: str = "mean"):
     out = pd.DataFrame()
     out["fid"] = np.arange(n_layer)
     out["layer"] = np.arange(n_layer)
-    out["aquitard_c"] = np.nan
-    out["aquitard_c"].values[1:] = dataframe[f"c-{statistic}"].values[:-1]
-    out["aquitard_npor"] = np.nan
-    out["aquitard_s"] = np.nan
-    out["aquifer_k"] = dataframe[f"kh-{statistic}"].values
-    out["aquifer_npor"] = np.nan
-    out["aquifer_s"] = np.nan
     out["aquifer_top"] = dataframe[f"top-{statistic}"]
     out["aquifer_bottom"] = dataframe[f"bottom-{statistic}"]
+    out["aquitard_c"] = np.nan
+    out["aquifer_k"] = dataframe[f"kh-{statistic}"].values
     out["semiconf_top"] = np.nan
     out["semiconf_head"] = np.nan
+    out["aquitard_s"] = np.nan
+    out["aquifer_s"] = np.nan
+    out["aquitard_npor"] = np.nan
+    out["aquifer_npor"] = np.nan
+    out["aquitard_c"].values[1:] = dataframe[f"c-{statistic}"].values[:-1]
     return out
 
 
