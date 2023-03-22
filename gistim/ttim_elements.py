@@ -432,7 +432,8 @@ def convert_to_script(spec: TtimModelSpecification) -> str:
 
     xg, yg = headgrid_code(spec.domain)
     times = spec.output_times.tolist()
-    strings.append(f"ttim_head = ttim_model.headgrid(xg={xg}, yg={yg}, t={times})")
+    if len(times) > 0:
+        strings.append(f"ttim_head = ttim_model.headgrid(xg={xg}, yg={yg}, t={times})")
 
     # Add all the individual observation points
     for name, kwargs in observations.items():

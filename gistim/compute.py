@@ -66,10 +66,12 @@ def compute_steady(
     gdfs_obs = gistim.timml_elements.head_observations(timml_model, observations)
     head = gistim.timml_elements.headgrid(timml_model, extent, cellsize)
 
-    for name, gdf in gdfs_obs.items():
-        write_vector(gdf, crs, outpath, layername=name)
     write_raster(head, crs, outpath)
     write_ugrid(head, crs, outpath)
+
+    for name, gdf in gdfs_obs.items():
+        write_vector(gdf, crs, outpath, layername=name)
+
     return
 
 
@@ -93,16 +95,26 @@ def compute_transient(
     extent, crs = gistim.gridspec(inpath, cellsize)
     refdate = ttim_spec.temporal_settings["reference_date"].iloc[0]
     gdfs_obs = gistim.ttim_elements.head_observations(ttim_model, refdate, observations)
-    head = gistim.ttim_elements.headgrid(
-        ttim_model,
-        extent,
-        cellsize,
-        ttim_spec.output_times,
-        refdate,
-    )
+
+    # If no output times are specified, just compute the TimML steady-state
+    # heads.
+    if len(ttim_spec.output_times) > 0:
+        head = gistim.ttim_elements.headgrid(
+            ttim_model,
+            extent,
+            cellsize,
+            ttim_spec.output_times,
+            refdate,
+        )
+        write_raster(head, crs, outpath)
+        write_ugrid(head, crs, outpath)
+    else:
+        head = gistim.timml_elements.headgrid(timml_model, extent, cellsize)
+
+    write_raster(head, crs, outpath)
+    write_ugrid(head, crs, outpath)
 
     for name, gdf in gdfs_obs.items():
         write_vector(gdf, crs, outpath, layername=name)
-    write_raster(head, crs, outpath)
-    write_ugrid(head, crs, outpath)
+
     return
