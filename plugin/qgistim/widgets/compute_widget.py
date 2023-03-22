@@ -20,10 +20,12 @@ from PyQt5.QtWidgets import (
 from qgis.core import (
     QgsApplication,
     QgsMapLayerProxyModel,
+    QgsMarkerSymbol,
     QgsMeshDatasetIndex,
     QgsMeshLayer,
     QgsProject,
     QgsRasterLayer,
+    QgsSingleSymbolRenderer,
     QgsTask,
     QgsVectorLayer,
     QgsVectorLayerTemporalProperties,
@@ -441,8 +443,16 @@ class ComputeWidget(QWidget):
             if add:
                 if "timml Observation:" in layername or "ttim Observation" in layername:
                     labels = layer_styling.number_labels("head_layer0")
+                    light_blue = "166,206,227,255"
+                    symbol = QgsMarkerSymbol.createSimple(
+                        dict(color=light_blue, name="triangle", size="3")
+                    )
+                    renderer = QgsSingleSymbolRenderer(symbol)
                 else:
                     labels = None
-                self.parent.output_group.add_layer(layer, "vector", labels=labels)
+                    renderer = None
+                self.parent.output_group.add_layer(
+                    layer, "vector", renderer=renderer, labels=labels
+                )
 
         return
