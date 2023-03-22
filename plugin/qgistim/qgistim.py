@@ -41,14 +41,14 @@ class QgisTimPlugin:
     def initGui(self):
         icon_name = "icon.png"
         self.action_timml = self.add_action(
-            icon_name, "QgisTim", self.toggle_timml, True
+            icon_name, "QGIS-Tim", self.toggle_timml, True
         )
 
     def toggle_timml(self):
         if self.tim_widget is None:
             from .widgets.tim_widget import QgisTimWidget
 
-            self.tim_widget = TimDockWidget("QgisTim")
+            self.tim_widget = TimDockWidget("QGIS-Tim")
             self.tim_widget.setObjectName("QgisTimDock")
             self.iface.addDockWidget(Qt.RightDockWidgetArea, self.tim_widget)
             widget = QgisTimWidget(self.tim_widget, self.iface)
