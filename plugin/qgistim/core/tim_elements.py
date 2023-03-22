@@ -34,6 +34,16 @@ The coupling of separate tables (geometry table and time series table) is only
 explicit in the Dataset Tree. The only way of knowing that tables are
 associated with each other is by comparing names. Names must therefore be
 unique within a group of the same type of elements.
+
+Rendering:
+
+* Fixed discharge (area sink, well, ditch): green
+* Fixed head (head well, semi-confined top, head line): blue
+* Inhomogeneity: grey
+* Constant: star
+* Observations: triangle
+* Line Doublets: red
+* Polygons: Line and Fill same color, Fill color 15% opacity.
 """
 
 import re
@@ -57,11 +67,27 @@ from qgis.core import (
     QgsFillSymbol,
     QgsGeometry,
     QgsLineSymbol,
+    QgsMarkerSymbol,
     QgsPointXY,
     QgsSingleSymbolRenderer,
     QgsVectorLayer,
 )
 from qgistim.core import geopackage
+
+RED = "215,48,39,255"
+GREEN = "51,160,44,255"
+BLUE = "31,120,180,255"
+GREY = "135,135,135,255"
+BLACK = "0,0,0,255"
+LIGHT_BLUE = "166,206,227,255"
+
+OPACITY = 51  # 20%
+TRANSPARENT = "255,255,255,0"
+TRANSPARENT_RED = f"215,48,39,{OPACITY}"
+TRANSPARENT_GREEN = f"51,160,44,{OPACITY}"
+TRANSPARENT_BLUE = f"31,120,180,{OPACITY}"
+TRANSPARENT_GREY = f"135,135,135,{OPACITY}"
+
 
 # These columns are reused by Aquifer and Polygon Inhom, Building pit Aquitards
 # are on top of the aquifer, so it comes first Nota bene: the order of these is
@@ -83,7 +109,19 @@ AQUIFER_ATTRIBUTES = [
 ]
 INHOM_ATTRIBUTES = [
     QgsField("inhomogeneity_id", QVariant.Int),
-] + AQUIFER_ATTRIBUTES
+    QgsField("layer", QVariant.Int),
+    QgsField("aquifer_top", QVariant.Double),
+    QgsField("aquifer_bottom", QVariant.Double),
+    QgsField("aquitard_c", QVariant.Double),
+    QgsField("aquifer_k", QVariant.Double),
+    QgsField("semiconf_top", QVariant.Double),
+    QgsField("semiconf_head", QVariant.Double),
+    QgsField("rate", QVariant.Double),
+    QgsField("aquitard_s", QVariant.Double),
+    QgsField("aquifer_s", QVariant.Double),
+    QgsField("aquitard_npor", QVariant.Double),
+    QgsField("aquifer_npor", QVariant.Double),
+]
 
 
 class NameDialog(QDialog):
@@ -194,6 +232,21 @@ class Element:
                 index = fields.indexFromName(name)
                 layer.setDefaultValueDefinition(index, definition)
         return
+
+    @staticmethod
+    def marker_renderer(**kwargs):
+        symbol = QgsMarkerSymbol.createSimple(kwargs)
+        return QgsSingleSymbolRenderer(symbol)
+
+    @staticmethod
+    def line_renderer(**kwargs):
+        symbol = QgsLineSymbol.createSimple(kwargs)
+        return QgsSingleSymbolRenderer(symbol)
+
+    @staticmethod
+    def polygon_renderer(**kwargs):
+        symbol = QgsFillSymbol.createSimple(kwargs)
+        return QgsSingleSymbolRenderer(symbol)
 
     @property
     def renderer(self):
@@ -333,14 +386,9 @@ class Domain(TransientElement):
         """
         Results in transparent fill, with a medium thick black border line.
         """
-        symbol = QgsFillSymbol.createSimple(
-            {
-                "color": "255,0,0,0",  # transparent
-                "color_border": "#000000#",  # black
-                "width_border": "0.5",
-            }
+        return self.polygon_renderer(
+            color="255,0,0,0", color_border=BLACK, width_border="0.75"
         )
-        return QgsSingleSymbolRenderer(symbol)
 
     def remove_from_geopackage(self):
         pass
@@ -429,6 +477,10 @@ class Constant(Element):
         QgsField("label", QVariant.String),
     )
 
+    @property
+    def renderer(self) -> QgsSingleSymbolRenderer:
+        return self.marker_renderer(color=RED, name="star", size="5")
+
 
 class Observation(TransientElement):
     element_type = "Observation"
@@ -448,6 +500,10 @@ class Observation(TransientElement):
         "timeseries_id": QgsDefaultValue("1"),
     }
     transient_columns = ("timeseries_id",)
+
+    @property
+    def renderer(self) -> QgsSingleSymbolRenderer:
+        return self.marker_renderer(color=LIGHT_BLUE, name="triangle", size="3")
 
 
 class Well(TransientElement):
@@ -480,6 +536,10 @@ class Well(TransientElement):
         "timeseries_id",
     )
 
+    @property
+    def renderer(self) -> QgsSingleSymbolRenderer:
+        return self.marker_renderer(color=GREEN, size="3")
+
 
 class HeadWell(TransientElement):
     element_type = "Head Well"
@@ -506,6 +566,10 @@ class HeadWell(TransientElement):
         "head_transient",
         "timeseries_id",
     )
+
+    @property
+    def renderer(self) -> QgsSingleSymbolRenderer:
+        return self.marker_renderer(color=BLUE, size="3")
 
 
 class HeadLineSink(TransientElement):
@@ -540,13 +604,7 @@ class HeadLineSink(TransientElement):
 
     @property
     def renderer(self) -> QgsSingleSymbolRenderer:
-        symbol = QgsLineSymbol.createSimple(
-            {
-                "color": "#3690c0",  # lighter blue
-                "width": "0.5",
-            }
-        )
-        return QgsSingleSymbolRenderer(symbol)
+        return self.line_renderer(color=BLUE, width="0.75")
 
 
 class LineSinkDitch(TransientElement):
@@ -581,13 +639,7 @@ class LineSinkDitch(TransientElement):
 
     @property
     def renderer(self) -> QgsSingleSymbolRenderer:
-        symbol = QgsLineSymbol.createSimple(
-            {
-                "color": "#034e7b",  # blue
-                "width": "0.5",
-            }
-        )
-        return QgsSingleSymbolRenderer(symbol)
+        return self.line_renderer(color=GREEN, width="0.75")
 
 
 class ImpermeableLineDoublet(Element):
@@ -604,13 +656,7 @@ class ImpermeableLineDoublet(Element):
 
     @property
     def renderer(self) -> QgsSingleSymbolRenderer:
-        symbol = QgsLineSymbol.createSimple(
-            {
-                "color": "#993404",  # dark orange / brown
-                "width": "0.5",
-            }
-        )
-        return QgsSingleSymbolRenderer(symbol)
+        return self.line_renderer(color=RED, width="0.75")
 
 
 class LeakyLineDoublet(Element):
@@ -628,13 +674,7 @@ class LeakyLineDoublet(Element):
 
     @property
     def renderer(self) -> QgsSingleSymbolRenderer:
-        symbol = QgsLineSymbol.createSimple(
-            {
-                "color": "#ec7014",  # orange
-                "width": "0.5",
-            }
-        )
-        return QgsSingleSymbolRenderer(symbol)
+        return self.line_renderer(color=RED, width="0.75", outline_style="dash")
 
 
 class CircularAreaSink(TransientElement):
@@ -663,17 +703,29 @@ class CircularAreaSink(TransientElement):
 
     @property
     def renderer(self):
-        """
-        Results in transparent fill, with a thick blue border line.
-        """
-        symbol = QgsFillSymbol.createSimple(
-            {
-                "color": "255,0,0,0",  # transparent
-                "color_border": "#3182bd",  # blue
-                "width_border": "0.75",
-            }
+        return self.polygon_renderer(
+            color=TRANSPARENT_GREEN, color_border=GREEN, width_border="0.75"
         )
-        return QgsSingleSymbolRenderer(symbol)
+
+
+class PolygonAreaSink(Element):
+    element_type = "Polygon Area Sink"
+    geometry_type = "Polygon"
+    timml_attributes = (
+        QgsField("rate", QVariant.Double),
+        QgsField("order", QVariant.Int),
+        QgsField("ndegrees", QVariant.Int),
+    )
+    timml_defaults = {
+        "order": QgsDefaultValue("4"),
+        "ndegrees": QgsDefaultValue("6"),
+    }
+
+    @property
+    def renderer(self) -> QgsSingleSymbolRenderer:
+        return self.polygon_renderer(
+            color=TRANSPARENT_GREEN, color_border=GREEN, width_border="0.75"
+        )
 
 
 class PolygonSemiConfinedTop(Element):
@@ -686,7 +738,6 @@ class PolygonSemiConfinedTop(Element):
         QgsField("order", QVariant.Int),
         QgsField("ndegrees", QVariant.Int),
     )
-    assoc_attributes = INHOM_ATTRIBUTES.copy()
     timml_defaults = {
         "order": QgsDefaultValue("4"),
         "ndegrees": QgsDefaultValue("6"),
@@ -694,41 +745,9 @@ class PolygonSemiConfinedTop(Element):
 
     @property
     def renderer(self) -> QgsSingleSymbolRenderer:
-        symbol = QgsFillSymbol.createSimple(
-            {
-                "color": "255,0,0,0",  # transparent
-                "color_border": "#878787",  # grey
-                "width_border": "0.75",
-            }
+        return self.polygon_renderer(
+            color=TRANSPARENT_BLUE, color_border=BLUE, width_border="0.75"
         )
-        return QgsSingleSymbolRenderer(symbol)
-
-
-class PolygonAreaSink(Element):
-    element_type = "Polygon Area Sink"
-    geometry_type = "Polygon"
-    timml_attributes = (
-        QgsField("phreatic_top", QVariant.Int),
-        QgsField("phreatic_head", QVariant.Int),
-        QgsField("order", QVariant.Int),
-        QgsField("ndegrees", QVariant.Int),
-    )
-    assoc_attributes = INHOM_ATTRIBUTES.copy()
-    timml_defaults = {
-        "order": QgsDefaultValue("4"),
-        "ndegrees": QgsDefaultValue("6"),
-    }
-
-    @property
-    def renderer(self) -> QgsSingleSymbolRenderer:
-        symbol = QgsFillSymbol.createSimple(
-            {
-                "color": "255,0,0,0",  # transparent
-                "color_border": "#034e7b",  # blue
-                "width_border": "0.75",
-            }
-        )
-        return QgsSingleSymbolRenderer(symbol)
 
 
 class PolygonInhomogeneity(AssociatedElement):
@@ -743,6 +762,10 @@ class PolygonInhomogeneity(AssociatedElement):
     timml_defaults = {
         "order": QgsDefaultValue("4"),
         "ndegrees": QgsDefaultValue("6"),
+        "inhomogeneity_id": QgsDefaultValue("1"),
+    }
+    assoc_defaults = {
+        "inhomogeneity_id": QgsDefaultValue("1"),
     }
     transient_columns = (
         "aquitard_s",
@@ -753,19 +776,11 @@ class PolygonInhomogeneity(AssociatedElement):
 
     @property
     def renderer(self) -> QgsSingleSymbolRenderer:
-        symbol = QgsFillSymbol.createSimple(
-            {
-                "color": "255,0,0,0",  # transparent
-                "color_border": "#878787",  # grey
-                "width_border": "0.75",
-            }
+        return self.polygon_renderer(
+            color=TRANSPARENT_GREY, color_border=GREY, width_border="0.75"
         )
-        return QgsSingleSymbolRenderer(symbol)
 
     def on_transient_changed(self, transient: bool):
-        if len(self.transient_columns) == 0:
-            return
-
         config = self.assoc_layer.attributeTableConfig()
         columns = config.columns()
 
@@ -781,7 +796,6 @@ class BuildingPit(AssociatedElement):
     element_type = "Building Pit"
     geometry_type = "Polygon"
     timml_attributes = (
-        QgsField("timeseries_id", QVariant.Int),
         QgsField("order", QVariant.Int),
         QgsField("ndegrees", QVariant.Int),
         QgsField("layer", QVariant.Int),
@@ -790,14 +804,9 @@ class BuildingPit(AssociatedElement):
 
     @property
     def renderer(self) -> QgsSingleSymbolRenderer:
-        symbol = QgsFillSymbol.createSimple(
-            {
-                "color": "255,0,0,0",  # transparent
-                "color_border": "#d73027",  # red
-                "width_border": "0.5",
-            }
+        return self.polygon_renderer(
+            color=TRANSPARENT_RED, color_border=RED, width_border="0.75"
         )
-        return QgsSingleSymbolRenderer(symbol)
 
 
 ELEMENTS = {
@@ -814,7 +823,7 @@ ELEMENTS = {
         CircularAreaSink,
         ImpermeableLineDoublet,
         LeakyLineDoublet,
-        # PolygonAreaSink,  # not in pypi release yet
+        PolygonAreaSink,
         PolygonSemiConfinedTop,
         PolygonInhomogeneity,
         BuildingPit,

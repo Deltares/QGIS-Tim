@@ -137,16 +137,25 @@ def polygoninhom(spec: ElementSpecification) -> List[Dict[str, Any]]:
     return kwarglist
 
 
-def polygontop(spec: ElementSpecification) -> List[Dict[str, Any]]:
-    """
-    Parameters
-    ----------
-    dataframe: tuple of geopandas.GeoDataFrame
+def polygonareasink(spec: ElementSpecification) -> List[Dict[str, Any]]:
+    geometry = spec.dataframe
+    properties = spec.associated_dataframe.sort_values(by="layer").set_index("layer")
+    # Ensure there's no semiconfined top
+    dataframe = properties.copy()
+    dataframe.loc[0, "semiconf_head"] = np.nan
+    kwarglist = []
+    for row in geometry.to_dict("records"):
+        row = filter_nan(row)
+        kwargs = aquifer_data(dataframe.reset_index())
+        kwargs["N"] = row["rate"]
+        kwargs["xy"] = polygon_coordinates(row)
+        kwargs["order"] = row["order"]
+        kwargs["ndeg"] = row["ndegrees"]
+        kwarglist.append(kwargs)
+    return kwarglist
 
-    Returns
-    -------
-    None
-    """
+
+def polygontop(spec: ElementSpecification) -> List[Dict[str, Any]]:
     geometry = spec.dataframe
     properties = spec.associated_dataframe.sort_values(by="layer").set_index("layer")
     kwarglist = []
@@ -353,6 +362,7 @@ MAPPING = {
     "Well": (well, timml.Well),
     "Head Well": (headwell, timml.HeadWell),
     "Polygon Inhomogeneity": (polygoninhom, timml.PolygonInhomMaq),
+    "Polygon Area Sink": (polygonareasink, timml.PolygonInhomMaq),
     "Polygon Semi-Confined Top": (polygontop, timml.PolygonInhomMaq),
     "Head Line Sink": (headlinesink, timml.HeadLineSinkString),
     "Line Sink Ditch": (linesinkditch, timml.LineSinkDitchString),

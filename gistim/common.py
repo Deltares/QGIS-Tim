@@ -159,6 +159,10 @@ def aquifer_data(
         d["npor"] = porosity
         d["hstar"] = hstar
 
+    # For inhomogeneities
+    if "rate" in dataframe:
+        d["N"] = dataframe.loc[0, "rate"]
+
     filtered = {}
     for k, value in d.items():
         if isinstance(value, np.ndarray):
@@ -252,7 +256,7 @@ def model_specification(
             )
 
             # Use the background aquifer for a semi-confined top
-            if element_type == "Polygon Semi-Confined Top":
+            if element_type in ("Polygon Area Sink", "Polygon Semi-Confined Top"):
                 timml_assoc_df = aquifer
 
             timml_spec = ElementSpecification(
