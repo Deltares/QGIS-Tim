@@ -210,6 +210,8 @@ class QgisTimWidget(QWidget):
     # Inter-widget communication
     # --------------------------
     def reset(self):
+        self.input_group = None
+        self.output_group = None
         self.shutdown_server()
         self.dataset_widget.reset()
         self.compute_widget.reset()
