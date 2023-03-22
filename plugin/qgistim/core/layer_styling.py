@@ -47,7 +47,7 @@ def color_ramp_items(
     ramp = QgsStyle().defaultStyle().colorRamp(colormap)
     colors = [ramp.color(f) for f in fractional_steps]
     steps = [minimum + f * delta for f in fractional_steps]
-    return [
+    return ramp, [
         QgsColorRampShader.ColorRampItem(step, color, str(step))
         for step, color in zip(steps, colors)
     ]
@@ -75,8 +75,12 @@ def pseudocolor_renderer(
     minimum = stats.minimumValue
     maximum = stats.maximumValue
 
-    ramp_items = color_ramp_items(colormap, minimum, maximum, nclass)
+    ramp, ramp_items = color_ramp_items(colormap, minimum, maximum, nclass)
     shader_function = QgsColorRampShader()
+    shader_function.setMinimumValue(minimum)
+    shader_function.setMaximumValue(maximum)
+    shader_function.setSourceColorRamp(ramp)
+    shader_function.setColorRampType(QgsColorRampShader.Interpolated)
     shader_function.setClassificationMode(QgsColorRampShader.EqualInterval)
     shader_function.setColorRampItemList(ramp_items)
 
@@ -84,20 +88,6 @@ def pseudocolor_renderer(
     raster_shader.setRasterShaderFunction(shader_function)
 
     return QgsSingleBandPseudoColorRenderer(layer.dataProvider(), band, raster_shader)
-
-
-def domain_renderer() -> QgsSingleSymbolRenderer:
-    """
-    Results in transparent fill, with a medium thick black border line.
-    """
-    symbol = QgsFillSymbol.createSimple(
-        {
-            "color": "255,0,0,0",  # transparent
-            "color_border": "#000000#",  # black
-            "width_border": "0.5",
-        }
-    )
-    return QgsSingleSymbolRenderer(symbol)
 
 
 def contour_renderer() -> QgsSingleSymbolRenderer:
