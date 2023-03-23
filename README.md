@@ -2,7 +2,7 @@
 
 QGIS-Tim is an open source project for multi-layer groundwater flow
 simulations. QGIS-Tim provides a link between QGIS and the open source analytic
-element method [TimML (steady-state)](https://github.com/mbakker7/timml)
+element method software: [TimML (steady-state)](https://github.com/mbakker7/timml)
 and [TTim (transient)](https://github.com/mbakker7/ttim).
 
 The benefit of the analytic element method (AEM) is that no grid or
