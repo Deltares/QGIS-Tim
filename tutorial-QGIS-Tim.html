@@ -71,7 +71,7 @@ ul.task-list li input[type="checkbox"] {
       <div class="navbar-container container-fluid">
       <div class="navbar-brand-container">
     <a href="./index.html" class="navbar-brand navbar-brand-logo">
-    <img src="./_static/QGIS-TIM-logo.svg" alt="" class="navbar-logo">
+    <img src="./_static/QGIS-Tim-logo.svg" alt="" class="navbar-logo">
     </a>
     <a class="navbar-brand" href="./index.html">
     <span class="navbar-title">QGIS-Tim</span>
@@ -87,7 +87,7 @@ ul.task-list li input[type="checkbox"] {
  <span class="menu-text">Installation</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link active" href="./tutorial-QGIS-TIM.html" aria-current="page">
+    <a class="nav-link active" href="./tutorial-QGIS-Tim.html" aria-current="page">
  <span class="menu-text">Tutorials</span></a>
   </li>  
 </ul>
@@ -126,12 +126,12 @@ ul.task-list li input[type="checkbox"] {
   <li><a href="#model-2-single-well" id="toc-model-2-single-well" class="nav-link" data-scroll-target="#model-2-single-well">Model 2: single well</a></li>
   <li><a href="#model-3-multiple-layers" id="toc-model-3-multiple-layers" class="nav-link" data-scroll-target="#model-3-multiple-layers">Model 3: multiple layers</a></li>
   <li><a href="#model-4-add-a-set-of-sheet-piles" id="toc-model-4-add-a-set-of-sheet-piles" class="nav-link" data-scroll-target="#model-4-add-a-set-of-sheet-piles">Model 4: add a set of sheet piles</a></li>
-  <li><a href="#how-to-reopen-tim-after-closing-qgis." id="toc-how-to-reopen-tim-after-closing-qgis." class="nav-link" data-scroll-target="#how-to-reopen-tim-after-closing-qgis."><img src="figures/tutorial/emoji-exclamation.png" class="img-fluid" style="width:4.0%"> How to reopen TIM after closing QGIS.</a></li>
+  <li><a href="#how-to-reopen-tim-after-closing-qgis." id="toc-how-to-reopen-tim-after-closing-qgis." class="nav-link" data-scroll-target="#how-to-reopen-tim-after-closing-qgis."><img src="figures/tutorial/emoji-exclamation.png" class="img-fluid" style="width:4.0%"> How to reopen Tim after closing QGIS.</a></li>
   <li><a href="#model-5-add-infiltration-of-drainwater" id="toc-model-5-add-infiltration-of-drainwater" class="nav-link" data-scroll-target="#model-5-add-infiltration-of-drainwater">Model 5: add infiltration of drainwater</a></li>
   <li><a href="#model-6-add-observation-points" id="toc-model-6-add-observation-points" class="nav-link" data-scroll-target="#model-6-add-observation-points">Model 6: add observation points</a></li>
   <li><a href="#model-7-determine-the-influence-of-the-nearby-lake" id="toc-model-7-determine-the-influence-of-the-nearby-lake" class="nav-link" data-scroll-target="#model-7-determine-the-influence-of-the-nearby-lake">Model 7: determine the influence of the nearby lake</a></li>
   <li><a href="#model-8-abstraction-effect-over-time" id="toc-model-8-abstraction-effect-over-time" class="nav-link" data-scroll-target="#model-8-abstraction-effect-over-time">Model 8: Abstraction effect over time</a></li>
-  <li><a href="#export-your-tim-model-to-python" id="toc-export-your-tim-model-to-python" class="nav-link" data-scroll-target="#export-your-tim-model-to-python">Export your TIM model to Python</a></li>
+  <li><a href="#export-your-tim-model-to-python" id="toc-export-your-tim-model-to-python" class="nav-link" data-scroll-target="#export-your-tim-model-to-python">Export your Tim model to Python</a></li>
   </ul>
 </nav>
     </div>
@@ -160,7 +160,7 @@ ul.task-list li input[type="checkbox"] {
 <ul>
 <li>Be sure QGIS 3.22.00 or higher is installed.</li>
 <li>Download the tutorial material. <a href="https://deltares.thegood.cloud/s/oJE7qAHG3nZw2fk">Follow this link.</a></li>
-<li>Be sure the GIS-TIM Python package is installed (see … for instructions).</li>
+<li>Be sure the <code>gistim</code> Python package is installed (see <a href="./install.html">installation</a> for instructions).</li>
 <li>The installation of the necessary QGIS-Tim plugin is part of this Tutorial.</li>
 </ul>
 </section>
@@ -169,7 +169,7 @@ ul.task-list li input[type="checkbox"] {
 <p>In this tutorial, you will learn how to:</p>
 <ul>
 <li>install and use the QGIS-Tim plugin;</li>
-<li>use the basic of QGIS for pre- and postprocessing of TIM;</li>
+<li>use the basic of QGIS for pre- and postprocessing of Tim;</li>
 <li>create several steady state models (TimML) and a transient model (TTim);</li>
 <li>analyse the results;</li>
 <li>export your model to a Python script.</li>
@@ -177,7 +177,7 @@ ul.task-list li input[type="checkbox"] {
 </section>
 <section id="objective" class="level2">
 <h2 class="anchored" data-anchor-id="objective">Objective</h2>
-<p>With the basic experience from this tutorial and the online documentation on TIM you are able to use TIM in your daily work.</p>
+<p>With the basic experience from this tutorial and the online documentation on Tim you are able to use Tim in your daily work.</p>
 </section>
 <section id="introduction-case-rijsenhout" class="level2">
 <h2 class="anchored" data-anchor-id="introduction-case-rijsenhout">Introduction case <em>Rijsenhout</em></h2>
@@ -238,7 +238,7 @@ ul.task-list li input[type="checkbox"] {
 <li>On the left section select <em>Install from ZIP</em>.</li>
 <li>Click the Browse button (<img src="figures/tutorial/button-Qgis-browse.png" class="img-fluid" style="width:4.0%">) and from the tutorial dataset select the ZIP file “QGIS-Tim_training\QGIS-iMOD-plugin.zip”.</li>
 <li>Click <em>Install Plugin</em>.</li>
-<li>In the same way, install the QGIS-Tim plugin using the ZIP file “QGIS-Tim_training\QGIS-TIM-plugin.zip”.</li>
+<li>In the same way, install the QGIS-Tim plugin using the ZIP file “QGIS-Tim_training\QGIS-Tim-plugin.zip”.</li>
 <li>From the left section, select the group <em>All</em> to see all available plugins.</li>
 <li>Search for “Value Tool” and install it.</li>
 <li>Search for “PDOK services plugin” and install it.</li>
@@ -310,13 +310,13 @@ ul.task-list li input[type="checkbox"] {
 <ol start="35" class="example" type="1">
 <li>Check in the <em>Layers</em> panel on the left that your new geopackage is added as a group. <br> A sub group <strong>timml</strong> for the steady state model input, the sub group <strong>ttim</strong> for the transient model input and a series of output formats (vector/mesh/raster).</li>
 </ol>
-<p>If you had no introduction to the TIM plugin, read the Intermezzo below for a general explanation of the components.</p>
+<p>If you had no introduction to the Tim plugin, read the Intermezzo below for a general explanation of the components.</p>
 <hr>
 <blockquote class="blockquote">
-<p><strong>Intermezzo:</strong> <em>introduction Tabs on the TIM panel</em></p>
+<p><strong>Intermezzo:</strong> <em>introduction Tabs on the Tim panel</em></p>
 <ol type="a">
 <li>GeoPackage: an overview of the elements in your geopackage. In case you switch to transient modelling, an extra column with <em>ttim</em> elements is added.</li>
-<li>Elements: a list of 12 TIM elements from which you can build your model.</li>
+<li>Elements: a list of 12 Tim elements from which you can build your model.</li>
 <li>Compute: here you can define your domain and cell size, decide if your model is transient or not and change the output name.</li>
 <li>Extract: open an existing 3d geohydrological model (NC file) and extract the data for your project area.</li>
 </ol>
@@ -366,7 +366,7 @@ ul.task-list li input[type="checkbox"] {
 </tr>
 </tbody>
 </table>
-<p><strong>NB!</strong> In the real world counting starts with 1. However, TIM is programmed in Python and in Python counting starts with 0. You will get used to it.<br><br> Also be aware that the <em>Aquifer</em> element you just edited is just a table. This is indicated with the icon (<img src="figures/tutorial/button-Qgis-AttributeTable.png" class="img-fluid" style="width:3.0%">) just before the layer name in the left panel. For TIM this means that the properties in this table apply for the full model domain. We will introduce some inhomogeneities later as polygons within that domain.</p>
+<p><strong>NB!</strong> In the real world counting starts with 1. However, Tim is programmed in Python and in Python counting starts with 0. You will get used to it.<br><br> Also be aware that the <em>Aquifer</em> element you just edited is just a table. This is indicated with the icon (<img src="figures/tutorial/button-Qgis-AttributeTable.png" class="img-fluid" style="width:3.0%">) just before the layer name in the left panel. For Tim this means that the properties in this table apply for the full model domain. We will introduce some inhomogeneities later as polygons within that domain.</p>
 <ol start="42" class="example" type="1">
 <li>Save all changes with the <em>Save Edits</em> button (<img src="figures/tutorial/button-Qgis-AttributeTable-SaveEdits.png" class="img-fluid" style="width:4.0%">).</li>
 <li>Stop the <em>Edditing Mode</em> with a click on the button (<img src="figures/tutorial/button-Qgis-AttributeTable-StartEditingMode.png" class="img-fluid" style="width:4.0%">).</li>
@@ -442,7 +442,7 @@ ul.task-list li input[type="checkbox"] {
 </section>
 <section id="model-3-multiple-layers" class="level2">
 <h2 class="anchored" data-anchor-id="model-3-multiple-layers">Model 3: multiple layers</h2>
-<p>A single aquifer is of course not enough to describe the geology of our project area. A simplification of the geology is given in the cross section in <a href="#fig-photo-fieldwork-liftbomb-crosssection">Figure&nbsp;5</a>. There is the Holocene toplayer with a resistance of 1500 days on top of an aquifer with a horizontal permeability of 30 m/d and a thickness of 50 m. The anisotropy factor is 3 resulting in a vertical resistance of 0.1 day per meter. TIM can handle multiple layers so the next step is to bring these parameters into the model.</p>
+<p>A single aquifer is of course not enough to describe the geology of our project area. A simplification of the geology is given in the cross section in <a href="#fig-photo-fieldwork-liftbomb-crosssection">Figure&nbsp;5</a>. There is the Holocene toplayer with a resistance of 1500 days on top of an aquifer with a horizontal permeability of 30 m/d and a thickness of 50 m. The anisotropy factor is 3 resulting in a vertical resistance of 0.1 day per meter. Tim can handle multiple layers so the next step is to bring these parameters into the model.</p>
 <div id="fig-photo-fieldwork-liftbomb-crosssection" class="quarto-figure quarto-figure-center anchored">
 <figure class="figure">
 <p><img src="figures/tutorial/photo-fieldwork-liftbomb-crosssection.jpg" class="img-fluid figure-img" style="width:100.0%"></p>
@@ -584,8 +584,8 @@ ul.task-list li input[type="checkbox"] {
 <hr>
 </section>
 <section id="how-to-reopen-tim-after-closing-qgis." class="level2">
-<h2 class="anchored" data-anchor-id="how-to-reopen-tim-after-closing-qgis."><img src="figures/tutorial/emoji-exclamation.png" class="img-fluid" style="width:4.0%"> How to reopen TIM after closing QGIS.</h2>
-<p>Before we introduce you another new TIM element we must explain you how to reopen your TIM project after a closure of QGIS. A crash might close QGIS or just a long day of work is a reason to shut down your laptop. Always remember two things:</p>
+<h2 class="anchored" data-anchor-id="how-to-reopen-tim-after-closing-qgis."><img src="figures/tutorial/emoji-exclamation.png" class="img-fluid" style="width:4.0%"> How to reopen Tim after closing QGIS.</h2>
+<p>Before we introduce you another new Tim element we must explain you how to reopen your Tim project after a closure of QGIS. A crash might close QGIS or just a long day of work is a reason to shut down your laptop. Always remember two things:</p>
 <ul>
 <li>your geopackage (*.gpkg) contains the complete set of model features and parameter values. Every time you change a model element, you will remember, you had to save the changes. So the GPKG file is always up to date.</li>
 <li>your QGIS project is saved in the *.qgz file and contains all the added layers and their format (legend, line color, labels etc.).</li>
@@ -597,19 +597,19 @@ ul.task-list li input[type="checkbox"] {
 <li>Again select <em>Project</em> but now choose <em>Open Recent</em> and find your own project in the list.</li>
 <li>Open the QGIS-Tim plugin with a click on <img src="figures/tutorial/button-Qgis-tim.png" class="img-fluid" style="width:4.0%">.</li>
 </ol>
-<p><em>The TIM panel is empty but why?</em> <br> It is not possible for the plugin to read your geopackage as it is loaded in the layer list. To load your TIM project you <em>must</em> open the geopackage from the TIM panel. This will add the geopackage to the Layers panel next to the existing one with the same name, which makes it at least confusing. We better remove the original Geopackage first before opening it with TIM. Disadvantage is that we also remove the calculated results including all your formatting efforts. The developers try to fix that in the next version. <br> The following steps are the right way to go for now:</p>
+<p><em>The Tim panel is empty but why?</em> <br> It is not possible for the plugin to read your geopackage as it is loaded in the layer list. To load your Tim project you <em>must</em> open the geopackage from the Tim panel. This will add the geopackage to the Layers panel next to the existing one with the same name, which makes it at least confusing. We better remove the original Geopackage first before opening it with Tim. Disadvantage is that we also remove the calculated results including all your formatting efforts. The developers try to fix that in the next version. <br> The following steps are the right way to go for now:</p>
 <ol start="106" class="example" type="1">
 <li>Select layer <em>case-Rijsenhout input</em> in the panel on the left in order to remove it.</li>
 <li>Click your right mouse button and select <em>Remove Group…</em> and click <em>OK</em>.</li>
 <li>In the same way remove layer <em>case-Rijsenhout output</em>.</li>
 <li>In the QGIS-Tim panel on the tab <em>GeoPackage</em> click <em>Open</em> and open the GPKG file containing your model.</li>
-<li>Your geopackage is now added to the TIM panel and the Layers list. Don’t forget to move down the background layer “pastel”.</li>
+<li>Your geopackage is now added to the Tim panel and the Layers list. Don’t forget to move down the background layer “pastel”.</li>
 </ol>
 <hr>
 </section>
 <section id="model-5-add-infiltration-of-drainwater" class="level2">
 <h2 class="anchored" data-anchor-id="model-5-add-infiltration-of-drainwater">Model 5: add infiltration of drainwater</h2>
-<p>To prevent damage on the private properties caused by the dewatering, the authorities demand 50% of the drained flux to be infiltrated. For the infiltration a horizontal well of 400 m is used. In TIM this element is called “Line Sink Ditch”. Let’s add this element just along the Aalsmeerderweg southeast of the project area.</p>
+<p>To prevent damage on the private properties caused by the dewatering, the authorities demand 50% of the drained flux to be infiltrated. For the infiltration a horizontal well of 400 m is used. In Tim this element is called “Line Sink Ditch”. Let’s add this element just along the Aalsmeerderweg southeast of the project area.</p>
 <ol start="111" class="example" type="1">
 <li>On the tab <em>Elements</em> in QGIS-Tim click on the element “Line Sink Ditch”.</li>
 <li>Give the layer a name, e.g.&nbsp;“InfiltrationWell”.</li>
@@ -636,7 +636,7 @@ ul.task-list li input[type="checkbox"] {
 </section>
 <section id="model-6-add-observation-points" class="level2">
 <h2 class="anchored" data-anchor-id="model-6-add-observation-points">Model 6: add observation points</h2>
-<p>We have the Value Tool and the Cross section tool to check for calculated values in the rasters. Besides that, TIM has the opporunity to add observation points automatically providing you with the calculated heads.</p>
+<p>We have the Value Tool and the Cross section tool to check for calculated values in the rasters. Besides that, Tim has the opporunity to add observation points automatically providing you with the calculated heads.</p>
 <ol start="123" class="example" type="1">
 <li>On the tab <em>Elements</em> in QGIS-Tim click on the element “Observation”.</li>
 <li>Give the layer a name, e.g.&nbsp;“Piezometers”.</li>
@@ -646,7 +646,7 @@ ul.task-list li input[type="checkbox"] {
 <div id="fig-figure_ObservationsLocations" class="quarto-figure quarto-figure-center anchored">
 <figure class="figure">
 <p><img src="figures/tutorial/figure_ObservationsLocations.png" class="img-fluid figure-img" style="width:80.0%"></p>
-<p></p><figcaption class="figure-caption">Figure&nbsp;8: Observation locations (<em>A</em>-<em>E</em>) together with other TIM elements</figcaption><p></p>
+<p></p><figcaption class="figure-caption">Figure&nbsp;8: Observation locations (<em>A</em>-<em>E</em>) together with other Tim elements</figcaption><p></p>
 </figure>
 </div>
 <p>The observed values are saved in a new layer under the existing group “case-Rijsenhout-output:vector”.</p>
@@ -670,7 +670,7 @@ ul.task-list li input[type="checkbox"] {
 </section>
 <section id="model-7-determine-the-influence-of-the-nearby-lake" class="level2">
 <h2 class="anchored" data-anchor-id="model-7-determine-the-influence-of-the-nearby-lake">Model 7: determine the influence of the nearby lake</h2>
-<p>East of the project area there is a large lake. What will be the influence of this lake? Let’s find out. <br> In TIM a lake is added as an inhomogeneity within the total model domain. This domain is described in table “timml Aquifer:Aquifer” we filled in with the first model.</p>
+<p>East of the project area there is a large lake. What will be the influence of this lake? Let’s find out. <br> In Tim a lake is added as an inhomogeneity within the total model domain. This domain is described in table “timml Aquifer:Aquifer” we filled in with the first model.</p>
 <ol start="132" class="example" type="1">
 <li>On the tab <em>Elements</em> in QGIS-Tim click on the element “Polygon Semi-Confined Top”.</li>
 <li>Give the layer a name, e.g.&nbsp;“Lake” and find out that layer “timml Polygon Semi-Confined Top:Lake” is added to the geopackage.</li>
@@ -685,7 +685,7 @@ ul.task-list li input[type="checkbox"] {
 <p></p><figcaption class="figure-caption">Figure&nbsp;10: Contour lines after adding the Lake element in the east</figcaption><p></p>
 </figure>
 </div>
-<p>You can not miss the effect of the Lake in this calculation. In many cases you like to analyse or even save this difference. Let’s see how we can use TIM and QGIS to isolate the effect. Therefor we rerun the model without the Lake and rename the output.</p>
+<p>You can not miss the effect of the Lake in this calculation. In many cases you like to analyse or even save this difference. Let’s see how we can use Tim and QGIS to isolate the effect. Therefor we rerun the model without the Lake and rename the output.</p>
 <ol start="138" class="example" type="1">
 <li>In QGIS-Tim go to the tab <em>Geopackage</em>.</li>
 <li>In the list of Steady State elements switch off “timml Polygon Semi-Confined Top:Lake”.</li>
@@ -717,7 +717,7 @@ ul.task-list li input[type="checkbox"] {
 <li>In your geopackage select the layer “timml Aquifer:Aquifer”.</li>
 <li>Open its table, start the editing mode and for every layer set both acquifer_s and acquitard_s to 0.001. Acquitard_s (layer 0) = 0.25.</li>
 </ol>
-<p><strong>NB!</strong> In transient mode, TIM can not handle aquitard with zero thickness so lets’s set the aquitard thickness to 0.1 m</p>
+<p><strong>NB!</strong> In transient mode, Tim can not handle aquitard with zero thickness so lets’s set the aquitard thickness to 0.1 m</p>
 <ol start="155" class="example" type="1">
 <li>Change the values in the column “aquifer_top” to -17.0, -22.1, -27.1 and -47.1 m.</li>
 <li>In your geopackage select the layer “ttim Temporal Settings:Aquifer” to define the temporal properties of the model.</li>
@@ -785,8 +785,8 @@ ul.task-list li input[type="checkbox"] {
 </div>
 </section>
 <section id="export-your-tim-model-to-python" class="level2">
-<h2 class="anchored" data-anchor-id="export-your-tim-model-to-python">Export your TIM model to Python</h2>
-<p>For scenario calculation or sensitivity analysis you probably want to switch from QGIS to Python for efficiency reasons. In this training we only show you the first step: export your model to a Python file (*.py). Your TIM model is just a set of elements (points, lines, polygons) and its parameters so the Python file is not very large.</p>
+<h2 class="anchored" data-anchor-id="export-your-tim-model-to-python">Export your Tim model to Python</h2>
+<p>For scenario calculation or sensitivity analysis you probably want to switch from QGIS to Python for efficiency reasons. In this training we only show you the first step: export your model to a Python file (*.py). Your Tim model is just a set of elements (points, lines, polygons) and its parameters so the Python file is not very large.</p>
 <ol start="187" class="example" type="1">
 <li>In QGIS-Tim go to the tab <em>GeoPackage</em>.</li>
 <li>Click the button <em>Convert GeoPackage to Python script</em> and you can save the *.py file wherever you like.</li>
