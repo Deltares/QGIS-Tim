@@ -1,0 +1,6 @@
+project:
+  output-dir: _build
+
+profile:
+  group: 
+    - [website]

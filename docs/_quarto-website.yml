@@ -1,0 +1,24 @@
+project:
+  type: website
+
+website:
+  title: "QGIS-Tim"
+  navbar:
+    background: "#080c80"
+    logo: _static/QGIS-TIM-logo.svg
+    left:
+      - text: "Installation"
+        href: install.qmd
+      - text: "Tutorials"
+        href: tutorial-QGIS-TIM.qmd
+    right:
+      - icon: github
+        href: https://github.com/Deltares/QGIS-Tim
+        aria-label: GitHub
+
+format:
+  html:
+    theme: cosmo
+    css: _static/styles.css
+    toc: true
+    code-fold: true
