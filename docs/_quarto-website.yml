@@ -5,12 +5,12 @@ website:
   title: "QGIS-Tim"
   navbar:
     background: "#080c80"
-    logo: _static/QGIS-TIM-logo.svg
+    logo: _static/QGIS-Tim-logo.svg
     left:
       - text: "Installation"
         href: install.qmd
       - text: "Tutorials"
-        href: tutorial-QGIS-TIM.qmd
+        href: tutorial-QGIS-Tim.qmd
     right:
       - icon: github
         href: https://github.com/Deltares/QGIS-Tim
