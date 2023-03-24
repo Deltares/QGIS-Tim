@@ -5,20 +5,20 @@ title: "Tutorial QGIS-Tim"
 ## Requirements
 - Be sure QGIS 3.22.00 or higher is installed. 
 - Download the tutorial material. [Follow this link.](https://deltares.thegood.cloud/s/oJE7qAHG3nZw2fk)
-- Be sure the GIS-TIM Python package is installed (see ... for instructions). 
+- Be sure the ``gistim`` Python package is installed (see [installation](install.qmd) for instructions). 
 - The installation of the necessary QGIS-Tim plugin is part of this Tutorial. 
 
 ## Description
 In this tutorial, you will learn how to:
 
 - install and use the QGIS-Tim plugin;
-- use the basic of QGIS for pre- and postprocessing of TIM;
+- use the basic of QGIS for pre- and postprocessing of Tim;
 - create several steady state models (TimML) and a transient model (TTim); 
 - analyse the results;
 - export your model to a Python script.
 
 ## Objective
-With the basic experience from this tutorial and the online documentation on TIM you are able to use TIM in your daily work.
+With the basic experience from this tutorial and the online documentation on Tim you are able to use Tim in your daily work.
 
 ## Introduction case *Rijsenhout*
 
@@ -71,7 +71,7 @@ This is the moment to download/import four plugins needed for this tutorial:
 (@) On the left section select *Install from ZIP*.
 (@) Click the Browse button (![](figures/tutorial/button-Qgis-browse.png){width=4%}) and from the tutorial dataset select the ZIP file "QGIS-Tim_training\\QGIS-iMOD-plugin.zip". 
 (@) Click *Install Plugin*.
-(@) In the same way, install the QGIS-Tim plugin using the ZIP file "QGIS-Tim_training\\QGIS-TIM-plugin.zip". 
+(@) In the same way, install the QGIS-Tim plugin using the ZIP file "QGIS-Tim_training\\QGIS-Tim-plugin.zip". 
 (@) From the left section, select the group *All* to see all available plugins. 
 (@) Search for “Value Tool” and install it. 
 (@) Search for “PDOK services plugin” and install it. 
@@ -134,14 +134,14 @@ Your window looks like in @fig-Panel-QGIS-Tim.
 
 (@) Check in the *Layers* panel on the left that your new geopackage is added as a group. <br> A sub group **timml** for the steady state model input, the sub group **ttim** for the transient model input and a series of output formats (vector/mesh/raster). 
 
-If you had no introduction to the TIM plugin, read the Intermezzo below for a general explanation of the components. 
+If you had no introduction to the Tim plugin, read the Intermezzo below for a general explanation of the components. 
 
 ---
 
-> **Intermezzo:** *introduction Tabs on the TIM panel* 
+> **Intermezzo:** *introduction Tabs on the Tim panel* 
 > 
 > a. GeoPackage: an overview of the elements in your geopackage. In case you switch to transient modelling, an extra column with *ttim* elements is added. 
-> a. Elements: a list of 12 TIM elements from which you can build your model. 
+> a. Elements: a list of 12 Tim elements from which you can build your model. 
 > a. Compute: here you can define your domain and cell size, decide if your model is transient or not and change the output name. 
 > a. Extract: open an existing 3d geohydrological model (NC file) and extract the data for your project area. 
 
@@ -167,8 +167,8 @@ Important message: all editing of model parameters and model elements you do in 
 | aquifer_top | -10   | [m MSL] |
 | aquifer_bottom | -30   | [m MSL]|
 
-**NB!** In the real world counting starts with 1. However, TIM is programmed in Python and in Python counting starts with 0. You will get used to it.<br><br>
-Also be aware that the *Aquifer* element you just edited is just a table. This is indicated with the icon (![](figures/tutorial/button-Qgis-AttributeTable.png){width=3%}) just before the layer name in the left panel. For TIM this means that the properties in this table apply for the full model domain. We will introduce some inhomogeneities later as polygons within that domain. 
+**NB!** In the real world counting starts with 1. However, Tim is programmed in Python and in Python counting starts with 0. You will get used to it.<br><br>
+Also be aware that the *Aquifer* element you just edited is just a table. This is indicated with the icon (![](figures/tutorial/button-Qgis-AttributeTable.png){width=3%}) just before the layer name in the left panel. For Tim this means that the properties in this table apply for the full model domain. We will introduce some inhomogeneities later as polygons within that domain. 
 
 (@) Save all changes with the *Save Edits* button (![](figures/tutorial/button-Qgis-AttributeTable-SaveEdits.png){width=4%}).
 (@) Stop the *Edditing Mode* with a click on the button (![](figures/tutorial/button-Qgis-AttributeTable-StartEditingMode.png ){width=4%}).
@@ -238,7 +238,7 @@ TIP: If you do not see any line, perhaps the axes are not defined well. To view 
 ![Cross section with calculated Head](figures/tutorial/figure_HeadsInCrossection01.png){width=100% #fig-figure_HeadsInCrossection01}
 
 ## Model 3: multiple layers
-A single aquifer is of course not enough to describe the geology of our project area. A simplification of the geology is given in the cross section in @fig-photo-fieldwork-liftbomb-crosssection. There is the Holocene toplayer with a resistance of 1500 days on top of an aquifer with a horizontal permeability of 30 m/d and a thickness of 50 m. The anisotropy factor is 3 resulting in a vertical resistance of 0.1 day per meter. TIM can handle multiple layers so the next step is to bring these parameters into the model.
+A single aquifer is of course not enough to describe the geology of our project area. A simplification of the geology is given in the cross section in @fig-photo-fieldwork-liftbomb-crosssection. There is the Holocene toplayer with a resistance of 1500 days on top of an aquifer with a horizontal permeability of 30 m/d and a thickness of 50 m. The anisotropy factor is 3 resulting in a vertical resistance of 0.1 day per meter. Tim can handle multiple layers so the next step is to bring these parameters into the model.
 
 ![Project area cross section (left) lifting the World War II bomb (right)](figures/tutorial/photo-fieldwork-liftbomb-crosssection.jpg){width=100% #fig-photo-fieldwork-liftbomb-crosssection}
 
@@ -311,8 +311,8 @@ Disappointed in the effect of the sheet piles on the calculated head? You are ri
 
 ***
 
-## ![](figures/tutorial/emoji-exclamation.png){width=4%} How to reopen TIM after closing QGIS.
-Before we introduce you another new TIM element we must explain you how to reopen your TIM project after a closure of QGIS. A crash might close QGIS or just a long day of work is a reason to shut down your laptop. Always remember two things:
+## ![](figures/tutorial/emoji-exclamation.png){width=4%} How to reopen Tim after closing QGIS.
+Before we introduce you another new Tim element we must explain you how to reopen your Tim project after a closure of QGIS. A crash might close QGIS or just a long day of work is a reason to shut down your laptop. Always remember two things:
 
 - your geopackage (*.gpkg) contains the complete set of model features and parameter values. Every time you change a model element, you will remember, you had to save the changes. So the GPKG file is always up to date. 
 - your QGIS project is saved in the *.qgz file and contains all the added layers and their format (legend, line color, labels etc.).
@@ -324,20 +324,20 @@ Now let's experience what it is to close and open QGIS including your QGIS-Tim p
 (@) Again select *Project* but now choose *Open Recent* and find your own project in the list.
 (@) Open the QGIS-Tim plugin with a click on ![](figures/tutorial/button-Qgis-tim.png){width=4%}.
  
-*The TIM panel is empty but why?* <br>
-It is not possible for the plugin to read your geopackage as it is loaded in the layer list. To load your TIM project you *must* open the geopackage from the TIM panel. This will add the geopackage to the Layers panel next to the existing one with the same name, which makes it at least confusing. We better remove the original Geopackage first before opening it with TIM. Disadvantage is that we also remove the calculated results including all your formatting efforts. The developers try to fix that in the next version. <br> 
+*The Tim panel is empty but why?* <br>
+It is not possible for the plugin to read your geopackage as it is loaded in the layer list. To load your Tim project you *must* open the geopackage from the Tim panel. This will add the geopackage to the Layers panel next to the existing one with the same name, which makes it at least confusing. We better remove the original Geopackage first before opening it with Tim. Disadvantage is that we also remove the calculated results including all your formatting efforts. The developers try to fix that in the next version. <br> 
 The following steps are the right way to go for now: 
  
 (@) Select layer *case-Rijsenhout input* in the panel on the left in order to remove it. 
 (@) Click your right mouse button and select *Remove Group...* and click *OK*. 
 (@) In the same way remove layer *case-Rijsenhout output*. 
 (@) In the QGIS-Tim panel on the tab *GeoPackage* click *Open* and open the GPKG file containing your model.
-(@) Your geopackage is now added to the TIM panel and the Layers list. Don't forget to move down the background layer "pastel".
+(@) Your geopackage is now added to the Tim panel and the Layers list. Don't forget to move down the background layer "pastel".
 
 ***
 
 ## Model 5: add infiltration of drainwater
-To prevent damage on the private properties caused by the dewatering, the authorities demand 50% of the drained flux to be infiltrated. For the infiltration a horizontal well of 400 m is used. In TIM this element is called "Line Sink Ditch". Let's add this element just along the Aalsmeerderweg southeast of the project area.
+To prevent damage on the private properties caused by the dewatering, the authorities demand 50% of the drained flux to be infiltrated. For the infiltration a horizontal well of 400 m is used. In Tim this element is called "Line Sink Ditch". Let's add this element just along the Aalsmeerderweg southeast of the project area.
 
 (@) On the tab *Elements* in QGIS-Tim click on the element "Line Sink Ditch".
 (@) Give the layer a name, e.g. "InfiltrationWell".
@@ -358,14 +358,14 @@ See that layer "timml Line Sink Ditch:InfiltrationWell" is added to the timml su
 ![Calculated head from the abstraction (left) to the infiltration (right)](figures/tutorial/figure_HeadsInCrossection02.png){width=70% #fig-figure_HeadsInCrossection02}
 
 ## Model 6: add observation points
-We have the Value Tool and the Cross section tool to check for calculated values in the rasters. Besides that, TIM has the opporunity to add observation points automatically providing you with the calculated heads.
+We have the Value Tool and the Cross section tool to check for calculated values in the rasters. Besides that, Tim has the opporunity to add observation points automatically providing you with the calculated heads.
 
 (@) On the tab *Elements* in QGIS-Tim click on the element "Observation".
 (@) Give the layer a name, e.g. "Piezometers".
 (@) Start editting with the *Toggle Edditing Mode* and use *Add Point Feature* button (![](figures/tutorial/button_AddPointFeature.png){width=4%}) to add 5 points in line with 1 really close to the dewatering well (see @fig-figure_ObservationsLocations).
 (@) Save your changes and rerun the model. 
 
-![Observation locations (*A*-*E*) together with other TIM elements](figures/tutorial/figure_ObservationsLocations.png){width=80% #fig-figure_ObservationsLocations}
+![Observation locations (*A*-*E*) together with other Tim elements](figures/tutorial/figure_ObservationsLocations.png){width=80% #fig-figure_ObservationsLocations}
 
 The observed values are saved in a new layer under the existing group "case-Rijsenhout-output:vector". 
 
@@ -384,7 +384,7 @@ A layer with your contours is saved in the group "case-Rijsenhout-output:vector"
 
 ## Model 7: determine the influence of the nearby lake
 East of the project area there is a large lake. What will be the influence of this lake? Let's find out. <br>
-In TIM a lake is added as an inhomogeneity within the total model domain. This domain is described in table "timml Aquifer:Aquifer" we filled in with the first model. 
+In Tim a lake is added as an inhomogeneity within the total model domain. This domain is described in table "timml Aquifer:Aquifer" we filled in with the first model. 
 
 (@) On the tab *Elements* in QGIS-Tim click on the element "Polygon Semi-Confined Top".
 (@) Give the layer a name, e.g. "Lake" and find out that layer "timml Polygon Semi-Confined Top:Lake" is added to the geopackage.
@@ -395,7 +395,7 @@ In TIM a lake is added as an inhomogeneity within the total model domain. This d
 
 ![Contour lines after adding the Lake element in the east](figures/tutorial/figure_Contourlines02.png){width=100% #fig-figure_Contourlines02}
 
-You can not miss the effect of the Lake in this calculation. In many cases you like to analyse or even save this difference. Let's see how we can use TIM and QGIS to isolate the effect. Therefor we rerun the model without the Lake and rename the output.     
+You can not miss the effect of the Lake in this calculation. In many cases you like to analyse or even save this difference. Let's see how we can use Tim and QGIS to isolate the effect. Therefor we rerun the model without the Lake and rename the output.     
 
 (@) In QGIS-Tim go to the tab *Geopackage*.
 (@) In the list of Steady State elements switch off "timml Polygon Semi-Confined Top:Lake".
@@ -425,7 +425,7 @@ By selecting the "transient" option, columns containing extra parameters necessa
 (@) In your geopackage select the layer "timml Aquifer:Aquifer".
 (@) Open its table, start the editing mode and for every layer set both acquifer_s and acquitard_s to 0.001. Acquitard_s (layer 0) = 0.25.  
 
-**NB!** In transient mode, TIM can not handle aquitard with zero thickness so lets's set the aquitard thickness to 0.1 m
+**NB!** In transient mode, Tim can not handle aquitard with zero thickness so lets's set the aquitard thickness to 0.1 m
 
 (@) Change the values in the column "aquifer_top" to -17.0, -22.1, -27.1 and -47.1 m.
 (@) In your geopackage select the layer "ttim Temporal Settings:Aquifer" to define the temporal properties of the model.
@@ -482,8 +482,8 @@ In the same way you can display the time series from the Observations.
 
 ![Calculated time series at observations locations](figures/tutorial/figure_HeadTimeSeries01.png){width=100% #fig-figure_HeadTimeSeries01}
 
-## Export your TIM model to Python
-For scenario calculation or sensitivity analysis you probably want to switch from QGIS to Python for efficiency reasons. In this training we only show you the first step: export your model to a Python file (*.py). Your TIM model is just a set of elements (points, lines, polygons) and its parameters so the Python file is not very large. 
+## Export your Tim model to Python
+For scenario calculation or sensitivity analysis you probably want to switch from QGIS to Python for efficiency reasons. In this training we only show you the first step: export your model to a Python file (*.py). Your Tim model is just a set of elements (points, lines, polygons) and its parameters so the Python file is not very large. 
 
 (@) In QGIS-Tim go to the tab *GeoPackage*. 
 (@) Click the button *Convert GeoPackage to Python script* and you can save the *.py file wherever you like.
