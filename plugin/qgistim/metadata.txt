@@ -4,16 +4,16 @@
 
 [general]
 name=Qgis-Tim
-qgisMinimumVersion=3.0
+qgisMinimumVersion=3.22
 description=QGIS plugin to setup TimML multi-layer analytic elements
-version=0.1
+version=0.4.1
 author=Deltares
 email=huitebootsma@gmail.com
 
 about=QGIS plugin to setup TimML multi-layer analytic elements
 
-tracker=https://gitlab.com/deltares/imod/qgis-tim/-/issues
-repository=https://gitlab.com/deltares/imod/qgis-tim
+tracker=https://github.com/Deltares/QGIS-Tim/issues
+repository=https://github.com/Deltares/QGIS-Tim
 # End of mandatory metadata
 
 # Recommended items:
@@ -25,7 +25,7 @@ hasProcessingProvider=no
 # Tags are comma separated with spaces allowed
 tags=python, groundwater, groundwater modeling, analytic element, TTim, TimML
 
-homepage=https://gitlab.com/deltares/imod/qgis-tim
+homepage=https://deltares.github.io/QGIS-Tim/
 category=Plugins
 icon=icon.png
 # experimental flag
