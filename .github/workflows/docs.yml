@@ -1,0 +1,32 @@
+# Based on: https://tarleb.com/posts/quarto-with-gh-pages/
+name: Publish Website
+
+# Allow one concurrent deployment
+concurrency:
+  group: "pages"
+  cancel-in-progress: true
+
+on:
+  push:
+    branches: ['master']
+
+jobs:
+  quarto-publish:
+    name: Publish with Quarto
+    runs-on: ubuntu-latest
+    steps:
+        # Circumvent this problem: https://github.com/actions/checkout/issues/165
+      - name: Checkout code with LFS cache
+        uses: nschloe/action-checkout-with-lfs-cache@v1
+
+      - name: Install Quarto
+        uses: quarto-dev/quarto-actions/setup@v2
+
+      - name: Render HTML
+        run: "quarto render docs --profile website --to html"
+
+      - name: Deploy HTML to github pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: docs/_build
