@@ -4,9 +4,10 @@ title: "Tutorial QGIS-Tim"
 
 ## Requirements
 - Be sure QGIS 3.22.00 or higher is installed. 
-- Download the tutorial material. [Follow this link.](https://deltares.thegood.cloud/s/oJE7qAHG3nZw2fk)
 - Be sure the ``gistim`` Python package is installed (see [installation](install.qmd) for instructions). 
-- The installation of the necessary QGIS-Tim plugin is part of this Tutorial. 
+- Download the tutorial material. [Follow this link.](https://deltares.thegood.cloud/s/oJE7qAHG3nZw2fk)
+- Installation of the QGIS-Tim and iMOD plugin is part of this Tutorial and the necessary ZIP files are included in the tutorial material. 
+- Internet connections is optional for the Tutorial and only required for installation of additional plugins and the use of an online topographic background map.  
 
 ## Description
 In this tutorial, you will learn how to:
@@ -65,14 +66,17 @@ This is the moment to download/import four plugins needed for this tutorial:
 
 - the QGIS-Tim plugin. The development version imported from ZIP file.
 - the iMOD plugin. The development version imported from ZIP file.
-- the Value Tool. The official version installed via QGIS. 
-- the PDOK plugin. The official version installed via QGIS. This plugin gives access to a large database from which we will load the topographic maps and use the navigation option.
+- the Value Tool. The official version installed via QGIS (internet connection required). 
+- the PDOK plugin. The official version installed via QGIS (internet connection required). <br> This plugin gives access to a large database from which we will load the topographic maps and use the navigation option.
 
 (@) Go to *Plugins* from the main menu and select *Manage and Install Plugins…* to open the plugin window. 
 (@) On the left section select *Install from ZIP*.
 (@) Click the Browse button (![](figures/tutorial/button-Qgis-browse.png){width=4%}) and from the tutorial dataset select the ZIP file "QGIS-Tim_training\\QGIS-iMOD-plugin.zip". 
 (@) Click *Install Plugin*.
 (@) In the same way, install the QGIS-Tim plugin using the ZIP file "QGIS-Tim_training\\QGIS-Tim-plugin.zip". 
+
+If you have an internet connection continue with the installation of the next two plugins.
+
 (@) From the left section, select the group *All* to see all available plugins. 
 (@) Search for “Value Tool” and install it. 
 (@) Search for “PDOK services plugin” and install it. 
@@ -91,8 +95,17 @@ Further in this Tutorial we will use some default toolbars that might be hidden 
 (@) Select *View* from the main menu and choose *Toolbars*.
 (@) Be sure the "Advanced Digitizing Toolbar", the "Snapping Toolbar" and the "Attributes Toolbar" is checked.
 
-### Prepare our project
-For navigation purposes, let's load a topographic map for The Netherlands from the PDOK database.
+### Prepare your project
+For navigation purposes, let's load a topographic map for The Netherlands from the PDOK database. 
+
+> If you do not have an internet connection, follow the next steps to import a simple PNG file as a background. 
+>
+> - Go to *Layer* in the main menu, go to *Add layer* and select *Add Raster layer*.
+> - Use the browse button (![](figures/tutorial/button-Qgis-browse.png){width=4%}) and from the tutorial material select “…\\QGIS-Tim_training\\dbase\\TopographicMapRijssenhout.png”.
+> - Click on *Add* and *Close* the window.
+> - If you do not see the map, select the layer "TopographicMapRijssenhout", click your right mouse button and select "Zoom to Layer(s)".
+> - Continue after step @continuewithoutinternet.
+
 
 (@) Click on the PDOK plugin button (![](figures/tutorial/button-PDOK.png){width=4%}) to open the "PDOK Services Plugin" window. 
 (@) From the tab *PDOK Services* search for "pastel" and you will find a WMTS type layer called "brtachtergrondkaart". 
@@ -103,12 +116,12 @@ For navigation purposes, let's load a topographic map for The Netherlands from t
 Our project area is near the town of Rijsenhout so let's navigate to that town using the PDOK plugin.
 
 (@) Type "Rijsenhout" in the PDOK search field, near the PDOK button (![](figures/tutorial/button-PDOK-search.png){width=20%})
-(@) PDOK will find "Rijsenhout, Haarlemmermeer, Noord-Holland". Click on it and QGIS wil fly to the project location.
+(@continuewithoutinternet) PDOK will find "Rijsenhout, Haarlemmermeer, Noord-Holland". Click on it and QGIS will fly you to the project location.
 
 Let's now open a shape file containing the locations and depths of the bombs.
 
 (@) Go to *Layer* in the main menu, go to *Add layer* and select *Add Vector layer*.
-(@) User the browse button (![](figures/tutorial/button-Qgis-browse.png){width=4%}) and from the tutorial material select “…\\QGIS-Tim_training\\dbase\\bombs.shp”.
+(@) Use the browse button (![](figures/tutorial/button-Qgis-browse.png){width=4%}) and from the tutorial material select “…\\QGIS-Tim_training\\dbase\\bombs.shp”.
 (@) Click on *Add* and *Close* the window.
 
 ![](figures/tutorial/emoji-tip.png){width=3%} **Tip:** a fast alternative for adding layers: from the menu *View > Toolbar* add the *Manage Layers Toolbar* and use the button ![](figures/tutorial/button-Qgis-VectorLayer.png){width=4%}.
@@ -142,7 +155,7 @@ If you had no introduction to the Tim plugin, read the Intermezzo below for a ge
 > **Intermezzo:** *introduction Tabs on the Tim panel* 
 > 
 > a. GeoPackage: an overview of the elements in your geopackage. In case you switch to transient modelling, an extra column with *ttim* elements is added. 
-> a. Elements: a list of 12 Tim elements from which you can build your model. 
+> a. Elements: a list of 14 Tim elements from which you can build your model. 
 > a. Compute: here you can define your domain and cell size, decide if your model is transient or not and change the output name. 
 > a. Extract: open an existing 3d geohydrological model (NC file) and extract the data for your project area. 
 
@@ -151,10 +164,10 @@ If you had no introduction to the Tim plugin, read the Intermezzo below for a ge
 Now we are ready to define our first steady state model by parameterizing our Aquifer. <br>
 
 ## Model 1: single aquifer
-We start with a very simple 'model', only the parameters of a single aquifer. 
+We start with a very simple 'model', only the parameters of a single aquifer. <br>
 Important message: all editing of model parameters and model elements you do in the *Layers* panel on the left! 
 
-(@) So in your geopackage select the layer "timml Aquifer:Aquifer".
+(@) So select the layer "timml Aquifer:Aquifer" on the left.
 (@) Click your right mouse button and from the menu select *Attribute Table* to open the table in a new window. <br> **NB** Alternative is to press F6 or use the button *Open Attribute Tabll* (![](figures/tutorial/button-Qgis-OpenAttributeTable.png){width=3%}).
 (@) Start the editing mode with a click on the *Toggle Editing Mode* button (![](figures/tutorial/button-Qgis-AttributeTable-StartEditingMode.png ){width=4%}).
 (@) Hover with your mouse over the buttons and find the *Add Feature* button (![](figures/tutorial/button-AttributeTable-AddFeature.png){width=20%}). Perhaps number 5 from left. 
@@ -181,13 +194,22 @@ Also be aware that the *Aquifer* element you just edited is just a table. This i
 (@) Go to the tab *Compute* in QGIS-Tim.
 (@) Click the button *Set to current extent*.
 (@) Start the calculation with a click on *Compute*.
-(@) Minimize the python.exe window. 
+
+A black Python.exe window pops up indicating that the TIM calculation started on the background. You can ignore this window but keep it open. Of course you van minimize it. If the calculation was completed successful, you will see this echo in QGIS.  
+![](figures/tutorial/Panel-QGIS-Tim-completion.png){width=80%}. 
 
 After the calculation you see that the result is automatically added to the geopackage, both as a mesh and raster layer. Although these layers are checked, the data is not visible. That is because the GeoPackage was added last, and QGIS adds layers at the end of the list. Let's move the layer "pastel" to the background. 
 
 (@) Select the layer "pastel" and drag it with your left mouse button to the bottom of the list of layers.
 
 The calculation result is now visible and we see a raster with just the value 0, not a very exciting result because no other elements are present yet. Let's now add a well element.
+
+> **Intermezzo:** *Mesh and Raster explained*
+> 
+> - Raster: is made up of pixels (also referred to as grid cells). They are usually regularly spaced and square but they don’t have to be. Preferred format to create cross sections or evaluate values at your mouse location. 
+> - Mesh: an unstructured grid usually with temporal and other components. Preferred format to animate temporal data and to perform calculations.  
+
+
 
 ## Model 2: single well
 
@@ -216,7 +238,7 @@ Next step is to rerun the model including the new well.
 
 The output in your Geopackage is directly overwritten with the new results.
 
-(@) Unhide the output layer voor raster, probably named "case-Rijsenhout-output:raster".
+(@) Unhide the output layer for raster, probably named "case-Rijsenhout-output:raster".
 
 Do you like to see the values of the calculated Head under you mouse?
 
@@ -366,9 +388,9 @@ We have the Value Tool and the Cross section tool to check for calculated values
 
 ![Observation locations (*A*-*E*) together with other Tim elements](figures/tutorial/figure_ObservationsLocations.png){width=80% #fig-figure_ObservationsLocations}
 
-The observed values are saved in a new layer under the existing group "case-Rijsenhout-output:vector". 
+The observed values are saved in a new layer under the existing group "case-Rijsenhout output" and sub group "vector". 
 
-(@) Select the layer "case-Rijsenhout.output" and check the calculated values from the Attribute Table (F6).
+(@) In this sub group select the layer "case-Rijsenhout-timml Observation:Piezometers" and check the calculated values within this layer by opening the Attribute Table (F6).
 (@) Close the Attribute Table.
 
 One way of displaying the calculated results is still missing: contour lines. 
@@ -431,14 +453,14 @@ By selecting the "transient" option, columns containing extra parameters necessa
 (@) Open its table, start the editing mode and add a new feature. 
 (@) Make sure that tmin=0.01, tmax=30, tstart=0, reference_date=2023-03-23 00:00:00.
 (@) In your geopackage select the layer "ttim Computation Times:Domain" in order to definte the moments in time for which raster output is saved.   
-(@) Open its table, start the editing mode and add 7 features / periods (click 6 times "Add feature").
+(@) Open its table, start the editing mode and add 7 features / periods (click 7 times "Add feature").
 (@) In the column "time" add the moments 1,2,5,10, 15, 20 and 30. 
 (@) Save and Close the table. 
 
 For the observations we can define a different set of output moments.  
 
 (@) In your geopackage select the layer "ttim Observation:Piezometers".   
-(@) Open its table, start the editing mode and add 10 features / periods (click 6 times "Add feature").
+(@) Open its table, start the editing mode and add 10 features / periods (click 10 times "Add feature").
 (@) In the column "time" add the moments 1,2,3,4,5,10,15,20,25 and 30. 
 (@) Save and Close the table. 
 
