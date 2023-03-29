@@ -5,7 +5,7 @@ title: "Tutorial QGIS-Tim"
 ## Requirements
 - Be sure QGIS 3.22.00 or higher is installed. 
 - Be sure the ``gistim`` Python package is installed (see [installation](install.qmd) for instructions). 
-- Download the tutorial material. [Follow this link.](https://deltares.thegood.cloud/s/oJE7qAHG3nZw2fk)
+- Download the tutorial material [Follow this link.](https://deltares.thegood.cloud/s/zryWnfjT43Ryoea)
 - Installation of the QGIS-Tim and iMOD plugin is part of this Tutorial and the necessary ZIP files are included in the tutorial material. 
 - Internet connections is optional for the Tutorial and only required for installation of additional plugins and the use of an online topographic background map.  
 
