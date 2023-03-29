@@ -32,7 +32,7 @@
     "href": "tutorial-QGIS-Tim.html",
     "title": "Tutorial QGIS-Tim",
     "section": "",
-    "text": "Be sure QGIS 3.22.00 or higher is installed.\nBe sure the gistim Python package is installed (see installation for instructions).\nDownload the tutorial material. Follow this link.\nInstallation of the QGIS-Tim and iMOD plugin is part of this Tutorial and the necessary ZIP files are included in the tutorial material.\nInternet connections is optional for the Tutorial and only required for installation of additional plugins and the use of an online topographic background map."
+    "text": "Be sure QGIS 3.22.00 or higher is installed.\nBe sure the gistim Python package is installed (see installation for instructions).\nDownload the tutorial material Follow this link.\nInstallation of the QGIS-Tim and iMOD plugin is part of this Tutorial and the necessary ZIP files are included in the tutorial material.\nInternet connections is optional for the Tutorial and only required for installation of additional plugins and the use of an online topographic background map."
   },
   {
     "objectID": "tutorial-QGIS-Tim.html#description",
