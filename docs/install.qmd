@@ -9,7 +9,7 @@ QGIS-Tim therfore consists of three steps:
 ## 1. Install QGIS
 
 Download and install a recent version of QGIS (>3.22):
-<https://www.qgis.org/en/site/forusers/download.html>
+<https://www.qgis.org/en/site/forusers/download.html>{target="_blank"}
 
 ## 2. Install ``gistim`` in a seperate Python environment
 
@@ -21,8 +21,8 @@ are two approaches: either using the fully-fletched Deltaforge distribution
 ### Method 1: with Deltaforge (Recommended)
 
 [Download and install Deltaforge](
-https://deltares.thegood.cloud/s/AefTz97ZHbWS4RT). 
-**Make sure you use Deltaforge version 3.0 or higher!**
+https://deltares.thegood.cloud/s/AefTz97ZHbWS4RT){target="_blank"}. 
+**Make sure you use Deltaforge version 0.3.0 or higher!**
 
 1. Open the Deltaforge prompt (search in Windows Start for \"Deltaforge
     Prompt\").
@@ -32,7 +32,7 @@ https://deltares.thegood.cloud/s/AefTz97ZHbWS4RT).
 ### Method 2: with Miniforge
 
 [Download and install a miniforge Python installation](
-https://github.com/conda-forge/miniforge)
+https://github.com/conda-forge/miniforge){target="_blank"}
 
 
 1.  Open the miniforge prompt (search in Windows Start for \"Miniforge
