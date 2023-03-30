@@ -149,14 +149,14 @@ ul.task-list li input[type="checkbox"] {
 <p>QGIS-Tim consists of two parts: A QGIS plugin and the <code>gistim</code> Python package, which runs in a separate Python environment. The installation of QGIS-Tim therfore consists of three steps:</p>
 <section id="install-qgis" class="level2">
 <h2 class="anchored" data-anchor-id="install-qgis">1. Install QGIS</h2>
-<p>Download and install a recent version of QGIS (&gt;3.22): <a href="https://www.qgis.org/en/site/forusers/download.html" class="uri">https://www.qgis.org/en/site/forusers/download.html</a></p>
+<p>Download and install a recent version of QGIS (&gt;3.22): <a href="https://www.qgis.org/en/site/forusers/download.html" target="_blank">https://www.qgis.org/en/site/forusers/download.html</a></p>
 </section>
 <section id="install-gistim-in-a-seperate-python-environment" class="level2">
 <h2 class="anchored" data-anchor-id="install-gistim-in-a-seperate-python-environment">2. Install <code>gistim</code> in a seperate Python environment</h2>
 <p><code>gistim</code> requires a seperate Python environment, because it depends on packages incompatible with the packages in QGIS’ own Python environment. There are two approaches: either using the fully-fletched Deltaforge distribution (Recommended) or the leaner Miniforge distribution.</p>
 <section id="method-1-with-deltaforge-recommended" class="level3">
 <h3 class="anchored" data-anchor-id="method-1-with-deltaforge-recommended">Method 1: with Deltaforge (Recommended)</h3>
-<p><a href="https://deltares.thegood.cloud/s/AefTz97ZHbWS4RT">Download and install Deltaforge</a>. <strong>Make sure you use Deltaforge version 3.0 or higher!</strong></p>
+<p><a href="https://deltares.thegood.cloud/s/AefTz97ZHbWS4RT" target="_blank">Download and install Deltaforge</a>. <strong>Make sure you use Deltaforge version 0.3.0 or higher!</strong></p>
 <ol type="1">
 <li>Open the Deltaforge prompt (search in Windows Start for "Deltaforge Prompt").</li>
 <li>Configure the gistim installation, so that the QGIS plugin is able to find it. Run: <code>python -m gistim configure</code></li>
@@ -164,7 +164,7 @@ ul.task-list li input[type="checkbox"] {
 </section>
 <section id="method-2-with-miniforge" class="level3">
 <h3 class="anchored" data-anchor-id="method-2-with-miniforge">Method 2: with Miniforge</h3>
-<p><a href="https://github.com/conda-forge/miniforge">Download and install a miniforge Python installation</a></p>
+<p><a href="https://github.com/conda-forge/miniforge" target="_blank">Download and install a miniforge Python installation</a></p>
 <ol type="1">
 <li>Open the miniforge prompt (search in Windows Start for "Miniforge Prompt").</li>
 <li>Create a new conda environment, run: conda create --name tim python=3.9</li>
