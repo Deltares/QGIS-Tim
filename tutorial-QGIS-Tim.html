@@ -161,7 +161,7 @@ ul.task-list li input[type="checkbox"] {
 <li>Be sure QGIS version 3.22.00 or higher is installed.</li>
 <li>Be sure the <code>gistim</code> Python package is installed (see <a href="./install.html">installation</a> for instructions).</li>
 <li>Download the tutorial material. <a href="https://deltares.thegood.cloud/s/zryWnfjT43Ryoea">Follow this link.</a></li>
-<li>Installation of the QGIS-Tim plugin and ithe MOD plugin is part of this Tutorial and the necessary ZIP files are included in the tutorial material.</li>
+<li>Installation of the QGIS-Tim plugin and the MOD plugin is part of this Tutorial and the necessary ZIP files are included in the tutorial material.</li>
 <li>Internet connections is optional during this Tutorial. It is only required for installation of additional plugins and the use of an online topographic background map.</li>
 </ul>
 </section>
@@ -216,7 +216,7 @@ ul.task-list li input[type="checkbox"] {
 <li>In the <em>Properties</em> window select the category <em>CRS</em>, search for “EPSG:28992” and you find “Amersfoort / RD New”. Select this option and click the <em>Apply</em> button, followed by the <em>OK</em> button to close the window.</li>
 </ol>
 <blockquote class="blockquote">
-<p>In case your work is mostly in The Netherlands and in the “Amersfoort / RD New” projection, consider to make this your default projection.</p>
+<p>In case your work is mostly in The Netherlands and in the “Amersfoort / RD New” projection, consider making this your default projection.</p>
 <ul>
 <li>From the main menu click on <em>Settings</em> and select <em>Options…</em>.</li>
 <li>In the section <em>CRS and Transforms</em> select <em>CRS (handling)</em>, pick the radio button <em>Use a default CRS</em> and select “EPSG:28992 -Amersfoort / RD New”.</li>
@@ -438,7 +438,7 @@ ul.task-list li input[type="checkbox"] {
 <li>Click on the element “Well” and a window opens to create a new (vector) layer in QGIS.</li>
 <li>Give the layer a name, e.g.&nbsp;“DewateringWell”.</li>
 </ol>
-<p>See that layer “timml Well:DewateringWell” is added to the timml sub-group in your geopackage with ‘point’ as geometry. Also in the ttim sub-group an element with the same name is added. This is a table that can store transient well data while refering to the x/y locations in the timml layer. Next step is to add the actual well, both the location and its parameters.</p>
+<p>See that layer “timml Well:DewateringWell” is added to the timml sub-group in your geopackage with ‘point’ as geometry. Also in the ttim sub-group an element with the same name is added. This is a table that can store transient well data while referring to the x/y locations in the timml layer. Next step is to add the actual well, both the location and its parameters.</p>
 <ol start="53" class="example" type="1">
 <li>Select the layer “timml Well:DewateringWell”.</li>
 <li>Click your right mouse button and select the <em>Toggle Editing Mode</em> (<img src="figures/tutorial/button-Qgis-AttributeTable-StartEditingMode.png" class="img-fluid" style="width:4.0%">).</li>
@@ -449,11 +449,11 @@ ul.task-list li input[type="checkbox"] {
 <p><img src="figures/tutorial/figure_WellFeatureAttributes.png" class="img-fluid" style="width:60.0%"></p>
 <ol start="58" class="example" type="1">
 <li>Click <em>OK</em>.</li>
-<li>Click the <em>Toggle Editing</em> button (<img src="figures/tutorial/button-Qgis-AttributeTable-StartEditingMode.png" class="img-fluid" style="width:4.0%">) and if you are asked to save changes select <em>Save</em>. <br> An alternative way to save your edits is to click the <em>Save Layer Edits</em> button (<img src="figures/tutorial/button_SavelayerEdits.png" class="img-fluid" style="width:4.0%"> and then stop editing with the <em>Toggle Editing</em> button (<img src="figures/tutorial/button-Qgis-AttributeTable-StartEditingMode.png" class="img-fluid" style="width:4.0%">).</li>
+<li>Click the <em>Toggle Editing</em> button (<img src="figures/tutorial/button-Qgis-AttributeTable-StartEditingMode.png" class="img-fluid" style="width:4.0%">) and if you are asked to save changes select <em>Save</em>. <br> An alternative way to save your edits is to click the <em>Save Layer Edits</em> button (<img src="figures/tutorial/button_SavelayerEdits.png" class="img-fluid" style="width:4.0%">) and then stop editing with the <em>Toggle Editing</em> button (<img src="figures/tutorial/button-Qgis-AttributeTable-StartEditingMode.png" class="img-fluid" style="width:4.0%">).</li>
 </ol>
 <p>Next step is to rerun the model including the new well.</p>
 <ol start="60" class="example" type="1">
-<li>In QGIS-Tim go to the tab GeoPackage and see that the Well is added.</li>
+<li>In QGIS-Tim go to the tab <em>GeoPackage</em> and see that the Well is added.</li>
 <li>Go to the tab <em>Compute</em> and click on <em>Compute</em>.</li>
 </ol>
 <p>The output in your Geopackage is directly overwritten with the new results.</p>
@@ -471,7 +471,7 @@ ul.task-list li input[type="checkbox"] {
 <p></p><figcaption class="figure-caption">Figure&nbsp;3: Example panel Value Tool</figcaption><p></p>
 </figure>
 </div>
-<p>Do you like to see the values in a crossection? Deltares developed the Cross Section Tool, available in the iMOD Plugin.</p>
+<p>Do you like to see the values in a cross section? Deltares developed the Cross Section Tool, available in the iMOD Plugin.</p>
 <ol start="65" class="example" type="1">
 <li><p>On the iMOD Toolbar select the <em>Cross section</em> button (<img src="figures/tutorial/button_iMOD-Cross-section.png" class="img-fluid" style="width:3.0%">) to start the iMOD Cross Section tool. In the empty cross-section we can add a selection of (geological) layers. For now, we only select the calculated heads.</p></li>
 <li><p>On the iMOD Cross Section Plot click on the button <em>Select location</em> and draw your cross-section line from north to south (right mouse button to close the line).</p></li>
@@ -479,18 +479,18 @@ ul.task-list li input[type="checkbox"] {
 <li><p>Click the button <em>Add</em> to add this layer to the cross-section manager below.</p></li>
 <li><p>Click the button <em>Plot</em> to draw this layer in the cross section.</p></li>
 </ol>
-<p>Your screen might look like <a href="#fig-figure_HeadsInCrossection01">Figure&nbsp;4</a>.</p>
+<p>Your screen might look like <a href="#fig-figure_HeadsInCrosssection01">Figure&nbsp;4</a>.</p>
 <p>TIP: If you do not see any line, perhaps the axes are not defined well. To view all data, click you right mouse button in the figure and select the option “View All”. The alternative is to click on the small A symbol (<img src="figures/tutorial/button_CrossSection-ViewAll.png" class="img-fluid" style="width:3.0%">) in the lower left of the chart.</p>
-<div id="fig-figure_HeadsInCrossection01" class="quarto-figure quarto-figure-center anchored">
+<div id="fig-figure_HeadsInCrosssection01" class="quarto-figure quarto-figure-center anchored">
 <figure class="figure">
-<p><img src="figures/tutorial/figure_HeadsInCrossection01.png" class="img-fluid figure-img" style="width:100.0%"></p>
+<p><img src="figures/tutorial/figure_HeadsInCrosssection01.png" class="img-fluid figure-img" style="width:100.0%"></p>
 <p></p><figcaption class="figure-caption">Figure&nbsp;4: Cross section with calculated Head</figcaption><p></p>
 </figure>
 </div>
 </section>
 <section id="model-3-multiple-layers" class="level2">
 <h2 class="anchored" data-anchor-id="model-3-multiple-layers">Model 3: multiple layers</h2>
-<p>A single aquifer is of course not enough to describe the geology of our project area. A simplification of the geology is given in the cross section in <a href="#fig-photo-fieldwork-liftbomb-crosssection">Figure&nbsp;5</a>. In this low lying polder, there is a Holocene toplayer of 12 m thickness on top of an aquifer. The surface level of the toplayer is 5 m below see level, it has a resistance of 1500 days and the water level within this polder is 1 meter below surface level. The aquifer has a horizontal permeability of 30 m/d and a thickness of 50 m. The anisotropy factor is 3 resulting in a vertical resistance of 0.1 day per meter. Tim can handle multiple layers so the next step is to bring these parameters into the model.</p>
+<p>A single aquifer is of course not enough to describe the geology of our project area. A simplification of the geology is given in the cross section in <a href="#fig-photo-fieldwork-liftbomb-crosssection">Figure&nbsp;5</a>. In this low lying polder, there is a Holocene top layer of 12 m thickness on top of an aquifer. The surface level of the top layer is 5 m below see level, it has a resistance of 1500 days and the water level within this polder is 1 meter below surface level. The aquifer has a horizontal permeability of 30 m/d and a thickness of 50 m. The anisotropy factor is 3 resulting in a vertical resistance of 0.1 day per meter. Tim can handle multiple layers so the next step is to bring these parameters into the model.</p>
 <div id="fig-photo-fieldwork-liftbomb-crosssection" class="quarto-figure quarto-figure-center anchored">
 <figure class="figure">
 <p><img src="figures/tutorial/photo-fieldwork-liftbomb-crosssection.jpg" class="img-fluid figure-img" style="width:100.0%"></p>
@@ -503,7 +503,7 @@ ul.task-list li input[type="checkbox"] {
 <li>Start the editing mode with a click on the <em>Toggle Editing Mode</em> button (<img src="figures/tutorial/button-Qgis-AttributeTable-StartEditingMode.png" class="img-fluid" style="width:4.0%">).</li>
 <li>Add three extra aquifers / features; click three times on the <em>Add Feature</em> button (<img src="figures/tutorial/button-AttributeTable-AddFeature.png" class="img-fluid" style="width:15.0%">).</li>
 </ol>
-<p>The Holocene toplayer is not a distinguished layer but a resistance on top of layer 0.</p>
+<p>The Holocene top layer is not a distinguished layer but a resistance on top of layer 0.</p>
 <ol start="74" class="example" type="1">
 <li>Fill the features with the values from the table below:</li>
 </ol>
@@ -595,7 +595,7 @@ ul.task-list li input[type="checkbox"] {
 <li>Click on the element “Leaky Line Doublet”.</li>
 <li>Give the layer a name, e.g.&nbsp;“sheetpile”.</li>
 <li>In your geopackage select the layer “timml Leaky Line Doublet:sheetpile” and start editing using the <em>Toggle Editing Mode</em> button (<img src="figures/tutorial/button-Qgis-AttributeTable-StartEditingMode.png" class="img-fluid" style="width:4.0%">).</li>
-<li>In the editing mode, the <em>Add Line Feature</em> button (<img src="figures/tutorial/button_AddLineFeature.png" class="img-fluid" style="width:4.0%">) is available. Click the button and draw a box arround the 5 bombs (click left to start, click right to close).</li>
+<li>In the editing mode, the <em>Add Line Feature</em> button (<img src="figures/tutorial/button_AddLineFeature.png" class="img-fluid" style="width:4.0%">) is available. Click the button and draw a box around the 5 bombs (click left to start, click right to close).</li>
 <li>In the <em>Feature Attributes</em> window make resistance = 1500 and layer = 0.</li>
 <li>Click <em>OK</em>.</li>
 </ol>
@@ -663,28 +663,28 @@ ul.task-list li input[type="checkbox"] {
 <li>Click the *Measure Line” button (<img src="figures/tutorial/button_MeasureLine.png" class="img-fluid" style="width:4.0%">) from the “Attributes Toolbar”.</li>
 <li>With your left mouse button try to get an idea what a distance of 400 m. looks like. Close the window.</li>
 <li>Select the layer “timml Line Sink Ditch:InfiltrationWell”.</li>
-<li>Start editting with the <em>Toggle Editing Mode</em>.</li>
+<li>Start editing with the <em>Toggle Editing Mode</em>.</li>
 <li>Use the <em>Add Line Feature</em> button (<img src="figures/tutorial/button_AddLineFeature.png" class="img-fluid" style="width:4.0%">) to draw a 400 m line (click left to start, click right to close).</li>
 <li>Fill these feature within the table: discharge = -1000 (negative abstraction is into the model), resistance = 1, width = 1, layer = 0! not <em>NULL</em> ;-). By default order = 4.</li>
 <li>Click <em>OK</em>.</li>
 <li>Stop editing the layer, save your changes.</li>
 <li>Rerun the model.</li>
-<li>Analyse the results with the iMOD Cross Section widget. Your graph may look like <a href="#fig-figure_HeadsInCrossection02">Figure&nbsp;7</a>.</li>
+<li>Analyse the results with the iMOD Cross Section widget. Your graph may look like <a href="#fig-figure_HeadsInCrosssection02">Figure&nbsp;7</a>.</li>
 </ol>
-<div id="fig-figure_HeadsInCrossection02" class="quarto-figure quarto-figure-center anchored">
+<div id="fig-figure_HeadsInCrosssection02" class="quarto-figure quarto-figure-center anchored">
 <figure class="figure">
-<p><img src="figures/tutorial/figure_HeadsInCrossection02.png" class="img-fluid figure-img" style="width:70.0%"></p>
+<p><img src="figures/tutorial/figure_HeadsInCrosssection02.png" class="img-fluid figure-img" style="width:70.0%"></p>
 <p></p><figcaption class="figure-caption">Figure&nbsp;7: Calculated head from the abstraction (left) to the infiltration (right)</figcaption><p></p>
 </figure>
 </div>
 </section>
 <section id="model-6-add-observation-points" class="level2">
 <h2 class="anchored" data-anchor-id="model-6-add-observation-points">Model 6: add observation points</h2>
-<p>We have the Value Tool and the Cross section tool to check for calculated values in the rasters. Besides that, Tim has the opporunity to add observation points automatically providing you with the calculated heads.</p>
+<p>We have the Value Tool and the Cross section tool to check for calculated values in the rasters. Besides that, Tim has the opportunity to add observation points automatically providing you with the calculated heads.</p>
 <ol start="122" class="example" type="1">
 <li>On the tab <em>Elements</em> in QGIS-Tim click on the element “Observation”.</li>
 <li>Give the layer a name, e.g.&nbsp;“Piezometers”.</li>
-<li>Start editting with the <em>Toggle Editing Mode</em> and use <em>Add Point Feature</em> button (<img src="figures/tutorial/button_AddPointFeature.png" class="img-fluid" style="width:4.0%">) to add 5 points in line with 1 really close to the dewatering well (see <a href="#fig-figure_ObservationsLocations">Figure&nbsp;8</a>).</li>
+<li>Start editing with the <em>Toggle Editing Mode</em> and use <em>Add Point Feature</em> button (<img src="figures/tutorial/button_AddPointFeature.png" class="img-fluid" style="width:4.0%">) to add 5 points in line with 1 really close to the dewatering well (see <a href="#fig-figure_ObservationsLocations">Figure&nbsp;8</a>).</li>
 <li>Save your changes and rerun the model.</li>
 </ol>
 <div id="fig-figure_ObservationsLocations" class="quarto-figure quarto-figure-center anchored">
@@ -718,7 +718,7 @@ ul.task-list li input[type="checkbox"] {
 <ol start="131" class="example" type="1">
 <li>On the tab <em>Elements</em> in QGIS-Tim click on the element “Polygon Semi-Confined Top”.</li>
 <li>Give the layer a name, e.g.&nbsp;“Lake” and find out that layer “timml Polygon Semi-Confined Top:Lake” is added to the geopackage.</li>
-<li>Start editting with the <em>Toggle Editing Mode</em> and use <em>Add Polygon Feature</em> button (<img src="figures/tutorial/button_AddPolygonFeature.png" class="img-fluid" style="width:4.0%">) to add the Lake contour. <br> <strong>NB</strong> Try to minimize the number of segments because each segment slows down the calculations. With QGIS it is tempting to use detail but the influence of detail on the outcome is small.</li>
+<li>Start editing with the <em>Toggle Editing Mode</em> and use <em>Add Polygon Feature</em> button (<img src="figures/tutorial/button_AddPolygonFeature.png" class="img-fluid" style="width:4.0%">) to add the Lake contour. <br> <strong>NB</strong> Try to minimize the number of segments because each segment slows down the calculations. With QGIS it is tempting to use detail but the influence of detail on the outcome is small.</li>
 <li>Fill the Lake feature with the following parameters: aquitard_c = 500, semiconf_top = -7 (bottom of the Lake) and semiconf_head = -2 (water level).</li>
 <li>Save your changes and rerun the model.</li>
 <li>Analyse the results and perhaps create contour lines from the tab “Compute”.</li>
@@ -742,9 +742,9 @@ ul.task-list li input[type="checkbox"] {
 <li>From the QGIS main menu <em>Raster</em> select the tool <em>Raster Calculator</em> and the tool window opens.</li>
 <li>In the section <em>Raster Calculator Expression</em> you can create an expression using the elements from <em>Raster Bands</em> and <em>Operators</em>. Create this expression: “case-Rijsenhout-head_layer_001 - case-Rijsenhout-NoLake-head_layer_001”.</li>
 <li>In <em>Output layer</em> give a new name for this new GeoTIFF file, e.g.&nbsp;“head-effect-lake”.</li>
-<li>Click <em>OK</em> to start the calculation and see that the GeoTiff file is added as a layer.</li>
+<li>Click <em>OK</em> to start the calculation and see that the GeoTIFF file is added as a layer.</li>
 <li>In the properties of layer “head-effect-lake” go to the section <em>Symbology</em> and set the <em>Render type</em> to “Singelband pseudocolor”.</li>
-<li>See that the difference in head is max 3 meter.</li>
+<li>See that the difference in head is maximum 3 meter.</li>
 <li>In <em>Geopackage</em> check again the Lake element.</li>
 <li>In <em>Compute</em> reset the path to the old name.</li>
 </ol>
@@ -756,18 +756,18 @@ ul.task-list li input[type="checkbox"] {
 <li>In <em>Compute</em> within the <em>output</em> section change “steady state” into “transient”.</li>
 <li>Go to <em>Geopackage</em> and see that only 5 elements have a transient component.</li>
 </ol>
-<p>By selecting the “transient” option, columns containing extra parameters necessary for a transient model have been unhided now. First of all we see it in the layer “timml Aquifer:Aquifer” where columns “storage” and “porosity are visible now.</p>
+<p>By selecting the “transient” option, columns containing extra parameters necessary for a transient model have been unhidden now. First of all we see it in the layer “timml Aquifer:Aquifer” where columns “storage” and “porosity are visible now.</p>
 <ol start="152" class="example" type="1">
 <li>In your geopackage select the layer “timml Aquifer:Aquifer”.</li>
 <li>Open its table, start the editing mode and for every layer set both acquifer_s and acquitard_s to 0.001. Acquitard_s (layer 0) = 0.25. You can use copy and paste to do it quickly.</li>
 </ol>
-<p><strong>NB!</strong> In transient mode, Tim can not handle aquitard with zero thickness so lets’s set the aquitard thickness to 0.1 m</p>
+<p><strong>NB!</strong> In transient mode, Tim can not handle aquitard with zero thickness so let’s set the aquitard thickness to 0.1 m</p>
 <ol start="154" class="example" type="1">
 <li>Change the values in the column “aquifer_top” to -17.0, -22.1, -27.1 and -47.1 m.</li>
 <li>In your geopackage select the layer “ttim Temporal Settings:Aquifer” to define the temporal properties of the model.</li>
 <li>Open its table, start the editing mode and add a new feature.</li>
 <li>Make sure that tmin=0.01, tmax=30, tstart=0, reference_date=2023-03-23 00:00:00.</li>
-<li>In your geopackage select the layer “ttim Computation Times:Domain” in order to definte the moments in time for which raster output is saved.<br>
+<li>In your geopackage select the layer “ttim Computation Times:Domain” in order to define the moments in time for which raster output is saved.<br>
 </li>
 <li>Open its table, start the editing mode and add 7 features / periods (click 7 times “Add feature”).</li>
 <li>In the column “time” add the moments 1,2,5,10, 15, 20 and 30.</li>
@@ -784,7 +784,7 @@ ul.task-list li input[type="checkbox"] {
 <p>Special attention for the Well package while it has 2 options to make it transient:</p>
 <ul>
 <li>Simple: a well can be switched on and off only once. Parameters are set in the stationary part of the model, so in “timml Well:DewateringWell”.</li>
-<li>Detailed: a well can be switched on and off multiple times within the modeled period. Parameters are set in the transient part of the model, so in “ttim Well:DewateringWell”.</li>
+<li>Detailed: a well can be switched on and off multiple times within the modelled period. Parameters are set in the transient part of the model, so in “ttim Well:DewateringWell”.</li>
 </ul>
 <p>In this training we show you the simple version.</p>
 <ol start="166" class="example" type="1">
@@ -813,7 +813,7 @@ ul.task-list li input[type="checkbox"] {
 <li>Click the button <em>Select Points</em>, your mouse changes into a <img src="figures/tutorial/mouse_plus.png" class="img-fluid">. Be sure <em>Update on Selection</em> is checked and hover over the mesh. The graph shows the timeseries at the location of your mouse.</li>
 <li>Deselect the checkbox <em>Update on Selection</em>.</li>
 <li>Click the button <em>Select Points</em> (your mouse becomes a <img src="figures/tutorial/mouse_plus.png" class="img-fluid"> and with the left mouse button select 3 points ad random.</li>
-<li>Finally click the <em>Plot</em> button and the 3 timeseries are added to the chart. Colors can be changed.</li>
+<li>Finally click the <em>Plot</em> button and the 3 timeseries are added to the chart. Colours can be changed.</li>
 </ol>
 <p>In the same way you can display the time series from the Observations.</p>
 <ol start="184" class="example" type="1">
@@ -821,7 +821,7 @@ ul.task-list li input[type="checkbox"] {
 <li>For “ID column:” select <em>label</em> and for “Variable:” select <em>head_layer0</em>. Don’t forget to <strong>deselect <em>fid</em></strong>.<br>
 </li>
 <li>Click the button <em>Select Points</em> and draw a box with your mouse to select one or more observation points.</li>
-<li>Click the <em>Plot</em> button and the selected timeseries are added to the chart. Colors can be changed.</li>
+<li>Click the <em>Plot</em> button and the selected timeseries are added to the chart. Colours can be changed.</li>
 </ol>
 <div id="fig-figure_HeadTimeSeries01" class="quarto-figure quarto-figure-center anchored">
 <figure class="figure">
@@ -836,7 +836,7 @@ ul.task-list li input[type="checkbox"] {
 <ol start="188" class="example" type="1">
 <li>In QGIS-Tim go to the tab <em>GeoPackage</em>.</li>
 <li>Click the button <em>Convert GeoPackage to Python script</em> and you can save the *.py file wherever you like.</li>
-<li>Check the content of the file with yout texteditor (e.g.&nbsp;Notepad).</li>
+<li>Check the content of the file with you text editor (e.g.&nbsp;Notepad).</li>
 </ol>
 <p>The tutorial ends here. You can save your QGIS project if you like. Thank you!</p>
 
