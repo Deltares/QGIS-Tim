@@ -122,6 +122,20 @@ INHOM_ATTRIBUTES = [
     QgsField("aquitard_npor", QVariant.Double),
     QgsField("aquifer_npor", QVariant.Double),
 ]
+BUILDING_PIT_ATTRIBUTES = [
+    QgsField("inhomogeneity_id", QVariant.Int),
+    QgsField("layer", QVariant.Int),
+    QgsField("aquifer_top", QVariant.Double),
+    QgsField("aquifer_bottom", QVariant.Double),
+    QgsField("aquitard_c", QVariant.Double),
+    QgsField("aquifer_k", QVariant.Double),
+    QgsField("semiconf_top", QVariant.Double),
+    QgsField("semiconf_head", QVariant.Double),
+    QgsField("aquitard_s", QVariant.Double),
+    QgsField("aquifer_s", QVariant.Double),
+    QgsField("aquitard_npor", QVariant.Double),
+    QgsField("aquifer_npor", QVariant.Double),
+]
 
 
 class NameDialog(QDialog):
@@ -796,17 +810,43 @@ class BuildingPit(AssociatedElement):
     element_type = "Building Pit"
     geometry_type = "Polygon"
     timml_attributes = (
+        QgsField("inhomogeneity_id", QVariant.Int),
         QgsField("order", QVariant.Int),
         QgsField("ndegrees", QVariant.Int),
         QgsField("layer", QVariant.Int),
     )
-    assoc_attributes = INHOM_ATTRIBUTES.copy()
+    assoc_attributes = BUILDING_PIT_ATTRIBUTES.copy()
+    timml_defaults = {
+        "inhomogeneity_id": QgsDefaultValue("1"),
+        "order": QgsDefaultValue("4"),
+        "ndegrees": QgsDefaultValue("6"),
+    }
+    assoc_defaults = {
+        "inhomogeneity_id": QgsDefaultValue("1"),
+    }
+    transient_columns = (
+        "aquitard_s",
+        "aquifer_s",
+        "aquitard_npor",
+        "aquifer_npor",
+    )
 
     @property
     def renderer(self) -> QgsSingleSymbolRenderer:
         return self.polygon_renderer(
             color=TRANSPARENT_RED, color_border=RED, width_border="0.75"
         )
+
+    def on_transient_changed(self, transient: bool):
+        config = self.assoc_layer.attributeTableConfig()
+        columns = config.columns()
+
+        for i, column in enumerate(columns):
+            if column.name in self.transient_columns:
+                config.setColumnHidden(i, not transient)
+
+        self.assoc_layer.setAttributeTableConfig(config)
+        return
 
 
 ELEMENTS = {

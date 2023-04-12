@@ -10,7 +10,6 @@ from typing import List
 from PyQt5.QtGui import QColor
 from qgis.core import (
     QgsColorRampShader,
-    QgsFillSymbol,
     QgsLineSymbol,
     QgsPalLayerSettings,
     QgsRasterBandStats,

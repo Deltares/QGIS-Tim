@@ -175,13 +175,13 @@ def polygontop(spec: ElementSpecification) -> List[Dict[str, Any]]:
 
 def buildingpit(spec: ElementSpecification) -> List[Dict[str, Any]]:
     geometry = spec.dataframe
-    properties = spec.associated_dataframe.set_index("timeseries_id")
+    properties = spec.associated_dataframe.set_index("inhomogeneity_id")
     # Iterate through the row containing the geometry
     # and iterate through the associated table containing k properties.
     kwarglist = []
     for row in geometry.to_dict("records"):
         row = filter_nan(row)
-        dataframe = properties.loc[row["timeseries_id"]]
+        dataframe = properties.loc[row["inhomogeneity_id"]]
         kwargs = aquifer_data(dataframe)
         kwargs["xy"] = polygon_coordinates(row)
         kwargs["order"] = row["order"]
