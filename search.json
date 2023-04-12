@@ -1,5 +1,12 @@
 [
   {
+    "objectID": "index.html",
+    "href": "index.html",
+    "title": "QGIS-Tim",
+    "section": "",
+    "text": "QGIS-Tim is an open source project for multi-layer groundwater flow simulations. QGIS-Tim provides a link between QGIS and the open source analytic element method software: TimML (steady-state) and TTim (transient).\nThe benefit of the analytic element method (AEM) is that no grid or time-stepping is required. Geohydrological features are represented by points, lines, and polygons. QGIS-Tim stores these features in a GeoPackage.\nQGIS-Tim consists of a “front-end” and a “back-end”. The front-end is a QGIS plugin that provides a limited graphical interface to setup model input, visualize, and analyze model input. The back-end is a Python package. It reads the contents of the GeoPackage and transforms it into a TimML or TTim model, computes a result, and writes it to a file that the QGIS plugin loads."
+  },
+  {
     "objectID": "install.html",
     "href": "install.html",
     "title": "Install",
@@ -138,12 +145,5 @@
     "title": "Tutorial QGIS-Tim",
     "section": "Export your Tim model to Python",
     "text": "Export your Tim model to Python\nFor scenario calculation or sensitivity analysis you probably want to switch from QGIS to Python for efficiency reasons. In this training we only show you the first step: export your model to a Python file (*.py). Your Tim model is just a set of elements (points, lines, polygons) and its parameters so the Python file is not very large.\n\nIn QGIS-Tim go to the tab GeoPackage.\nClick the button Convert GeoPackage to Python script and you can save the *.py file wherever you like.\nCheck the content of the file with you text editor (e.g. Notepad).\n\nThe tutorial ends here. You can save your QGIS project if you like. Thank you!"
-  },
-  {
-    "objectID": "index.html",
-    "href": "index.html",
-    "title": "QGIS-Tim",
-    "section": "",
-    "text": "QGIS-Tim is an open source project for multi-layer groundwater flow simulations. QGIS-Tim provides a link between QGIS and the open source analytic element method software: TimML (steady-state) and TTim (transient).\nThe benefit of the analytic element method (AEM) is that no grid or time-stepping is required. Geohydrological features are represented by points, lines, and polygons. QGIS-Tim stores these features in a GeoPackage.\nQGIS-Tim consists of a “front-end” and a “back-end”. The front-end is a QGIS plugin that provides a limited graphical interface to setup model input, visualize, and analyze model input. The back-end is a Python package. It reads the contents of the GeoPackage and transforms it into a TimML or TTim model, computes a result, and writes it to a file that the QGIS plugin loads."
   }
 ]
