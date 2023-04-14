@@ -16,6 +16,9 @@ visualize, and analyze model input. The back-end is a Python package. It reads
 the contents of the GeoPackage and transforms it into a TimML or TTim model,
 computes a result, and writes it to a file that the QGIS plugin loads.
 
+## Documentation
+[Find the documentation here.](https://deltares.github.io/QGIS-Tim/)
+
 ## Installation
 
 Download and install a recent version of QGIS (>3.22):
