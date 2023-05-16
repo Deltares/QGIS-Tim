@@ -68,9 +68,9 @@ This is the moment to download/import four plugins needed for this tutorial:
 
 (@) Go to *Plugins* from the main menu and select *Manage and Install Plugins…* to open the plugin window. 
 (@) On the left section select *Install from ZIP*.
-(@) Click the Browse button (![](figures/tutorial/button-Qgis-browse.png){width=4%}) and from the tutorial dataset select the ZIP file "QGIS-Tim_training\\QGIS-iMOD-plugin.zip". 
+(@) Click the Browse button (![](figures/tutorial/button-Qgis-browse.png){width=4%}) and from the tutorial dataset select the ZIP file "QGIS-Tim_Tutorial\\QGIS-iMOD-plugin.zip". 
 (@) Click *Install Plugin*.
-(@) In the same way, install the QGIS-Tim plugin using the ZIP file "QGIS-Tim_training\\QGIS-Tim-plugin.zip". 
+(@) In the same way, install the QGIS-Tim plugin using the ZIP file "QGIS-Tim_Tutorial\\QGIS-Tim-plugin.zip". 
 
 If you have an internet connection continue with the installation of the next two plugins.
 
@@ -98,7 +98,7 @@ For navigation purposes, let's load a topographic map for The Netherlands from t
 > If you do not have an internet connection, follow the next steps to import a simple PNG file as a background. 
 >
 > - Go to *Layer* in the main menu, go to *Add layer* and select *Add Raster layer*.
-> - Use the browse button (![](figures/tutorial/button-Qgis-browse.png){width=4%}) and from the tutorial material select “…\\QGIS-Tim_training\\dbase\\TopographicMapRijssenhout.png”.
+> - Use the browse button (![](figures/tutorial/button-Qgis-browse.png){width=4%}) and from the tutorial material select “…\\QGIS-Tim_Tutorial\\dbase\\TopographicMapRijssenhout.png”.
 > - Click on *Add* and *Close* the window.
 > - If you do not see the map, select the layer "TopographicMapRijssenhout", click your right mouse button and select "Zoom to Layer(s)".
 > - Continue after step @continuewithoutinternet.
@@ -118,7 +118,7 @@ Our project area is near the town of Rijsenhout so let's navigate to that town u
 Let's now open a shape file containing the locations and depths of the bombs.
 
 (@) Go to *Layer* in the main menu, go to *Add layer* and select *Add Vector layer*.
-(@) Use the browse button (![](figures/tutorial/button-Qgis-browse.png){width=4%}) and from the tutorial material select “…\\QGIS-Tim_training\\dbase\\bombs.shp”.
+(@) Use the browse button (![](figures/tutorial/button-Qgis-browse.png){width=4%}) and from the tutorial material select “…\\QGIS-Tim_Tutorial\\dbase\\bombs.shp”.
 (@) Click on *Add* and *Close* the window.
 
 ![](figures/tutorial/emoji-tip.png){width=3%} **Tip:** a fast alternative for adding layers: from the menu *View > Toolbar* add the *Manage Layers Toolbar* and use the button ![](figures/tutorial/button-Qgis-VectorLayer.png){width=4%}.
@@ -130,14 +130,14 @@ Let's now open a shape file containing the locations and depths of the bombs.
 
 Let's save this project to be able to return to it later or in case of a crash of QGIS.
 
-(@) Go to *Project* in the main menu, select *Save As* and select a folder and a file name for your project, e.g. “…\\QGIS-Tim_training\\tutorial1.qgz”
+(@) Go to *Project* in the main menu, select *Save As* and select a folder and a file name for your project, e.g. “…\\QGIS-Tim_Tutorial\\Rijsenhout.qgz”
 
 ## Start your Tim model<br> 
 Now we are ready to activate the QGIS-Tim plugin. 
 
 (@) Click on the QGIS-Tim plugin button (![](figures/tutorial/button-Qgis-tim.png){width=4%}) and the QGIS-Tim panel appears.
 (@) Go to the tab *GeoPackage*. <br> Here we will create an empty database (geopackage) to store all elements and parameters for the model. 
-(@) Click the *New* button to create the GeoPackage and save it for instance in the folder with your training data, e.g. "..\\QGIS-Tim_training\\dbase\\case-Rijsenhout.gpkg".
+(@) Click the *New* button to create the GeoPackage and save it for instance in the folder with your tutorial data, e.g. "..\\QGIS-Tim_Tutorial\\dbase\\case-Rijsenhout.gpkg".
 
 Your window looks like in @fig-Panel-QGIS-Tim.
 
@@ -460,7 +460,7 @@ Special attention for the Well package while it has 2 options to make it transie
 - Simple: a well can be switched on and off only once. Parameters are set in the stationary part of the model, so in "timml Well:DewateringWell".
 - Detailed: a well can be switched on and off multiple times within the modelled period. Parameters are set in the transient part of the model, so in "ttim Well:DewateringWell".
 
-In this training we show you the simple version. 
+In this tutorial we show you the simple version. 
 
 (@) In your geopackage select the layer "timml Well:DewateringWell".   
 (@) Open its table, start the editing mode and see that columns with time dependent parameters are visible now. 
@@ -497,7 +497,7 @@ In the same way you can display the time series from the Observations.
 ![Calculated time series at observations locations](figures/tutorial/figure_HeadTimeSeries01.png){width=100% #fig-figure_HeadTimeSeries01}
 
 ## Export your Tim model to Python
-For scenario calculation or sensitivity analysis you probably want to switch from QGIS to Python for efficiency reasons. In this training we only show you the first step: export your model to a Python file (*.py). Your Tim model is just a set of elements (points, lines, polygons) and its parameters so the Python file is not very large. 
+For scenario calculation or sensitivity analysis you probably want to switch from QGIS to Python for efficiency reasons. In this tutorial we only show you the first step: export your model to a Python file (*.py). Your Tim model is just a set of elements (points, lines, polygons) and its parameters so the Python file is not very large. 
 
 (@) In QGIS-Tim go to the tab *GeoPackage*. 
 (@) Click the button *Convert GeoPackage to Python script* and you can save the *.py file wherever you like.
