@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.2.475">
+<meta name="generator" content="quarto-1.3.353">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
@@ -17,7 +17,7 @@ div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
 ul.task-list{list-style: none;}
 ul.task-list li input[type="checkbox"] {
   width: 0.8em;
-  margin: 0 0.8em 0.2em -1.6em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
 }
 </style>
@@ -77,28 +77,30 @@ ul.task-list li input[type="checkbox"] {
     <span class="navbar-title">QGIS-Tim</span>
     </a>
   </div>
+            <div id="quarto-search" class="" title="Search"></div>
           <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
   <span class="navbar-toggler-icon"></span>
 </button>
           <div class="collapse navbar-collapse" id="navbarCollapse">
             <ul class="navbar-nav navbar-nav-scroll me-auto">
   <li class="nav-item">
-    <a class="nav-link" href="./install.html">
+    <a class="nav-link" href="./install.html" rel="" target="">
  <span class="menu-text">Installation</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link active" href="./tutorial-QGIS-Tim.html" aria-current="page">
+    <a class="nav-link active" href="./tutorial-QGIS-Tim.html" rel="" target="" aria-current="page">
  <span class="menu-text">Tutorials</span></a>
   </li>  
 </ul>
             <ul class="navbar-nav navbar-nav-scroll ms-auto">
   <li class="nav-item compact">
-    <a class="nav-link" href="https://github.com/Deltares/QGIS-Tim"><i class="bi bi-github" role="img" aria-label="GitHub">
+    <a class="nav-link" href="https://github.com/Deltares/QGIS-Tim" rel="" target=""><i class="bi bi-github" role="img" aria-label="GitHub">
 </i> 
  <span class="menu-text"></span></a>
   </li>  
 </ul>
-              <div id="quarto-search" class="" title="Search"></div>
+            <div class="quarto-navbar-tools">
+</div>
           </div> <!-- /navcollapse -->
       </div> <!-- /container-fluid -->
     </nav>
@@ -186,7 +188,7 @@ ul.task-list li input[type="checkbox"] {
 <div id="fig-GeoTOP-Verticaledoorsnede" class="quarto-figure quarto-figure-center anchored">
 <figure class="figure">
 <p><img src="figures/tutorial/GeoTOP-Verticaledoorsnede.png" class="img-fluid figure-img" style="width:100.0%"></p>
-<p></p><figcaption class="figure-caption">Figure&nbsp;1: Geological cross section near Rijssenhout [source: BRO GeoTOP v1.4.1]</figcaption><p></p>
+<figcaption class="figure-caption">Figure&nbsp;1: Geological cross section near Rijssenhout [source: BRO GeoTOP v1.4.1]</figcaption>
 </figure>
 </div>
 </section>
@@ -236,9 +238,9 @@ ul.task-list li input[type="checkbox"] {
 <ol start="5" class="example" type="1">
 <li>Go to <em>Plugins</em> from the main menu and select <em>Manage and Install Plugins…</em> to open the plugin window.</li>
 <li>On the left section select <em>Install from ZIP</em>.</li>
-<li>Click the Browse button (<img src="figures/tutorial/button-Qgis-browse.png" class="img-fluid" style="width:4.0%">) and from the tutorial dataset select the ZIP file “QGIS-Tim_training\QGIS-iMOD-plugin.zip”.</li>
+<li>Click the Browse button (<img src="figures/tutorial/button-Qgis-browse.png" class="img-fluid" style="width:4.0%">) and from the tutorial dataset select the ZIP file “QGIS-Tim_Tutorial\QGIS-iMOD-plugin.zip”.</li>
 <li>Click <em>Install Plugin</em>.</li>
-<li>In the same way, install the QGIS-Tim plugin using the ZIP file “QGIS-Tim_training\QGIS-Tim-plugin.zip”.</li>
+<li>In the same way, install the QGIS-Tim plugin using the ZIP file “QGIS-Tim_Tutorial\QGIS-Tim-plugin.zip”.</li>
 </ol>
 <p>If you have an internet connection continue with the installation of the next two plugins.</p>
 <ol start="10" class="example" type="1">
@@ -268,7 +270,7 @@ ul.task-list li input[type="checkbox"] {
 <p>If you do not have an internet connection, follow the next steps to import a simple PNG file as a background.</p>
 <ul>
 <li>Go to <em>Layer</em> in the main menu, go to <em>Add layer</em> and select <em>Add Raster layer</em>.</li>
-<li>Use the browse button (<img src="figures/tutorial/button-Qgis-browse.png" class="img-fluid" style="width:4.0%">) and from the tutorial material select “…\QGIS-Tim_training\dbase\TopographicMapRijssenhout.png”.</li>
+<li>Use the browse button (<img src="figures/tutorial/button-Qgis-browse.png" class="img-fluid" style="width:4.0%">) and from the tutorial material select “…\QGIS-Tim_Tutorial\dbase\TopographicMapRijssenhout.png”.</li>
 <li>Click on <em>Add</em> and <em>Close</em> the window.</li>
 <li>If you do not see the map, select the layer “TopographicMapRijssenhout”, click your right mouse button and select “Zoom to Layer(s)”.</li>
 <li>Continue after step 23.</li>
@@ -289,7 +291,7 @@ ul.task-list li input[type="checkbox"] {
 <p>Let’s now open a shape file containing the locations and depths of the bombs.</p>
 <ol start="24" class="example" type="1">
 <li>Go to <em>Layer</em> in the main menu, go to <em>Add layer</em> and select <em>Add Vector layer</em>.</li>
-<li>Use the browse button (<img src="figures/tutorial/button-Qgis-browse.png" class="img-fluid" style="width:4.0%">) and from the tutorial material select “…\QGIS-Tim_training\dbase\bombs.shp”.</li>
+<li>Use the browse button (<img src="figures/tutorial/button-Qgis-browse.png" class="img-fluid" style="width:4.0%">) and from the tutorial material select “…\QGIS-Tim_Tutorial\dbase\bombs.shp”.</li>
 <li>Click on <em>Add</em> and <em>Close</em> the window.</li>
 </ol>
 <p><img src="figures/tutorial/emoji-tip.png" class="img-fluid" style="width:3.0%"> <strong>Tip:</strong> a fast alternative for adding layers: from the menu <em>View &gt; Toolbar</em> add the <em>Manage Layers Toolbar</em> and use the button <img src="figures/tutorial/button-Qgis-VectorLayer.png" class="img-fluid" style="width:4.0%">.</p>
@@ -301,7 +303,7 @@ ul.task-list li input[type="checkbox"] {
 </ol>
 <p>Let’s save this project to be able to return to it later or in case of a crash of QGIS.</p>
 <ol start="31" class="example" type="1">
-<li>Go to <em>Project</em> in the main menu, select <em>Save As</em> and select a folder and a file name for your project, e.g.&nbsp;“…\QGIS-Tim_training\tutorial1.qgz”</li>
+<li>Go to <em>Project</em> in the main menu, select <em>Save As</em> and select a folder and a file name for your project, e.g.&nbsp;“…\QGIS-Tim_Tutorial\Rijsenhout.qgz”</li>
 </ol>
 </section>
 </section>
@@ -311,13 +313,13 @@ ul.task-list li input[type="checkbox"] {
 <ol start="32" class="example" type="1">
 <li>Click on the QGIS-Tim plugin button (<img src="figures/tutorial/button-Qgis-tim.png" class="img-fluid" style="width:4.0%">) and the QGIS-Tim panel appears.</li>
 <li>Go to the tab <em>GeoPackage</em>. <br> Here we will create an empty database (geopackage) to store all elements and parameters for the model.</li>
-<li>Click the <em>New</em> button to create the GeoPackage and save it for instance in the folder with your training data, e.g.&nbsp;“..\QGIS-Tim_training\dbase\case-Rijsenhout.gpkg”.</li>
+<li>Click the <em>New</em> button to create the GeoPackage and save it for instance in the folder with your tutorial data, e.g.&nbsp;“..\QGIS-Tim_Tutorial\dbase\case-Rijsenhout.gpkg”.</li>
 </ol>
 <p>Your window looks like in <a href="#fig-Panel-QGIS-Tim">Figure&nbsp;2</a>.</p>
 <div id="fig-Panel-QGIS-Tim" class="quarto-figure quarto-figure-center anchored">
 <figure class="figure">
 <p><img src="figures/tutorial/Panel-QGIS-Tim.png" class="img-fluid figure-img" style="width:60.0%"></p>
-<p></p><figcaption class="figure-caption">Figure&nbsp;2: QGIS-Tim panel</figcaption><p></p>
+<figcaption class="figure-caption">Figure&nbsp;2: QGIS-Tim panel</figcaption>
 </figure>
 </div>
 <ol start="35" class="example" type="1">
@@ -468,7 +470,7 @@ ul.task-list li input[type="checkbox"] {
 <div id="fig-figure_ValueTool-in-QGIS" class="quarto-figure quarto-figure-left anchored">
 <figure class="figure">
 <p><img src="figures/tutorial/figure_ValueTool-in-QGIS.png" class="img-fluid figure-img" style="width:60.0%"></p>
-<p></p><figcaption class="figure-caption">Figure&nbsp;3: Example panel Value Tool</figcaption><p></p>
+<figcaption class="figure-caption">Figure&nbsp;3: Example panel Value Tool</figcaption>
 </figure>
 </div>
 <p>Do you like to see the values in a cross section? Deltares developed the Cross Section Tool, available in the iMOD Plugin.</p>
@@ -484,7 +486,7 @@ ul.task-list li input[type="checkbox"] {
 <div id="fig-figure_HeadsInCrosssection01" class="quarto-figure quarto-figure-center anchored">
 <figure class="figure">
 <p><img src="figures/tutorial/figure_HeadsInCrosssection01.png" class="img-fluid figure-img" style="width:100.0%"></p>
-<p></p><figcaption class="figure-caption">Figure&nbsp;4: Cross section with calculated Head</figcaption><p></p>
+<figcaption class="figure-caption">Figure&nbsp;4: Cross section with calculated Head</figcaption>
 </figure>
 </div>
 </section>
@@ -494,7 +496,7 @@ ul.task-list li input[type="checkbox"] {
 <div id="fig-photo-fieldwork-liftbomb-crosssection" class="quarto-figure quarto-figure-center anchored">
 <figure class="figure">
 <p><img src="figures/tutorial/photo-fieldwork-liftbomb-crosssection.jpg" class="img-fluid figure-img" style="width:100.0%"></p>
-<p></p><figcaption class="figure-caption">Figure&nbsp;5: Project area cross section (left) lifting the World War II bomb (right)</figcaption><p></p>
+<figcaption class="figure-caption">Figure&nbsp;5: Project area cross section (left) lifting the World War II bomb (right)</figcaption>
 </figure>
 </div>
 <ol start="70" class="example" type="1">
@@ -622,7 +624,7 @@ ul.task-list li input[type="checkbox"] {
 <div id="fig-figure_DrawdownConstructionPit" class="quarto-figure quarto-figure-center anchored">
 <figure class="figure">
 <p><img src="figures/tutorial/figure_DrawdownConstructionPit.png" class="img-fluid figure-img" style="width:60.0%"></p>
-<p></p><figcaption class="figure-caption">Figure&nbsp;6: Drawdown within the building pit</figcaption><p></p>
+<figcaption class="figure-caption">Figure&nbsp;6: Drawdown within the building pit</figcaption>
 </figure>
 </div>
 <hr>
@@ -674,7 +676,7 @@ ul.task-list li input[type="checkbox"] {
 <div id="fig-figure_HeadsInCrosssection02" class="quarto-figure quarto-figure-center anchored">
 <figure class="figure">
 <p><img src="figures/tutorial/figure_HeadsInCrosssection02.png" class="img-fluid figure-img" style="width:70.0%"></p>
-<p></p><figcaption class="figure-caption">Figure&nbsp;7: Calculated head from the abstraction (left) to the infiltration (right)</figcaption><p></p>
+<figcaption class="figure-caption">Figure&nbsp;7: Calculated head from the abstraction (left) to the infiltration (right)</figcaption>
 </figure>
 </div>
 </section>
@@ -690,7 +692,7 @@ ul.task-list li input[type="checkbox"] {
 <div id="fig-figure_ObservationsLocations" class="quarto-figure quarto-figure-center anchored">
 <figure class="figure">
 <p><img src="figures/tutorial/figure_ObservationsLocations.png" class="img-fluid figure-img" style="width:80.0%"></p>
-<p></p><figcaption class="figure-caption">Figure&nbsp;8: Observation locations (<em>A</em>-<em>E</em>) together with other Tim elements</figcaption><p></p>
+<figcaption class="figure-caption">Figure&nbsp;8: Observation locations (<em>A</em>-<em>E</em>) together with other Tim elements</figcaption>
 </figure>
 </div>
 <p>The observed values are saved in a new layer under the existing group “case-Rijsenhout output” and sub group “vector”.</p>
@@ -708,7 +710,7 @@ ul.task-list li input[type="checkbox"] {
 <div id="fig-figure_Contourlines" class="quarto-figure quarto-figure-center anchored">
 <figure class="figure">
 <p><img src="figures/tutorial/figure_Contourlines.png" class="img-fluid figure-img" style="width:90.0%"></p>
-<p></p><figcaption class="figure-caption">Figure&nbsp;9: Calculated heads, displayed as contour lines</figcaption><p></p>
+<figcaption class="figure-caption">Figure&nbsp;9: Calculated heads, displayed as contour lines</figcaption>
 </figure>
 </div>
 </section>
@@ -726,7 +728,7 @@ ul.task-list li input[type="checkbox"] {
 <div id="fig-figure_Contourlines02" class="quarto-figure quarto-figure-center anchored">
 <figure class="figure">
 <p><img src="figures/tutorial/figure_Contourlines02.png" class="img-fluid figure-img" style="width:100.0%"></p>
-<p></p><figcaption class="figure-caption">Figure&nbsp;10: Contour lines after adding the Lake element in the east</figcaption><p></p>
+<figcaption class="figure-caption">Figure&nbsp;10: Contour lines after adding the Lake element in the east</figcaption>
 </figure>
 </div>
 <p>You can not miss the effect of the Lake in this calculation. In many cases you like to analyse or even save this difference. Let’s see how we can use Tim and QGIS to isolate the effect. Therefor we rerun the model without the Lake and rename the output.</p>
@@ -786,7 +788,7 @@ ul.task-list li input[type="checkbox"] {
 <li>Simple: a well can be switched on and off only once. Parameters are set in the stationary part of the model, so in “timml Well:DewateringWell”.</li>
 <li>Detailed: a well can be switched on and off multiple times within the modelled period. Parameters are set in the transient part of the model, so in “ttim Well:DewateringWell”.</li>
 </ul>
-<p>In this training we show you the simple version.</p>
+<p>In this tutorial we show you the simple version.</p>
 <ol start="166" class="example" type="1">
 <li>In your geopackage select the layer “timml Well:DewateringWell”.<br>
 </li>
@@ -826,13 +828,13 @@ ul.task-list li input[type="checkbox"] {
 <div id="fig-figure_HeadTimeSeries01" class="quarto-figure quarto-figure-center anchored">
 <figure class="figure">
 <p><img src="figures/tutorial/figure_HeadTimeSeries01.png" class="img-fluid figure-img" style="width:100.0%"></p>
-<p></p><figcaption class="figure-caption">Figure&nbsp;11: Calculated time series at observations locations</figcaption><p></p>
+<figcaption class="figure-caption">Figure&nbsp;11: Calculated time series at observations locations</figcaption>
 </figure>
 </div>
 </section>
 <section id="export-your-tim-model-to-python" class="level2">
 <h2 class="anchored" data-anchor-id="export-your-tim-model-to-python">Export your Tim model to Python</h2>
-<p>For scenario calculation or sensitivity analysis you probably want to switch from QGIS to Python for efficiency reasons. In this training we only show you the first step: export your model to a Python file (*.py). Your Tim model is just a set of elements (points, lines, polygons) and its parameters so the Python file is not very large.</p>
+<p>For scenario calculation or sensitivity analysis you probably want to switch from QGIS to Python for efficiency reasons. In this tutorial we only show you the first step: export your model to a Python file (*.py). Your Tim model is just a set of elements (points, lines, polygons) and its parameters so the Python file is not very large.</p>
 <ol start="188" class="example" type="1">
 <li>In QGIS-Tim go to the tab <em>GeoPackage</em>.</li>
 <li>Click the button <em>Convert GeoPackage to Python script</em> and you can save the *.py file wherever you like.</li>
@@ -871,9 +873,23 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
     icon: icon
   };
   anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
   const clipboard = new window.ClipboardJS('.code-copy-button', {
-    target: function(trigger) {
-      return trigger.previousElementSibling;
+    text: function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
     }
   });
   clipboard.on('success', function(e) {
@@ -938,6 +954,92 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
       return note.innerHTML;
     });
   }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
   const findCites = (el) => {
     const parentEl = el.parentElement;
     if (parentEl) {
