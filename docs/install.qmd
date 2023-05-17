@@ -48,19 +48,21 @@ https://github.com/conda-forge/miniforge){target="_blank"}
  
 ### Method 1: From the GQIS plugin database 
 **NB** Due to ongoing developments new features and bug fixes might not be part of this release. Consider installation method 2.
+
+
 1.  Open QGIS.
 3.  At the top, find the Plugins menu (\~sixth object in the menubar).
 4.  Find \"Manage and Install plugins\" (first object in drop-down).
-5.  Find \"All\" (First in list).
-6.  Search for ``Qgis-Tim``.
+5.  Find \"All\" (first in left section).
+6.  Search for \"Qgis-Tim\".
 7.  Click \"Install Plugin\".
 
 ### method 2: From Zip (prefered) 
-1.  Download the QGIS-TIM-plugin.zip (do not unzip!) from the [iMOD-Suite download portal.](https://deltares.thegood.cloud/s/AefTz97ZHbWS4RT){target="_blank"}
+1.  Download the **\"QGIS-TIM-plugin.zip\"** (do not unzip!) from the [iMOD-Suite download portal.](https://deltares.thegood.cloud/s/AefTz97ZHbWS4RT){target="_blank"}
 2.  Open QGIS.
 3.  At the top, find the Plugins menu (\~sixth object in the menubar).
 4.  Find \"Manage and Install plugins\" (first object in drop-down).
-5.  Find \"Install from ZIP\" (Sixth in list).
+5.  Find \"Install from ZIP\" (fourth in left section).
 6.  Enter the path to the qgistim.zip file.
 7.  Click \"Install Plugin\".
 
