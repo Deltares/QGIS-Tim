@@ -485,16 +485,26 @@ Only the first few days you see most prominent drawdown. Let's now display the t
 (@) Click the button *Select Points*, your mouse changes into a ![](figures/tutorial/mouse_plus.png). Be sure *Update on Selection* is checked and hover over the mesh. The graph shows the timeseries at the location of your mouse. 
 (@) Deselect the checkbox *Update on Selection*. 
 (@) Click the button *Select Points* (your mouse becomes a ![](figures/tutorial/mouse_plus.png) and with the left mouse button select 3 points ad random. 
-(@) Finally click the *Plot* button and the 3 timeseries are added to the chart. Colours can be changed.  
+(@) Finally click the *Plot* button and the 3 timeseries are added to the chart.  
 
 In the same way you can display the time series from the Observations. 
 
 (@) In the iMOD time series panel select the layer "case-Rijsenhout-ttim Observation:Piezometers". 
 (@) For "ID column:" select *label* and for "Variable:" select *head_layer0*. Don't forget to **deselect *fid***.   
 (@) Click the button *Select Points* and draw a box with your mouse to select one or more observation points. 
-(@) Click the *Plot* button and the selected timeseries are added to the chart. Colours can be changed.  
+(@) Click the *Plot* button and the selected timeseries are added to the chart.  
 
 ![Calculated time series at observations locations](figures/tutorial/figure_HeadTimeSeries01.png){width=100% #fig-figure_HeadTimeSeries01}
+
+Before closing the display we change the line properties and save the graph as a PNG file. 
+
+(@) Select the single time series for the observation point closest to your dewatering well. The color of the line is now visible in the field next to the button *Line Color*.
+(@) Change the color to red.
+(@) Select the timeseries with the most shallow timeseries and change the color to green.
+(@) Check the box *Draw markers*.
+(@) Move your mouse to the display and click your right mouse button. Explore the different options. 
+(@) From this menu (or from the display) select the function *Export...*.
+(@) Set the export format to PNG and export the file and don't forget to close the *Export* window. 
 
 ## Export your Tim model to Python
 For scenario calculation or sensitivity analysis you probably want to switch from QGIS to Python for efficiency reasons. In this tutorial we only show you the first step: export your model to a Python file (*.py). Your Tim model is just a set of elements (points, lines, polygons) and its parameters so the Python file is not very large. 
