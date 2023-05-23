@@ -117,13 +117,13 @@ ul.task-list li input[type="checkbox"] {
   <li><a href="#install-qgis" id="toc-install-qgis" class="nav-link active" data-scroll-target="#install-qgis">1. Install QGIS</a></li>
   <li><a href="#install-gistim-in-a-seperate-python-environment" id="toc-install-gistim-in-a-seperate-python-environment" class="nav-link" data-scroll-target="#install-gistim-in-a-seperate-python-environment">2. Install <code>gistim</code> in a seperate Python environment</a>
   <ul class="collapse">
-  <li><a href="#method-1-with-deltaforge-recommended" id="toc-method-1-with-deltaforge-recommended" class="nav-link" data-scroll-target="#method-1-with-deltaforge-recommended">Method 1: with Deltaforge (Recommended)</a></li>
+  <li><a href="#method-1-with-deltaforge-recommended" id="toc-method-1-with-deltaforge-recommended" class="nav-link" data-scroll-target="#method-1-with-deltaforge-recommended">Method 1: with Deltaforge (recommended)</a></li>
   <li><a href="#method-2-with-miniforge" id="toc-method-2-with-miniforge" class="nav-link" data-scroll-target="#method-2-with-miniforge">Method 2: with Miniforge</a></li>
   </ul></li>
   <li><a href="#install-the-qgis-plugin" id="toc-install-the-qgis-plugin" class="nav-link" data-scroll-target="#install-the-qgis-plugin">3. Install the QGIS plugin</a>
   <ul class="collapse">
   <li><a href="#method-1-from-the-gqis-plugin-database" id="toc-method-1-from-the-gqis-plugin-database" class="nav-link" data-scroll-target="#method-1-from-the-gqis-plugin-database">Method 1: From the GQIS plugin database</a></li>
-  <li><a href="#method-2-from-zip-prefered" id="toc-method-2-from-zip-prefered" class="nav-link" data-scroll-target="#method-2-from-zip-prefered">Method 2: From Zip (prefered)</a></li>
+  <li><a href="#method-2-from-zip-recommended" id="toc-method-2-from-zip-recommended" class="nav-link" data-scroll-target="#method-2-from-zip-recommended">Method 2: From Zip (recommended)</a></li>
   </ul></li>
   </ul>
 </nav>
@@ -157,7 +157,7 @@ ul.task-list li input[type="checkbox"] {
 <h2 class="anchored" data-anchor-id="install-gistim-in-a-seperate-python-environment">2. Install <code>gistim</code> in a seperate Python environment</h2>
 <p><code>gistim</code> requires a seperate Python environment, because it depends on packages incompatible with the packages in QGIS’ own Python environment. There are two approaches: either using the fully-fletched Deltaforge distribution (Recommended) or the leaner Miniforge distribution.</p>
 <section id="method-1-with-deltaforge-recommended" class="level3">
-<h3 class="anchored" data-anchor-id="method-1-with-deltaforge-recommended">Method 1: with Deltaforge (Recommended)</h3>
+<h3 class="anchored" data-anchor-id="method-1-with-deltaforge-recommended">Method 1: with Deltaforge (recommended)</h3>
 <p><a href="https://download2.deltares.nl/imod-suite/" target="_blank">Download and install Deltaforge</a>. <strong>Make sure you use Deltaforge version 0.3.0 or higher!</strong></p>
 <ol type="1">
 <li>Open the Deltaforge prompt (search in Windows Start for "Deltaforge Prompt").</li>
@@ -169,9 +169,9 @@ ul.task-list li input[type="checkbox"] {
 <p><a href="https://github.com/conda-forge/miniforge" target="_blank">Download and install a miniforge Python installation</a></p>
 <ol type="1">
 <li>Open the miniforge prompt (search in Windows Start for "Miniforge Prompt").</li>
-<li>Create a new conda environment, run: conda create --name tim python=3.9</li>
-<li>Activate the environment: conda activate tim</li>
-<li>Run: conda install -c conda-forge gistim</li>
+<li>Create a new conda environment, run: <code>conda create \--name tim python=3.9</code></li>
+<li>Activate the environment: <code>conda activate tim</code></li>
+<li>Run: <code>conda install -c conda-forge gistim</code></li>
 <li>Configure the gistim installation, so that the QGIS plugin is able to find it. Run: <code>python -m gistim configure</code></li>
 </ol>
 </section>
@@ -190,8 +190,8 @@ ul.task-list li input[type="checkbox"] {
 <li>Click "Install Plugin".</li>
 </ol>
 </section>
-<section id="method-2-from-zip-prefered" class="level3">
-<h3 class="anchored" data-anchor-id="method-2-from-zip-prefered">Method 2: From Zip (prefered)</h3>
+<section id="method-2-from-zip-recommended" class="level3">
+<h3 class="anchored" data-anchor-id="method-2-from-zip-recommended">Method 2: From Zip (recommended)</h3>
 <ol type="1">
 <li>Download the "QGIS-TIM-plugin.zip" (do not unzip!) from the <a href="https://deltares.thegood.cloud/s/AefTz97ZHbWS4RT" target="_blank">iMOD-Suite download portal.</a></li>
 <li>Open QGIS.</li>
@@ -201,7 +201,7 @@ ul.task-list li input[type="checkbox"] {
 <li>Enter the path to the file "QGIS-TIM-plugin.zip".</li>
 <li>Click "Install Plugin".</li>
 </ol>
-<p>This will add an icon to the toolbar(s). By clicking the icon, the plugin is started. The QGIS plugin will automatically start and external interpreter when it is required.</p>
+<p>This will add an icon to the toolbar(s). <img src="figures/tutorial/button-Qgis-tim.png" class="img-fluid" style="width:6.0%"> By clicking the icon, the plugin is started. <br> The QGIS plugin automatically starts an extra window for the background calculation of a TIM model. This black window is called <em>Python.exe</em> and can be minimized or even closed after the calculation.</p>
 
 
 </section>

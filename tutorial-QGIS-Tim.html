@@ -815,7 +815,7 @@ ul.task-list li input[type="checkbox"] {
 <li>Click the button <em>Select Points</em>, your mouse changes into a <img src="figures/tutorial/mouse_plus.png" class="img-fluid">. Be sure <em>Update on Selection</em> is checked and hover over the mesh. The graph shows the timeseries at the location of your mouse.</li>
 <li>Deselect the checkbox <em>Update on Selection</em>.</li>
 <li>Click the button <em>Select Points</em> (your mouse becomes a <img src="figures/tutorial/mouse_plus.png" class="img-fluid"> and with the left mouse button select 3 points ad random.</li>
-<li>Finally click the <em>Plot</em> button and the 3 timeseries are added to the chart. Colours can be changed.</li>
+<li>Finally click the <em>Plot</em> button and the 3 timeseries are added to the chart.</li>
 </ol>
 <p>In the same way you can display the time series from the Observations.</p>
 <ol start="184" class="example" type="1">
@@ -823,7 +823,7 @@ ul.task-list li input[type="checkbox"] {
 <li>For “ID column:” select <em>label</em> and for “Variable:” select <em>head_layer0</em>. Don’t forget to <strong>deselect <em>fid</em></strong>.<br>
 </li>
 <li>Click the button <em>Select Points</em> and draw a box with your mouse to select one or more observation points.</li>
-<li>Click the <em>Plot</em> button and the selected timeseries are added to the chart. Colours can be changed.</li>
+<li>Click the <em>Plot</em> button and the selected timeseries are added to the chart.</li>
 </ol>
 <div id="fig-figure_HeadTimeSeries01" class="quarto-figure quarto-figure-center anchored">
 <figure class="figure">
@@ -831,11 +831,21 @@ ul.task-list li input[type="checkbox"] {
 <figcaption class="figure-caption">Figure&nbsp;11: Calculated time series at observations locations</figcaption>
 </figure>
 </div>
+<p>Before closing the display we change the line properties and save the graph as a PNG file.</p>
+<ol start="188" class="example" type="1">
+<li>Select the single time series for the observation point closest to your dewatering well. The color of the line is now visible in the field next to the button <em>Line Color</em>.</li>
+<li>Change the color to red.</li>
+<li>Select the timeseries with the most shallow timeseries and change the color to green.</li>
+<li>Check the box <em>Draw markers</em>.</li>
+<li>Move your mouse to the display and click your right mouse button. Explore the different options.</li>
+<li>From this menu (or from the display) select the function <em>Export…</em>.</li>
+<li>Set the export format to PNG and export the file and don’t forget to close the <em>Export</em> window.</li>
+</ol>
 </section>
 <section id="export-your-tim-model-to-python" class="level2">
 <h2 class="anchored" data-anchor-id="export-your-tim-model-to-python">Export your Tim model to Python</h2>
 <p>For scenario calculation or sensitivity analysis you probably want to switch from QGIS to Python for efficiency reasons. In this tutorial we only show you the first step: export your model to a Python file (*.py). Your Tim model is just a set of elements (points, lines, polygons) and its parameters so the Python file is not very large.</p>
-<ol start="188" class="example" type="1">
+<ol start="195" class="example" type="1">
 <li>In QGIS-Tim go to the tab <em>GeoPackage</em>.</li>
 <li>Click the button <em>Convert GeoPackage to Python script</em> and you can save the *.py file wherever you like.</li>
 <li>Check the content of the file with you text editor (e.g.&nbsp;Notepad).</li>
