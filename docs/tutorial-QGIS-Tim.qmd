@@ -161,7 +161,7 @@ We start with a very simple 'model', only the parameters of a single aquifer. <b
 Important message: all editing of model parameters and model elements you do in the *Layers* panel on the left! 
 
 (@) So select the layer "timml Aquifer:Aquifer" on the left.
-(@) Click your right mouse button and from the menu select *Attribute Table* to open the table in a new window. <br> **NB** Alternative is to press F6 or use the button *Open Attribute Tabll* (![](figures/tutorial/button-Qgis-OpenAttributeTable.png){width=3%}).
+(@) Click your right mouse button and from the menu select *Attribute Table* to open the table in a new window. <br> **NB** Alternative is to press F6 or use the button *Open Attribute Table* (![](figures/tutorial/button-Qgis-OpenAttributeTable.png){width=3%}).
 (@) Start the editing mode with a click on the *Toggle Editing Mode* button (![](figures/tutorial/button-Qgis-AttributeTable-StartEditingMode.png ){width=4%}).
 (@) Hover with your mouse over the buttons and find the *Add Feature* button (![](figures/tutorial/button-AttributeTable-AddFeature.png){width=20%}). Perhaps number 5 from left. 
 (@) Add a new feature with this *Add Feature* button. In this case a feature is a hydrological layer. 
@@ -191,7 +191,7 @@ Also be aware that the *Aquifer* element you just edited is just a table. This i
 A black Python.exe window pops up indicating that the TIM calculation started on the background. You can ignore this window but keep it open. Of course you van minimize it. If the calculation was completed successful, you will see this echo in QGIS.  
 ![](figures/tutorial/Panel-QGIS-Tim-completion.png){width=80%}. 
 
-After the calculation you see that the result is automatically added to the geopackage, both as a mesh and raster layer. Although these layers are checked, the data is not visible. That is because the GeoPackage was added last, and QGIS adds layers at the end of the list. Let's move the layer "pastel" to the background. 
+After the calculation you see that the result is automatically added to a new geopackage, probably called "case-Rijsenhout output". Results are saved both as mesh and raster. For each format a separate sub group is created. Although these layers / groups are checked, the data is not visible. That is because the geopackage was added last, and QGIS adds layers at the end of the list. Let's move the layer "pastel" to the background. 
 
 (@) Select the layer "pastel" and drag it with your left mouse button to the bottom of the list of layers.
 
@@ -209,7 +209,7 @@ The calculation result is now visible and we see a raster with just the value 0,
 (@) Click on the element "Well" and a window opens to create a new (vector) layer in QGIS.
 (@) Give the layer a name, e.g. "DewateringWell".
 
-See that layer "timml Well:DewateringWell" is added to the timml sub-group in your geopackage with 'point' as geometry. Also in the ttim sub-group an element with the same name is added. This is a table that can store transient well data while referring to the x/y locations in the timml layer. Next step is to add the actual well, both the location and its parameters.
+See that layer "timml Well:DewateringWell" is added to the timml sub group in your geopackage with 'point' as geometry. Also in the ttim sub group an element with the same name is added. This is a table that can store transient well data while referring to the x/y locations in the timml layer. Next step is to add the actual well, both the location and its parameters.
 
 (@) Select the layer "timml Well:DewateringWell".
 (@) Click your right mouse button and select the *Toggle Editing Mode* (![](figures/tutorial/button-Qgis-AttributeTable-StartEditingMode.png ){width=4%}).
@@ -220,21 +220,22 @@ See that layer "timml Well:DewateringWell" is added to the timml sub-group in yo
 ![](figures/tutorial/figure_WellFeatureAttributes.png){width=60%}
 
 (@) Click *OK*.
-(@) Click the *Toggle Editing* button (![](figures/tutorial/button-Qgis-AttributeTable-StartEditingMode.png){width=4%}) and if you are asked to save changes select *Save*. <br> An alternative way to save your edits is to click the *Save Layer Edits* button (![](figures/tutorial/button_SavelayerEdits.png){width=4%}) and then stop editing with the *Toggle Editing* button (![](figures/tutorial/button-Qgis-AttributeTable-StartEditingMode.png){width=4%}).
+(@) Click the *Toggle Editing* button (![](figures/tutorial/button-Qgis-AttributeTable-StartEditingMode.png){width=4%}) and if you are asked to save changes and select *Save*. <br> An alternative way to save your edits is to click the *Save Layer Edits* button (![](figures/tutorial/button_SavelayerEdits.png){width=4%}) and then stop editing with the *Toggle Editing* button (![](figures/tutorial/button-Qgis-AttributeTable-StartEditingMode.png){width=4%}).
 
 Next step is to rerun the model including the new well. 
 
 (@) In QGIS-Tim go to the tab *GeoPackage* and see that the Well is added.
 (@) Go to the tab *Compute* and click on *Compute*.
 
-The output in your Geopackage is directly overwritten with the new results.
+The output in your ouput group "case-Rijsenhout output" is directly overwritten with the new results.
 
-(@) Unhide the output layer for raster, probably named "case-Rijsenhout-output:raster".
+(@) Open the sub group *raster* and see the created raster "case-Rijsenhout-head_layer_0".
 
 Do you like to see the values of the calculated Head under you mouse?
 
+(@) Deselect the output sub group *mesh*.
 (@) Select the *Value Tool* button (![](figures/tutorial/button_valuetool.png){width=4%}). 
-(@) Hover over the area and in the “Value Tool” panel you see the value at your mouse location. 
+(@) Hover over the area and in the “Value Tool” panel you see the value within the raster file at your mouse location. 
 
 ![Example panel Value Tool](figures/tutorial/figure_ValueTool-in-QGIS.png){width=60% #fig-figure_ValueTool-in-QGIS fig-align="left"}
 
@@ -354,7 +355,7 @@ To prevent damage on the private properties caused by the dewatering, the author
 (@) On the tab *Elements* in QGIS-Tim click on the element "Line Sink Ditch".
 (@) Give the layer a name, e.g. "InfiltrationWell".
 
-See that layer "timml Line Sink Ditch:InfiltrationWell" is added to the timml sub-group in your geopackage with 'line' as geometry. For the transient sum a table with the same name is added to the ttim sub-group. Next step is to add the location of the well and its capacity. 
+See that layer "timml Line Sink Ditch:InfiltrationWell" is added to the timml sub group in your geopackage with 'line' as geometry. For the transient sum a table with the same name is added to the ttim sub group. Next step is to add the location of the well and its capacity. 
 
 (@) Click the *Measure Line" button (![](figures/tutorial/button_MeasureLine.png){width=4%}) from the "Attributes Toolbar".
 (@) With your left mouse button try to get an idea what a distance of 400 m. looks like. Close the window.
@@ -415,7 +416,7 @@ You can not miss the effect of the Lake in this calculation. In many cases you l
 (@) Click the button *Set path as ...* and change the name of the output, e.g. "case-Rijsenhout-NoLake". 
 (@) Click *Compute* to run the model without the Lake. 
 
-The new results are added as new layer to the project. Check for instance sub-group "raster" under the group "case-Rijsenhout output". Now we use QGIS to calculate the head difference for layer 0. For raster calculations we prefer *Raster Calculator* over the *Mesh Calculator* in QGIS. 
+The new results are added as new layer to the project. Check for instance sub group "raster" under the group "case-Rijsenhout output". Now we use QGIS to calculate the head difference for layer 0. For raster calculations we prefer *Raster Calculator* over the *Mesh Calculator* in QGIS. 
 
 (@) From the QGIS main menu *Raster* select the tool *Raster Calculator* and the tool window opens. 
 (@) In the section *Raster Calculator Expression* you can create an expression using the elements from *Raster Bands* and *Operators*. Create this expression: "case-Rijsenhout-head_layer_001 - case-Rijsenhout-NoLake-head_layer_001".
@@ -426,7 +427,7 @@ The new results are added as new layer to the project. Check for instance sub-gr
 (@) In *Geopackage* check again the Lake element.
 (@) In *Compute* reset the path to the old name.
 
-## Model 8: Abstraction effect over time
+## Model 8: abstraction effect over time
 Now you are ready for the last step: make your model transient. We keep it simple: we run the model for 30 days and see the increasing effect of the well. 
 
 (@) In *Compute* within the *output* section change "steady state" into "transient".
