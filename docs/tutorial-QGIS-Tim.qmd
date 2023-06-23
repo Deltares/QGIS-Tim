@@ -6,7 +6,7 @@ title: "Tutorial QGIS-Tim"
 - Be sure QGIS version 3.22.00 or higher is installed. 
 - Be sure the ``gistim`` Python package is installed (see [installation](install.qmd) for instructions). 
 - Download the tutorial material. [Follow this link.](https://deltares.thegood.cloud/s/zryWnfjT43Ryoea)
-- Installation of the QGIS-Tim plugin and the MOD plugin is part of this Tutorial and the necessary ZIP files are included in the tutorial material. 
+- Installation of the QGIS-Tim plugin and the MOD plugin is part of this Tutorial. The necessary ZIP files are included in the tutorial material. 
 - Internet connections is optional during this Tutorial. It is only required for installation of additional plugins and the use of an online topographic background map.  
 
 ## Description
@@ -29,16 +29,21 @@ At the project location, the top layer is 12 m thick and consists of a low perme
 ![Geological cross section near Rijssenhout \[source: BRO GeoTOP v1.4.1\]](figures/tutorial/GeoTOP-Verticaledoorsnede.png){width=100% #fig-GeoTOP-Verticaledoorsnede}
 
 ## Getting Started 
-(@) Launch QGIS from your START menu, your desktop or click on …\\QGIS3.28.0\\bin\\qgis-bin.exe.
+Let's first configure the gistim python installation again, to be sure that QGIS can find the gistim software.
+
+(@) Open the Deltaforge prompt (search in Windows Start for "Deltaforge Prompt"). A black window pops up. 
+(@) In this window type ``python -m gistim configure`` and press ENTER.
+(@) You can close this window now. 
+(@) Launch QGIS from your START menu, from your desktop or click on …\\QGIS3.28.0\\bin\\qgis-bin.exe.
 
 > **Intermezzo:** *QGIS language settings*
 > 
 > Perhaps your QGIS was installed in another language than English. Because the Tutorial refers to the English version, let’s change to English. 
 > 
 > a. From the main menu click on *Settings* and select *Options* (e.g. in Dutch *Extra* and *Opties*). 
-> a. In the new window go to the *General section* on the left. 
-> a. Check the box to allow *Override System Locale*. 
-> a. From the drop-down menu *“User interface translation”* select *American English* and click *OK*. 
+> a. In the new window go to the *General section* (Dutch: *Algemeen*) on the left. 
+> a. Check the box to allow *Override System Locale* (Dutch: *Landinstellingen negeren*) and expand this sub menu. 
+> a. From the drop-down menu *“User interface translation”* (Dutch: *Vertaling gebruikers-interface*) select *American English* and click *OK*. 
 > a. Close QGIS and open it again to activate your language change.
 
 
@@ -72,7 +77,7 @@ This is the moment to download/import four plugins needed for this tutorial:
 (@) Click *Install Plugin*.
 (@) In the same way, install the QGIS-Tim plugin using the ZIP file "QGIS-Tim_Tutorial\\QGIS-Tim-plugin.zip". 
 
-If you have an internet connection continue with the installation of the next two plugins.
+If you have an internet connection continue with the installation of the next two plugins from the QGIS plugin library.
 
 (@) From the left section, select the group *All* to see all available plugins. 
 (@) Search for “Value Tool” and install it. 
@@ -90,12 +95,12 @@ See in the toolbar section of QGIS that the plugins are installed:
 Further in this Tutorial we will use some default toolbars that might be hidden at the moment. Let's check that and unhide if necessary. 
 
 (@) Select *View* from the main menu and choose *Toolbars*.
-(@) Be sure the "Advanced Digitizing Toolbar", the "Snapping Toolbar" and the "Attributes Toolbar" is checked.
+(@) Be sure the "Advanced Digitizing Toolbar", the "Snapping Toolbar" and the "Attributes Toolbar" are checked.
 
 ### Prepare your project
-For navigation purposes, let's load a topographic map for The Netherlands from the PDOK database. 
+For navigation purposes, let's load a topographic map for The Netherlands from the online PDOK database. 
 
-> If you do not have an internet connection, follow the next steps to import a simple PNG file as a background. 
+> No internet connection? Follow the next steps to import a simple PNG file as a background. 
 >
 > - Go to *Layer* in the main menu, go to *Add layer* and select *Add Raster layer*.
 > - Use the browse button (![](figures/tutorial/button-Qgis-browse.png){width=4%}) and from the tutorial material select “…\\QGIS-Tim_Tutorial\\dbase\\TopographicMapRijssenhout.png”.
@@ -104,7 +109,7 @@ For navigation purposes, let's load a topographic map for The Netherlands from t
 > - Continue after step @continuewithoutinternet.
 
 
-(@) Click on the PDOK plugin button (![](figures/tutorial/button-PDOK.png){width=4%}) to open the "PDOK Services Plugin" window. 
+(@) If you do have an internet connection click on the PDOK plugin button (![](figures/tutorial/button-PDOK.png){width=4%}) to open the "PDOK Services Plugin" window. 
 (@) From the tab *PDOK Services* search for "pastel" and you will find a WMTS type layer called "brtachtergrondkaart". 
 (@) Select the layer.
 (@) In the section "laag toevoegen" click the button *Onder*. 
@@ -167,6 +172,8 @@ Important message: all editing of model parameters and model elements you do in 
 (@) Add a new feature with this *Add Feature* button. In this case a feature is a hydrological layer. 
 (@) Fill the feature with the values from the table below: 
 
+![](figures/tutorial/Panel-Timml Aquifer L0.png){width=80%}
+
 | parameter  | value | unit | comment|
 |---          |---    |--- |--- |
 | fid         | Autogenerate  | [-]  | ID is autogenerated by QGIS |  
@@ -217,7 +224,7 @@ See that layer "timml Well:DewateringWell" is added to the timml sub group in yo
 (@) With your mouse, click on a location in the centre of the group of bombs. 
 (@) Fill the feature with the values from the example below. 
 
-![](figures/tutorial/figure_WellFeatureAttributes.png){width=60%}
+![](figures/tutorial/figure_WellFeatureAttributes.png){width=40%}
 
 (@) Click *OK*.
 (@) Click the *Toggle Editing* button (![](figures/tutorial/button-Qgis-AttributeTable-StartEditingMode.png){width=4%}) and if you are asked to save changes and select *Save*. <br> An alternative way to save your edits is to click the *Save Layer Edits* button (![](figures/tutorial/button_SavelayerEdits.png){width=4%}) and then stop editing with the *Toggle Editing* button (![](figures/tutorial/button-Qgis-AttributeTable-StartEditingMode.png){width=4%}).
@@ -237,7 +244,7 @@ Do you like to see the values of the calculated Head under you mouse?
 (@) Select the *Value Tool* button (![](figures/tutorial/button_valuetool.png){width=4%}). 
 (@) Hover over the area and in the “Value Tool” panel you see the value within the raster file at your mouse location. 
 
-![Example panel Value Tool](figures/tutorial/figure_ValueTool-in-QGIS.png){width=60% #fig-figure_ValueTool-in-QGIS fig-align="left"}
+![Example panel Value Tool](figures/tutorial/figure_ValueTool-in-QGIS.png){width=40% #fig-figure_ValueTool-in-QGIS fig-align="left"}
 
 Do you like to see the values in a cross section? Deltares developed the Cross Section Tool, available in the iMOD Plugin.
 

@@ -20,27 +20,22 @@ are two approaches: either using the fully-fletched Deltaforge distribution
 
 ### Method 1: with Deltaforge (recommended)
 
-[Download and install Deltaforge](
-https://download.deltares.nl/imod-suite/){target="_blank"}. 
-**Make sure you use Deltaforge version 0.3.0 or higher!**
-
+1. [Download and install Deltaforge](
+https://download.deltares.nl/imod-suite/){target="_blank"}. **Make sure you use Deltaforge version 0.3.0 or higher!**
 1. Open the Deltaforge prompt (search in Windows Start for \"Deltaforge
     Prompt\").
-2. Configure the gistim installation, so that the QGIS plugin is able
+1. Configure the gistim installation, so that the QGIS plugin is able
     to find it. Run: ``python -m gistim configure``
 
 ### Method 2: with Miniforge
 
-[Download and install a miniforge Python installation](
-https://github.com/conda-forge/miniforge){target="_blank"}
-
-
+1. [Download and install a miniforge Python installation](https://github.com/conda-forge/miniforge){target="_blank"}
 1.  Open the miniforge prompt (search in Windows Start for \"Miniforge
     Prompt\").
-2.  Create a new conda environment, run: ``conda create \--name tim python=3.9``
-3.  Activate the environment: ``conda activate tim``
-4.  Run: ``conda install -c conda-forge gistim``
-6.  Configure the gistim installation, so that the QGIS plugin is able
+1.  Create a new conda environment, run: ``conda create \--name tim python=3.9``
+1.  Activate the environment: ``conda activate tim``
+1.  Run: ``conda install -c conda-forge gistim``
+1.  Configure the gistim installation, so that the QGIS plugin is able
     to find it. Run: ``python -m gistim configure``
 
 ## 3. Install the QGIS plugin
