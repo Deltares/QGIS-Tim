@@ -21,7 +21,7 @@ are two approaches: either using the fully-fletched Deltaforge distribution
 ### Method 1: with Deltaforge (recommended)
 
 [Download and install Deltaforge](
-https://download2.deltares.nl/imod-suite/){target="_blank"}. 
+https://download.deltares.nl/imod-suite/){target="_blank"}. 
 **Make sure you use Deltaforge version 0.3.0 or higher!**
 
 1. Open the Deltaforge prompt (search in Windows Start for \"Deltaforge
