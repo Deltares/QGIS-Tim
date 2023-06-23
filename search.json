@@ -7,6 +7,34 @@
     "text": "QGIS-Tim is an open source project for multi-layer groundwater flow simulations. QGIS-Tim provides a link between QGIS and the open source analytic element method software: TimML (steady-state) and TTim (transient).\nThe benefit of the analytic element method (AEM) is that no grid or time-stepping is required. Geohydrological features are represented by points, lines, and polygons. QGIS-Tim stores these features in a GeoPackage.\nQGIS-Tim consists of a “front-end” and a “back-end”. The front-end is a QGIS plugin that provides a limited graphical interface to setup model input, visualize, and analyze model input. The back-end is a Python package. It reads the contents of the GeoPackage and transforms it into a TimML or TTim model, computes a result, and writes it to a file that the QGIS plugin loads."
   },
   {
+    "objectID": "install.html",
+    "href": "install.html",
+    "title": "Install",
+    "section": "",
+    "text": "QGIS-Tim consists of two parts: A QGIS plugin and the gistim Python package, which runs in a separate Python environment. The installation of QGIS-Tim therfore consists of three steps:"
+  },
+  {
+    "objectID": "install.html#install-qgis",
+    "href": "install.html#install-qgis",
+    "title": "Install",
+    "section": "1. Install QGIS",
+    "text": "1. Install QGIS\nDownload and install a recent version of QGIS (&gt;3.22): https://www.qgis.org/en/site/forusers/download.html"
+  },
+  {
+    "objectID": "install.html#install-gistim-in-a-seperate-python-environment",
+    "href": "install.html#install-gistim-in-a-seperate-python-environment",
+    "title": "Install",
+    "section": "2. Install gistim in a seperate Python environment",
+    "text": "2. Install gistim in a seperate Python environment\ngistim requires a seperate Python environment, because it depends on packages incompatible with the packages in QGIS’ own Python environment. There are two approaches: either using the fully-fletched Deltaforge distribution (Recommended) or the leaner Miniforge distribution.\n\nMethod 1: with Deltaforge (recommended)\nDownload and install Deltaforge. Make sure you use Deltaforge version 0.3.0 or higher!\n\nOpen the Deltaforge prompt (search in Windows Start for \"Deltaforge Prompt\").\nConfigure the gistim installation, so that the QGIS plugin is able to find it. Run: python -m gistim configure\n\n\n\nMethod 2: with Miniforge\nDownload and install a miniforge Python installation\n\nOpen the miniforge prompt (search in Windows Start for \"Miniforge Prompt\").\nCreate a new conda environment, run: conda create \\--name tim python=3.9\nActivate the environment: conda activate tim\nRun: conda install -c conda-forge gistim\nConfigure the gistim installation, so that the QGIS plugin is able to find it. Run: python -m gistim configure"
+  },
+  {
+    "objectID": "install.html#install-the-qgis-plugin",
+    "href": "install.html#install-the-qgis-plugin",
+    "title": "Install",
+    "section": "3. Install the QGIS plugin",
+    "text": "3. Install the QGIS plugin\n\nMethod 1: From the GQIS plugin database\nNB Due to ongoing developments new features and bug fixes might not be part of this release. Consider installation method 2.\n\nOpen QGIS.\nAt the top, find the Plugins menu (~sixth object in the menubar).\nFind \"Manage and Install plugins\" (~first object in drop-down).\nFind \"All\" (~first in left section).\nSearch for \"Qgis-Tim\".\nClick \"Install Plugin\".\n\n\n\nMethod 2: From Zip (recommended)\n\nDownload the \"QGIS-TIM-plugin.zip\" (do not unzip!) from the iMOD-Suite download portal.\nOpen QGIS.\nAt the top, find the Plugins menu (~sixth object in the menubar).\nFind \"Manage and Install plugins\" (~first object in drop-down).\nFind \"Install from ZIP\" (~fourth in left section).\nEnter the path to the file \"QGIS-TIM-plugin.zip\".\nClick \"Install Plugin\".\n\nThis will add an icon to the toolbar(s).  By clicking the icon, the plugin is started.  The QGIS plugin automatically starts an extra window for the background calculation of a TIM model. This black window is called Python.exe and can be minimized or even closed after the calculation."
+  },
+  {
     "objectID": "tutorial-QGIS-Tim.html",
     "href": "tutorial-QGIS-Tim.html",
     "title": "Tutorial QGIS-Tim",
@@ -124,33 +152,5 @@
     "title": "Tutorial QGIS-Tim",
     "section": "Export your Tim model to Python",
     "text": "Export your Tim model to Python\nFor scenario calculation or sensitivity analysis you probably want to switch from QGIS to Python for efficiency reasons. In this tutorial we only show you the first step: export your model to a Python file (*.py). Your Tim model is just a set of elements (points, lines, polygons) and its parameters so the Python file is not very large.\n\nIn QGIS-Tim go to the tab GeoPackage.\nClick the button Convert GeoPackage to Python script and you can save the *.py file wherever you like.\nCheck the content of the file with you text editor (e.g. Notepad).\n\nThe tutorial ends here. You can save your QGIS project if you like. Thank you!"
-  },
-  {
-    "objectID": "install.html",
-    "href": "install.html",
-    "title": "Install",
-    "section": "",
-    "text": "QGIS-Tim consists of two parts: A QGIS plugin and the gistim Python package, which runs in a separate Python environment. The installation of QGIS-Tim therfore consists of three steps:"
-  },
-  {
-    "objectID": "install.html#install-qgis",
-    "href": "install.html#install-qgis",
-    "title": "Install",
-    "section": "1. Install QGIS",
-    "text": "1. Install QGIS\nDownload and install a recent version of QGIS (&gt;3.22): https://www.qgis.org/en/site/forusers/download.html"
-  },
-  {
-    "objectID": "install.html#install-gistim-in-a-seperate-python-environment",
-    "href": "install.html#install-gistim-in-a-seperate-python-environment",
-    "title": "Install",
-    "section": "2. Install gistim in a seperate Python environment",
-    "text": "2. Install gistim in a seperate Python environment\ngistim requires a seperate Python environment, because it depends on packages incompatible with the packages in QGIS’ own Python environment. There are two approaches: either using the fully-fletched Deltaforge distribution (Recommended) or the leaner Miniforge distribution.\n\nMethod 1: with Deltaforge (recommended)\nDownload and install Deltaforge. Make sure you use Deltaforge version 0.3.0 or higher!\n\nOpen the Deltaforge prompt (search in Windows Start for \"Deltaforge Prompt\").\nConfigure the gistim installation, so that the QGIS plugin is able to find it. Run: python -m gistim configure\n\n\n\nMethod 2: with Miniforge\nDownload and install a miniforge Python installation\n\nOpen the miniforge prompt (search in Windows Start for \"Miniforge Prompt\").\nCreate a new conda environment, run: conda create \\--name tim python=3.9\nActivate the environment: conda activate tim\nRun: conda install -c conda-forge gistim\nConfigure the gistim installation, so that the QGIS plugin is able to find it. Run: python -m gistim configure"
-  },
-  {
-    "objectID": "install.html#install-the-qgis-plugin",
-    "href": "install.html#install-the-qgis-plugin",
-    "title": "Install",
-    "section": "3. Install the QGIS plugin",
-    "text": "3. Install the QGIS plugin\n\nMethod 1: From the GQIS plugin database\nNB Due to ongoing developments new features and bug fixes might not be part of this release. Consider installation method 2.\n\nOpen QGIS.\nAt the top, find the Plugins menu (~sixth object in the menubar).\nFind \"Manage and Install plugins\" (~first object in drop-down).\nFind \"All\" (~first in left section).\nSearch for \"Qgis-Tim\".\nClick \"Install Plugin\".\n\n\n\nMethod 2: From Zip (recommended)\n\nDownload the \"QGIS-TIM-plugin.zip\" (do not unzip!) from the iMOD-Suite download portal.\nOpen QGIS.\nAt the top, find the Plugins menu (~sixth object in the menubar).\nFind \"Manage and Install plugins\" (~first object in drop-down).\nFind \"Install from ZIP\" (~fourth in left section).\nEnter the path to the file \"QGIS-TIM-plugin.zip\".\nClick \"Install Plugin\".\n\nThis will add an icon to the toolbar(s).  By clicking the icon, the plugin is started.  The QGIS plugin automatically starts an extra window for the background calculation of a TIM model. This black window is called Python.exe and can be minimized or even closed after the calculation."
   }
 ]
