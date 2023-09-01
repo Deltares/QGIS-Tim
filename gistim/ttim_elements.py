@@ -121,7 +121,7 @@ def well(
     dataframe = spec.steady_spec.dataframe
     X, Y = point_coordinates(dataframe)
     kwargslist = []
-    for (row, x, y) in zip(dataframe.to_dict("records"), X, Y):
+    for row, x, y in zip(dataframe.to_dict("records"), X, Y):
         row = filter_nan(row)
         kwargslist.append(
             {
@@ -146,7 +146,7 @@ def headwell(
     dataframe = spec.steady_spec.dataframe
     X, Y = point_coordinates(dataframe)
     kwargslist = []
-    for (row, x, y) in zip(dataframe.to_dict("records"), X, Y):
+    for row, x, y in zip(dataframe.to_dict("records"), X, Y):
         row = filter_nan(row)
         kwargslist.append(
             {

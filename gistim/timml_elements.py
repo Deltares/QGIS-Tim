@@ -59,7 +59,7 @@ def observation(spec: ElementSpecification) -> List[Dict[str, Any]]:
     X, Y = point_coordinates(dataframe)
     kwargslist = []
     kwargslist = []
-    for (row, x, y) in zip(dataframe.to_dict("records"), X, Y):
+    for row, x, y in zip(dataframe.to_dict("records"), X, Y):
         row = filter_nan(row)
         kwargslist.append(
             {
@@ -75,7 +75,7 @@ def well(spec: ElementSpecification) -> List[Dict[str, Any]]:
     dataframe = spec.dataframe
     X, Y = point_coordinates(dataframe)
     kwargslist = []
-    for (row, x, y) in zip(dataframe.to_dict("records"), X, Y):
+    for row, x, y in zip(dataframe.to_dict("records"), X, Y):
         row = filter_nan(row)
         kwargslist.append(
             {
@@ -95,7 +95,7 @@ def headwell(spec: ElementSpecification) -> List[Dict[str, Any]]:
     dataframe = spec.dataframe
     X, Y = point_coordinates(dataframe)
     kwargslist = []
-    for (row, x, y) in zip(dataframe.to_dict("records"), X, Y):
+    for row, x, y in zip(dataframe.to_dict("records"), X, Y):
         row = filter_nan(row)
         kwargslist.append(
             {
@@ -369,6 +369,7 @@ MAPPING = {
     "Leaky Line Doublet": (leakylinedoublet, timml.LeakyLineDoubletString),
     "Impermeable Line Doublet": (implinedoublet, timml.ImpLineDoubletString),
     "Building Pit": (buildingpit, timml.BuildingPit),
+    "Leaky Building Pit": (buildingpit, timml.LeakyBuildingPit),
     "Observation": (observation, None),
 }
 

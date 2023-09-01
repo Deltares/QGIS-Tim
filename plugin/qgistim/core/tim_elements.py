@@ -44,8 +44,14 @@ Rendering:
 * Observations: triangle
 * Line Doublets: red
 * Polygons: Line and Fill same color, Fill color 15% opacity.
+
+Nota bene: the order of the columns is important for hiding and showing the
+transient columns. QGIS has a bug which causes it to show the wrong column if
+hidden columns appear before shown ones. This only affects the attribute table
+when it has no features.
 """
 
+import abc
 import re
 from collections import defaultdict
 from functools import partial
@@ -87,55 +93,6 @@ TRANSPARENT_RED = f"215,48,39,{OPACITY}"
 TRANSPARENT_GREEN = f"51,160,44,{OPACITY}"
 TRANSPARENT_BLUE = f"31,120,180,{OPACITY}"
 TRANSPARENT_GREY = f"135,135,135,{OPACITY}"
-
-
-# These columns are reused by Aquifer and Polygon Inhom, Building pit Aquitards
-# are on top of the aquifer, so it comes first Nota bene: the order of these is
-# important for hiding and showing the transient columns. QGIS has a bug which
-# causes it to show the wrong column if hidden columns appear before shown
-# ones. This only affects the attribute table when it has no features.
-AQUIFER_ATTRIBUTES = [
-    QgsField("layer", QVariant.Int),
-    QgsField("aquifer_top", QVariant.Double),
-    QgsField("aquifer_bottom", QVariant.Double),
-    QgsField("aquitard_c", QVariant.Double),
-    QgsField("aquifer_k", QVariant.Double),
-    QgsField("semiconf_top", QVariant.Double),
-    QgsField("semiconf_head", QVariant.Double),
-    QgsField("aquitard_s", QVariant.Double),
-    QgsField("aquifer_s", QVariant.Double),
-    QgsField("aquitard_npor", QVariant.Double),
-    QgsField("aquifer_npor", QVariant.Double),
-]
-INHOM_ATTRIBUTES = [
-    QgsField("inhomogeneity_id", QVariant.Int),
-    QgsField("layer", QVariant.Int),
-    QgsField("aquifer_top", QVariant.Double),
-    QgsField("aquifer_bottom", QVariant.Double),
-    QgsField("aquitard_c", QVariant.Double),
-    QgsField("aquifer_k", QVariant.Double),
-    QgsField("semiconf_top", QVariant.Double),
-    QgsField("semiconf_head", QVariant.Double),
-    QgsField("rate", QVariant.Double),
-    QgsField("aquitard_s", QVariant.Double),
-    QgsField("aquifer_s", QVariant.Double),
-    QgsField("aquitard_npor", QVariant.Double),
-    QgsField("aquifer_npor", QVariant.Double),
-]
-BUILDING_PIT_ATTRIBUTES = [
-    QgsField("inhomogeneity_id", QVariant.Int),
-    QgsField("layer", QVariant.Int),
-    QgsField("aquifer_top", QVariant.Double),
-    QgsField("aquifer_bottom", QVariant.Double),
-    QgsField("aquitard_c", QVariant.Double),
-    QgsField("aquifer_k", QVariant.Double),
-    QgsField("semiconf_top", QVariant.Double),
-    QgsField("semiconf_head", QVariant.Double),
-    QgsField("aquitard_s", QVariant.Double),
-    QgsField("aquifer_s", QVariant.Double),
-    QgsField("aquitard_npor", QVariant.Double),
-    QgsField("aquifer_npor", QVariant.Double),
-]
 
 
 class NameDialog(QDialog):
@@ -432,7 +389,19 @@ class Domain(TransientElement):
 class Aquifer(TransientElement):
     element_type = "Aquifer"
     geometry_type = "No Geometry"
-    timml_attributes = AQUIFER_ATTRIBUTES.copy()
+    timml_attributes = [
+        QgsField("layer", QVariant.Int),
+        QgsField("aquifer_top", QVariant.Double),
+        QgsField("aquifer_bottom", QVariant.Double),
+        QgsField("aquitard_c", QVariant.Double),
+        QgsField("aquifer_k", QVariant.Double),
+        QgsField("semiconf_top", QVariant.Double),
+        QgsField("semiconf_head", QVariant.Double),
+        QgsField("aquitard_s", QVariant.Double),
+        QgsField("aquifer_s", QVariant.Double),
+        QgsField("aquitard_npor", QVariant.Double),
+        QgsField("aquifer_npor", QVariant.Double),
+    ]
     ttim_attributes = (
         QgsField("time_min", QVariant.Double),
         QgsField("time_max", QVariant.Double),
@@ -772,7 +741,21 @@ class PolygonInhomogeneity(AssociatedElement):
         QgsField("order", QVariant.Int),
         QgsField("ndegrees", QVariant.Int),
     )
-    assoc_attributes = INHOM_ATTRIBUTES.copy()
+    assoc_attributes = [
+        QgsField("inhomogeneity_id", QVariant.Int),
+        QgsField("layer", QVariant.Int),
+        QgsField("aquifer_top", QVariant.Double),
+        QgsField("aquifer_bottom", QVariant.Double),
+        QgsField("aquitard_c", QVariant.Double),
+        QgsField("aquifer_k", QVariant.Double),
+        QgsField("semiconf_top", QVariant.Double),
+        QgsField("semiconf_head", QVariant.Double),
+        QgsField("rate", QVariant.Double),
+        QgsField("aquitard_s", QVariant.Double),
+        QgsField("aquifer_s", QVariant.Double),
+        QgsField("aquitard_npor", QVariant.Double),
+        QgsField("aquifer_npor", QVariant.Double),
+    ]
     timml_defaults = {
         "order": QgsDefaultValue("4"),
         "ndegrees": QgsDefaultValue("6"),
@@ -806,8 +789,7 @@ class PolygonInhomogeneity(AssociatedElement):
         return
 
 
-class BuildingPit(AssociatedElement):
-    element_type = "Building Pit"
+class AbstractBuildingPit(AssociatedElement, abc.ABC):
     geometry_type = "Polygon"
     timml_attributes = (
         QgsField("inhomogeneity_id", QVariant.Int),
@@ -815,7 +797,6 @@ class BuildingPit(AssociatedElement):
         QgsField("ndegrees", QVariant.Int),
         QgsField("layer", QVariant.Int),
     )
-    assoc_attributes = BUILDING_PIT_ATTRIBUTES.copy()
     timml_defaults = {
         "inhomogeneity_id": QgsDefaultValue("1"),
         "order": QgsDefaultValue("4"),
@@ -831,12 +812,6 @@ class BuildingPit(AssociatedElement):
         "aquifer_npor",
     )
 
-    @property
-    def renderer(self) -> QgsSingleSymbolRenderer:
-        return self.polygon_renderer(
-            color=TRANSPARENT_RED, color_border=RED, width_border="0.75"
-        )
-
     def on_transient_changed(self, transient: bool):
         config = self.assoc_layer.attributeTableConfig()
         columns = config.columns()
@@ -847,6 +822,50 @@ class BuildingPit(AssociatedElement):
 
         self.assoc_layer.setAttributeTableConfig(config)
         return
+
+
+class BuildingPit(AbstractBuildingPit):
+    element_type = "Building Pit"
+    assoc_attributes = [
+        QgsField("inhomogeneity_id", QVariant.Int),
+        QgsField("layer", QVariant.Int),
+        QgsField("aquifer_top", QVariant.Double),
+        QgsField("aquifer_bottom", QVariant.Double),
+        QgsField("aquitard_c", QVariant.Double),
+        QgsField("aquifer_k", QVariant.Double),
+        QgsField("semiconf_top", QVariant.Double),
+        QgsField("semiconf_head", QVariant.Double),
+    ]
+
+    @property
+    def renderer(self) -> QgsSingleSymbolRenderer:
+        return self.polygon_renderer(
+            color=TRANSPARENT_RED, color_border=RED, width_border="0.75"
+        )
+
+
+class LeakyBuildingPit(AbstractBuildingPit):
+    element_type = "Leaky Building Pit"
+    assoc_attributes = [
+        QgsField("inhomogeneity_id", QVariant.Int),
+        QgsField("layer", QVariant.Int),
+        QgsField("aquifer_top", QVariant.Double),
+        QgsField("aquifer_bottom", QVariant.Double),
+        QgsField("aquitard_c", QVariant.Double),
+        QgsField("aquifer_k", QVariant.Double),
+        QgsField("resistance", QVariant.Double),
+        QgsField("semiconf_top", QVariant.Double),
+        QgsField("semiconf_head", QVariant.Double),
+    ]
+
+    @property
+    def renderer(self) -> QgsSingleSymbolRenderer:
+        return self.polygon_renderer(
+            color=TRANSPARENT_RED,
+            color_border=RED,
+            width_border="0.75",
+            outline_style="dash",
+        )
 
 
 ELEMENTS = {
@@ -867,6 +886,7 @@ ELEMENTS = {
         PolygonSemiConfinedTop,
         PolygonInhomogeneity,
         BuildingPit,
+        LeakyBuildingPit,
         Observation,
     )
 }

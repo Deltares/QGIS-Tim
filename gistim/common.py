@@ -163,6 +163,10 @@ def aquifer_data(
     if "rate" in dataframe:
         d["N"] = dataframe.loc[0, "rate"]
 
+    # For leaky building pit
+    if "resistance" in dataframe:
+        d["res"] = dataframe.loc[0, "resistance"]
+
     filtered = {}
     for k, value in d.items():
         if isinstance(value, np.ndarray):

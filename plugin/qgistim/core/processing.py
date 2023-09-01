@@ -78,7 +78,6 @@ def steady_contours(
     stop: float,
     step: float,
 ) -> QgsVectorLayer:
-
     contourer = QgsMeshContours(layer)
 
     # Collect contours from mesh layer
