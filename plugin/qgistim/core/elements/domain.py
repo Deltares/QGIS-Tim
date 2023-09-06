@@ -1,0 +1,73 @@
+from typing import Any, Tuple
+
+from PyQt5.QtCore import QVariant
+from qgis.core import (
+    QgsFeature,
+    QgsField,
+    QgsGeometry,
+    QgsPointXY,
+    QgsSingleSymbolRenderer,
+)
+from qgistim.core.elements.colors import BLACK
+from qgistim.core.elements.element import TransientElement
+
+
+class Domain(TransientElement):
+    element_type = "Domain"
+    geometry_type = "Polygon"
+    ttim_attributes = (QgsField("time", QVariant.Double),)
+
+    def __init__(self, path: str, name: str):
+        self._initialize_default(path, name)
+        self.timml_name = f"timml {self.element_type}:Domain"
+        self.ttim_name = "ttim Computation Times:Domain"
+
+    @property
+    def renderer(self) -> QgsSingleSymbolRenderer:
+        """
+        Results in transparent fill, with a medium thick black border line.
+        """
+        return self.polygon_renderer(
+            color="255,0,0,0", color_border=BLACK, width_border="0.75"
+        )
+
+    def remove_from_geopackage(self):
+        pass
+
+    def update_extent(self, iface: Any) -> Tuple[float, float]:
+        provider = self.timml_layer.dataProvider()
+        provider.truncate()  # removes all features
+        canvas = iface.mapCanvas()
+        extent = canvas.extent()
+        xmin = extent.xMinimum()
+        ymin = extent.yMinimum()
+        xmax = extent.xMaximum()
+        ymax = extent.yMaximum()
+        points = [
+            QgsPointXY(xmin, ymax),
+            QgsPointXY(xmax, ymax),
+            QgsPointXY(xmax, ymin),
+            QgsPointXY(xmin, ymin),
+        ]
+        feature = QgsFeature()
+        feature.setGeometry(QgsGeometry.fromPolygonXY([points]))
+        provider.addFeatures([feature])
+        canvas.refresh()
+        return ymax, ymin
+
+    def to_timml(self):
+        data = self.to_dict(self.timml_layer)
+        x = [point[0] for point in data[0]["geometry"]]
+        y = [point[1] for point in data[0]["geometry"]]
+        return {
+            "xmin": min(x),
+            "xmax": max(x),
+            "ymin": min(y),
+            "ymax": max(y),
+        }
+
+    def to_ttim(self):
+        data = self.to_timml()
+        ttim_data = self.table_to_dict(self.ttim_layer)
+        data["time"] = ttim_data["time"]
+        return data

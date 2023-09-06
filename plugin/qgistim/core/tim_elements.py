@@ -55,7 +55,7 @@ import abc
 import re
 from collections import defaultdict
 from functools import partial
-from typing import Any, List, Tuple
+from typing import Any, Dict, List, Tuple
 
 from PyQt5.QtCore import QVariant
 from PyQt5.QtWidgets import (
@@ -510,6 +510,12 @@ class Well(TransientElement):
         QgsField("time_start", QVariant.Double),
         QgsField("discharge", QVariant.Double),
     )
+    timml_defaults = {
+        "radius": QgsDefaultValue("0.1"),
+        "resistance": QgsDefaultValue("0.0"),
+        "caisson_radius": QgsDefaultValue("0.0"),
+        "slug": QgsDefaultValue("True"),
+    }
     transient_columns = (
         "time_start",
         "time_end",
@@ -543,6 +549,10 @@ class HeadWell(TransientElement):
         QgsField("time_start", QVariant.Double),
         QgsField("head", QVariant.Double),
     )
+    timml_defaults = {
+        "radius": QgsDefaultValue("0.1"),
+        "resistance": QgsDefaultValue("0.0"),
+    }
     transient_columns = (
         "time_start",
         "time_end",
@@ -912,6 +922,7 @@ def parse_name(layername: str) -> Tuple[str, str, str]:
         "Temporal Settings": "Aquifer",
         "Polygon Inhomogeneity Properties": "Polygon Inhomogeneity",
         "Building Pit Properties": "Building Pit",
+        "Leaky Building Pit Properties": "Building Pit",
     }
     element_type = mapping.get(element_type, element_type)
     if "timml" in prefix:

@@ -10,6 +10,7 @@ Not every TimML element has a TTim equivalent (yet). This means that when a
 user chooses the transient simulation mode, a number of elements must be
 disabled (such as inhomogeneities).
 """
+import json
 from pathlib import Path
 from shutil import copy
 from typing import List, Set
@@ -31,8 +32,8 @@ from PyQt5.QtWidgets import (
     QWidget,
 )
 from qgis.core import QgsApplication, QgsProject, QgsTask
+from qgistim.core.elements import Aquifer, Domain, load_elements_from_geopackage
 from qgistim.core.task import BaseServerTask
-from qgistim.core.tim_elements import Aquifer, Domain, load_elements_from_geopackage
 
 SUPPORTED_TTIM_ELEMENTS = set(
     [
@@ -196,6 +197,16 @@ class DatasetTreeWidget(QTreeWidget):
 
         return
 
+    def convert_to_timml(self):
+        elements = {
+            item.text(1): item.element
+            for item in self.items()
+            if item.timml_checkbox.isChecked()
+        }
+        print(elements)
+        data = {k: element.to_timml() for k, element in elements.items()}
+        return data
+
 
 class DatasetWidget(QWidget):
     def __init__(self, parent):
@@ -220,7 +231,7 @@ class DatasetWidget(QWidget):
         self.remove_button.clicked.connect(self.remove_geopackage_layer)
         self.add_button.clicked.connect(self.add_selection_to_qgis)
         self.convert_button = QPushButton("Convert GeoPackage to Python script")
-        self.convert_button.clicked.connect(self.convert)
+        self.convert_button.clicked.connect(self.convert_to_json)
         # Layout
         dataset_layout = QVBoxLayout()
         dataset_row = QHBoxLayout()
@@ -432,4 +443,14 @@ class DatasetWidget(QWidget):
 
         self.parent.set_interpreter_interaction(False)
         QgsApplication.taskManager().addTask(self.convert_task)
+        return
+
+    def convert_to_json(self) -> None:
+        outpath, _ = QFileDialog.getSaveFileName(self, "Select file", "", "*.py")
+        if outpath == "":  # Empty string in case of cancel button press
+            return
+
+        data = self.dataset_tree.convert_to_timml()
+        json_string = json.dumps(data, indent=4)
+        print(json_string)
         return

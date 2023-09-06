@@ -1,7 +1,7 @@
 from functools import partial
 
 from PyQt5.QtWidgets import QGridLayout, QPushButton, QVBoxLayout, QWidget
-from qgistim.core.tim_elements import ELEMENTS
+from qgistim.core.elements import ELEMENTS
 
 
 class ElementsWidget(QWidget):
