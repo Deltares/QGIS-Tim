@@ -1,0 +1,349 @@
+<style>
+r { color: Red }
+o { color: Orange }
+g { color: Green }
+b { color: Blue }
+y { color: Yellow }
+gr { color: Gray }
+</style>
+
+---
+title: "Tutorial The Hague building pit"
+---
+
+## Requirements
+- Be sure QGIS version 3.22.00 or higher is installed. 
+- Be sure the ``gistim`` Python package is installed (see [installation](install.qmd) for instructions). 
+- Download the tutorial material. [Follow this link.](https://deltares.thegood.cloud/s/zryWnfjT43Ryoea)
+- Installation of the QGIS-Tim plugin and the MOD plugin is part of this Tutorial. The necessary ZIP files are included in the tutorial material. 
+- Internet connections is optional during this Tutorial. It is only required for installation of additional plugins and the use of an online topographic background map.  
+
+## Description
+In this tutorial, you will learn how to:
+
+- install and use the QGIS-Tim plugin;
+- use the basic of QGIS for pre- and postprocessing of TIM;
+- create several steady state models (TimML) and a transient model (TTim);
+- analyse the results;
+- export your model to a Python script.
+
+## Objective
+Calculation of a pumping well extraction.
+
+<r>Frans: More description required </r> 
+	
+## Introduction case *Den Haag*
+In the old city center of The Hague a building plan with a parking basement is constructed.
+The dimensions of the building pit are **34.5 m * 84.7 m.** The area is shown in . 
+
+Your window looks like in @fig-TheHagueCityCenter.
+
+![Schematization of the building area in The Hague city center](figures/tutorial/photo-TheHagueCityCenter.png){width=80% #fig-TheHagueCityCenter} 
+
+To carry out the construction in dry conditions, the groundwater level needs to be lowered by **3.5 m.** The required drainage time is 4 months. <br> 
+The environment is vulnerable with valuable buildings and monuments that have a shallow foundation. The subsoil consists of sandy layers which locally contain shallow peat/clay/silt layers and deeper layers of clay/silt. The builder contractor must use a sheet pile wall that needs to be installed in a water-retarding layer (aquitard).
+
+![The monumental environment](figures/tutorial/photo-TheMonumentalEnvironment.png){width=60% #fig-TheMonumentalEnvironment} 
+
+**The question to be elaborated in the hydrogeological advice is:** <br>
+*"how deep should a sheet pile wall be placed to prevent damage and can risks arise from a leak."*
+
+Applications of a sheet pile wall (with a hydraulic resistance of 100 days) and a concrete cut off wall (with a ydraulic resistance of 1000 days) need to be studied.
+
+The soil profile has been investigated with borings and CPTs. An example of a CPT is shown in @fig-CPT01.
+
+The interpretation of the CPT and borings gives the following soil layer scheme:
+
+- The soil mainly consist of fine sand in Holocene layers (max depth NAP -15 m) and coarse sand in deeper Pleistocene layers.
+- Just below the groundwater level (NAP -0.5m), there is an approximately 1.5 m thick peat/clay/silt layer (not in CPT). 
+- The layer between NAP –5.5 and –8.5 m consists of clay lenses. There is little certainty about the resistance of that layer. 
+- Between NAP –13 and –15 m there is a clay/silt layer.
+
+Based on experience in this region, the following geohydrological schematization is known. The layer depth is indicated relative to the groundwater level: 
+
+|Cluster|Layer type|Layer Bottom|c|K|E-oed|
+|:-:|--:|--:|--:|--:|--:|
+|||[m]|[dagen]|[m/dag]|[kPa]|
+|1|Aquitard|-1|750||33|
+||Aquifer|-5||10|160|
+|2|Aquitard|-8|40||10000|
+||Aquifer|-13||10|170000|
+|3|Aquitard|-15|100||6000|
+||Aquifer|-60||25|200000|
+: Geohydrological model of the subsoil
+
+![CPT to a depth of NAP -20m](figures/tutorial/figure-CPT01.png ){width=70% #fig-CPT01} 
+
+According to DINOloket, the average groundwater level on site is NAP -0.4m. There are strict demands from authorities for allowable groundwater lowering.  The maximum allowed lowering is 0.5 m outside the construction pit.
+
+To perform the calculation, dewatering is schematized to 8 wells. 
+
+**Tip: Don't place the wells in the model too close to the sheet piles.**
+
+Tasks:
+
+- Which element form the TIM package would you use to place the wells and sheet piles?
+- Do you need to install sheet piles deep (in sand layers of cluster 1 and 2) or shallow (only in the first sand layer of cluster 1)
+- Investigate the effect of the presence of a lower or higher hydraulic resistance in the layer between MV -6.5 m and -9.5 m. isn't it 6.5 en 8.5???
+- Estimate the water burden to keep the well dry. Also use the excel file.
+- What are the risks? Look at the groundwater lowering outside the construction pit in the different situations
+- Also check for point leaks. Model it with a hole in the sheet pile in the northwest corner of the area.
+
+
+## Getting Started 
+Let's first configure the gistim python installation again, to be sure that QGIS can find the gistim software.
+
+(@) Open the Deltaforge prompt (search in Windows Start for "Deltaforge Prompt"). A black window pops up. 
+(@) In this window type ``python -m gistim configure`` and press ENTER.
+(@) You can close this window now. 
+(@) Launch QGIS from your START menu, from your desktop or click on …\\QGIS3.28.0\\bin\\qgis-bin.exe.
+
+> **Intermezzo:** *QGIS language settings*
+> 
+> Perhaps your QGIS was installed in another language than English. Because the Tutorial refers to the English version, let’s change to English. 
+> 
+> a. From the main menu click on *Settings* and select *Options* (e.g. in Dutch *Extra* and *Opties*). 
+> a. In the new window go to the *General section* (Dutch: *Algemeen*) on the left. 
+> a. Check the box to allow *Override System Locale* (Dutch: *Landinstellingen negeren*) and expand this sub menu. 
+> a. From the drop-down menu *“User interface translation”* (Dutch: *Vertaling gebruikers-interface*) select *American English* and click *OK*. 
+> a. Close QGIS and open it again to activate your language change.
+
+
+We start with the creation of a new QGIS project.
+
+(@) From the main menu click on *Project* and select *New*. 
+
+The case in this tutorial is located in The Netherlands, so next we select the appropriate projection.
+
+(@) From the main menu click on *Project* and select *Properties*. 
+(@) In the *Properties* window select the category *CRS*, search for “EPSG:28992” and you find “Amersfoort / RD New”. Select this option and click the *Apply* button, followed by the *OK* button to close the window.
+
+> In case your work is mostly in The Netherlands and in the “Amersfoort / RD New” projection, consider making this your default projection.
+> 
+> - From the main menu click on *Settings* and select *Options...*.
+> - In the section *CRS and Transforms* select *CRS (handling)*, pick the radio button *Use a default CRS* and select “EPSG:28992 -Amersfoort / RD New”.
+> - Click OK.
+> - Close this window.
+
+### Install plugins
+This is the moment to download/import four plugins needed for this tutorial:
+
+- the QGIS-Tim plugin. The development version imported from ZIP file.
+- the iMOD plugin. The development version imported from ZIP file.
+- the Value Tool. The official version installed via QGIS (internet connection required). 
+- the PDOK plugin. The official version installed via QGIS (internet connection required). <br> This plugin gives access to a large database from which we will load the topographic maps and use the navigation option.
+
+(@) Go to *Plugins* from the main menu and select *Manage and Install Plugins…* to open the plugin window. 
+(@) On the left section select *Install from ZIP*.
+(@) Click the Browse button (![](figures/tutorial/button-Qgis-browse.png){width=4%}) and from the tutorial dataset select the ZIP file "QGIS-Tim_Tutorial\\QGIS-iMOD-plugin.zip". 
+(@) Click *Install Plugin*.
+(@) In the same way, install the QGIS-Tim plugin using the ZIP file "QGIS-Tim_Tutorial\\QGIS-Tim-plugin.zip". 
+
+If you have an internet connection continue with the installation of the next two plugins from the QGIS plugin library.
+
+(@) From the left section, select the group *All* to see all available plugins. 
+(@) Search for “Value Tool” and install it. 
+(@) Search for “PDOK services plugin” and install it. 
+(@) Make sure that under *Plugins > Manage and Install Plugins > Installed* now the 4 added plugins are checked.
+(@) *Close* the Plugins window. 
+
+See in the toolbar section of QGIS that the plugins are installed: 
+
+- iMOD Toolbar ![](figures/tutorial/button_iMOD-Toolbar.png){width=30%} 
+- QGIS-Tim ![](figures/tutorial/button-Qgis-tim.png){width=4%}
+- Value Tool ![](figures/tutorial/button_valuetool.png){width=4%}
+- PDOK Services Plugin ![](figures/tutorial/button-PDOK.png){width=4%}
+
+Further in this Tutorial we will use some default toolbars that might be hidden at the moment. Let's check that and unhide if necessary. 
+
+(@) Select *View* from the main menu and choose *Toolbars*.
+(@) Be sure the "Advanced Digitizing Toolbar", the "Snapping Toolbar" and the "Attributes Toolbar" are checked.
+
+### Prepare your project
+For navigation purposes, let's load a topographic map for The Netherlands from the online PDOK database. 
+
+> No internet connection? Follow the next steps to import a simple PNG file as a background. 
+>
+> - Go to *Layer* in the main menu, go to *Add layer* and select *Add Raster layer*.
+> - Use the browse button (![](figures/tutorial/button-Qgis-browse.png){width=4%}) and from the tutorial material select “…\\QGIS-Tim_Tutorial\\dbase\\TopographicMapTheHague.png”.
+> - Click on *Add* and *Close* the window.
+> - If you do not see the map, select the layer "TopographicMapTheHague", click your right mouse button and select "Zoom to Layer(s)".
+> - Continue after step @continuewithoutinternet.
+
+
+(@) If you do have an internet connection click on the PDOK plugin button (![](figures/tutorial/button-PDOK.png){width=4%}) to open the "PDOK Services Plugin" window. 
+(@) From the tab *PDOK Services* search for "pastel" and you will find a WMTS type layer called "BTRM Achtergrondkaart WMTS". 
+(@) Select the layer.
+(@) In the section "laag toevoegen" click the button *Onder*. 
+(@) Close the PDOK window.
+
+Our project area is in the centre of the city of The Hague so let's navigate to that town using the PDOK plugin.
+
+(@) Type "Parkstraat" in the PDOK search field, near the PDOK button (![](figures/tutorial/button-PDOK-search.png){width=20%})
+(@continuewithoutinternet) On of the locations PDOK will find "Parkstraat, 's-Gravenhage". Click on it and QGIS will fly you to the project location.
+
+<!--
+Let's now open a shape file containing the locations and depths of the bombs.
+
+(@) Go to *Layer* in the main menu, go to *Add layer* and select *Add Vector layer*.
+(@) Use the browse button (![](figures/tutorial/button-Qgis-browse.png){width=4%}) and from the tutorial material select “…\\QGIS-Tim_Tutorial\\dbase\\bombs.shp”.
+(@) Click on *Add* and *Close* the window.
+
+![](figures/tutorial/emoji-tip.png){width=3%} **Tip:** a fast alternative for adding layers: from the menu *View > Toolbar* add the *Manage Layers Toolbar* and use the button ![](figures/tutorial/button-Qgis-VectorLayer.png){width=4%}.
+
+(@) In the *Layers* panel on the left, select the layer "bombs".
+(@) Click your right mouse button and from the menu select *Show Labels*.
+(@) You can zoom in and out with the scroll button on your mouse or navigate with the buttons in the main menu: ![](figures/tutorial/button_zoom-menu.png){width=40%}
+(@) Use ![](figures/tutorial/button_zoomPan.png){width=4%} to pan the map with your left mouse button and use ![](figures/tutorial/button_zoomtolayer.png){width=4%} to zoom to the extend of the layers/groups selected in the *Layers* panel.
+-->
+
+### Start your Tim model
+Now we are ready to activate the QGIS-Tim plugin. 
+
+(@) Click on the QGIS-Tim plugin button (![](figures/tutorial/button-Qgis-tim.png){width=4%}) and the QGIS-Tim panel appears.
+(@) Go to the tab *GeoPackage*. <br> Here we will create an empty database (geopackage) to store all elements and parameters for the model. 
+(@) Click the *New* button to create the GeoPackage and save it for instance in the folder with your tutorial data, e.g. "..\\QGIS-Tim_Tutorial\\dbase\\case-TheHague.gpkg".
+
+
+Let's save this project to be able to return to it later or in case of a crash of QGIS.
+
+(@) Go to *Project* in the main menu, select *Save As* and select a folder and a file name for your project, e.g. “…\\QGIS-Tim_Tutorial\\TheHague.qgz”
+
+## Checking available data
+Research what possible layer info is available from LHM (Landelijk hydrologisch model). Information from LHM is made available in the provided file “…\\QGIS-Tim_Tutorial\\LHM4.1-ondergrondmodel.nc"
+
+<r>Frans: beschrijf wat Extract gaat doen </r> 
+
+(@) In the QGIS-TimML Window go to the *Extract* tab. 
+(@) Open the file LHM4.1-ondergrondmodel.nc (this may take a minute because the file is 350 MB). 
+(@) Click the button *Select by Polygon* and draw a polygon to select an area around the building location (left click several times and last point to end with right click).  
+(@) Then use the *Extract* button and a window will pop up to ask in which directory the created csv with subsoil data can be placed (I called it Ex2DH.csv). <br> A python prompt will be opened and selection is performed. You can follow the progress in your tool bar. 
+
+<r>Frans: 2 of alles in 1? </r> 
+
+Automatically 2 csv files will be created: one with average values for bottom and top of layers and aquifer permeabilities en aquitard resistances, and another with statistics on the data. 
+
+(@) From your explorer open the CVS-files 
+
+The values from the first CSV are presented in Table 1. In each LHM layer Aquitard is positioned on top of Aquifer. 
+
+| fid| layer| aquitard_c| aquitard_npor| aquitard_s| aquifer_k| aquifer_npor| aquifer_s| aquifer_top| aquifer_bottom| semiconf_top| semiconf_head|
+|---|---|---|---|---|---|---|---|---|---|---|---|
+|     0    |     0    |  |  |  |  |  |  |  |  |  |  |
+|     1    |     1    |     287    |  |  |     62.37    |  |  |     -18.97    |     -38.30    |  |  |
+|     2    |     2    |     1    |  |  |     37.94    |  |  |     -38.30    |     -60.54    |  |  |
+|     3    |     3    |     3056    |  |  |     13.21    |  |  |     -66.62    |     -77.50    |  |  |
+|     4    |     4    |     708    |  |  |     9.25    |  |  |     -84.59    |     -88.38    |  |  |
+|     5    |     5    |     3143    |  |  |     10.94    |  |  |     -106.06    |     -120.63    |  |  |
+|     6    |     6    |     8092    |  |  |     5.68    |  |  |     -151.11    |     -254.94    |  |  |
+|     7    |     7    |     17752    |  |  |     3.10    |  |  |     -307.82    |     -390.71    |  |                |
+: The characteristics of the subsoil based on LHM data
+
+A choice should be made at which depth the hydrogeological base is chosen for this project. Where high aquifer k is followed by a large aquifer c the base is chosen. For this case the base is chosen at -60.5 m (all depth data in m NAP). As you can see values for Holocene layers are not available here and thus not displayed in LHM results.
+Aquitard resistance in the city is quite high, so a value of 750 days is best guess form experience. For marine deposits at -12 a value of 50 to 100 days per meter layer thickness is a proper choice. The permeability of fine Holocene sand is chosen at 10 m/d.
+
+<r>Frans: waarom nieuwe versie? </r> 
+
+(@) In the QGIS-TimML Window go to the *Geopackage* tab.
+(@) Selecting *New* to create a new Geopackage and save it in your desired directory. 
+
+The TIMml elements of Aquifer and Domain appear in the QGISTIM Window as they are always added by default. The layers are also added in the Layers Window as Timml input and Ttim input.
+
+(@) From the *Layers* panel, right click on the *Timml aquifer: Aquifer*. 
+(@) Click your right mouse button and from the menu select *Attribute table* and click on *Toggle Editing*.
+(@) Then by clicking *Add feature* you will be able to fill in the desired values shown in @fig-AquiferAttrTable_v01.
+
+For each desired next layer you need to select add feature separately. 
+
+![The characteristics of the aquifer](figures/tutorial/Panel-Timml AquiferAttrTable_v01.png){width=80% #fig-AquiferAttrTable_v01} 
+
+In the QGIS-TimML Window we now introduce the following elements in the Element Tab: 
+
+- Leaky Line Doublet
+- Well
+
+To help maneuvering in the QGIS we first draw the circumference of the building location in QGIS. We can do it by creating a drawing in the menu option Layer, choosing Create layer, New shapefile layer. We create a new polygon geometry. Don’t forget to set the proper path to your directory and to fill in the right CRS (see @fig-NewShapefileLayer).  
+
+(@) Click in the Layers panel on the shape
+(@) <r> and draw with (buton) a polygon. </r>
+
+By using the vertex option you can adjust the geometry shape with help of the measuring tool of QGIS.
+
+![Creating a new shapefile drawing in the map](figures/tutorial/Panel-QGIS-NewShapefileLayer.png){width=80% #fig-NewShapefileLayer} 
+
+(@) In the QGISTIM panel tab Elements select the button Leaky line doublet. 
+(@) Fill in the name of the layer in the popup panel.
+(@) At this step you can create the mentioned rectangular area of  34.5 m * 84.7 m as shown in Figure 6. 
+(@) In the Layers Window right click on TIMml Leaky Line Doublet and in the menu select Toggle editing. 
+(@) Then select the Add line feature icon, ending last point is first point, right click to close the geometry.
+(@) In the popup panel fill in resistance and layer (upper=0) and save it. 
+
+In order to make a closed area surrounded with the sheet piles, the first and last point must have the same coordinate and intersect. 
+
+(@) To do so you can click on (self snapping) from the toolbar. 
+
+You can activate this option by going to the QGIS menu Project, snapping options, where you can activate by clicking the left and right button.
+
+Figure 7 Switching on snapping options
+Figure 8 The characteristics of the Leaky line doublet 
+
+(@) Go to the QGISTIM panel and select the Well element. A Name for the element can be given in the popup panel. Then got to the timml Well layer in the Layers panel. Click the mouse on this layer and then go to the digitizing toolbar to click Toggle editing  .  Next click on  (Add point feature). At this step you can add the wells similar to the points in Figure 6. After each positioning you need to fill in values for well parameters, at least discharge (50 m3/d), radius (0.1 m), resistance (1 d), layer where the well is active (0)
+
+(@) In the Layers panel right click the TIMml Well layer and open the attribute table. Then check the values shown in Figure 9. The discharge value in the table is a first guess to be adjusted later to desired level of -3.5m groundwater lowering in the building pit.
+
+Figure 9 Schematization of the pumping wells and the sheet piles
+
+(@) When you are done drawing the sheet pile wall the Feature Attributes panel pops up automatically. You need to fill in parameter values. For normal sheet pile walls a resistance value of 100 d for interlock leakage is a good choice. 
+Because of a known error in the Timml software, until this issue is resolved, the value of the resistance must be multiplied by the permeability, in this case Resistance will become 10*100. BIJ DAMWAND The order is the default value of 4…Huite??
+
+Figure 10 Well properties
+
+Open the attribute table for Leaky line doublet to check hydraulic resistance values for the sheet pile walls. Due to an aberration in the program for the moment the normal value of sheet pile wall resistance needs to be increased by multiplying with the applicable aquifer permeability in the effected layer (in this case R=100 d becomes R=10*100 d).
+## Computing the groundwater head lowering:
+
+(@) As shown in 9, zoom in to desired scale, then go to the QGISTIM panel and select the Compute tab. Set the domain to current extent. Grid spacing will follow automatically. Make the mesh more or less dense by changing Grid spacing to desired density. 
+(@) Give the name of the file where you want to store the results. 
+
+Figure 11 Compute settings
+
+(@) For contouring check the auto generate option. Set the increment for contouring to a proper value: 0.5, 0.25 or 0.1 as applicable for your study. 
+(@) Then press the compute button to have the program perform the calculations. A python program screen will be started (but calculations take place in the background). While the calculation is running the progress is shown in the QGIS button in the task bar.
+(@) If you want to see contouring isolines on the map uncheck the mesh and raster output.
+The lowering in the building pit is shown to be around -7.5m. To get it around -3.5m as demanded the well discharge should be decreased accordingly. 
+(@) An extra calculation with half the flow per well will be sufficient. Go to the well attribute table and adjust the flow to 50%. Then again run the program.
+
+However we can observe that the lowering of groundwater around the building pit is quite high due to leakage of the sheet piles. Therefore it is needed to improve the wall quality.
+
+Figure 12 Updated results of groundwater head lowering contours due to 8 wells 25 m3/d and a sheet pile wall with 100d wall resistance 
+
+The city authorities that perform quality checks on the effect of construction projects insisted on the installation of some piezometers to assure reduction of risks for surrounding old monumental structures.
+
+(@) in the QGISTIM Elements tab select the element Observation. Give a name in the pop up panel. Then go to the Layers panel and select the timml Observatio layer. Go to the toolbar with drawing options and activate Toggle editing  . Go right to the Add point feature and drop some piezometers in the drawing.
+(@) Run the program again.
+
+## Studying output results
+**Mesh, raster and contours**
+
+Results of calculations are presented as Mesh, Raster and Contour data in the layers menu.
+
+Tip: In the layer window the Open street map layer must be dragged or positioned at the bottom so that the desired contour lines will be shown and can be observed. 
+
+(@) Outcheck mesh and raster to only visualize contours on the base map as in Figure 12
+
+Figure 9  Drawdown contour lines
+Create a cross section
+
+(@) To make a cross section in the toolbar with iMod plugins click  (Cross Section). 
+(@) From the dropdown menu on the left of this toolbar, select the raster    with layer_0”. 
+(@) Check As Line and press Add
+(@) On the iMOD Cross Section Plot click on the button Select location and draw your cross-section line like in Figure 10. Draw a line by left clicking on the map and right clicking to stop drawing.
+(@) Click the button Plot to draw this layer in the cross section.
+(@) By using the Export button you can store results from the cross section in a CSV file.
+
+Figure 10 cross sections
+
+VERDER IS HET NOG NIET AF <br>
+EXTRA LAAG IN SHEET PILES TOEVOEGEN <br>
+OPENING IN DAMWAND MAKEN <br>
+Nogmaals berekenen <br>
+With the opening and order02 (about 30 cm)  <br>

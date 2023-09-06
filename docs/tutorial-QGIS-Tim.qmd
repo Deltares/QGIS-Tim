@@ -1,5 +1,5 @@
 ---
-title: "Tutorial QGIS-Tim"
+title: "Tutorial Building Pit"
 ---
 
 ## Requirements
@@ -13,13 +13,13 @@ title: "Tutorial QGIS-Tim"
 In this tutorial, you will learn how to:
 
 - install and use the QGIS-Tim plugin;
-- use the basic of QGIS for pre- and postprocessing of Tim;
-- create several steady state models (TimML) and a transient model (TTim); 
+- use the basic of QGIS for pre- and postprocessing of TIM;
+- create several steady state models (TimML) and a transient model (TTim);
 - analyse the results;
 - export your model to a Python script.
 
 ## Objective
-With the basic experience from this tutorial and the online documentation on Tim you are able to use Tim in your daily work.
+Calculation of a pumping well extraction.
 
 ## Introduction case *Rijsenhout*
 
@@ -110,7 +110,7 @@ For navigation purposes, let's load a topographic map for The Netherlands from t
 
 
 (@) If you do have an internet connection click on the PDOK plugin button (![](figures/tutorial/button-PDOK.png){width=4%}) to open the "PDOK Services Plugin" window. 
-(@) From the tab *PDOK Services* search for "pastel" and you will find a WMTS type layer called "brtachtergrondkaart". 
+(@) From the tab *PDOK Services* search for "pastel" and you will find a WMTS type layer called "BTRM Achtergrondkaart WMTS". 
 (@) Select the layer.
 (@) In the section "laag toevoegen" click the button *Onder*. 
 (@) Close the PDOK window.
