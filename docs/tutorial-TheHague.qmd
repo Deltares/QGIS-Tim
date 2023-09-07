@@ -38,12 +38,12 @@ The dimensions of the building pit are **34.5 m * 84.7 m.** The area is shown in
 
 Your window looks like in @fig-TheHagueCityCenter.
 
-![Schematization of the building area in The Hague city center](figures/tutorial/photo-TheHagueCityCenter.png){width=80% #fig-TheHagueCityCenter} 
+![Schematization of the building area in The Hague city center](figures/tutorial/photo-TheHagueCityCenter.png){width=80% #fig-TheHagueCityCenter fig-align="left"} 
 
 To carry out the construction in dry conditions, the groundwater level needs to be lowered by **3.5 m.** The required drainage time is 4 months. <br> 
 The environment is vulnerable with valuable buildings and monuments that have a shallow foundation. The subsoil consists of sandy layers which locally contain shallow peat/clay/silt layers and deeper layers of clay/silt. The builder contractor must use a sheet pile wall that needs to be installed in a water-retarding layer (aquitard).
 
-![The monumental environment](figures/tutorial/photo-TheMonumentalEnvironment.png){width=60% #fig-TheMonumentalEnvironment} 
+![The monumental environment](figures/tutorial/photo-TheMonumentalEnvironment.png){width=60% #fig-TheMonumentalEnvironment fig-align="left"} 
 
 **The question to be elaborated in the hydrogeological advice is:** <br>
 *"how deep should a sheet pile wall be placed to prevent damage and can risks arise from a leak."*
@@ -72,7 +72,7 @@ Based on experience in this region, the following geohydrological schematization
 ||Aquifer|-60||25|200000|
 : Geohydrological model of the subsoil
 
-![CPT to a depth of NAP -20m](figures/tutorial/figure-CPT01.png ){width=70% #fig-CPT01} 
+![CPT to a depth of NAP -20m](figures/tutorial/figure-CPT01.png ){width=70% #fig-CPT01 fig-align="left"} 
 
 According to DINOloket, the average groundwater level on site is NAP -0.4m. There are strict demands from authorities for allowable groundwater lowering.  The maximum allowed lowering is 0.5 m outside the construction pit.
 
@@ -88,7 +88,6 @@ Tasks:
 - Estimate the water burden to keep the well dry. Also use the excel file.
 - What are the risks? Look at the groundwater lowering outside the construction pit in the different situations
 - Also check for point leaks. Model it with a hole in the sheet pile in the northwest corner of the area.
-
 
 ## Getting Started 
 Let's first configure the gistim python installation again, to be sure that QGIS can find the gistim software.
@@ -250,8 +249,8 @@ Aquitard resistance in the city is quite high, so a value of 750 days is best gu
 The TIMml elements of Aquifer and Domain appear in the QGISTIM Window as they are always added by default. The layers are also added in the Layers Window as Timml input and Ttim input.
 
 (@) From the *Layers* panel, right click on the *Timml aquifer: Aquifer*. 
-(@) Click your right mouse button and from the menu select *Attribute table* and click on *Toggle Editing*.
-(@) Then by clicking *Add feature* you will be able to fill in the desired values shown in @fig-AquiferAttrTable_v01.
+(@) Click your right mouse button and from the menu select *Attribute table* and click on (![](figures/tutorial/button-Qgis-AttributeTable-StartEditingMode.png ){width=4%}) *Toggle Editing*.
+(@) Then by clicking (![](figures/tutorial/button-Qgis-AttributeTable-AddFeature.png){width=4%}) *Add feature* you will be able to fill in the desired values shown in @fig-AquiferAttrTable_v01.
 
 For each desired next layer you need to select add feature separately. 
 
@@ -265,7 +264,7 @@ In the QGIS-TimML Window we now introduce the following elements in the Element 
 To help maneuvering in the QGIS we first draw the circumference of the building location in QGIS. We can do it by creating a drawing in the menu option Layer, choosing Create layer, New shapefile layer. We create a new polygon geometry. Don’t forget to set the proper path to your directory and to fill in the right CRS (see @fig-NewShapefileLayer).  
 
 (@) Click in the Layers panel on the shape
-(@) <r> and draw with (buton) a polygon. </r>
+(@) <r> and draw with (![](figures/tutorial/button-Qgis-AttributeTable-StartEditingMode.png ){width=4%}) a polygon. </r>
 
 By using the vertex option you can adjust the geometry shape with help of the measuring tool of QGIS.
 
@@ -273,48 +272,63 @@ By using the vertex option you can adjust the geometry shape with help of the me
 
 (@) In the QGISTIM panel tab Elements select the button Leaky line doublet. 
 (@) Fill in the name of the layer in the popup panel.
-(@) At this step you can create the mentioned rectangular area of  34.5 m * 84.7 m as shown in Figure 6. 
+(@) At this step you can create the mentioned rectangular area of  34.5 m * 84.7 m as shown in @fig-SchematizationTheHague. 
 (@) In the Layers Window right click on TIMml Leaky Line Doublet and in the menu select Toggle editing. 
 (@) Then select the Add line feature icon, ending last point is first point, right click to close the geometry.
 (@) In the popup panel fill in resistance and layer (upper=0) and save it. 
 
 In order to make a closed area surrounded with the sheet piles, the first and last point must have the same coordinate and intersect. 
 
-(@) To do so you can click on (self snapping) from the toolbar. 
+(@) To do so you can click on (self snapping) from the toolbar (see @fig-button_ToolbarSnappingSettings). 
 
 You can activate this option by going to the QGIS menu Project, snapping options, where you can activate by clicking the left and right button.
 
-Figure 7 Switching on snapping options
-Figure 8 The characteristics of the Leaky line doublet 
+![Switching on snapping options](figures/tutorial/button_ToolbarSnappingSettings.png){width=80% #fig-button_ToolbarSnappingSettings} 
 
-(@) Go to the QGISTIM panel and select the Well element. A Name for the element can be given in the popup panel. Then got to the timml Well layer in the Layers panel. Click the mouse on this layer and then go to the digitizing toolbar to click Toggle editing  .  Next click on  (Add point feature). At this step you can add the wells similar to the points in Figure 6. After each positioning you need to fill in values for well parameters, at least discharge (50 m3/d), radius (0.1 m), resistance (1 d), layer where the well is active (0)
+@fig-LeakylinedoubletFeatureAttributes
 
-(@) In the Layers panel right click the TIMml Well layer and open the attribute table. Then check the values shown in Figure 9. The discharge value in the table is a first guess to be adjusted later to desired level of -3.5m groundwater lowering in the building pit.
+![The characteristics of the Leaky line doublet](figures/tutorial/figure_LeakylinedoubletFeatureAttributes.png){width=60% #fig-LeakylinedoubletFeatureAttributes fig-align="left"} 
 
-Figure 9 Schematization of the pumping wells and the sheet piles
+
+(@) Go to the QGISTIM panel and select the Well element. A Name for the element can be given in the popup panel. Then got to the timml Well layer in the Layers panel. Click the mouse on this layer and then go to the digitizing toolbar to click Toggle editing.  Next click on  (Add point feature). At this step you can add the wells similar to the points in @fig-SchematizationTheHague. After each positioning you need to fill in values for well parameters, at least discharge (50 m3/d), radius (0.1 m), resistance (1 d), layer where the well is active (0).
+
+(@) In the Layers panel right click the TIMml Well layer and open the attribute table. Then check the values shown in @fig-SchematizationTheHague. The discharge value in the table is a first guess to be adjusted later to desired level of -3.5 m groundwater lowering in the building pit.
+
+![Schematization of the pumping wells and the sheet piles](figures/tutorial/figure_SchematizationTheHague.png){width=100% #fig-SchematizationTheHague} 
 
 (@) When you are done drawing the sheet pile wall the Feature Attributes panel pops up automatically. You need to fill in parameter values. For normal sheet pile walls a resistance value of 100 d for interlock leakage is a good choice. 
-Because of a known error in the Timml software, until this issue is resolved, the value of the resistance must be multiplied by the permeability, in this case Resistance will become 10*100. BIJ DAMWAND The order is the default value of 4…Huite??
+Because of a known error in the Timml software, until this issue is resolved, the value of the resistance must be multiplied by the permeability, in this case Resistance will become 10*100. <r> BIJ DAMWAND The order is the default value of 4…Huite?? </r>
 
-Figure 10 Well properties
+@fig-WellAttributeTable  
+
+![Well properties](figures/tutorial/figure_WellAttributeTable.png){width=100% #fig-WellAttributeTable} 
 
 Open the attribute table for Leaky line doublet to check hydraulic resistance values for the sheet pile walls. Due to an aberration in the program for the moment the normal value of sheet pile wall resistance needs to be increased by multiplying with the applicable aquifer permeability in the effected layer (in this case R=100 d becomes R=10*100 d).
-## Computing the groundwater head lowering:
+
+## Computing the groundwater head lowering
 
 (@) As shown in 9, zoom in to desired scale, then go to the QGISTIM panel and select the Compute tab. Set the domain to current extent. Grid spacing will follow automatically. Make the mesh more or less dense by changing Grid spacing to desired density. 
 (@) Give the name of the file where you want to store the results. 
 
-Figure 11 Compute settings
+@fig-ComputeSettings  
+
+![Compute settings](figures/tutorial/figure_ComputeSettings.png){width=45% #fig-ComputeSettings fig-align="left"} 
+
 
 (@) For contouring check the auto generate option. Set the increment for contouring to a proper value: 0.5, 0.25 or 0.1 as applicable for your study. 
 (@) Then press the compute button to have the program perform the calculations. A python program screen will be started (but calculations take place in the background). While the calculation is running the progress is shown in the QGIS button in the task bar.
 (@) If you want to see contouring isolines on the map uncheck the mesh and raster output.
-The lowering in the building pit is shown to be around -7.5m. To get it around -3.5m as demanded the well discharge should be decreased accordingly. 
+The lowering in the building pit is shown to be around -7.5 m. To get it around -3.5 m as demanded the well discharge should be decreased accordingly. 
 (@) An extra calculation with half the flow per well will be sufficient. Go to the well attribute table and adjust the flow to 50%. Then again run the program.
 
 However we can observe that the lowering of groundwater around the building pit is quite high due to leakage of the sheet piles. Therefore it is needed to improve the wall quality.
 
-Figure 12 Updated results of groundwater head lowering contours due to 8 wells 25 m3/d and a sheet pile wall with 100d wall resistance 
+@fig-DrawdownConstructionPit_v01  
+
+![Updated results of groundwater head lowering contours due to 8 wells 25 m3/d and a sheet pile wall with 100d wall resistance](figures/tutorial/figure_DrawdownConstructionPit_v01.png){width=70% #fig-DrawdownConstructionPit_v01  fig-align="left"} 
+
+
+
 
 The city authorities that perform quality checks on the effect of construction projects insisted on the installation of some piezometers to assure reduction of risks for surrounding old monumental structures.
 
@@ -328,22 +342,25 @@ Results of calculations are presented as Mesh, Raster and Contour data in the la
 
 Tip: In the layer window the Open street map layer must be dragged or positioned at the bottom so that the desired contour lines will be shown and can be observed. 
 
-(@) Outcheck mesh and raster to only visualize contours on the base map as in Figure 12
+(@) Outcheck mesh and raster to only visualize contours on the base map as in @fig-DrawdownConstructionPit_v01
 
-Figure 9  Drawdown contour lines
-Create a cross section
+<r> Figure 9  Drawdown contour lines ...  dubbelle figuur?</r>
+
+## Create a cross section
 
 (@) To make a cross section in the toolbar with iMod plugins click  (Cross Section). 
 (@) From the dropdown menu on the left of this toolbar, select the raster    with layer_0”. 
 (@) Check As Line and press Add
-(@) On the iMOD Cross Section Plot click on the button Select location and draw your cross-section line like in Figure 10. Draw a line by left clicking on the map and right clicking to stop drawing.
+(@) On the iMOD Cross Section Plot click on the button Select location and draw your cross-section line like in @fig-HeadsInCrosssection03. Draw a line by left clicking on the map and right clicking to stop drawing.
 (@) Click the button Plot to draw this layer in the cross section.
 (@) By using the Export button you can store results from the cross section in a CSV file.
 
-Figure 10 cross sections
+@fig-HeadsInCrosssection03
 
-VERDER IS HET NOG NIET AF <br>
+![Cross section](figures/tutorial/figure_HeadsInCrosssection03.png){width=100% #fig-HeadsInCrosssection03} 
+
+<r> VERDER IS HET NOG NIET AF <br>
 EXTRA LAAG IN SHEET PILES TOEVOEGEN <br>
 OPENING IN DAMWAND MAKEN <br>
 Nogmaals berekenen <br>
-With the opening and order02 (about 30 cm)  <br>
+With the opening and order02 (about 30 cm)  <br> </r>
