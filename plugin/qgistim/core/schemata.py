@@ -67,10 +67,9 @@ class Required(BaseSchema):
 
 
 class Positive:
-    def validate(self, data):
-        for value in data:
-            if value is not None and value < 0:
-                raise ValidationError(f"Non-positive value: {value}")
+    def validate(self, value):
+        if value < 0:
+            raise ValidationError(f"Non-positive value: {value}")
         return
 
 
