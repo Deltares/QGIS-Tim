@@ -7,6 +7,40 @@ y { color: Yellow }
 gr { color: Gray }
 </style>
 
+<style>
+ul.a {list-style-type: circle;}
+ul.b {list-style-type: disc;}
+ul.c {list-style-type: square;}
+ol.d {list-style-type: armenian;}
+ol.e {list-style-type: cjk-ideographic;}
+ol.f {list-style-type: decimal;}
+ol.g {list-style-type: decimal-leading-zero;}
+ol.h {list-style-type: georgian;}
+ol.i {list-style-type: hebrew;}
+ol.j {list-style-type: hiragana;}
+ol.k {list-style-type: hiragana-iroha;}
+ol.l {list-style-type: katakana;}
+ol.m {list-style-type: katakana-iroha;}
+ol.n {list-style-type: lower-alpha;}
+ol.o {list-style-type: lower-greek;}
+ol.p {list-style-type: lower-latin;}
+ol.q {list-style-type: lower-roman;}
+ol.r {list-style-type: upper-alpha;}
+ol.s {list-style-type: upper-greek;}
+ol.t {list-style-type: upper-latin;}
+ol.u {list-style-type: upper-roman;}
+ol.v {list-style-type: none;}
+ol.w {list-style-type: inherit;}
+</style>
+
+<!--
+<ul class="a">
+  <li>Circle type</li>
+  <li>Tea</li>
+  <li>Coca Cola</li>
+</ul>
+-->
+
 ---
 title: "Tutorial The Hague building pit"
 ---
@@ -22,7 +56,7 @@ title: "Tutorial The Hague building pit"
 In this tutorial, you will learn how to:
 
 - install and use the QGIS-Tim plugin;
-- use the basic of QGIS for pre- and postprocessing of TIM;
+- use the basic of QGIS for pre- and postprocessing of Tim;
 - create several steady state models (TimML) and a transient model (TTim);
 - analyse the results;
 - export your model to a Python script.
@@ -34,12 +68,12 @@ Calculation of a pumping well extraction.
 In the old city center of The Hague a building plan with a parking basement is constructed.
 The dimensions of the building pit are **34.2 m * 83.2 m.** The area is shown in @fig-TheHagueCityCenter.
 
-![Schematization of the building area in The Hague city center](figures/tutorial/photo-TheHagueCityCenter.png){width=80% #fig-TheHagueCityCenter fig-align="left"} 
+![Schematization of the building area in The Hague city center (orange: building pit)](figures/tutorial/photo-TheHagueCityCenter.png){width=80% #fig-TheHagueCityCenter fig-align="left"} 
 
 To carry out the construction in dry conditions, the groundwater level needs to be lowered by **3.5 m.** The required drainage time is 4 months. <br> 
 The environment is vulnerable with valuable buildings and monuments (see @fig-TheMonumentalEnvironment) that have a shallow foundation. The subsoil consists of sandy layers which locally contain shallow peat/clay/silt layers and deeper layers of clay/silt. The builder contractor must use a sheet pile wall that needs to be installed in a water-retarding layer (aquitard).
 
-![The monumental environment](figures/tutorial/photo-TheMonumentalEnvironment.png){width=60% #fig-TheMonumentalEnvironment fig-align="left"} 
+![The monumental environment](figures/tutorial/photo-TheMonumentalEnvironment.png){width=70% #fig-TheMonumentalEnvironment fig-align="left"} 
 
 **The questions to be elaborated in the hydrogeological advice is:** <br>
 *"How deep should a sheet pile wall be placed to prevent damage? Can risks arise from a leak?"*
@@ -66,7 +100,7 @@ table {
 </style>
 |Cluster|Layer type|Layer Bottom|c|K|E-oed|
 |:-:|--:|--:|--:|--:|--:|
-|||[m]|[dagen]|[m/dag]|[kPa]|
+|||[m]|[days]|[m/day]|[kPa]|
 |1|Aquitard|-1|3000||33|
 ||Aquifer|-5||10|160|
 |2|Aquitard|-8|40||10000|
@@ -75,17 +109,18 @@ table {
 ||Aquifer|-60||25|200000|
 : Geohydrological model of the subsoil
 
-According to DINOloket, the average groundwater level on site is NAP -0.5 m. There are strict demands from authorities for allowable groundwater lowering. The maximum allowed drawdown outside the construction pit is 0.1 m. <br> To perform the calculation, dewatering is schematized to 8 wells. 
+According to <a href="https://www.dinoloket.nl" target="_blank">DINOloket</a> the average groundwater level on site is NAP -0.5 m. There are strict demands from authorities for allowable groundwater lowering. The maximum allowed drawdown outside the construction pit is 0.1 m. <br> To perform the calculation, dewatering is schematized to 8 wells. 
 
 **Tip: Don't place the wells in the model too close to the sheet piles.**
 
 Tasks:
-- Which element form the TIM package would you use to place the wells and sheet piles?
-- Do you need to install sheet piles deep (in sand layers of aquifer 1 and 2) or shallow (only in the first sand layer of aquifer 1)
-- Investigate the effect of the presence of a lower or higher hydraulic resistance in the layer between NAP -5.5 m and -8.5 m
+
+- Which element from the Tim package would you use to place the wells and sheet piles?
+- Do you need to install sheet piles deep (in sand layers of aquifer 1 and 2) or shallow (only in the first sand layer of aquifer 1)?
+- Investigate the effect of the presence of a lower or higher hydraulic resistance in the layer between NAP -5.5 m and -8.5 m.
 - Estimate the extraction rate to keep the building pit dry. <r> Also use the excel file [??] </r>.
-- What are the risks? Look at the groundwater drawdown outside the construction pit in the different situations with sheet pile depth
-- Also check for point leaks. Model it with a hole in the sheet pile in the southwest corner of the area.
+- What are the risks? Look at the groundwater drawdown outside the construction pit in situations with different sheet pile depth.
+- Also check for point leaks. Model these leaks with a hole in the sheet pile in the southwest corner of the area.
 
 ## Getting Started 
 Let's first configure the gistim python installation again, to be sure that QGIS can find the gistim software.
@@ -104,7 +139,6 @@ Let's first configure the gistim python installation again, to be sure that QGIS
 > a. Check the box to allow *Override System Locale* (Dutch: *Landinstellingen negeren*) and expand this sub menu. 
 > a. From the drop-down menu *“User interface translation”* (Dutch: *Vertaling gebruikers-interface*) select *American English* and click *OK*. 
 > a. Close QGIS and open it again to activate your language change.
-
 
 We start with the creation of a new QGIS project.
 
@@ -153,11 +187,8 @@ See in the toolbar section of QGIS that the plugins are installed:
 
 Further in this Tutorial we will use some default toolbars that might be hidden at the moment. Let's check that and unhide if necessary. 
 
-(@) Select *View* from the main menu and choose *Toolbars*.
-(@) Be sure these three toolbars are checed:
-+ "Advanced Digitizing Toolbar"
-+ "Snapping Toolbar"
-+ "Attributes Toolbar".
+(@) Select *View* from the main menu and choose *Panels* and be sure these two toolbars are checked: <br> - Layers <br> - Browser.
+(@) Select *View* from the main menu and choose *Toolbars* and be sure these three toolbars are checked: <br> - Advanced Digitizing Toolbar <br> - Snapping Toolbar <br> - Attributes Toolbar.
 
 ### Prepare your project
 For navigation purposes, let's load a topographic map for The Netherlands from the online PDOK database. 
@@ -171,64 +202,76 @@ For navigation purposes, let's load a topographic map for The Netherlands from t
 > - Continue after step @continuewithoutinternet.
 
 
-(@) If you do have an internet connection click on the PDOK plugin button (![](figures/tutorial/button-PDOK.png){width=4%}) to open the "PDOK Services Plugin" window. 
-(@) From the tab *PDOK Services* search for "pastel" and you will find a WMTS type layer called "BTRM Achtergrondkaart WMTS". 
-(@) Select the layer.
-(@) In the section "laag toevoegen" click the button *Onder*. 
-(@) Close the PDOK window.
+(@) If you do have an internet connection go to the *Browser* panel on the left open the group *XYZ Tiles*.
+(@) Double click on ![](figures/tutorial/button_OpenStreetMap.png){width=15%} to load this map to the panel *Layers*.  
+(@) You might close the panel *Browser* now (click on X) in order to give the panel *Layers* the full vertical space. 
 
 Our project area is in the centre of the city of The Hague so let's navigate to that city using the PDOK plugin.
 
 (@) Type "Parkstraat" in the PDOK search field, near the PDOK button (![](figures/tutorial/button-PDOK-search.png){width=20%})
-(@continuewithoutinternet) On of the locations PDOK will find "Parkstraat, 's-Gravenhage". Click on it and QGIS will fly you to the project location.
+(@continuewithoutinternet) One of the locations PDOK will find is "Parkstraat, 's-Gravenhage". Click on it and QGIS will fly you to the project location.
 
-<!--
-Let's now open a shape file containing the locations and depths of the bombs.
+Let's now open a shape file containing the circumference of the building location.
 
 (@) Go to *Layer* in the main menu, go to *Add layer* and select *Add Vector layer*.
-(@) Use the browse button (![](figures/tutorial/button-Qgis-browse.png){width=4%}) and from the tutorial material select “…\\QGIS-Tim_Tutorial\\dbase\\bombs.shp”.
+(@) Use the browse button (![](figures/tutorial/button-Qgis-browse.png){width=4%}) and from the tutorial material select “…\\QGIS-Tim_Tutorial\\dbase\\building_pit.shp”.
 (@) Click on *Add* and *Close* the window.
 
 ![](figures/tutorial/emoji-tip.png){width=3%} **Tip:** a fast alternative for adding layers: from the menu *View > Toolbar* add the *Manage Layers Toolbar* and use the button ![](figures/tutorial/button-Qgis-VectorLayer.png){width=4%}.
 
-(@) In the *Layers* panel on the left, select the layer "bombs".
-(@) Click your right mouse button and from the menu select *Show Labels*.
-(@) You can zoom in and out with the scroll button on your mouse or navigate with the buttons in the main menu: ![](figures/tutorial/button_zoom-menu.png){width=40%}
-(@) Use ![](figures/tutorial/button_zoomPan.png){width=4%} to pan the map with your left mouse button and use ![](figures/tutorial/button_zoomtolayer.png){width=4%} to zoom to the extend of the layers/groups selected in the *Layers* panel.
--->
+(@) In the *Layers* panel on the left, select the layer "building_pit".
+(@) Click your right mouse button and from the menu select *Properties*.
+(@) In the new window go to the section *Symbology* on the left and try to pick a polygon style with only a contour color. 
+(@) Click on *OK* a to save and close the window.
 
-### Start your Tim model
+Let's save this project to be able to return to it later or in case of a crash of QGIS.
+
+(@) Go to *Project* in the main menu, select *Save As* and select a folder and a file name for your project, e.g. “…\\QGIS-Tim_Tutorial\\Rijsenhout.qgz”
+
+### Open the QGIS-Tim panel
 Now we are ready to activate the QGIS-Tim plugin. 
 
 (@) Click on the QGIS-Tim plugin button (![](figures/tutorial/button-Qgis-tim.png){width=4%}) and the QGIS-Tim panel appears.
 (@) Go to the tab *GeoPackage*. <br> Here we will create an empty database (geopackage) to store all elements and parameters for the model. 
 (@) Click the *New* button to create the GeoPackage and save it for instance in the folder with your tutorial data, e.g. "..\\QGIS-Tim_Tutorial\\dbase\\case-TheHague.gpkg".
 
+Your window looks like in @fig-Panel-QGIS-Tim_v02.
+
+![QGIS-Tim panel](figures/tutorial/Panel-QGIS-Tim_v02.png){width=60% #fig-Panel-QGIS-Tim_v02}
+
+(@) Check in the *Layers* panel on the left that your new geopackage is added as a group. <br> A sub group **timml** for the steady state model input, the sub group **ttim** for the transient model input and a series of output formats (vector/mesh/raster). 
+
+If you had no introduction to the Tim plugin, read the Intermezzo below for a general explanation of the components. 
+
+> **Intermezzo:** *introduction Tabs on the Tim panel* 
+> 
+> a. GeoPackage: an overview of the elements in your geopackage. In case you switch to transient modelling, an extra column with *ttim* elements is added. 
+> a. Elements: a list of 14 Tim elements from which you can build your model. 
+> a. Compute: here you can define your domain and cell size, decide if your model is transient or not and change the output name. 
+> a. Extract: open an existing 3d geohydrological model (NC file) and extract the data for your project area. 
 
 Let's save this project to be able to return to it later or in case of a crash of QGIS.
 
 (@) Go to *Project* in the main menu, select *Save As* and select a folder and a file name for your project, e.g. “…\\QGIS-Tim_Tutorial\\TheHague.qgz”
 
-## Checking available data
-Research what possible layer info is available from LHM (Landelijk hydrologisch model). Information from LHM is made available in the provided file “…\\QGIS-Tim_Tutorial\\LHM4.1-ondergrondmodel.nc"
+## Checking available data from LHM
+We wil now research what possible layer info is available from the LHM database (Landelijk hydrologisch model). Information from LHM is made available in the provided file “…\\QGIS-Tim_Tutorial\\LHM4.1-ondergrondmodel.nc". The file contains rasterdata of both the 3D geological layering within The Netherlands and the corresponding geological parameterization (permeability, resistance, thickness). 
 
-<r>Frans: beschrijf wat Extract gaat doen </r> 
+(@) In the QGIS-Tim panel go to the *Extract* tab. 
+(@) Open the file "..\\QGIS-Tim_Tutorial\\dbase\\LHM4.1-ondergrondmodel.nc" (this may take a minute because the file is 350 MB). 
+(@) Click the button *Select by Polygon* and draw a large polygon (> 250x250m) to select the area around the building location between *Parkstraat* and *Oranjestraat* (see @fig-TheHagueCityCenter). Left-click several times and close the polygon with a right click.  
+(@) Then click the *Extract* button and save the extracted subsoil data to a CSV file, e.g. "Ex2DH.csv". <br> A separate python window is opened and the selection is performed. You can follow the progress in your tool bar. 
 
-(@) In the QGIS-TimML Window go to the *Extract* tab. 
-(@) Open the file LHM4.1-ondergrondmodel.nc (this may take a minute because the file is 350 MB). 
-(@) Click the button *Select by Polygon* and draw a polygon to select an area around the building location (left click several times and last point to end with right click).  
-(@) Then use the *Extract* button and a window will pop up to ask in which directory the created csv with subsoil data can be placed (I called it Ex2DH.csv). <br> A python prompt will be opened and selection is performed. You can follow the progress in your tool bar. 
+> ![](figures/tutorial/figure_ExtractionError.png){width=80% #fig-figure_ExtractionError} <br> QGIS displays this error message in case your polygon is to small. In that case redraw your polygon for a larger area. 
 
-<r>Frans: 2 of alles in 1? </r> 
+Automatically 2 CSV files will be created. One with average values for bottom and top of layers and aquifer permeabilities and aquitard resistances. The other contains statistics on the data. 
 
-Automatically 2 csv files will be created: one with average values for bottom and top of layers and aquifer permeabilities en aquitard resistances, and another with statistics on the data. 
+(@) From a file manager on you laptop (e.g. Explorer) open the CVS files. 
 
-(@) From your explorer open the CVS-files 
+An example of values from the first CSV are presented in Table 1. In each LHM layer the Aquitard information is positioned on top of Aquifer. 
 
-The values from the first CSV are presented in Table 1. In each LHM layer Aquitard is positioned on top of Aquifer. 
-
-| fid| layer| aquitard_c| aquitard_npor| aquitard_s| aquifer_k| aquifer_npor| aquifer_s| aquifer_top| aquifer_bottom| semiconf_top| semiconf_head|
-|---|---|---|---|---|---|---|---|---|---|---|---|
+| fid <br> -| layer <br> -| aquitard <br> c| aquitard <br> npor| aquitard <br> s| aquifer <br> k| aquifer <br> npor| aquifer <br> s| aquifer <br> top| aquifer <br> bottom| semiconf <br> top| semiconf <br> head|
+|---|---|--:|--:|--:|--:|--:|--:|--:|--:|--:|--:|
 |     0    |     0    |  |  |  |  |  |  |  |  |  |  |
 |     1    |     1    |     287    |  |  |     62.37    |  |  |     -18.97    |     -38.30    |  |  |
 |     2    |     2    |     1    |  |  |     37.94    |  |  |     -38.30    |     -60.54    |  |  |
@@ -237,67 +280,89 @@ The values from the first CSV are presented in Table 1. In each LHM layer Aquita
 |     5    |     5    |     3143    |  |  |     10.94    |  |  |     -106.06    |     -120.63    |  |  |
 |     6    |     6    |     8092    |  |  |     5.68    |  |  |     -151.11    |     -254.94    |  |  |
 |     7    |     7    |     17752    |  |  |     3.10    |  |  |     -307.82    |     -390.71    |  |                |
-: The characteristics of the subsoil based on LHM data
+: The characteristics of the subsoil based on LHM data (example, your values may differ)
 
-A choice should be made at which depth the hydrogeological base is chosen for this project. Where high aquifer k is followed by a large aquifer c the base is chosen. For this case the base is chosen at -60.5 m (all depth data in m NAP). As you can see values for Holocene layers are not available here and thus not displayed in LHM results.
-Aquitard resistance in the city is quite high, so a value of 750 days is best guess form experience. For marine deposits at -12 a value of 50 to 100 days per meter layer thickness is a proper choice. The permeability of fine Holocene sand is chosen at 10 m/d.
+A choice should be made at which depth the hydrogeological base is chosen for this project. Where high aquifer k is followed by a large aquifer c the base is chosen. For this case the base is chosen at -60.5 m (all depth data in m NAP). As you can see, values for Holocene layers are not available here and thus not displayed in LHM results. <br><br>
+Aquitard resistance in the city is quite high, so a value of 750 days is best guess from experience. <br><br>
+For marine deposits at -12 a value of 50 to 100 days per meter layer thickness is a proper choice. The permeability of fine Holocene sand is chosen at 10 m/d.
 
-<r>Frans: waarom nieuwe versie? </r> 
+## Start your Tim model
+We are now ready to define our first steady state model by parameterizing our Aquifer.
 
-(@) In the QGIS-TimML Window go to the *Geopackage* tab.
-(@) Selecting *New* to create a new Geopackage and save it in your desired directory. 
-
-The TIMml elements of Aquifer and Domain appear in the QGISTIM Window as they are always added by default. The layers are also added in the Layers Window as Timml input and Ttim input.
-
-(@) From the *Layers* panel, right click on the *Timml aquifer: Aquifer*. 
-(@) Click your right mouse button and from the menu select *Attribute table* and click on (![](figures/tutorial/button-Qgis-AttributeTable-StartEditingMode.png ){width=4%}) *Toggle Editing*.
-(@) Then by clicking (![](figures/tutorial/button-Qgis-AttributeTable-AddFeature.png){width=4%}) *Add feature* you will be able to fill in the desired values shown in @fig-AquiferAttrTable_v01.
-
-For each desired next layer you need to select add feature separately. 
+(@) From the *Layers* panel, select the layer *timml Aquifer:Aquifer*. 
+(@) Click your right mouse button and from the menu select *Open Attribute table* (![](figures/tutorial/button-Qgis-OpenAttributeTable.png){width=3%}). Search for the same icon somewhere on the *Attributes Toolbar*.
+(@) Switch to the editing mode in the table with a click on (![](figures/tutorial/button-Qgis-AttributeTable-StartEditingMode.png ){width=4%}) *Toggle Editing*.
+(@) Then by clicking 3 times on (![](figures/tutorial/button-Qgis-AttributeTable-AddFeature.png){width=4%}) *Add feature* you will see new rows are added. 
+(@) Now you are able to fill in the desired values shown in @fig-AquiferAttrTable_v01. <br> 
+**NB do not fill in column FID. 'Autogenerate' will takes care.** 
 
 ![The characteristics of the aquifer](figures/tutorial/Panel-Timml AquiferAttrTable_v01.png){width=80% #fig-AquiferAttrTable_v01} 
 
-In the QGIS-TimML Window we now introduce the following elements in the Element Tab: 
+Closing this table window with the ![](figures/tutorial/Button_CloseWindow.png){width=2.5%} wil not save the filled in data or stop the editing mode! 
+
+(@) Click on the Save-Edits button (![](figures/tutorial/button_SavelayerEdits.png){width=3%}) to save you data during the process or click on the *Toggle Editing Mode* button (![](figures/tutorial/button-Qgis-AttributeTable-StartEditingMode.png ){width=4%}) to stop edditing and QGIS askes you if your changes should be saved. 
+(@) Now you can close the Attribute Table window.
+
+In the QGIS-Tim Window we now introduce the following elements for ground water modelling in the QGIS-Tim tab *Element*: 
 
 - Leaky Line Doublet
 - Well
 
-To help maneuvering in the QGIS we first draw the circumference of the building location in QGIS. We can do it by creating a drawing in the menu option Layer, choosing Create layer, New shapefile layer. We create a new polygon geometry. Don’t forget to set the proper path to your directory and to fill in the right CRS (see @fig-NewShapefileLayer).  
+<r> ?? Hans, waarom moeten de gebruikers eers een shape maken? Kunnen we niet beter de shape aanleveren als tutorial achtergrond? 
 
-(@) Click in the Layers panel on the shape
-(@) <r> and draw with (![](figures/tutorial/button-Qgis-AttributeTable-StartEditingMode.png ){width=4%}) a polygon. </r>
+<r> To help maneuvering in the QGIS we first draw the circumference of the building location in QGIS. We can do it by creating a drawing in the menu option Layer, choosing Create layer, New shapefile layer. We create a new polygon geometry. Don’t forget to set the proper path to your directory and to fill in the right CRS (see @fig-NewShapefileLayer).  
 
-By using the vertex option you can adjust the geometry shape with help of the measuring tool of QGIS.
+(@) <r> Click in the Layers panel on the shape
+(@) <r> and draw with (![](figures/tutorial/button-Qgis-AttributeTable-StartEditingMode.png ){width=4%}) a polygon. 
+
+<r> By using the vertex option you can adjust the geometry shape with help of the measuring tool of QGIS. 
 
 ![Creating a new shapefile drawing in the map](figures/tutorial/Panel-QGIS-NewShapefileLayer.png){width=80% #fig-NewShapefileLayer} 
 
-(@) In the QGISTIM panel tab *Elements* select the button *Leaky Line Doublet*. 
-(@) Fill in the name of the layer in the popup panel.
-(@) At this step you can create the mentioned rectangular area of 34.2 m * 83.2 m as shown in @fig-SchematizationTheHague. <br> **NOTE** When drawing we start at the most southern corner of the building pit to make a variation for an extra purpose later on in this tutorial. 
-(@) In the Layers Window right click on ![](figures/tutorial/figure_Leakylinedoublet_icon.png){width=4%} *timml Leaky Line Doublet:name* and in the menu select Toggle editing (![](figures/tutorial/button-Qgis-AttributeTable-StartEditingMode.png ){width=4%}). 
-(@) Then select the Add line feature icon, ending last point is first point, right click to close the geometry.
-(@) In the popup panel fill in resistance and layer (upper=0) and save it. 
+### Adding a Leaky Line Doublet
 
-In order to make a closed area surrounded with the sheet piles, the first and last point must have the same coordinate and intersect. 
+(@) In the QGIS-Tim window go to tab *Elements* and select the button *Leaky Line Doublet*. 
+(@) Fill in the name of the layer in the popup panel, e.g. 'sheet_pile', and click *OK* and this new Layer is added to the Layers window.  
 
-(@) To do so you can click on (self snapping) from the toolbar (see @fig-button_ToolbarSnappingSettings). 
+First we will *draw* the location of the sheet pile before *adding* the parameter values. 
 
-You can activate this option by going to the QGIS menu Project, snapping options, where you can activate by clicking the left and right button.
+(@) In the Layers Window right click on the layer ![](figures/tutorial/figure_Leakylinedoublet_icon.png){width=4%} *timml Leaky Line Doublet:sheet_pile* and start the editing mode by clicking the Toggle Editing button (![](figures/tutorial/button-Qgis-AttributeTable-StartEditingMode.png ){width=4%}). 
+
+Two important remarks before drawing the sheet pile: 
+
+- Start drawing at the most southern corner of the building pit to make a variation for an extra purpose later on in this tutorial. 
+- In order to make a closed area surrounded with the sheet piles, the first and last point must have the same coordinate and intersect. For this we must activate the Snapping option in QGIS.  
+
+(@) In the main menu go to *Project* and select *Snapping Options..*.  
+(@) From the new toolbar (see @fig-button_ToolbarSnappingSettings), click on the *Enable Snapping* button (![](figures/tutorial/button_EnableSnapping.png){width=3%}). 
 
 ![Switching on snapping options](figures/tutorial/button_ToolbarSnappingSettings.png){width=80% #fig-button_ToolbarSnappingSettings} 
 
-When you are done drawing the sheet pile wall the Feature Attributes panel pops up automatically. You need to fill in parameter values. For normal sheet pile walls a resistance value of 100 d for interlock leakage is a good choice. <br>
-Because of a known error in the Timml software, until this issue is resolved, the value of the resistance must be multiplied by the permeability. In this case the chosen value of sheet pile wall resistance needs to be increased by multiplying with the applicable aquifer permeability in the effected layer (R=100 d becomes R=10*100 d).
+(@) Then select the *Add line feature* icon (![](figures/tutorial/button_AddLineFeature.png){width=3%}) to start the drawing of the sheet pile. 
+(@) Draw the sheet pile arround the building pit (start south corner) with your left mouse button and close the feature on the first point. 
+(@) In the popup panel fill in resistance (1000 \*) and layer number (layer=0 \**) as in @fig-LeakylinedoubletFeatureAttributes and click OK to close the window.
+(@) Close the editing mode with a click on (![](figures/tutorial/button-Qgis-AttributeTable-StartEditingMode.png ){width=4%}) and you are asked to save your changes.  
 
-(@) Open the attribute table for *Leaky Line Doublet* to check hydraulic resistance values for the sheet pile walls. Due to an aberration in the program for the moment. 
+Remarks to the provided values: <br>
+\* Because of a known error in the TimML software, until this issue is resolved, the value of the resistance must be multiplied by the permeability. For normal sheet pile walls a resistance value of 100 d for interlock leakage is a good choice. In this case the chosen value needs to be increased by multiplying with the applicable aquifer permeability in the effected layer (R=100 d becomes R=10*100 d). <br>
+\*\* In the real world counting starts with 1. However, Tim is programmed in Python and in Python counting starts with 0. You will get used to it.
 
-@fig-LeakylinedoubletFeatureAttributes
+![The characteristics of the Leaky line doublet](figures/tutorial/figure_LeakylinedoubletFeatureAttributes.png){width=70% #fig-LeakylinedoubletFeatureAttributes fig-align="left"} 
 
-![The characteristics of the Leaky line doublet](figures/tutorial/figure_LeakylinedoubletFeatureAttributes.png){width=60% #fig-LeakylinedoubletFeatureAttributes fig-align="left"} 
+(@) Open the attribute table for *Leaky Line Doublet* (click ![](figures/tutorial/button-Qgis-OpenAttributeTable.png){width=3%} or press F6) to check hydraulic resistance values for the sheet pile walls. 
 
-(@) Go to the QGISTIM panel and select the Well element. A Name for the element can be given in the popup panel. Then go to the timml Well layer in the Layers panel. Click the mouse on this layer and then go to the digitizing toolbar to click Toggle editing.  Next click on  (Add point feature). At this step you can add the wells similar to the points in @fig-SchematizationTheHague. After each positioning you need to fill in values for well parameters, at least discharge (50 m3/d), radius (0.1 m), resistance (1 d), layer where the well is active (0).
+### Adding a Well
 
-(@) In the Layers panel right click the TIMml Well layer and open the attribute table. Then check the values shown in @fig-SchematizationTheHague. The discharge value in the table is a first guess to be adjusted later to desired level of -3.5 m groundwater lowering in the building pit.
+(@) In GIS-Tim goto the tab *Elements* and select the *Well* element. 
+(@) A name for the element can be given in the popup panel, e.g. *pumping_wells*. 
+(@) In the Layers Window right click on the layer ![](figures/tutorial/figure_well_icon.png){width=3%} *timml Well:pumping_wells* and start the editing mode by clicking the Toggle Editing button (![](figures/tutorial/button-Qgis-AttributeTable-StartEditingMode.png ){width=4%}). 
+(@) Next click on *Add point feature* (![](figures/tutorial/button_AddPointFeature.png){width=3%}).
+(@) With you left mouse button now add the 8 wells locations similar to the points in @fig-SchematizationTheHague. 
+
+After each positioning you need to fill in values for well parameters, at least discharge (50 m3/d), radius (0.1 m), resistance (1 d), layer where the well is active (0).
+
+(@) In the Layers panel right click the *TimML Well layer* and open the attribute table. 
+(@) Then check the values shown in @fig-SchematizationTheHague. The discharge value in the table is a first guess to be adjusted later to desired level of -3.5 m groundwater lowering in the building pit.
 
 ![Schematization of the pumping wells and the sheet piles](figures/tutorial/figure_SchematizationTheHague.png){width=100% #fig-SchematizationTheHague} 
 
@@ -315,7 +380,7 @@ Open the attribute table for Leaky line doublet to check hydraulic resistance va
 
 ## Computing the groundwater head drawdown
 
-(@) Zoom in to desired scale, then go to the QGISTIM panel and select the Compute tab. Set the domain to current extent. Grid spacing will follow automatically. Make the mesh more or less dense by changing Grid spacing to desired density. 
+(@) Zoom in to desired scale, then go to the QGIS-Tim panel and select the Compute tab. Set the domain to current extent. Grid spacing will follow automatically. Make the mesh more or less dense by changing Grid spacing to desired density. 
 (@) Give the name of the file where you want to store the results. 
 
 @fig-ComputeSettings  
@@ -344,7 +409,7 @@ Results of calculations are presented as Mesh, Raster and Contour data in the la
 
 The city authorities that perform quality checks on the effect of construction projects insisted on the installation of some piezometers to assure reduction of risks for surrounding old monumental structures.
 
-(@) In the QGIS-TimML Window go to the *Elements* tab and select the element *Observation*. 
+(@) In the QGIS-Tim Window go to the *Elements* tab and select the element *Observation*. 
 (@) Give a name in the pop up panel, e.g. "observations". 
 (@) Then go to the Layers panel and select the layer ![](figures/tutorial/figure_Observation_icon.png){width=3%}*timml Observation:observations*. 
 (@) Go to the toolbar with drawing options and activate Toggle editing (![](figures/tutorial/button-Qgis-AttributeTable-StartEditingMode.png){width=4%}). 
@@ -409,7 +474,7 @@ We conclude that the lowering around the building pit with deep sheet piles impr
 
 Next also alternatives with a shallow concrete cut-off wall will be calculated for a shallow and a deep wall. In that case we have R=1000 d, but note that the input in the attribute than becomes k*R=10000 due to the error in Tim. 
 
-(@) After changing the value in attribute tables of wall elements, we can compute again, switching off and on the element for the deep wall section in the geopackage (go to tab in the Qgistim panel). 
+(@) After changing the value in attribute tables of wall elements, we can compute again, switching off and on the element for the deep wall section in the geopackage (go to tab ?? in the QGIS-Tim panel). 
 
 Again extra calculation is needed to adjust well extractions for drawdown in the building pit.
 
@@ -442,22 +507,22 @@ When the coordinates differ a gap results, in the studied case we created a 0.2 
 
 When the contractor wants to restore the dewatering level inside the building pit, the drawdown outside the gap will even grow further.
 
-## Using Python for sensitivity analyses with a QGISTIM model
-Qgistim offers the opportunity to export the geopackage of the created model to a Python script. This makes it possible to use the script for other ways of calculation, e.g.:
+## Using Python for sensitivity analyses with a QGIS-Tim model
+QGIS-Tim offers the opportunity to export the geopackage of the created model to a Python script. This makes it possible to use the script for other ways of calculation, e.g.:
 - Calculation of model results in other Python environments, like Anaconda or Spyder or in a notebook.
 - Use in other python oriented programs, like the Probabilistic Toolkit.
 
-(@) If input of all elements is ready and the model has proved to run properly, go to the Qgistim panel and the tab *Geopackage*. 
+(@) If input of all elements is ready and the model has proved to run properly, go to the QGIS-Tim panel and the tab *Geopackage*. 
 (@) At the bottom press the button *Convert GeoPackage to Python script*. 
 (@) After a short period for translation in Python the explorer panel appears where you can enter the name you want to give for the python file, e.g. “DHRVS.py” and store it in a directory you choose to save your work. The file looks like:
 
 ![](figures/tutorial/figure_PythonExport01.png){width=60%}
 
-As can be seen the converted Python file contains a call on main necessary Python packages and all data coordinates and parameter values related to the elements that were selected in the model that was created in Qgistim. At the end of the Python file the model.solve command is stated after which all head values in the domain with the desired mesh density are determined and also at demanded observation points.
+As can be seen the converted Python file contains a call on main necessary Python packages and all data coordinates and parameter values related to the elements that were selected in the model that was created in QGIS-Tim. At the end of the Python file the model.solve command is stated after which all head values in the domain with the desired mesh density are determined and also at demanded observation points.
 
 ![](figures/tutorial/figure_PythonExport02.png){width=60%}
 
-As can be seen the Python script for Timml is written in a very dedicated and condensed manner.
+As can be seen the Python script for TimML is written in a very dedicated and condensed manner.
 
 To get the Python file running in a platform like Anaconda or Spyder, extra lines should be added at wish, to get the output that the user needs. 
 
@@ -465,13 +530,15 @@ Also this file can be used for geostatistical and scenario-analysis. There are s
 
 The PTK can be downloaded free of charge at <a href="https://download.deltares.nl/ptk" target="_blank">Probabilistic Toolkit - download.</a>
 
-(@) First we open the PTK. 
+(@) Open the **Probabilistic Toolkit** from your desktop (![](figures/tutorial/icon-probabiliticToolKit.png){width=4%}) or Windows menu (Deltares folder). 
 
-An empty window opens at the Model tab. 
+The Toolkit opens at the first of 5 tabs: *Model*. 
 
-We set the Model Type to Internal and the Language to Python and we give the path where PTK can find the Python interpreter.
+(@) In the section *Model Type* check if the dropdown menu *Type* is set to *Internal*
+(@) In the section *Model Type* check if the dropdown menu *Language* is set to *Python* and a the field *Version* appears.
+(@) Select the '...' in the field *Version* and give the path where PTK can find the Python interpreter, e.g. Spyder at .
 
-(@) Than we copy the Python file we converted from QgisTim into the Source code window.
+(@) Than we copy the Python file we converted from QGIS-Tim into the Source code window.
 We handle the process in this way because we want to change some lines in the source code to get the program running in PTK.
  
 Next the specific parameters must be selected that are expected to be probably most relevant to variations in results. In the source code used in the PTK those parameters will not have input on a value but need to be mentioned with a name that the PTK can use for input selection in the calculations. <br>
@@ -515,7 +582,7 @@ Because we only are interested in 2 points we use the first two observation poin
 In the output screen of the PTK we add variables pb0 and pb1.
 
 
-We check if the program works properly by performing the Run model in Single run mode (in toolbar of PTK). By pressing the arrow the calculation starts running. In the Run model tab we find the results of our calculation. Check if it complies with your earlier calculations in QgisTim.
+We check if the program works properly by performing the Run model in Single run mode (in toolbar of PTK). By pressing the arrow the calculation starts running. In the Run model tab we find the results of our calculation. Check if it complies with your earlier calculations in QGIS-Tim.
 
 ![](figures/tutorial/figure-PTK03.png){width=50%} 
 
