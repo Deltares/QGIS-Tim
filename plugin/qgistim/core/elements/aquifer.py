@@ -1,11 +1,7 @@
-from collections import defaultdict
-from dataclasses import dataclass
-from typing import Any, Dict, List
-
 from PyQt5.QtCore import QVariant
 from qgis.core import QgsDefaultValue, QgsField
 from qgistim.core import geopackage
-from qgistim.core.elements.element import TransientElement
+from qgistim.core.elements.element import ElementSchema, TransientElement
 from qgistim.core.schemata import (
     AllGreaterEqual,
     AllOptional,
@@ -17,6 +13,26 @@ from qgistim.core.schemata import (
     SemiConfined,
     StrictlyDecreasing,
 )
+
+
+class AquiferSchema(ElementSchema):
+    timml_schemata = {
+        "layer": AllRequired(Range()),
+        "aquifer_top": AllRequired(StrictlyDecreasing()),
+        "aquifer_bottom": AllRequired(StrictlyDecreasing()),
+        "aquitard_c": OffsetAllRequired(Positive()),
+        "aquifer_k": AllRequired(Positive()),
+        "semiconf_top": AllOptional(FirstOnly()),
+        "semiconf_head": AllOptional(FirstOnly()),
+    }
+    timml_consistency_schemata = (
+        SemiConfined(),
+        AllGreaterEqual("aquifer_top", "aquifer_bottom"),
+    )
+    ttim_schemata = {
+        "aquitard_s": OffsetAllRequired(Positive()),
+        "aquifer_s": AllRequired(Positive()),
+    }
 
 
 class Aquifer(TransientElement):
@@ -54,24 +70,7 @@ class Aquifer(TransientElement):
         "aquitard_npor",
         "aquifer_npor",
     )
-
-    timml_schemata = {
-        "layer": AllRequired(Range()),
-        "aquifer_top": AllRequired(StrictlyDecreasing()),
-        "aquifer_bottom": AllRequired(StrictlyDecreasing()),
-        "aquifer_k": AllRequired(Positive()),
-        "aquitard_c": OffsetAllRequired(Positive()),
-        "semiconf_top": AllOptional(FirstOnly()),
-        "semiconf_head": AllOptional(FirstOnly()),
-    }
-    timml_global_schemata = (
-        SemiConfined(),
-        AllGreaterEqual("aquifer_top", "aquifer_bottom"),
-    )
-    ttim_schemata = {
-        "aquitard_s": OffsetAllRequired(Positive()),
-        "aquifer_s": AllRequired(Positive()),
-    }
+    schema = AquiferSchema()
 
     def __init__(self, path: str, name: str):
         self._initialize_default(path, name)
@@ -93,9 +92,16 @@ class Aquifer(TransientElement):
 
     def to_timml(self):
         data = self.table_to_dict(self.timml_layer)
-        self.validate_timml(data)
-        return self.aquifer_data(data, transient=False)
+        errors = self.schema.validate_timml(data)
+        if errors:
+            return errors, None
+        else:
+            return None, self.aquifer_data(data, transient=False)
 
     def to_ttim(self):
         data = self.table_to_dict(self.timml_layer)
-        return self.aquifer_data(data, transient=True)
+        errors = self.schema.validate_ttim(data)
+        if errors:
+            return errors, None
+        else:
+            return None, self.aquifer_data(data, transient=False)

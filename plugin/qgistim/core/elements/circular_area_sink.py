@@ -6,7 +6,7 @@ class CircularAreaSinkSchema:
 
 
 class TransientCircularAreaSinkSchema:
-    global_schemata = (
+    consistency_schemata = (
         AllOrNone("time_start", "time_end", "rate_transient"),
         NotBoth("time_start", "timeseries_id"),
     )

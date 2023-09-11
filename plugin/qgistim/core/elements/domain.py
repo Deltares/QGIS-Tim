@@ -9,13 +9,19 @@ from qgis.core import (
     QgsSingleSymbolRenderer,
 )
 from qgistim.core.elements.colors import BLACK
-from qgistim.core.elements.element import TransientElement
+from qgistim.core.elements.element import ElementSchema, TransientElement
+from qgistim.core.schemata import SingleRow
+
+
+class DomainSchema(ElementSchema):
+    timml_consistency_schemata = (SingleRow,)
 
 
 class Domain(TransientElement):
     element_type = "Domain"
     geometry_type = "Polygon"
     ttim_attributes = (QgsField("time", QVariant.Double),)
+    schema = DomainSchema()
 
     def __init__(self, path: str, name: str):
         self._initialize_default(path, name)
@@ -57,14 +63,18 @@ class Domain(TransientElement):
 
     def to_timml(self):
         data = self.to_dict(self.timml_layer)
-        x = [point[0] for point in data[0]["geometry"]]
-        y = [point[1] for point in data[0]["geometry"]]
-        return {
-            "xmin": min(x),
-            "xmax": max(x),
-            "ymin": min(y),
-            "ymax": max(y),
-        }
+        errors = self.schema.validate_timml(data)
+        if errors:
+            return errors, None
+        else:
+            x = [point[0] for point in data[0]["geometry"]]
+            y = [point[1] for point in data[0]["geometry"]]
+            return None, {
+                "xmin": min(x),
+                "xmax": max(x),
+                "ymin": min(y),
+                "ymax": max(y),
+            }
 
     def to_ttim(self):
         data = self.to_timml()

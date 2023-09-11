@@ -24,7 +24,7 @@ class HeadLineSinkSchema:
 
 
 class TransientHeadLineSinkSchema:
-    global_schemata = (
+    consistency_schemata = (
         AllOrNone("time_start", "time_end", "head_transient"),
         NotBoth("time_start", "timeseries_id"),
         Time(),

@@ -99,7 +99,7 @@ class TestAllRequired(TestCase):
         schema = AllRequired(Positive())
         self.assertIsNone(schema.validate([1, 2, 3]))
         self.assertEqual(
-            schema.validate([None, 2, None]), ["No values provided at rows: 1, 3"]
+            schema.validate([None, 2, None]), ["No values provided at row(s): 1, 3"]
         )
         self.assertEqual(schema.validate([1, 2, -1]), ["Non-positive value: -1"])
 
@@ -109,7 +109,7 @@ class TestOffsetAllRequired(TestCase):
         schema = OffsetAllRequired(Positive())
         self.assertIsNone(schema.validate([None, 2, 3]))
         self.assertEqual(
-            schema.validate([None, 2, None]), ["No values provided at rows: 3"]
+            schema.validate([None, 2, None]), ["No values provided at row(s): 3"]
         )
         self.assertEqual(schema.validate([None, 2, -1]), ["Non-positive value: -1"])
 
@@ -204,7 +204,7 @@ class TestAllGreateEqual(TestCase):
         d = {"top": [0.0, -1.0], "bot": [0.0, -1.0]}
         self.assertIsNone(schema.validate(d))
         d = {"bot": [1.0, 0.0], "top": [0.0, -1.0]}
-        expected = "top is not greater or equal to bot at rows: 1, 2"
+        expected = "top is not greater or equal to bot at row(s): 1, 2"
         self.assertEqual(schema.validate(d), expected)
 
 
@@ -221,14 +221,15 @@ class TestFirstOnly(TestCase):
 class TestSemiConfined(TestCase):
     def test_semi_confined(self):
         schema = SemiConfined()
-        other = {"aquifer_top": [0.0, 1.0]}
         d = {
+            "aquifer_top": [0.0, 1.0],
             "aquitard_c": [1.0, None],
             "semiconf_top": [1.0, None],
             "semiconf_head": [1.0, None],
         }
-        self.assertIsNone(schema.validate(d, other))
+        self.assertIsNone(schema.validate(d))
         d = {
+            "aquifer_top": [0.0, 1.0],
             "aquitard_c": [None, None],
             "semiconf_top": [1.0, None],
             "semiconf_head": [1.0, None],
@@ -238,14 +239,15 @@ class TestSemiConfined(TestCase):
             "filled in for aquitard_c, semiconf_top, semiconf_head. To disable semi-confined top, none "
             "of the values must be filled in. Found: None, 1.0, 1.0"
         )
-        self.assertEqual(schema.validate(d, other), expected)
+        self.assertEqual(schema.validate(d), expected)
 
         d = {
+            "aquifer_top": [0.0, 1.0],
             "aquitard_c": [1.0, None],
             "semiconf_top": [-1.0, None],
             "semiconf_head": [1.0, None],
         }
         self.assertEqual(
-            schema.validate(d, other),
+            schema.validate(d),
             "semiconf_top must be greater than first aquifer_top.",
         )

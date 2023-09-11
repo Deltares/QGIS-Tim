@@ -11,7 +11,7 @@ class TransientHeadWellSchema:
     schemata = {
         "timeseries_id": [MembershipSchema("timeseries_ids")],
     }
-    global_schemata = (
+    consistency_schemata = (
         AllOrNoneSchema(("time_start", "time_end", "head_transient")),
         XorSchema("time_start", "timeseries_id"),
     )

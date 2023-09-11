@@ -34,6 +34,7 @@ from PyQt5.QtWidgets import (
 from qgis.core import QgsApplication, QgsProject, QgsTask
 from qgistim.core.elements import Aquifer, Domain, load_elements_from_geopackage
 from qgistim.core.task import BaseServerTask
+from qgistim.widgets.error_window import ValidationDialog
 
 SUPPORTED_TTIM_ELEMENTS = set(
     [
@@ -203,9 +204,15 @@ class DatasetTreeWidget(QTreeWidget):
             for item in self.items()
             if item.timml_checkbox.isChecked()
         }
-        print(elements)
-        data = {k: element.to_timml() for k, element in elements.items()}
-        return data
+        data = {}
+        errors = {}
+        for name, element in elements.items():
+            _errors, _data = element.to_timml()
+            if _errors:
+                errors[name] = _errors
+            else:
+                data[name] = _data
+        return errors, data
 
 
 class DatasetWidget(QWidget):
@@ -248,6 +255,7 @@ class DatasetWidget(QWidget):
         dataset_layout.addLayout(layer_row)
         dataset_layout.addWidget(self.convert_button)
         self.setLayout(dataset_layout)
+        self.validation_dialog = None
 
     @property
     def path(self) -> str:
@@ -446,11 +454,19 @@ class DatasetWidget(QWidget):
         return
 
     def convert_to_json(self) -> None:
+        if self.validation_dialog:
+            self.validation_dialog.close()
+            self.validation_dialog = None
+
         outpath, _ = QFileDialog.getSaveFileName(self, "Select file", "", "*.py")
         if outpath == "":  # Empty string in case of cancel button press
             return
 
-        data = self.dataset_tree.convert_to_timml()
+        errors, data = self.dataset_tree.convert_to_timml()
+        if errors:
+            self.validation_dialog = ValidationDialog(errors)
+            return
+
         json_string = json.dumps(data, indent=4)
         print(json_string)
         return

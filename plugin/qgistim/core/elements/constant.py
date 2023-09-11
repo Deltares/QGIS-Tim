@@ -6,7 +6,7 @@ from qgistim.core.schemata import Membership, Required, SingleRow
 
 
 class ConstantSchema(ElementSchema):
-    global_schemata = (SingleRow(),)
+    consistency_schemata = (SingleRow(),)
     schemata = {
         "head": Required(),
         "layer": Membership("layers"),

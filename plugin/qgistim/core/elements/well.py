@@ -30,7 +30,7 @@ class TransientWellSchema:
         "time_end": Optional(Time()),
         "timeseries_id": Optional(Membership("timeseries_ids")),
     }
-    global_schemata = (
+    consistency_schemata = (
         AllOrNone(("time_start", "time_end", "discharge_transient")),
         NotBoth("time_start", "timeseries_id"),
     )

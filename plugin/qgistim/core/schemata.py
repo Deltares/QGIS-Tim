@@ -107,7 +107,7 @@ class AllRequired(SchemaContainer):
     def validate(self, data, other=None) -> MaybeErrorList:
         missing = [i + 1 for i, v in enumerate(data) if v is None]
         if missing:
-            return [f"No values provided at rows: {format(missing)}"]
+            return [f"No values provided at row(s): {format(missing)}"]
         return self._validate_schemata(data, other)
 
 
@@ -115,7 +115,7 @@ class OffsetAllRequired(SchemaContainer):
     def validate(self, data, other=None) -> MaybeErrorList:
         missing = [i + 2 for i, v in enumerate(data[1:]) if v is None]
         if missing:
-            return [f"No values provided at rows: {format(missing)}"]
+            return [f"No values provided at row(s): {format(missing)}"]
         if data[0] is None:
             return self._validate_schemata(data[1:], other)
         else:
@@ -256,9 +256,7 @@ class AllGreaterEqual(IterableSchema):
         y = data[self.y]
         wrong = [i + 1 for i, (a, b) in enumerate(zip(x, y)) if a < b]
         if wrong:
-            return (
-                f"{self.x} is not greater or equal to {self.y} at rows: {format(wrong)}"
-            )
+            return f"{self.x} is not greater or equal to {self.y} at row(s): {format(wrong)}"
         return None
 
 
@@ -275,7 +273,7 @@ class FirstOnly(SchemaContainer):
 
 
 class SemiConfined(IterableSchema):
-    def validate(self, data, other) -> MaybeError:
+    def validate(self, data, _=None) -> MaybeError:
         semiconf_data = {
             "aquitard_c": data["aquitard_c"][0],
             "semiconf_top": data["semiconf_top"][0],
@@ -290,7 +288,8 @@ class SemiConfined(IterableSchema):
                 f"filled in for {variables}. To disable semi-confined top, none "
                 f"of the values must be filled in. Found: {values}"
             )
-        if data["semiconf_top"][0] <= other["aquifer_top"][0]:
+        semitop = data["semiconf_top"][0]
+        if semitop is not None and semitop <= data["aquifer_top"][0]:
             return "semiconf_top must be greater than first aquifer_top."
         return None
 
@@ -298,4 +297,5 @@ class SemiConfined(IterableSchema):
 class SingleRow(IterableSchema):
     def validate(self, data, other=None) -> MaybeError:
         if len(data) != 1:
-            return "Constant may contain only one row."
+            return "Table may contain only one row."
+        return None

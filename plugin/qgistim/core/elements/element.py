@@ -53,7 +53,7 @@ when it has no features.
 
 import abc
 from collections import defaultdict
-from typing import Any, List
+from typing import Any, Dict, List
 
 from PyQt5.QtWidgets import (
     QDialog,
@@ -72,14 +72,37 @@ from qgis.core import (
 )
 from qgistim.core import geopackage
 from qgistim.core.extractor import ExtractorMixin
-from qgistim.core.schemata import ValidationError
 
 
 class ElementSchema(abc.ABC):
-    def validate(self, data, **kwargs):
-        for key, value in self.schemata.items():
-            value.validate(data[key], **kwargs)
-        return
+    timml_schemata = {}
+    timml_consistency_schemata = {}
+    ttim_schemata = {}
+    ttim_consistency_schemata = {}
+
+    def validate_timml(self, data, other=None) -> Dict[str, List]:
+        if len(data) == 0:
+            return {"table": ["Table is empty."]}
+
+        errors = defaultdict(list)
+        for variable, schema in self.timml_schemata.items():
+            _errors = schema.validate(data[variable], other)
+            if _errors is not None:
+                errors[variable].extend(_errors)
+
+        if not errors:
+            for schema in self.timml_consistency_schemata:
+                _error = schema.validate(data, other)
+                if _error:
+                    errors["table"].append(_error)
+
+        if errors:
+            return errors
+        else:
+            return None
+
+    def validate_ttim(self, data, other=None) -> Dict[str, List]:
+        raise NotImplementedError
 
 
 class NameDialog(QDialog):
@@ -252,29 +275,8 @@ class Element(ExtractorMixin):
         return
 
     @abc.abstractmethod
-    def to_timml(self, data, **kwargs):
-        """ """
-
-    def validate(self, data, **kwargs):
-        errors = []
-        for schema in self.global_schemata:
-            try:
-                schema.validate(data, **kwargs)
-            except ValidationError as e:
-                errors.append(str(e))
-
-        for variable, schema in self.schemata:
-            variable_errors = []
-            try:
-                schema.validate(data, **kwargs)
-            except ValidationError as e:
-                variable_errors.append(str(e))
-
-            if variable_errors:
-                errors.append(f"{variable:}\n")
-                errors.append(variable_errors)
-
-        return errors
+    def to_timml(self, other=None):
+        pass
 
     @staticmethod
     def transient_input(row, all_timeseries, variable: str, time_start):
@@ -353,22 +355,6 @@ class Element(ExtractorMixin):
             aquifer["N"] = data["rate"][0]
 
         return aquifer
-
-    def validate_timml(self, data):
-        errors = defaultdict(list)
-        for variable, schema in self.timml_schemata.items():
-            try:
-                schema.validate(data)
-            except ValidationError as e:
-                errors[variable].append(e)
-
-        for schema in self.timml_global_schemata:
-            try:
-                schema.validate(data)
-            except ValidationError as e:
-                errors[""].append(e)
-
-        return errors
 
 
 class TransientElement(Element):
