@@ -1,6 +1,6 @@
 import abc
 import operator
-from typing import Any, Sequence
+from typing import List, Sequence, Union
 
 OPERATORS = {
     "<": operator.lt,
@@ -12,90 +12,156 @@ OPERATORS = {
 }
 
 
+MaybeError = Union[None, str]
+MaybeErrorList = Union[None, List[str]]
+
+
+def format(data) -> str:
+    return ", ".join(map(str, data))
+
+
 def discard_none(data):
     return [v for v in data if v is not None]
 
 
-def collect_errors(schemata, data, **kwargs):
-    errors = []
-    for schema in schemata:
-        try:
-            schema.validate(data, **kwargs)
-        except ValidationError as e:
-            errors.append(str(e))
-
-    if errors:
-        raise ValidationError("\n\t".join(errors))
-
-
-class ValidationError(Exception):
-    pass
-
-
 class BaseSchema(abc.ABC):
+    """Base class for single value."""
+
     def __init__(self):
         pass
 
     @abc.abstractmethod
-    def validate(self):
+    def validate(self, data, other) -> MaybeError:
         pass
 
+    def validate_many(self, data, other) -> MaybeErrorList:
+        errors = []
+        for value in data:
+            error = self.validate(value, other)
+            if error is not None:
+                errors.append(error)
 
-# Schemata for a single value
+        if errors:
+            return errors
+        else:
+            return None
 
 
-class Optional(BaseSchema):
+class IterableSchema(BaseSchema, abc.ABC):
+    """Base class for collection of values."""
+
+    def validate_many(self, data, other) -> MaybeErrorList:
+        error = self.validate(data, other)
+        if error:
+            if isinstance(error, list):
+                return error
+            else:
+                return [error]
+        else:
+            return None
+
+
+class SchemaContainer(IterableSchema):
     def __init__(self, *schemata):
         self.schemata = schemata
 
-    def validate(self, data, **kwargs):
+    def _validate_schemata(self, data, other=None) -> MaybeErrorList:
+        errors = []
+        for schema in self.schemata:
+            if isinstance(data, list):
+                _errors = schema.validate_many(data, other)
+                if _errors:
+                    errors.extend(_errors)
+            else:
+                _error = schema.validate(data, other)
+                if _error:
+                    errors.append(_error)
+
+        if errors:
+            return errors
+
+        return None
+
+
+# SchemataContainer for a single value.
+
+
+class Optional(SchemaContainer):
+    def validate(self, data, other=None) -> MaybeError:
         if data is None:
-            return
-        collect_errors(self.schemata, data, **kwargs)
-        return
+            return None
+        return self._validate_schemata(data, other)
 
 
-class Required(BaseSchema):
-    def __init__(self, *schemata):
-        self.schemata = schemata
-
-    def validate(self, data, **kwargs):
+class Required(SchemaContainer):
+    def validate(self, data, other=None) -> MaybeError:
         if data is None:
-            raise ValidationError("a value is required.")
-        collect_errors(self.schemata, data, **kwargs)
-        return
+            return "a value is required."
+        return self._validate_schemata(data, other)
 
 
-class Positive:
-    def validate(self, value):
-        if value < 0:
-            raise ValidationError(f"Non-positive value: {value}")
-        return
+# SchemataContainer for multiple values.
+
+
+class AllRequired(SchemaContainer):
+    def validate(self, data, other=None) -> MaybeErrorList:
+        missing = [i + 1 for i, v in enumerate(data) if v is None]
+        if missing:
+            return [f"No values provided at rows: {format(missing)}"]
+        return self._validate_schemata(data, other)
+
+
+class OffsetAllRequired(SchemaContainer):
+    def validate(self, data, other=None) -> MaybeErrorList:
+        missing = [i + 2 for i, v in enumerate(data[1:]) if v is None]
+        if missing:
+            return [f"No values provided at rows: {format(missing)}"]
+        if data[0] is None:
+            return self._validate_schemata(data[1:], other)
+        else:
+            return self._validate_schemata(data, other)
+
+
+class AllOptional(SchemaContainer):
+    def validate(self, data, other=None) -> MaybeErrorList:
+        missing = [i + 1 for i, v in enumerate(data) if v is None]
+        if len(missing) == len(data):
+            return None
+        return self._validate_schemata(data, other)
+
+
+# Schemata for a single value.
+
+
+class Positive(BaseSchema):
+    def validate(self, data, _=None) -> MaybeError:
+        if data < 0:
+            return f"Non-positive value: {data}"
+        return None
 
 
 class Time(BaseSchema):
-    def validate(self, data, **kwargs):
-        start = kwargs["start"]
-        end = kwargs["end"]
+    def validate(self, data, other=None) -> MaybeError:
+        start = other["start"]
+        end = other["end"]
         if not (start < data < end):
-            raise ValidationError(
-                f"time does not fall in model time window: {start} to {end}"
-            )
-        return
+            return f"time does not fall in model time window: {start} to {end}"
+        return None
 
 
 class AllOrNone(BaseSchema):
     def __init__(self, *variables: Sequence[str]):
         self.variables = variables
 
-    def validate(self, data):
+    def validate(self, data, _=None) -> MaybeError:
         present = [data[v] is not None for v in self.variables]
         if any(present) != all(present):
-            raise ValidationError(
+            vars = ", ".join(self.variables)
+            return (
                 "Exactly all or none of the following variables must be "
-                f"provided: {self.variables}"
+                f"provided: {vars}"
             )
-        return
+        return None
 
 
 class Xor(BaseSchema):
@@ -105,10 +171,10 @@ class Xor(BaseSchema):
         self.x = x
         self.y = y
 
-    def validate(self, data):
+    def validate(self, data, _=None) -> MaybeError:
         if not ((data[self.x] is None) ^ (data[self.y] is None)):
-            raise ValidationError(f"Either {self.x} or {self.y} should be provided.")
-        return
+            return f"Either {self.x} or {self.y} should be provided, not both."
+        return None
 
 
 class NotBoth(BaseSchema):
@@ -116,147 +182,100 @@ class NotBoth(BaseSchema):
         self.x = x
         self.y = y
 
-    def validate(self, data):
+    def validate(self, data, _=None) -> MaybeError:
         if (data[self.x] is not None) and (data[self.y] is not None):
-            raise ValidationError(f"Both {self.x} and {self.y} should not be provided.")
-        return
+            return f"Either {self.x} or {self.y} should be provided, not both."
+        return None
 
 
 class Membership(BaseSchema):
     def __init__(self, members_key: str):
         self.members_key = members_key
 
-    def validate(self, data, **kwargs):
+    def validate(self, data, other=None) -> MaybeError:
         if data is None:
-            return
-        member_values = kwargs[self.members_key]
+            return None
+        member_values = other[self.members_key]
         if data not in member_values:
-            raise ValidationError(
-                f"Value {data} not found in {self.members_key}: {member_values}"
+            return (
+                f"Value {data} not found in {self.members_key}: {format(member_values)}"
             )
-        return
+        return None
 
 
-# Schemata for collections of values
+# Schemata for a collection of values.
 
 
-class AllRequired(BaseSchema):
-    def __init__(self, *schemata):
-        self.schemata = schemata
-
-    def validate(self, data, **kwargs):
-        missing = [i + 1 for i, v in enumerate(data) if v is not None]
-        if missing:
-            raise ValidationError(f"No values provided at rows: {missing}")
-
-        collect_errors(self.schemata, data, **kwargs)
-        return
-
-
-class OffsetAllRequired(BaseSchema):
-    def __init__(self, *schemata):
-        self.schemata = schemata
-
-    def validate(self, data, **kwargs):
-        missing = [i + 2 for i, v in enumerate(data[1:]) if v is not None]
-        if missing:
-            raise ValidationError(f"No values provided at rows: {missing}")
-
-        collect_errors(self.schemata, data, **kwargs)
-        return
-
-
-class AllOptional(BaseSchema):
-    def __init__(self, *schemata):
-        self.schemata = schemata
-
-    def validate(self, data, **kwargs):
-        missing = [i + 1 for i, v in enumerate(data) if v is not None]
-        if len(missing) == len(data):
-            return
-
-        collect_errors(self.schemata, data, **kwargs)
-        return
-
-
-class Range(BaseSchema):
-    def validate(self, data):
+class Range(IterableSchema):
+    def validate(self, data, _=None) -> MaybeError:
         expected = list(range(len(data)))
         if not data == expected:
-            raise ValidationError(f"Expected {expected}, received: {data}")
-        return
+            return f"Expected {format(expected)}; received {format(data)}"
+        return None
 
 
-class Increasing(BaseSchema):
-    def validate(self, data):
-        data = discard_none(data)
+class Increasing(IterableSchema):
+    def validate(self, data, _=None) -> MaybeError:
         monotonic = all(a <= b for a, b in zip(data, data[1:]))
         if not monotonic:
-            raise ValidationError(f"Values are not increasing: {data}")
-        return
+            return f"Values are not increasing: {format(data)}"
+        return None
 
 
-class StrictlyIncreasing(BaseSchema):
-    def validate(self, data):
-        data = discard_none(data)
+class StrictlyIncreasing(IterableSchema):
+    def validate(self, data, _=None) -> MaybeError:
         monotonic = all(a < b for a, b in zip(data, data[1:]))
         if not monotonic:
-            raise ValidationError(
-                f"Values are not strictly increasing (no repeated values): {data}"
-            )
-        return
+            return f"Values are not strictly increasing (no repeated values): {format(data)}"
+        return None
 
 
-class Decreasing(BaseSchema):
-    def validate(self, data):
-        data = discard_none(data)
+class Decreasing(IterableSchema):
+    def validate(self, data, _=None) -> MaybeError:
         monotonic = all(a >= b for a, b in zip(data, data[1:]))
         if not monotonic:
-            raise ValidationError(f"Values are not decreasing: {data}")
-        return
+            return f"Values are not decreasing: {format(data)}"
+        return None
 
 
-class StrictlyDecreasing(BaseSchema):
-    def validate(self, data):
-        data = discard_none(data)
+class StrictlyDecreasing(IterableSchema):
+    def validate(self, data, _=None) -> MaybeError:
         monotonic = all(a > b for a, b in zip(data, data[1:]))
         if not monotonic:
-            raise ValidationError(
-                f"Values are not strictly decreasing (no repeated values): {data}"
-            )
-        return
+            return f"Values are not strictly decreasing (no repeated values): {format(data)}"
+        return None
 
 
-class AllGreaterEqual(BaseSchema):
+class AllGreaterEqual(IterableSchema):
     def __init__(self, x, y):
         self.x = x
         self.y = y
 
-    def validate(self, data):
+    def validate(self, data, _=None) -> MaybeError:
         x = data[self.x]
         y = data[self.y]
-        wrong = [i + 1 for i, (a, b) in zip(x, y) if a < b]
+        wrong = [i + 1 for i, (a, b) in enumerate(zip(x, y)) if a < b]
         if wrong:
-            raise ValidationError(
-                f"{self.x} is not greater or requal to {self.y} at rows: {wrong}"
+            return (
+                f"{self.x} is not greater or equal to {self.y} at rows: {format(wrong)}"
             )
-        return
+        return None
 
 
-class FirstOnly(BaseSchema):
+class FirstOnly(SchemaContainer):
     """Exclusively the first value must be provided."""
 
-    def validate(self, data):
+    def validate(self, data, other=None) -> Union[MaybeError, MaybeErrorList]:
         if any(v is not None for v in data[1:]):
-            raise ValidationError("Only the first value may be filled in.")
-        return
+            return "Only the first value may be filled in."
+        return self._validate_schemata(data[0], other)
 
 
-# Global schemata
+# Consistency schemata
 
 
-class SemiConfined(BaseSchema):
-    def validate(self, data):
+class SemiConfined(IterableSchema):
+    def validate(self, data, other) -> MaybeError:
         semiconf_data = {
             "aquitard_c": data["aquitard_c"][0],
             "semiconf_top": data["semiconf_top"][0],
@@ -264,57 +283,19 @@ class SemiConfined(BaseSchema):
         }
         present = [v is not None for v in semiconf_data.values()]
         if any(present) != all(present):
-            variables = ", ".join(semiconf_data.keys())
-            raise ValidationError(
+            variables = format(semiconf_data.keys())
+            values = format(semiconf_data.values())
+            return (
                 "To enable a semi-confined top, the first row must be fully "
                 f"filled in for {variables}. To disable semi-confined top, none "
-                f"of the values must be filled in. Found: {semiconf_data}"
+                f"of the values must be filled in. Found: {values}"
             )
-        return
+        if data["semiconf_top"][0] <= other["aquifer_top"][0]:
+            return "semiconf_top must be greater than first aquifer_top."
+        return None
 
 
-class ValueSchema(BaseSchema, abc.ABC):
-    """
-    Base class for AllValueSchema or AnyValueSchema.
-    """
-
-    def __init__(
-        self,
-        operator: str,
-        other: Any,
-    ):
-        self.operator = OPERATORS[operator]
-        self.operator_str = operator
-        self.other = other
-
-
-class AllValue(ValueSchema):
-    def validate(self, data, **kwargs):
-        error = ValidationError(
-            f"Not all values comply with criterion: {self.operator_str} {self.other}"
-        )
-        if isinstance(self.other, str):
-            other_obj = kwargs[self.other]
-            if any(self.operator(a, b) for a, b in zip(data, other_obj)):
-                raise error
-        else:
-            if any(self.operator(v, self.other) for v in data):
-                raise error
-        return
-
-
-class InLayer(BaseSchema):
-    def validate(self, data, **kwargs):
-        allowed_layers = kwargs["layers"]
-        for value in data:
-            if value not in allowed_layers:
-                raise ValidationError(
-                    f"Layer {value} is not in aquifer layers: {allowed_layers}"
-                )
-
-
-class SingleRow(BaseSchema):
-    def validate(self, data, **kwargs):
+class SingleRow(IterableSchema):
+    def validate(self, data, other=None) -> MaybeError:
         if len(data) != 1:
-            raise ValidationError("Constant may contain only one row.")
-        super().validate(data, **kwargs)
+            return "Constant may contain only one row."
