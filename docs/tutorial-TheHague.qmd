@@ -308,7 +308,7 @@ In the QGIS-Tim Window we now introduce the following elements for ground water 
 - Leaky Line Doublet
 - Well
 
-<r> ?? Hans, waarom moeten de gebruikers eers een shape maken? Kunnen we niet beter de shape aanleveren als tutorial achtergrond? 
+<r> ?? Hans, waarom moeten de gebruikers hieronder eerst een shape maken? Kunnen we niet beter de shape aanleveren als tutorial achtergrond? 
 
 <r> To help maneuvering in the QGIS we first draw the circumference of the building location in QGIS. We can do it by creating a drawing in the menu option Layer, choosing Create layer, New shapefile layer. We create a new polygon geometry. Don’t forget to set the proper path to your directory and to fill in the right CRS (see @fig-NewShapefileLayer).  
 
@@ -322,11 +322,11 @@ In the QGIS-Tim Window we now introduce the following elements for ground water 
 ### Adding a Leaky Line Doublet
 
 (@) In the QGIS-Tim window go to tab *Elements* and select the button *Leaky Line Doublet*. 
-(@) Fill in the name of the layer in the popup panel, e.g. 'sheet_pile', and click *OK* and this new Layer is added to the Layers window.  
+(@) Fill in the name of the layer in the popup panel, e.g. 'sheet_pile', and click *OK* and this new Layer is added to the Layers panel.  
 
 First we will *draw* the location of the sheet pile before *adding* the parameter values. 
 
-(@) In the Layers Window right click on the layer ![](figures/tutorial/figure_Leakylinedoublet_icon.png){width=4%} *timml Leaky Line Doublet:sheet_pile* and start the editing mode by clicking the Toggle Editing button (![](figures/tutorial/button-Qgis-AttributeTable-StartEditingMode.png ){width=4%}). 
+(@) In the Layers panel right click on the layer ![](figures/tutorial/figure_Leakylinedoublet_icon.png){width=4%} *timml Leaky Line Doublet:sheet_pile* and start the editing mode by clicking the Toggle Editing button (![](figures/tutorial/button-Qgis-AttributeTable-StartEditingMode.png ){width=4%}). 
 
 Two important remarks before drawing the sheet pile: 
 
@@ -355,61 +355,66 @@ Remarks to the provided values: <br>
 
 (@) In GIS-Tim goto the tab *Elements* and select the *Well* element. 
 (@) A name for the element can be given in the popup panel, e.g. *pumping_wells*. 
-(@) In the Layers Window right click on the layer ![](figures/tutorial/figure_well_icon.png){width=3%} *timml Well:pumping_wells* and start the editing mode by clicking the Toggle Editing button (![](figures/tutorial/button-Qgis-AttributeTable-StartEditingMode.png ){width=4%}). 
-(@) Next click on *Add point feature* (![](figures/tutorial/button_AddPointFeature.png){width=3%}).
-(@) With you left mouse button now add the 8 wells locations similar to the points in @fig-SchematizationTheHague. 
-
-After each positioning you need to fill in values for well parameters, at least discharge (50 m3/d), radius (0.1 m), resistance (1 d), layer where the well is active (0).
-
-(@) In the Layers panel right click the *TimML Well layer* and open the attribute table. 
-(@) Then check the values shown in @fig-SchematizationTheHague. The discharge value in the table is a first guess to be adjusted later to desired level of -3.5 m groundwater lowering in the building pit.
+(@) In the Layers panel right click on the layer ![](figures/tutorial/figure_well_icon.png){width=3%} *timml Well:pumping_wells* and start the editing mode by clicking the Toggle Editing button (![](figures/tutorial/button-Qgis-AttributeTable-StartEditingMode.png ){width=4%}). 
+(@) Next click on *Add point feature* (![](figures/tutorial/button_AddPointFeature.png){width=4%}).
+(@) With you left mouse button add the first well location similar to point 1 in @fig-SchematizationTheHague. 
+(@) In the pop uped window, fill in the well parameters discharge (50 m3/d), radius (0.1 m), resistance (1 d) and layer (0).
+(@) Now add the other 7 wells locations in a fast way: do not import parameters with every single point. We will do that later. Just click OK on each *Feature Attribute* window. 
 
 ![Schematization of the pumping wells and the sheet piles](figures/tutorial/figure_SchematizationTheHague.png){width=100% #fig-SchematizationTheHague} 
 
-@fig-WellAttributeTable  
+(@) In the Layers panel right select layer *timml Well:pumping_wells* and open the *Attribute Table (F6)*. 
+(@) Start the editting mode and fill in the values shown in @fig-WellAttributeTable. Dont forget the column 'Label'. <br> The discharge value in the table is a first guess to be adjusted later to desired level of -3.5 m groundwater lowering in the building pit.
+(@) Stop the editting mode, save your work and close the window. 
+(@) Select layer *timml Well:pumping_wells* again, click right and from the menu select *Show labels*.  
 
 ![Well properties](figures/tutorial/figure_WellAttributeTable.png){width=100% #fig-WellAttributeTable} 
 
-(@) When you finished the input of the wells and their parameters, you have to look back to the combination of wells and sheet pile wall. The reason is that near a well the flow is strong and therefore the flow through the wall is increased. This may lead to extremities in the calculation if wall segments are chosen too large. Tim uses control points but they are set at regular distances on the doublet (the number of control points is 1+order). It is necessary to divide the wall in smaller sections near well locations. The length of each section should be chosen equal to approximately the distance of the wall to the nearest well. 
-(@) To perform this adjustment, select the leaky line doublet in the layers panel and select the editing option in the toolbar. Also activate the vertex tool and then hoover along the sheet pile line in your drawing. You can see appearing a plus sign in the line. You can select that point by clicking and drag it to the position you want. After clicking again a new point is added to the line. Repeat that for the number of points you want to add. @fig-figure_SheetPileExtraPoints shows the result of positioned extra points in the line.
+When you finished the input of the wells and their parameters, you have to look back to the combination of wells and sheet pile wall. The reason is that near a well the flow is strong and therefore the flow through the wall is increased. This may lead to extremities in the calculation if wall segments are chosen too large. Tim uses control points but they are set at regular distances on the doublet (the number of control points is 1+order). It is necessary to divide the wall in smaller sections near well locations. The length of each section should be chosen equal to approximately the distance of the wall to the nearest well. 
+
+(@) Select the Leaky Line Doublet in the layers panel and start the editing mode.
+(@) Activate the Vertex Tool (![](figures/tutorial/button_VertexTool.png){width=4%}) and then hoover along the sheet pile line in your drawing. The line element near you pointer lights up.
+(@) With the combination of **Shift + double left click**, you can add a new vertex to the line. Repeat that for the number of points you want to add.
+
+ @fig-figure_SheetPileExtraPoints shows the result of positioned extra points in the line.
 
 ![Extra points for segmentation of the sheet pile element](figures/tutorial/figure_SheetPileExtraPoints.png ){width=100% #fig-figure_SheetPileExtraPoints} 
 
-
-Open the attribute table for Leaky line doublet to check hydraulic resistance values for the sheet pile walls. Due to an aberration in the program for the moment the normal value of sheet pile wall resistance needs to be increased by multiplying with the applicable aquifer permeability in the effected layer (in this case R=100 d becomes R=10*100 d).
-
 ## Computing the groundwater head drawdown
 
-(@) Zoom in to desired scale, then go to the QGIS-Tim panel and select the Compute tab. Set the domain to current extent. Grid spacing will follow automatically. Make the mesh more or less dense by changing Grid spacing to desired density. 
-(@) Give the name of the file where you want to store the results. 
+(@) Zoom in or out to desired domain for which you want to see the modelresults.
+(@) In the QGIS-Tim panel select the tab *Compute* (see @fig-ComputeSettings). 
+(@) Select the button "Set to current extent" to define the Domain. 
+(@) Grid spacing will follow automatically but for now make the results mesh more dense by changing "Grid spacing" to 5.00 m. 
+(@) In the "Output" section give the name of the file where you want to store the results. 
+(@) For contouring, select the check box "Auto-generate contours". 
+(@) Set the increment for contouring to a proper value: 0.5, 0.25 or 0.1 as applicable for your study. 
+(@) Press the "Compute" button to have the program perform the calculations. A black Python.exe window might pop up (but calculations take place in the background). While the calculation is running the progress is shown in the QGIS button in the task bar.
 
-@fig-ComputeSettings  
+![Compute settings](figures/tutorial/figure_ComputeSettings.png){width=60% #fig-ComputeSettings fig-align="left"} 
 
-![Compute settings](figures/tutorial/figure_ComputeSettings.png){width=45% #fig-ComputeSettings fig-align="left"} 
+After the calculation you see that the result is automatically added to a new geopackage, probably called “case-TheHague output”. Results are saved both as mesh and raster. Contours are saved as vector. For each format a separate sub group is created. Although these layers / groups are checked, the data is not visible. That is because the geopackage was added last, and QGIS adds layers at the end of the list. <br> Let’s move the layer “OpenStreetMap” to the background.
 
+(@) Select the layer "OpenStreetMap" and drag it with your left mouse button to the bottom of the list of layers.
+(@) Uncheck the mes and raster ouput in order to only dispay the isolines on the map.
 
-(@) For contouring check the auto generate option. Set the increment for contouring to a proper value: 0.5, 0.25 or 0.1 as applicable for your study. 
-(@) Then press the compute button to have the program perform the calculations. A python program screen will be started (but calculations take place in the background). While the calculation is running the progress is shown in the QGIS button in the task bar.
+The lowering in the building pit is shown to be around -7.5 m (<r> ?? Ik krijg 14 m </r> ). To get it around -3.5 m as demanded the well discharge should be decreased accordingly. An extra calculation with half the flow per well will be sufficient. 
 
-If you want to see contouring isolines on the map uncheck the mesh and raster output.
-The lowering in the building pit is shown to be around -7.5 m. To get it around -3.5 m as demanded the well discharge should be decreased accordingly. 
-
-(@) An extra calculation with half the flow per well will be sufficient. Go to the well attribute table and adjust the flow to 60% (30 m3/d per well). Then again run the program.
+(@) Go to the well attribute table, adjust the flow to 60% (30 m3/d per well) and compute the model again.
 
 ## Studying output results
-Tip: In the layer window the Open street map layer must be dragged or positioned at the bottom so that the desired contour lines will be shown and can be observed. 
-
-Mesh, raster and contours
 Results of calculations are presented as Mesh, Raster and Contour data in the layers menu.
 
-(@) Outcheck mesh and raster to only visualize contours on the base map as in @fig-DrawdownConstructionPit_v01.
-(@) Outcheck contour lines of layer 1 and 2 to get only the result for layer 0 on screen.
+(@) Uncheck mesh and raster to only visualize contours on the base map as in @fig-DrawdownConstructionPit_v01.
+(@) Uncheck contour lines of layer 1 and 2 to get only the result for layer 0 on screen.
 
 ![Updated results of groundwater head lowering contours due to 8 wells 25 m3/d and a sheet pile wall with 100d wall resistance](figures/tutorial/figure_DrawdownConstructionPit_v01.png){width=70% #fig-DrawdownConstructionPit_v01  fig-align="left"} 
 
+### Adding observations wells
+
 The city authorities that perform quality checks on the effect of construction projects insisted on the installation of some piezometers to assure reduction of risks for surrounding old monumental structures.
 
-(@) In the QGIS-Tim Window go to the *Elements* tab and select the element *Observation*. 
+(@) In the QGIS-Tim panel go to the *Elements* tab and select the element *Observation*. 
 (@) Give a name in the pop up panel, e.g. "observations". 
 (@) Then go to the Layers panel and select the layer ![](figures/tutorial/figure_Observation_icon.png){width=3%}*timml Observation:observations*. 
 (@) Go to the toolbar with drawing options and activate Toggle editing (![](figures/tutorial/button-Qgis-AttributeTable-StartEditingMode.png){width=4%}). 
