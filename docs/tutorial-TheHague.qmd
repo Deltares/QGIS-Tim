@@ -65,10 +65,10 @@ In this tutorial, you will learn how to:
 Calculation of a pumping well extraction.
 
 ## Introduction case *The Hague*
-In the old city center of The Hague a building plan with a parking basement is constructed.
-The dimensions of the building pit are **34.2 m * 83.2 m.** The area is shown in @fig-TheHagueCityCenter.
+In the old city centre of The Hague a building plan with a parking basement is constructed.
+The dimensions of the building pit are **34.2 m * 83.2 m.** The area is shown in @fig-TheHagueCityCentre.
 
-![Schematization of the building area in The Hague city center (orange: building pit)](figures/tutorial/photo-TheHagueCityCenter.png){width=80% #fig-TheHagueCityCenter fig-align="left"} 
+![Schematization of the building area in The Hague city centre (orange: building pit)](figures/tutorial/photo-TheHagueCityCentre.png){width=80% #fig-TheHagueCityCentre fig-align="left"} 
 
 To carry out the construction in dry conditions, the groundwater level needs to be lowered by **3.5 m.** The required drainage time is 4 months. <br> 
 The environment is vulnerable with valuable buildings and monuments (see @fig-TheMonumentalEnvironment) that have a shallow foundation. The subsoil consists of sandy layers which locally contain shallow peat/clay/silt layers and deeper layers of clay/silt. The builder contractor must use a sheet pile wall that needs to be installed in a water-retarding layer (aquitard).
@@ -91,7 +91,7 @@ The interpretation of the CPT and borings gives the following soil layer scheme:
 - The layer between NAP –5.5 m and –8.5 m consists of clay lenses. There is little certainty about the resistance of that layer. 
 - Between NAP –13 m and –15 m there is a clay/silt layer.
 
-Based on experience in this region, the following geohydrological schematization is known. The layer depth is indicated relative to the <r> groundwater level  of NAP-0.5m:  [Frans: we modelleren in het model toch met ligging tov NAP en niet tov Grondwater stand toch? ]  </r>
+Based on experience in this region, the following geohydrological schematization is known (@tbl-GeohydrologicalModelSubsoil). The layer depth is indicated relative to the groundwater level of NAP-0.5m:
 
 <style scoped>
 table {
@@ -107,18 +107,17 @@ table {
 ||Aquifer|-13||10|170000|
 |3|Aquitard|-15|100||6000|
 ||Aquifer|-60||25|200000|
-: Geohydrological model of the subsoil
+: Geohydrological model of the subsoil {#tbl-GeohydrologicalModelSubsoil}
 
 According to <a href="https://www.dinoloket.nl" target="_blank">DINOloket</a> the average groundwater level on site is NAP -0.5 m. There are strict demands from authorities for allowable groundwater lowering. The maximum allowed drawdown outside the construction pit is 0.1 m. <br> To perform the calculation, dewatering is schematized to 8 wells. 
 
 **Tip: Don't place the wells in the model too close to the sheet piles.**
-
 Tasks:
 
 - Which element from the Tim package would you use to place the wells and sheet piles?
 - Do you need to install sheet piles deep (in sand layers of aquifer 1 and 2) or shallow (only in the first sand layer of aquifer 1)?
 - Investigate the effect of the presence of a lower or higher hydraulic resistance in the layer between NAP -5.5 m and -8.5 m.
-- Estimate the extraction rate to keep the building pit dry. <r> Also use the excel file [??] </r>.
+- Estimate the extraction rate to keep the building pit dry.
 - What are the risks? Look at the groundwater drawdown outside the construction pit in situations with different sheet pile depth.
 - Also check for point leaks. Model these leaks with a hole in the sheet pile in the southwest corner of the area.
 
@@ -166,7 +165,7 @@ This is the moment to download/import four plugins needed for this tutorial. Thi
 
 (@) Go to *Plugins* from the main menu and select *Manage and Install Plugins…* to open the plugin window. 
 (@) On the left section select *Install from ZIP*.
-(@) Click the Browse button (![](figures/tutorial/button-Qgis-browse.png){width=4%}) and from the tutorial dataset select the ZIP file "QGIS-Tim_Tutorial\\QGIS-iMOD-plugin.zip". 
+(@) Click the *Browse* button (![](figures/tutorial/button-Qgis-browse.png){width=4%}) and from the tutorial dataset select the ZIP file "QGIS-Tim_Tutorial\\QGIS-iMOD-plugin.zip". 
 (@) Click *Install Plugin*.
 (@) In the same way, install the QGIS-Tim plugin using the ZIP file "QGIS-Tim_Tutorial\\QGIS-Tim-plugin.zip". 
 
@@ -196,15 +195,16 @@ For navigation purposes, let's load a topographic map for The Netherlands from t
 > No internet connection? Follow the next steps to import a simple PNG file as a background. 
 >
 > - Go to *Layer* in the main menu, go to *Add layer* and select *Add Raster layer*.
-> - Use the browse button (![](figures/tutorial/button-Qgis-browse.png){width=4%}) and from the tutorial material select “…\\QGIS-Tim_Tutorial\\dbase\\TopographicMapTheHague.png”.
+> - Use the *Browse* button (![](figures/tutorial/button-Qgis-browse.png){width=4%}) and from the tutorial material select “…\\QGIS-Tim_Tutorial\\dbase\\TopographicMapTheHague.png”.
 > - Click on *Add* and *Close* the window.
 > - If you do not see the map, select the layer "TopographicMapTheHague", click your right mouse button and select "Zoom to Layer(s)".
 > - Continue after step @continuewithoutinternet.
 
-
-(@) If you do have an internet connection go to the *Browser* panel on the left open the group *XYZ Tiles*.
-(@) Double click on ![](figures/tutorial/button_OpenStreetMap.png){width=15%} to load this map to the panel *Layers*.  
-(@) You might close the panel *Browser* now (click on X) in order to give the panel *Layers* the full vertical space. 
+(@) If you do have an internet connection click on the PDOK plugin button (![](figures/tutorial/button-PDOK.png){width=4%}) to open the "PDOK Services Plugin" window. 
+(@) From the tab *PDOK Services* search for "pastel" and you will find a WMTS type layer called "BTRM Achtergrondkaart WMTS". 
+(@) Select the layer.
+(@) In the section "laag toevoegen" click the button *Onder*. 
+(@) Close the PDOK window.
 
 Our project area is in the centre of the city of The Hague so let's navigate to that city using the PDOK plugin.
 
@@ -214,7 +214,7 @@ Our project area is in the centre of the city of The Hague so let's navigate to 
 Let's now open a shape file containing the circumference of the building location.
 
 (@) Go to *Layer* in the main menu, go to *Add layer* and select *Add Vector layer*.
-(@) Use the browse button (![](figures/tutorial/button-Qgis-browse.png){width=4%}) and from the tutorial material select “…\\QGIS-Tim_Tutorial\\dbase\\building_pit.shp”.
+(@) Use the *Browse* button (![](figures/tutorial/button-Qgis-browse.png){width=4%}) and from the tutorial material select “…\\QGIS-Tim_Tutorial\\dbase\\building_pit.shp”.
 (@) Click on *Add* and *Close* the window.
 
 ![](figures/tutorial/emoji-tip.png){width=3%} **Tip:** a fast alternative for adding layers: from the menu *View > Toolbar* add the *Manage Layers Toolbar* and use the button ![](figures/tutorial/button-Qgis-VectorLayer.png){width=4%}.
@@ -255,20 +255,20 @@ Let's save this project to be able to return to it later or in case of a crash o
 (@) Go to *Project* in the main menu, select *Save As* and select a folder and a file name for your project, e.g. “…\\QGIS-Tim_Tutorial\\TheHague.qgz”
 
 ## Checking available data from LHM
-We wil now research what possible layer info is available from the LHM database (Landelijk hydrologisch model). Information from LHM is made available in the provided file “…\\QGIS-Tim_Tutorial\\LHM4.1-ondergrondmodel.nc". The file contains rasterdata of both the 3D geological layering within The Netherlands and the corresponding geological parameterization (permeability, resistance, thickness). 
+We will now research what possible layer info is available from the LHM database (Landelijk hydrologisch model). Information from LHM is made available in the provided file “…\\QGIS-Tim_Tutorial\\LHM4.1-ondergrondmodel.nc". The file contains rasterdata of both the 3D geological layering within The Netherlands and the corresponding geological parameterization (permeability, resistance, thickness). 
 
 (@) In the QGIS-Tim panel go to the *Extract* tab. 
 (@) Open the file "..\\QGIS-Tim_Tutorial\\dbase\\LHM4.1-ondergrondmodel.nc" (this may take a minute because the file is 350 MB). 
-(@) Click the button *Select by Polygon* and draw a large polygon (> 250x250m) to select the area around the building location between *Parkstraat* and *Oranjestraat* (see @fig-TheHagueCityCenter). Left-click several times and close the polygon with a right click.  
+(@) Click the button *Select by Polygon* and draw a large polygon (> 250x250m) to select the area around the building location between *Parkstraat* and *Oranjestraat* (see @fig-TheHagueCityCentre). Left-click several times and close the polygon with a right click.  
 (@) Then click the *Extract* button and save the extracted subsoil data to a CSV file, e.g. "Ex2DH.csv". <br> A separate python window is opened and the selection is performed. You can follow the progress in your tool bar. 
 
-> ![](figures/tutorial/figure_ExtractionError.png){width=80% #fig-figure_ExtractionError} <br> QGIS displays this error message in case your polygon is to small. In that case redraw your polygon for a larger area. 
+> ![](figures/tutorial/figure_ExtractionError.png){width=80% #fig-figure_ExtractionError} <br> QGIS displays this error message in case your polygon is too small. In that case redraw your polygon for a larger area. 
 
 Automatically 2 CSV files will be created. One with average values for bottom and top of layers and aquifer permeabilities and aquitard resistances. The other contains statistics on the data. 
 
-(@) From a file manager on you laptop (e.g. Explorer) open the CVS files. 
+(@) From a file manager on your laptop (e.g. Explorer) open the CVS files. 
 
-An example of values from the first CSV are presented in Table 1. In each LHM layer the Aquitard information is positioned on top of Aquifer. 
+An example of values from the first CSV are presented in @tbl-SubsoilCharacteristicsLHM. In each LHM layer the Aquitard information is positioned on top of Aquifer. 
 
 | fid <br> -| layer <br> -| aquitard <br> c| aquitard <br> npor| aquitard <br> s| aquifer <br> k| aquifer <br> npor| aquifer <br> s| aquifer <br> top| aquifer <br> bottom| semiconf <br> top| semiconf <br> head|
 |---|---|--:|--:|--:|--:|--:|--:|--:|--:|--:|--:|
@@ -280,7 +280,7 @@ An example of values from the first CSV are presented in Table 1. In each LHM la
 |     5    |     5    |     3143    |  |  |     10.94    |  |  |     -106.06    |     -120.63    |  |  |
 |     6    |     6    |     8092    |  |  |     5.68    |  |  |     -151.11    |     -254.94    |  |  |
 |     7    |     7    |     17752    |  |  |     3.10    |  |  |     -307.82    |     -390.71    |  |                |
-: The characteristics of the subsoil based on LHM data (example, your values may differ)
+: The characteristics of the subsoil based on LHM data (example, your values may differ) {#tbl-SubsoilCharacteristicsLHM}
 
 A choice should be made at which depth the hydrogeological base is chosen for this project. Where high aquifer k is followed by a large aquifer c the base is chosen. For this case the base is chosen at -60.5 m (all depth data in m NAP). As you can see, values for Holocene layers are not available here and thus not displayed in LHM results. <br><br>
 Aquitard resistance in the city is quite high, so a value of 750 days is best guess from experience. <br><br>
@@ -298,9 +298,9 @@ We are now ready to define our first steady state model by parameterizing our Aq
 
 ![The characteristics of the aquifer](figures/tutorial/Panel-Timml AquiferAttrTable_v01.png){width=80% #fig-AquiferAttrTable_v01} 
 
-Closing this table window with the ![](figures/tutorial/Button_CloseWindow.png){width=2.5%} wil not save the filled in data or stop the editing mode! 
+Closing this table window with the ![](figures/tutorial/Button_CloseWindow.png){width=2.5%} will not save the filled in data or stop the editing mode! 
 
-(@) Click on the Save-Edits button (![](figures/tutorial/button_SavelayerEdits.png){width=3%}) to save you data during the process or click on the *Toggle Editing Mode* button (![](figures/tutorial/button-Qgis-AttributeTable-StartEditingMode.png ){width=4%}) to stop edditing and QGIS askes you if your changes should be saved. 
+(@) Click on the *Save-Edits* button (![](figures/tutorial/button_SavelayerEdits.png){width=3%}) to save you data during the process or click on the *Toggle Editing Mode* button (![](figures/tutorial/button-Qgis-AttributeTable-StartEditingMode.png ){width=4%}) to stop edditing and QGIS askes you if your changes should be saved. 
 (@) Now you can close the Attribute Table window.
 
 In the QGIS-Tim Window we now introduce the following elements for ground water modelling in the QGIS-Tim tab *Element*: 
@@ -308,25 +308,14 @@ In the QGIS-Tim Window we now introduce the following elements for ground water 
 - Leaky Line Doublet
 - Well
 
-<r> ?? Hans, waarom moeten de gebruikers hieronder eerst een shape maken? Kunnen we niet beter de shape aanleveren als tutorial achtergrond? 
-
-<r> To help maneuvering in the QGIS we first draw the circumference of the building location in QGIS. We can do it by creating a drawing in the menu option Layer, choosing Create layer, New shapefile layer. We create a new polygon geometry. Don’t forget to set the proper path to your directory and to fill in the right CRS (see @fig-NewShapefileLayer).  
-
-(@) <r> Click in the Layers panel on the shape
-(@) <r> and draw with (![](figures/tutorial/button-Qgis-AttributeTable-StartEditingMode.png ){width=4%}) a polygon. 
-
-<r> By using the vertex option you can adjust the geometry shape with help of the measuring tool of QGIS. 
-
-![Creating a new shapefile drawing in the map](figures/tutorial/Panel-QGIS-NewShapefileLayer.png){width=80% #fig-NewShapefileLayer} 
-
 ### Adding a Leaky Line Doublet
 
 (@) In the QGIS-Tim window go to tab *Elements* and select the button *Leaky Line Doublet*. 
-(@) Fill in the name of the layer in the popup panel, e.g. 'sheet_pile', and click *OK* and this new Layer is added to the Layers panel.  
+(@) Fill in the name of the layer in the pop-up panel, e.g. 'sheet_pile', and click *OK* and this new Layer is added to the *Layers* panel.  
 
-First we will *draw* the location of the sheet pile before *adding* the parameter values. 
+First, we will *draw* the location of the sheet pile before *adding* the parameter values. 
 
-(@) In the Layers panel right click on the layer ![](figures/tutorial/figure_Leakylinedoublet_icon.png){width=4%} *timml Leaky Line Doublet:sheet_pile* and start the editing mode by clicking the Toggle Editing button (![](figures/tutorial/button-Qgis-AttributeTable-StartEditingMode.png ){width=4%}). 
+(@) In the *Layers* panel right click on the layer ![](figures/tutorial/figure_Leakylinedoublet_icon.png){width=4%} *timml Leaky Line Doublet:sheet_pile* and start the editing mode by clicking the *Toggle Editing* button (![](figures/tutorial/button-Qgis-AttributeTable-StartEditingMode.png ){width=4%}). 
 
 Two important remarks before drawing the sheet pile: 
 
@@ -336,44 +325,44 @@ Two important remarks before drawing the sheet pile:
 (@) In the main menu go to *Project* and select *Snapping Options..*.  
 (@) From the new toolbar (see @fig-button_ToolbarSnappingSettings), click on the *Enable Snapping* button (![](figures/tutorial/button_EnableSnapping.png){width=3%}). 
 
-![Switching on snapping options](figures/tutorial/button_ToolbarSnappingSettings.png){width=80% #fig-button_ToolbarSnappingSettings} 
+![Switching on snapping options](figures/tutorial/button_ToolbarSnappingSettings.png){width=90% #fig-button_ToolbarSnappingSettings} 
 
 (@) Then select the *Add line feature* icon (![](figures/tutorial/button_AddLineFeature.png){width=3%}) to start the drawing of the sheet pile. 
-(@) Draw the sheet pile arround the building pit (start south corner) with your left mouse button and close the feature on the first point. 
-(@) In the popup panel fill in resistance (1000 \*) and layer number (layer=0 \**) as in @fig-LeakylinedoubletFeatureAttributes and click OK to close the window.
-(@) Close the editing mode with a click on (![](figures/tutorial/button-Qgis-AttributeTable-StartEditingMode.png ){width=4%}) and you are asked to save your changes.  
-
-Remarks to the provided values: <br>
-\* Because of a known error in the TimML software, until this issue is resolved, the value of the resistance must be multiplied by the permeability. For normal sheet pile walls a resistance value of 100 d for interlock leakage is a good choice. In this case the chosen value needs to be increased by multiplying with the applicable aquifer permeability in the effected layer (R=100 d becomes R=10*100 d). <br>
-\*\* In the real world counting starts with 1. However, Tim is programmed in Python and in Python counting starts with 0. You will get used to it.
+(@) Draw the sheet pile around the building pit (start south corner) with your left mouse button and close the feature on the first point. 
+(@) In the pop-up window fill in the resistance (1000 d, see \* below) and layer number (layer=0, see \*\* below) as in @fig-LeakylinedoubletFeatureAttributes and click OK to close the window.
 
 ![The characteristics of the Leaky line doublet](figures/tutorial/figure_LeakylinedoubletFeatureAttributes.png){width=70% #fig-LeakylinedoubletFeatureAttributes fig-align="left"} 
 
+> Remarks to the provided values: <br>
+> \* Because of a known issue in the TimML software, until this issue is resolved, the value of the resistance must be multiplied by the permeability. For normal sheet pile walls a resistance value of 100 d for interlock leakage is a good choice. In this case the chosen value needs to be increased by multiplying with the applicable aquifer permeability in the effected layer (R=100 d becomes R=10*100 d). <br>
+> \*\* In the real-world counting starts with 1. However, Tim is programmed in Python and in Python counting starts with 0. You will get used to it.
+
+(@) Close the editing mode with a click on (![](figures/tutorial/button-Qgis-AttributeTable-StartEditingMode.png ){width=4%}) and you are asked to save your changes.  
 (@) Open the attribute table for *Leaky Line Doublet* (click ![](figures/tutorial/button-Qgis-OpenAttributeTable.png){width=3%} or press F6) to check hydraulic resistance values for the sheet pile walls. 
 
 ### Adding a Well
 
-(@) In GIS-Tim goto the tab *Elements* and select the *Well* element. 
-(@) A name for the element can be given in the popup panel, e.g. *pumping_wells*. 
-(@) In the Layers panel right click on the layer ![](figures/tutorial/figure_well_icon.png){width=3%} *timml Well:pumping_wells* and start the editing mode by clicking the Toggle Editing button (![](figures/tutorial/button-Qgis-AttributeTable-StartEditingMode.png ){width=4%}). 
+(@) In GIS-Tim go to the tab *Elements* and select the *Well* element. 
+(@) A name for the element can be given in the pop-up panel, e.g. *pumping_wells*. 
+(@) In the *Layers* panel right click on the layer ![](figures/tutorial/figure_well_icon.png){width=3%} *timml Well:pumping_wells* and start the editing mode by clicking the *Toggle Editing* button (![](figures/tutorial/button-Qgis-AttributeTable-StartEditingMode.png ){width=4%}). 
 (@) Next click on *Add point feature* (![](figures/tutorial/button_AddPointFeature.png){width=4%}).
 (@) With you left mouse button add the first well location similar to point 1 in @fig-SchematizationTheHague. 
-(@) In the pop uped window, fill in the well parameters discharge (50 m3/d), radius (0.1 m), resistance (1 d) and layer (0).
-(@) Now add the other 7 wells locations in a fast way: do not import parameters with every single point. We will do that later. Just click OK on each *Feature Attribute* window. 
+(@) In the pop-uped window, fill in the well parameters discharge (50 m3/d), radius (0.1 m), resistance (1 d) and layer (0).
+(@) Now add the other 7 wells locations in a fast way: do not import parameters with every single point. We will do that later. Just click *OK* on each *Feature Attribute* window. 
 
-![Schematization of the pumping wells and the sheet piles](figures/tutorial/figure_SchematizationTheHague.png){width=100% #fig-SchematizationTheHague} 
+![Schematization of the pumping wells, sheet piles and observation locations](figures/tutorial/figure_SchematizationTheHague.png){width=80% #fig-SchematizationTheHague} 
 
-(@) In the Layers panel right select layer *timml Well:pumping_wells* and open the *Attribute Table (F6)*. 
-(@) Start the editting mode and fill in the values shown in @fig-WellAttributeTable. Dont forget the column 'Label'. <br> The discharge value in the table is a first guess to be adjusted later to desired level of -3.5 m groundwater lowering in the building pit.
-(@) Stop the editting mode, save your work and close the window. 
+(@) In the *Layers* panel right select layer *timml Well:pumping_wells* and open the *Attribute Table (F6)*. 
+(@) Start the editing mode and fill in the values shown in @fig-WellAttributeTable. Don't forget the column 'Label'. <br> The discharge value in the table is a first guess to be adjusted later to desired level of -3.5 m groundwater lowering in the building pit.
+(@) Stop the editing mode, save your work and close the window. 
 (@) Select layer *timml Well:pumping_wells* again, click right and from the menu select *Show labels*.  
 
 ![Well properties](figures/tutorial/figure_WellAttributeTable.png){width=100% #fig-WellAttributeTable} 
 
 When you finished the input of the wells and their parameters, you have to look back to the combination of wells and sheet pile wall. The reason is that near a well the flow is strong and therefore the flow through the wall is increased. This may lead to extremities in the calculation if wall segments are chosen too large. Tim uses control points but they are set at regular distances on the doublet (the number of control points is 1+order). It is necessary to divide the wall in smaller sections near well locations. The length of each section should be chosen equal to approximately the distance of the wall to the nearest well. 
 
-(@) Select the Leaky Line Doublet in the layers panel and start the editing mode.
-(@) Activate the Vertex Tool (![](figures/tutorial/button_VertexTool.png){width=4%}) and then hoover along the sheet pile line in your drawing. The line element near you pointer lights up.
+(@) Select the Leaky Line Doublet in the *Layers* panel and start the editing mode.
+(@) Activate the Vertex Tool (![](figures/tutorial/button_VertexTool.png){width=4%}) and then hoover along the sheet pile line in your drawing. The line element near your pointer lights up.
 (@) With the combination of **Shift + double left click**, you can add a new vertex to the line. Repeat that for the number of points you want to add.
 
  @fig-figure_SheetPileExtraPoints shows the result of positioned extra points in the line.
@@ -382,96 +371,126 @@ When you finished the input of the wells and their parameters, you have to look 
 
 ## Computing the groundwater head drawdown
 
-(@) Zoom in or out to desired domain for which you want to see the modelresults.
-(@) In the QGIS-Tim panel select the tab *Compute* (see @fig-ComputeSettings). 
-(@) Select the button "Set to current extent" to define the Domain. 
-(@) Grid spacing will follow automatically but for now make the results mesh more dense by changing "Grid spacing" to 5.00 m. 
+(@) Zoom in or out to desired domain for which you want to see the model results.
+(@) In the QGIS-Tim panel select the tab *Compute*. 
+(@) Select the button *Set to current extent* to define the Domain. 
+(@) Grid spacing will follow automatically but for now make the results mesh more dense by changing "Grid spacing" to 3.00 m. 
 (@) In the "Output" section give the name of the file where you want to store the results. 
 (@) For contouring, select the check box "Auto-generate contours". 
 (@) Set the increment for contouring to a proper value: 0.5, 0.25 or 0.1 as applicable for your study. 
-(@) Press the "Compute" button to have the program perform the calculations. A black Python.exe window might pop up (but calculations take place in the background). While the calculation is running the progress is shown in the QGIS button in the task bar.
+(@) Press the *Compute* button to have the program perform the calculations. 
 
-![Compute settings](figures/tutorial/figure_ComputeSettings.png){width=60% #fig-ComputeSettings fig-align="left"} 
+A black Python.exe window pops up indicating that the TIM calculation started on the background. You can ignore this window but keep it open. Of course you van minimize it. If the calculation was completed successful, you will see this echo in QGIS.  
+![](figures/tutorial/Panel-QGIS-Tim-completion.png){width=80%}. 
 
-After the calculation you see that the result is automatically added to a new geopackage, probably called “case-TheHague output”. Results are saved both as mesh and raster. Contours are saved as vector. For each format a separate sub group is created. Although these layers / groups are checked, the data is not visible. That is because the geopackage was added last, and QGIS adds layers at the end of the list. <br> Let’s move the layer “OpenStreetMap” to the background.
+## Studying output results
+After the calculation you see that the result is automatically added to the *Layers* panel, probably called "case-TheHague output". Results are presented as Mesh, Raster and Vector data. Contours are saved as vector. <br> Although these layers / groups are checked, the data is not visible. That is because the geopackage was added last, and QGIS adds layers at the end of the list. <br> Let's move the layer "pastel" to the background. 
 
-(@) Select the layer "OpenStreetMap" and drag it with your left mouse button to the bottom of the list of layers.
-(@) Uncheck the mes and raster ouput in order to only dispay the isolines on the map.
+(@) Select the layer "pastel" and drag it with your left mouse button to the bottom of the list of layers.
+(@) Uncheck mesh and raster to only visualize contours on the base map.
+(@) Uncheck contour lines of layer 1 and 2 to get only the result for layer 0 on screen as in @fig-DrawdownConstructionPit_v01.
 
-The lowering in the building pit is shown to be around -7.5 m (<r> ?? Ik krijg 14 m </r> ). To get it around -3.5 m as demanded the well discharge should be decreased accordingly. An extra calculation with half the flow per well will be sufficient. 
+![Updated results of groundwater head lowering contours due to 8 wells 50 m3/d and a sheet pile wall with 100 d wall resistance.](figures/tutorial/figure_DrawdownConstructionPit_v01.png){width=90% #fig-DrawdownConstructionPit_v01  fig-align="left"} 
+
+The lowering in the building pit is shown to be around -6.20 m. To get it around -3.50 m as demanded the well discharge should be decreased accordingly. An extra calculation with half the flow per well will be sufficient. 
 
 (@) Go to the well attribute table, adjust the flow to 60% (30 m3/d per well) and compute the model again.
 
-## Studying output results
-Results of calculations are presented as Mesh, Raster and Contour data in the layers menu.
-
-(@) Uncheck mesh and raster to only visualize contours on the base map as in @fig-DrawdownConstructionPit_v01.
-(@) Uncheck contour lines of layer 1 and 2 to get only the result for layer 0 on screen.
-
-![Updated results of groundwater head lowering contours due to 8 wells 25 m3/d and a sheet pile wall with 100d wall resistance](figures/tutorial/figure_DrawdownConstructionPit_v01.png){width=70% #fig-DrawdownConstructionPit_v01  fig-align="left"} 
-
 ### Adding observations wells
-
 The city authorities that perform quality checks on the effect of construction projects insisted on the installation of some piezometers to assure reduction of risks for surrounding old monumental structures.
 
 (@) In the QGIS-Tim panel go to the *Elements* tab and select the element *Observation*. 
-(@) Give a name in the pop up panel, e.g. "observations". 
-(@) Then go to the Layers panel and select the layer ![](figures/tutorial/figure_Observation_icon.png){width=3%}*timml Observation:observations*. 
+(@) Give a name in the pop-up panel, e.g. "observations". 
+(@) Then go to the *Layers* panel and select the layer ![](figures/tutorial/figure_Observation_icon.png){width=3%}*timml Observation:observations*. 
 (@) Go to the toolbar with drawing options and activate Toggle editing (![](figures/tutorial/button-Qgis-AttributeTable-StartEditingMode.png){width=4%}). 
-(@) Go right to the Add point feature (![](figures/tutorial/button_AddPointFeature.png){width=3%}) and drop some piezometers in the drawing. <br> We propose to use 5 points: 1 point in the center of the building pit, 1 near the lower corner outside, 1 outside near the middle of the eastern sheet pile section and just 2 near street corners.
-(@) Run the program again.
+(@) Go right to the Add point feature (![](figures/tutorial/button_AddPointFeature.png){width=3%}) and drop some piezometers in the drawing. <br> We propose to use 5 points (see @fig-SchematizationTheHague): 1 point in the centre of the building pit, 1 near the lower corner outside, 1 outside near the middle of the eastern sheet pile section and just 2 near street corners.
+(@) Compute the model again.
 
-The result is also (??) given in @fig-DrawdownConstructionPit_v01.
+Results of calculations at the observation locations are presented as *Vector* data in the *Layers* panel.
 
-We can observe that the lowering of groundwater around the building pit is quite high due to leakage of the sheet piles or leakage through the bottom clay layer with small resistance. Therefore, it is needed to improve the wall quality or the length. 
-First we check the effect of the clay layer by studying a cross section.
+(@) Uncheck/check layers in order to display observation results only. 
 
-## Creating a cross section
+By default, the label at each observation location is the calculated head for layer 0. Perhaps you see a second number near the location. For your information: this is the "location number" label belonging to the model input in layer *timml Observation:observations*. 
+
+We can observe that the lowering of groundwater around the building pit is quite high due to leakage of the sheet piles or leakage through the bottom clay layer with small resistance. Therefore, it is needed to improve the wall quality or the length. First we check the effect of the clay layer by studying a cross section.
+
+### Creating a cross section
 
 (@) To make a cross section, use the iMOD plugin toolbar and click on the Cross Section widget (![](figures/tutorial/button_iMOD-Cross-section.png){width=3%})
-(@) From the dropdown menu on the left of this toolbar, select the raster (![](figures/tutorial/button-Raster.png){width=3%}) with "layer_0”. 
-(@) Check *As Line* and press *Add*.
-(@) On the *iMOD Cross Section Plot???* click on the button *Select location* and draw your cross-section line in  @fig-HeadsInCrosssection03. Draw a line by left clicking on the map and right clicking to stop drawing.
-(@) Click the button *Plot* to draw this layer in the cross section.
+(@) From the dropdown menu on the left of this panel, select the mesh (![](figures/tutorial/button_Mesh.png){width=3%}) with \*_layer_0.
+(@) Press *Add*.
+(@) Start to define you cross section with a click on the button *Select location*.
+(@) Draw your cross section by left clicking on the map. Stop drawing with a right click. You can redraw this line anytime you like.
+(@) Satisfied with your line? Click the button *Plot* to draw this layer in the cross section. Your screen might look like @fig-HeadsInCrosssection03.
 (@) By using the *Export* button you can store results from the cross section in a CSV file.
 
 ![Cross section of groundwater heads per layer, sheet pile wall R=100d and 8 wells at 30 m3/d each in layer0](figures/tutorial/figure_HeadsInCrosssection03.png){width=100% #fig-HeadsInCrosssection03} 
 
 ## Making calculations with parameter variations or checking bandwidth
-The authorities demand a drawdown effect of dewatering at a maximum of 0.10m at surrounding buildings. This means that improvements for leakage control are needed but first we need to discover what parameter to focus on.
+The authorities demand a drawdown effect of dewatering at a maximum of 0.10 m at surrounding buildings. This means that improvements for leakage control are needed but first we need to discover what parameter to focus on.
 
-To check whether the wall resistance or the bottom resistance is more important we can make 2 variations, with R-wall=500 d and with c-clay=200 d. 
-(@) Adjust the values in the attribute tables per element.
+To check whether the wall resistance or the bottom resistance of the layer 1 (below the building pit) is more important we can make 2 variations; one with C-clay=200 d and one with R-wall=500 d. <br>
+Of course you can change your model input, rerun the model and overwrite your model results. The next steps show you how to change the model input and save the results in separate *.gpkg and *.nc files.  
 
-Each time you start a new calculation, set the name of the output-file to a different indication for the specific variant or register your variations in a logfile. We gather the variation results for the heads at the piezometers in a table.
+(@) In the input group select layer *timml Aquifer:...*
+(@) Open the *Attrribute Table* (F6) and change the value for "aquitard_c" in layer 1 into 200 d. 
+(@) In the QGIS-Tim panel go to the tab *Compute* and change the name of the output, e.g. case-TheHague_v1.
+(@) Click *Compute* to run variant 1.
 
-|Location | C=40d, Rw=100d | C=200d, Rw=100d| C=40d,Rw=500d*|
-|---|---|---|---|
-|Pb1 center pit|-3.65|-10.44|-4.00|
-|Pb2 south corner|-0.39|-0.54|-0.35|
-|Pb3 street corner|-0.33|-0.43|-0.31|
-|Pb4 south point|-0.26|-0.32|-0.25|
-|Pb5 east wall|-0.48|-0.70|-0.41|
-: tabel: ??????
+Check in the *Layers* panel and see that the results are not overwritten but added to the groups, e.g. layer *case-TheHague_v1-timml Observation:observations* is added to the group *Vector*. 
 
-\* note that you have to multiply R by layer permeability.
+(@) Fill in your calculated heads at the observation locations in @tbl-CalculatedHeads2Variants or use Excel.  
+
+|Observation <br>location |Default:<br>Cc=40d<br>Rw=100d*|![](figures/tutorial/button-pencil.png){width=20%} <br> your value:|Variant 1:<br>Cc=200d<br>Rw=100d*|your value:|Variant 2:<br>Cc=40d<br>Rw=500d*|your value:|
+|---|---|---|---|---|---|---|
+|Pb1 centre pit|-3.95| ... |-10.44| ...|-4.00| ...|
+|Pb2 south corner|-0.43| ...|-0.54| ...|-0.35| ...|
+|Pb3 street corner|-0.35| ...|-0.43| ...|-0.31| ...|
+|Pb4 south point|-0.29| ...|-0.32| ...|-0.25| ...|
+|Pb5 east wall|-0.51| ...|-0.70| ...|-0.41| ...|
+: Table: calculated heads [m] in observation points for 2 variants compared to the initial situations. Your values will differ. {#tbl-CalculatedHeads2Variants}
+
+\* Known issue in TimML: you have to multiply Rw by layer permeability (Rw*10).
+
+Let's now run Variant 2.
+
+(@) In layer *timml Aquifer:...* reset the value for "aquitard_c" in layer 1 to the default of 40 d. 
+(@) In layer *timml Leaky Line Doublet:...* change the value for "resistance" into 5000 d (500x10). 
+(@) In the QGIS-Tim panel go to the tab *Compute* and change the name of the output, e.g. case-TheHague_v2.
+(@) Click *Compute* to run variant 2.
+(@) Fill in your calculated heads at the observation locations in the table above.  
 
 To get the same lowering in the building pit, in the second variation the well flow might be reduced to 33% (10m3/d per well). For the sheet pile wall, increasing the wall quality or decreasing interlock leakage doesn’t make a big difference. <br>
 We can conclude that the best investment during the phase of design would be to perform extra hydrogeological research, e.g. by making more cpt’s, borings or performing a pumping test.
 
-Suppose the best guess value of the clay layer resistance was right, than a mitigation measure for the effect of dewatering in the construction phase could be the installation of the wall to a deeper level where additional hydraulic resistance of 100d can be found at a depth of -13 m to -15 m NAP.
+## Sheet piles with extra depth
+Suppose the best guess value of the clay layer resistance was right, then a mitigation measure for the effect of dewatering in the construction phase could be the installation of the wall to a deeper level where additional hydraulic resistance of 100d can be found at a depth of -13 m to -15 m NAP.
 
-If we want to create extra depth of the sheet pile we will have to introduce it in a deeper layer. This is only possible by selecting an extra *Leaky Line Doublet* element. We can not just add an extra feature layer to the existing element because every line feature needs coordinates. They are not shown in the attribute table but points are kept in memory in the background (??).
+If we want to create extra depth of the sheet pile we will have to introduce it in a deeper layer. There are 2 options to implement it in your model: 
 
-(@) We follow the same routing as before. Since we started drawing the sheetpile wall in layer 0 at the north end of the pit we do so again for the wall in layer 1. 
+- Add a copy of the geometry of the sheet pile wall to the existing *Leaky Line Doublet* shape and assign it to layer 1. 
+- We recommend to create an extra *Leaky Line Doublet* element. In this case it is more easy to switch on/off this additional element in your sensitivity analysis. 
 
-Because we activated snapping it is easy to draw the wall at the intermediate points again.
+How to copy the sheet pile wall to an extra *Leaky Line Doublet* element? 
 
-(@) We start the computation again and get the results of contours and a cross-section again. 
+(@) In the QGIS-Tim panel go to the tab *Elements* and add a second *Leaky Line Doublet* and give it a name, e.g. "sheet_pile_L1"
+(@) Go to the tab *GeoPackage* and see that the element separately is added to the list. Here is can switch this element on / off for a calculation.  
+(@) In the *Layers* panel select the new layer *timml Leaky Line Doublet:sheet_pile_l1*.
+(@) Open its *Attribute Table* (F6) and start the editing mode. The table is empty. 
+(@) Also open the *Attribute Table* of the first *Leaky Line Doublet* and select the existing element.  
+(@) Click on the *Copy* button (![](figures/tutorial/button_Copy_Selected_Row.png){width=3%}) in the source table to copy the selected row to the clipboard.
 
-We can conclude that the drawdown in the building pit increases with a factor of almost 2 (-6.88 m at the centre of the building pit).
+ ![](figures/tutorial/figure_Leakylinedoublet_copy.png){width=70%} 
 
-(@) Therefore, we go to the attributes table of the wells and adjust the flow to 3.5/6.88*30=15.25 m3/d per well. Then perform the calculation again.
+(@) In the target table, paste it with the *Paste* button (![](figures/tutorial/button_Paste_Feature.png){width=3%}) as a new layer.
+(@) Assign this new sheet pile to layer=1.
+(@) Stop editing and save the new element. 
+(@) Click *Compute* to start the computation again. 
+
+The results are directly visible in the contours and cross-section again. <br>
+We can conclude that the drawdown in the building pit increases with a factor of almost 2 (-7.48 m at the centre of the building pit). Therefore, we adjust the well flow to 3.95/7.48*30=15.54 m3/d per well. 
+
+(@) Implement this change in the *timm Well* element and recalculate the model.
 
 ![Cross section of groundwater heads per layer, sheet pile wall R=100d in layers 0 and 1 and 8 wells at 15.25 m3/d each in layer0](figures/tutorial/figure_HeadsInCrosssection04.png){width=100% #fig-figure_HeadsInCrosssection04} 
 
@@ -479,10 +498,9 @@ We conclude that the lowering around the building pit with deep sheet piles impr
 
 Next also alternatives with a shallow concrete cut-off wall will be calculated for a shallow and a deep wall. In that case we have R=1000 d, but note that the input in the attribute than becomes k*R=10000 due to the error in Tim. 
 
-(@) After changing the value in attribute tables of wall elements, we can compute again, switching off and on the element for the deep wall section in the geopackage (go to tab ?? in the QGIS-Tim panel). 
+(@) After changing the value in attribute tables of wall elements, we can compute again, switching off and on the element for the deep wall section (tab Geopackage on the QGIS-Tim panel). 
 
-Again extra calculation is needed to adjust well extractions for drawdown in the building pit.
-
+Again extra calculation is needed to adjust well extractions for drawdown in the building pit.<br>
 Results of calculations are gathered in the following table, showing extractions and head outside the wall at South East monitoring position.
 
 |Wall alternative <br> at c1=40 d|Wall resistance <br> [d] |Groundwater extraction <br> [m3/d] |Head SE monitoring <br> [dh in m]|
@@ -491,16 +509,16 @@ Results of calculations are gathered in the following table, showing extractions
 |Deep sheet pile wall |100 |122 |-0.16|
 |Shallow cut-off wall |1000 |208 |-0.30|
 |Deep cut-off wall |1000 |80 |-0.04|
-: table ??
+: Effect of 4 Wall alternatives on extraction rate and drawdown South East. {#tbl-CalculatedHeads2Variants}
 
 Installation of 15 m deep sheet pile wall or cut-off wall can be elaborated in a geotechnical design. <br>
 Still, probably some decrease of interlock leakage is needed when sheet piles are chosen. Interlock sealing or maybe irrigation of water in a shallow drain pipe around the building pit could lead to approval by authorities. 
 
 ## Effect of a not closed wall (about 20 cm) 
-Authorities are afraid leakage incidents could be harmful for surrounding monuments. 
+Authorities are afraid that leakage incidents could be harmful for surrounding monuments. 
 The effect of leakage can be studied by creating a fictitious little opening in the wall. This can be done e.g. by changing the values of first and last coordinate of the leaky line doublet. 
 
-(@) Select the *Leaky Line Doublet* in the layers panel
+(@) Select the *Leaky Line Doublet* in the *Layers* panel
 (@) In the editing toolbar go to the toggle editing option (![](figures/tutorial/button-Qgis-AttributeTable-StartEditingMode.png){width=4%}) and check the vertex option (![](figures/tutorial/button_VertexTool.png){width=4%}). 
 (@) On the drawing panel select a point in the line element of the wall and right click. 
 
