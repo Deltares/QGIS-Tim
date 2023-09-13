@@ -86,27 +86,27 @@ The soil profile has been investigated with borings and CPTs. An example of a CP
 
 The interpretation of the CPT and borings gives the following soil layer scheme:
 
-- The soil mainly consist of fine sand in Holocene layers (max depth NAP -15 m) and coarse sand in deeper Pleistocene layers.
+- The soil mainly consists of fine sand in Holocene layers (max depth NAP -15 m) and coarse sand in deeper Pleistocene layers.
 - Just below the groundwater level (NAP -0.5 m), there is an approximately 1.5 m thick peat/clay/silt layer (not in CPT). 
 - The layer between NAP –5.5 m and –8.5 m consists of clay lenses. There is little certainty about the resistance of that layer. 
 - Between NAP –13 m and –15 m there is a clay/silt layer.
 
-Based on experience in this region, the following geohydrological schematization is known (@tbl-GeohydrologicalModelSubsoil). The layer depth is indicated relative to the groundwater level of NAP-0.5m:
+Based on experience in this region, the following geohydrological schematization is known (@tbl-GeohydrologicalModelSubsoil). The layer depth is indicated relative to the groundwater level of NAP-0.5m, because only that part is relevant for our model. In @tbl-GeohydrologicalModelSubsoil c = vertical hydraulic resistance, k= horizontal permeability, S’= specific storage: :
 
 <style scoped>
 table {
   font-size: 13px;
 }
 </style>
-|Cluster|Layer type|Layer Bottom|c|K|E-oed|
+|Cluster|Layer type|Layer Bottom|c|k|S’|
 |:-:|--:|--:|--:|--:|--:|
-|||[m]|[days]|[m/day]|[kPa]|
-|1|Aquitard|-1|3000||33|
-||Aquifer|-5||10|160|
-|2|Aquitard|-8|40||10000|
-||Aquifer|-13||10|170000|
-|3|Aquitard|-15|100||6000|
-||Aquifer|-60||25|200000|
+|||[m-REF]|[days]|[m/day]|[1/m]|
+|1|Aquitard|-1|3000||0.01|
+||Aquifer|-5||10|0.00025|
+|2|Aquitard|-8|40||0.0002|
+||Aquifer|-13||10|0.00005|
+|3|Aquitard|-15|100||0.001|
+||Aquifer|-60||25|0.00001|
 : Geohydrological model of the subsoil {#tbl-GeohydrologicalModelSubsoil}
 
 According to <a href="https://www.dinoloket.nl" target="_blank">DINOloket</a> the average groundwater level on site is NAP -0.5 m. There are strict demands from authorities for allowable groundwater lowering. The maximum allowed drawdown outside the construction pit is 0.1 m. <br> To perform the calculation, dewatering is schematized to 8 wells. 
@@ -226,7 +226,7 @@ Let's now open a shape file containing the circumference of the building locatio
 
 Let's save this project to be able to return to it later or in case of a crash of QGIS.
 
-(@) Go to *Project* in the main menu, select *Save As* and select a folder and a file name for your project, e.g. “…\\QGIS-Tim_Tutorial\\Rijsenhout.qgz”
+(@) Go to *Project* in the main menu, select *Save As* and select a folder and a file name for your project, e.g. “…\\QGIS-Tim_Tutorial\\TheHague.qgz”
 
 ### Open the QGIS-Tim panel
 Now we are ready to activate the QGIS-Tim plugin. 
@@ -271,7 +271,7 @@ Automatically 2 CSV files will be created. One with average values for bottom an
 An example of values from the first CSV are presented in @tbl-SubsoilCharacteristicsLHM. In each LHM layer the Aquitard information is positioned on top of Aquifer. 
 
 | fid <br> -| layer <br> -| aquitard <br> c| aquitard <br> npor| aquitard <br> s| aquifer <br> k| aquifer <br> npor| aquifer <br> s| aquifer <br> top| aquifer <br> bottom| semiconf <br> top| semiconf <br> head|
-|---|---|--:|--:|--:|--:|--:|--:|--:|--:|--:|--:|
+|---|---|:--:|:--:|:--:|:--:|:--:|:--:|:-:|:--:|:--:|:--:|
 |     0    |     0    |  |  |  |  |  |  |  |  |  |  |
 |     1    |     1    |     287    |  |  |     62.37    |  |  |     -18.97    |     -38.30    |  |  |
 |     2    |     2    |     1    |  |  |     37.94    |  |  |     -38.30    |     -60.54    |  |  |
@@ -282,8 +282,8 @@ An example of values from the first CSV are presented in @tbl-SubsoilCharacteris
 |     7    |     7    |     17752    |  |  |     3.10    |  |  |     -307.82    |     -390.71    |  |                |
 : The characteristics of the subsoil based on LHM data (example, your values may differ) {#tbl-SubsoilCharacteristicsLHM}
 
-A choice should be made at which depth the hydrogeological base is chosen for this project. Where high aquifer k is followed by a large aquifer c the base is chosen. For this case the base is chosen at -60.5 m (all depth data in m NAP). As you can see, values for Holocene layers are not available here and thus not displayed in LHM results. <br><br>
-Aquitard resistance in the city is quite high, so a value of 750 days is best guess from experience. <br><br>
+A choice should be made at which depth the hydrogeological base is chosen for this project. Where high aquifer k is followed by a large aquifer c the base is chosen. For this case the base is chosen at -60.5 m (all depth data in @tbl-SubsoilCharacteristicsLHM are m NAP). As you can see, values for Holocene layers are not available here and thus not displayed in LHM results. <br><br>
+Aquitard resistance in the city is quite high, so a value of 3000 days is best guess from experience. <br><br>
 For marine deposits at -12 a value of 50 to 100 days per meter layer thickness is a proper choice. The permeability of fine Holocene sand is chosen at 10 m/d.
 
 ## Start your Tim model
@@ -294,11 +294,11 @@ We are now ready to define our first steady state model by parameterizing our Aq
 (@) Switch to the editing mode in the table with a click on (![](figures/tutorial/button-Qgis-AttributeTable-StartEditingMode.png ){width=4%}) *Toggle Editing*.
 (@) Then by clicking 3 times on (![](figures/tutorial/button-Qgis-AttributeTable-AddFeature.png){width=4%}) *Add feature* you will see new rows are added. 
 (@) Now you are able to fill in the desired values shown in @fig-AquiferAttrTable_v01. <br> 
-**NB do not fill in column FID. 'Autogenerate' will takes care.** 
+**NB do not fill in column FID. 'Autogenerate' will take care.** 
 
 ![The characteristics of the aquifer](figures/tutorial/Panel-Timml AquiferAttrTable_v01.png){width=80% #fig-AquiferAttrTable_v01} 
 
-Closing this table window with the ![](figures/tutorial/Button_CloseWindow.png){width=2.5%} will not save the filled in data or stop the editing mode! 
+**NB!** Closing this table window with the ![](figures/tutorial/Button_CloseWindow.png){width=2.5%} will not save the filled in data or stop the editing mode! 
 
 (@) Click on the *Save-Edits* button (![](figures/tutorial/button_SavelayerEdits.png){width=3%}) to save you data during the process or click on the *Toggle Editing Mode* button (![](figures/tutorial/button-Qgis-AttributeTable-StartEditingMode.png ){width=4%}) to stop edditing and QGIS askes you if your changes should be saved. 
 (@) Now you can close the Attribute Table window.
@@ -334,7 +334,7 @@ Two important remarks before drawing the sheet pile:
 ![The characteristics of the Leaky line doublet](figures/tutorial/figure_LeakylinedoubletFeatureAttributes.png){width=70% #fig-LeakylinedoubletFeatureAttributes fig-align="left"} 
 
 > Remarks to the provided values: <br>
-> \* Because of a known issue in the TimML software, until this issue is resolved, the value of the resistance must be multiplied by the permeability. For normal sheet pile walls a resistance value of 100 d for interlock leakage is a good choice. In this case the chosen value needs to be increased by multiplying with the applicable aquifer permeability in the effected layer (R=100 d becomes R=10*100 d). <br>
+> \* Because of a known issue in the TimML software, until this issue is resolved, the value of the resistance must be multiplied by the permeability. For normal sheet pile walls a resistance value of 100-250 d for interlock leakage is a good choice. In this case the chosen value needs to be increased by multiplying with the applicable aquifer permeability in the effected layer (R=100 d becomes R=10*100 d). <br>
 > \*\* In the real-world counting starts with 1. However, Tim is programmed in Python and in Python counting starts with 0. You will get used to it.
 
 (@) Close the editing mode with a click on (![](figures/tutorial/button-Qgis-AttributeTable-StartEditingMode.png ){width=4%}) and you are asked to save your changes.  
@@ -347,7 +347,7 @@ Two important remarks before drawing the sheet pile:
 (@) In the *Layers* panel right click on the layer ![](figures/tutorial/figure_well_icon.png){width=3%} *timml Well:pumping_wells* and start the editing mode by clicking the *Toggle Editing* button (![](figures/tutorial/button-Qgis-AttributeTable-StartEditingMode.png ){width=4%}). 
 (@) Next click on *Add point feature* (![](figures/tutorial/button_AddPointFeature.png){width=4%}).
 (@) With you left mouse button add the first well location similar to point 1 in @fig-SchematizationTheHague. 
-(@) In the pop-uped window, fill in the well parameters discharge (50 m3/d), radius (0.1 m), resistance (1 d) and layer (0).
+(@) In the pop-up window, fill in the well parameters discharge (50 m3/d), radius (0.1 m), resistance (1 d) and layer (0).
 (@) Now add the other 7 wells locations in a fast way: do not import parameters with every single point. We will do that later. Just click *OK* on each *Feature Attribute* window. 
 
 ![Schematization of the pumping wells, sheet piles and observation locations](figures/tutorial/figure_SchematizationTheHague.png){width=80% #fig-SchematizationTheHague} 
@@ -392,7 +392,7 @@ After the calculation you see that the result is automatically added to the *Lay
 
 ![Updated results of groundwater head lowering contours due to 8 wells 50 m3/d and a sheet pile wall with 100 d wall resistance.](figures/tutorial/figure_DrawdownConstructionPit_v01.png){width=90% #fig-DrawdownConstructionPit_v01  fig-align="left"} 
 
-The lowering in the building pit is shown to be around -6.20 m. To get it around -3.50 m as demanded the well discharge should be decreased accordingly. An extra calculation with half the flow per well will be sufficient. 
+The lowering in the building pit is shown to be around -6.20 m. To get it around -3.50 m as demanded, the well discharge should be decreased accordingly. An extra calculation with half the flow per well will be sufficient. 
 
 (@) Go to the well attribute table, adjust the flow to 60% (30 m3/d per well) and compute the model again.
 
@@ -419,7 +419,7 @@ We can observe that the lowering of groundwater around the building pit is quite
 (@) To make a cross section, use the iMOD plugin toolbar and click on the Cross Section widget (![](figures/tutorial/button_iMOD-Cross-section.png){width=3%})
 (@) From the dropdown menu on the left of this panel, select the mesh (![](figures/tutorial/button_Mesh.png){width=3%}) with \*_layer_0.
 (@) Press *Add*.
-(@) Start to define you cross section with a click on the button *Select location*.
+(@) Start to define your cross section with a click on the button *Select location*.
 (@) Draw your cross section by left clicking on the map. Stop drawing with a right click. You can redraw this line anytime you like.
 (@) Satisfied with your line? Click the button *Plot* to draw this layer in the cross section. Your screen might look like @fig-HeadsInCrosssection03.
 (@) By using the *Export* button you can store results from the cross section in a CSV file.
@@ -492,9 +492,9 @@ We can conclude that the drawdown in the building pit increases with a factor of
 
 (@) Implement this change in the *timm Well* element and recalculate the model.
 
-![Cross section of groundwater heads per layer, sheet pile wall R=100d in layers 0 and 1 and 8 wells at 15.25 m3/d each in layer0](figures/tutorial/figure_HeadsInCrosssection04.png){width=100% #fig-figure_HeadsInCrosssection04} 
+![Cross section of groundwater heads per layer, sheet pile wall R=500d in layers 0 and 1 and 8 wells at 15.25 m3/d each in layer0](figures/tutorial/figure_HeadsInCrosssection04.png){width=100% #fig-figure_HeadsInCrosssection04} 
 
-We conclude that the lowering around the building pit with deep sheet piles improved significantly. 
+We conclude that the drawdown of groundwater level around the building pit with deep sheet piles decreased significantly. 
 
 Next also alternatives with a shallow concrete cut-off wall will be calculated for a shallow and a deep wall. In that case we have R=1000 d, but note that the input in the attribute than becomes k*R=10000 due to the error in Tim. 
 
@@ -533,23 +533,23 @@ When the contractor wants to restore the dewatering level inside the building pi
 ## Using Python for sensitivity analyses with a QGIS-Tim model
 QGIS-Tim offers the opportunity to export the geopackage of the created model to a Python script. This makes it possible to use the script for other ways of calculation, e.g.:
 - Calculation of model results in other Python environments, like Anaconda or Spyder or in a notebook.
-- Use in other python oriented programs, like the Probabilistic Toolkit.
+- Use in other Python oriented programs, like the Probabilistic Toolkit.
 
 (@) If input of all elements is ready and the model has proved to run properly, go to the QGIS-Tim panel and the tab *Geopackage*. 
 (@) At the bottom press the button *Convert GeoPackage to Python script*. 
-(@) After a short period for translation in Python the explorer panel appears where you can enter the name you want to give for the python file, e.g. “DHRVS.py” and store it in a directory you choose to save your work. The file looks like:
+(@) After a short period for translation in Python the explorer panel appears where you can enter the name you want to give for the python file, e.g. “case-TheHague.py” and store it in a directory you choose to save your work. The file looks like:
 
-![](figures/tutorial/figure_PythonExport01.png){width=60%}
+![Python script, first part.](figures/tutorial/figure_PythonExport01.png){width=70% #fig-figure_PythonExport01}
 
-As can be seen the converted Python file contains a call on main necessary Python packages and all data coordinates and parameter values related to the elements that were selected in the model that was created in QGIS-Tim. At the end of the Python file the model.solve command is stated after which all head values in the domain with the desired mesh density are determined and also at demanded observation points.
+As can be seen the converted Python file start with calls (e.g. import timml) to main necessary Python packages. After that, for each timm element in the model, all data coordinates and parameter values follow. At the end of the Python file the "model.solve" command is stated after which all head values in the domain with the desired mesh density are determined and also at demanded observation points.
 
-![](figures/tutorial/figure_PythonExport02.png){width=60%}
+![Python script, last part.](figures/tutorial/figure_PythonExport02.png){width=70%  #fig-figure_PythonExport01}
 
 As can be seen the Python script for TimML is written in a very dedicated and condensed manner.
 
 To get the Python file running in a platform like Anaconda or Spyder, extra lines should be added at wish, to get the output that the user needs. 
 
-Also this file can be used for geostatistical and scenario-analysis. There are several ways of handling this kind of study, like writing an additional Python program to perform repeated calculations and statistical analysis on results. But another way is to use the Probabilistic Toolkit (PTK), a platform for statistical analysis to be used together with geotechnical design programs, developed by Deltares. The PTK can be used for study of model sensitivity for variation of parameter values or reliability analysis. 
+Next this file can be used for geostatistical and scenario-analysis. There are several ways of handling this kind of study, like writing an additional Python program to perform repeated calculations and statistical analysis on results. But an easy way is to use the Probabilistic Toolkit (PTK), a platform for statistical analysis to be used together with geotechnical design programs, developed by Deltares. The PTK can be used for study of model sensitivity for variation of parameter values or reliability analysis. 
 
 The PTK can be downloaded free of charge at <a href="https://download.deltares.nl/ptk" target="_blank">Probabilistic Toolkit - download.</a>
 
@@ -557,82 +557,152 @@ The PTK can be downloaded free of charge at <a href="https://download.deltares.n
 
 The Toolkit opens at the first of 5 tabs: *Model*. 
 
-(@) In the section *Model Type* check if the dropdown menu *Type* is set to *Internal*
+(@) In the section *Model Type* check if the dropdown menu *Type* is set to *Internal*.
 (@) In the section *Model Type* check if the dropdown menu *Language* is set to *Python* and a the field *Version* appears.
-(@) Select the '...' in the field *Version* and give the path where PTK can find the Python interpreter, e.g. Spyder at .
+(@) Select the tree points ('...') in the field *Version* and give the path where PTK can find the Python interpreter, e.g. Spyder at "C:\\roelofs_fs\\_software\\deltaforge\\pythonw.exe".
+(@) Than you copy the content of the Python file we converted from QGIS-Tim into the window "Model code".
 
-(@) Than we copy the Python file we converted from QGIS-Tim into the Source code window.
 We handle the process in this way because we want to change some lines in the source code to get the program running in PTK.
  
-Next the specific parameters must be selected that are expected to be probably most relevant to variations in results. In the source code used in the PTK those parameters will not have input on a value but need to be mentioned with a name that the PTK can use for input selection in the calculations. <br>
+Next the specific parameters must be selected that are expected to be probably most relevant to variations in results. In the source code used in the PTK, those parameters will not have input on a value but need to be mentioned with a name that the PTK can use for input selection in the calculations. <br>
 The parameters that seem to be important are:
 
-- The hydraulic resistance of the sheet pile wall Rlld.
+- The hydraulic resistance of the sheet pile wall Rwall.
 - The resistance c1 of the first clay layer.
 - The permeability of the sand layer k01.
 - The resistance c2 of the second clay layer at -14 m NAP.
 
-This is shown in the next figure.
+![Declaration of Variables to control the analysis and first guess for values.](figures/tutorial/figure-PTK-VariableNameValue.png ){width=100% #fig-figure-PTK-VariableNameValue} 
 
-![](figures/tutorial/figure-PTK01.png){width=70%} 
+In PTK we have to set these parameters:
 
+(@) In the PTK panel *Input* click 4 times on the *Add* button (![](figures/tutorial/button-PTK-add.png){width=3%}), to add 4 variables and name them Rshp, czba, khol and cbasis (see @fig-figure-PTK-VariableNameValue)
+(@) In the tab *Variables* give these 4 variables the values 10000, 40, 10 and 100. 
+(@) Return to the tab *Model* and assign these variable values to the parameters in the source code by copying this code block to the top of the Python source code (see @fig-figure-PTK02). <br>
+``Rwall = Rshp`` <br>
+``c0    = czba`` <br>
+``k0    = khol`` <br>
+``c2    = cbasis`` 
+(@) Finaly, replace the fixed value (**NB**, 2 times "Rwall") in the Python code for the parameter name (see red elements in @fig-figure-PTK02). 
 
-In the Source code we have to change a few things:
+![Replace parameters in the Python code.](figures/tutorial/figure-PTK02.png){width=100% #fig-figure-PTK02} 
 
-- In the PTK panel input we use the parameter names Rshp, czba, khol and cbasis, give them values (10000, 40, 10, 100) 
-- in the variables tab and in the source we assign these values to the parameters by statement lines in the source code.
-
-![](figures/tutorial/figure-PTK02.png){width=50%} 
-
-In the source code we change the values in the element declaration of the aquifer, leaky line doublet Damw0_0, to the names of the parameters Rlld, c1, khol, c2.
-
-We make this a simple analysis by using only the sheetpile in the upper layer (maybe eliminating the element statement lines for the sheetpile in the second layer). 
-At the end of the source code we eliminate the following lines form the converted file:
+(@) At the end of the source code, eliminate the following lines from the converted file:
 
 ``head = model.headgrid(xg=np.arange(80940.0, 81166.0, 4), yg=np.arange(455554.0, 455360.0, -4) )``
 
-And also we eliminate the lines
+(@) Also eliminate the lines:
 
 ``observation_peilbuis_2 = model.head(x=80970.16497991727, y=455495.54316352855)``
 ``observation_peilbuis_3 = model.head(x=81004.86605597858, y=455389.68291883526)``
 ``observation_peilbuis_4 = model.head(x=81049.06450220713, y=455485.0645022071)``
 
-Because we only are interested in 2 points we use the first two observation points and we add
+(@) Because we only are interested in 2 points, use the first two observation points and add these lines at the end of the Python script:
 
-``pb0 = observation_peilbuis_0[0]``
-``pb1 = observation_peilbuis_1[0]``
+``pb0 = observation_observations_0[0]``<br>
+``pb1 = observation_observations_1[0]``
 
-In the output screen of the PTK we add variables pb0 and pb1.
+(@) In the panel *Output* of the PTK use the *Add* button (![](figures/tutorial/button-PTK-add.png){width=3%}) the new defined variables "pb0" and "pb1".
+(@) Check if the program works properly. Field *Analysis* must contain "Run model", field *Results* must contain "Single run"
+(@) Press thet START button (![](figures/tutorial/button-PTK-START.png){width=3%}) to calculate the model. 
 
+In the tab *Run model* we find the results of our calculation.
 
-We check if the program works properly by performing the Run model in Single run mode (in toolbar of PTK). By pressing the arrow the calculation starts running. In the Run model tab we find the results of our calculation. Check if it complies with your earlier calculations in QGIS-Tim.
+(@) Check if it complies with your earlier calculations in QGIS-Tim.
 
-![](figures/tutorial/figure-PTK03.png){width=50%} 
+![Result of test run in PTK to check model outcome.](figures/tutorial/figure-PTK03.png){width=50% #fig-figure-PTK03} 
 
 If results are as expected, we can step to a sensitivity analyses. 
-For each selected parameter a distribution is defined with certain limits or characteristic values. Distribution formulas can be chosen based on knowhow of the user.
-Best guess of the parameter value distributions are given in the next table.
 
-![Best guess of the parameter value distributions](figures/tutorial/figure-PTK04.png){width=100%} 
+(@) In the tab *Field*, set the Analysis option to "Sensitivity*.
+(@) Go to the tab *Variables*.
 
-Parameter value distributions of sheetpile resistance Rshp, silt layer resistance czba, basic peat layer resistance cbasis and permeability of Holocene sand khol are shown in graphs below.
+For each selected parameter a distribution is defined with certain limits or characteristic values. Distribution formulas can be chosen based on knowhow of the user. Best guess of the parameter value distributions is given in the next example window.
 
-figuur Pameter value distributions of sheetpile resistance Rshp (??)
+(@) Change the distributon types for each Variable in the column "Distrubution" and fill in the other values. 
 
-![Pameter value distributions of silt layer resistance czba (??)](figures/tutorial/figure-PTK-graph01.png){width=100%} 
+![Best guess of the parameter value distributions](figures/tutorial/figure-PTK04.png){width=100% #fig-figure-PTK04} 
 
-![Pameter value distributions of basic peat layer resistance (??)](figures/tutorial/figure-PTK-graph02.png){width=100%} 
+(@) Select the row with sheetpile resistance (Rshp) and in the panel below the distribution is shown (see @fig-figure-PTK-graph01). 
 
-![Pameter value distributions of cbasis (??)](figures/tutorial/figure-PTK-graph03.png){width=100%} 
+Parameter value distributions of silt layer resistance (czba), basic peat layer resistance (cbasis) and permeability of Holocene sand (khol) are shown in graphs below.
 
-![Pameter value distributions of permeability of Holocene sand khol (??)](figures/tutorial/figure-PTK-graph04.png){width=100%} 
+![Pameter value distributions of sheetpile resistance Rshp](figures/tutorial/figure-PTK-graph01.png){width=100%  #fig-figure-PTK-graph01} 
 
+![Pameter value distributions of silt layer resistance czba](figures/tutorial/figure-PTK-graph02.png){width=100% #fig-figure-PTK-graph02} 
+
+![Pameter value distributions of basic peat layer resistance cbasis](figures/tutorial/figure-PTK-graph03.png){width=100% #fig-figure-PTK-graph03} 
+
+![Pameter value distributions of permeability of Holocene sand khol](figures/tutorial/figure-PTK-graph04.png){width=100% #fig-figure-PTK-graph04} 
  
 Low and high value of resistivity are set in the Calculation tab to 10 and 90%.
 
 In the tab *Sensitivity* we can find in what extent parameter variations contribute to model results. In the next graph it is shown what parameter variation means for drawdown in the building pit. We conclude that for a situation with a sheet pile wall in only the first sand layer the variation of the resistance of the loamy layer determines the drawdown, and with that this factor determines the amount of extraction in that situation for the largest part. Translated to practical considerations, it is worthwhile to spend extra budget on determining the homogeneity of that layer and the vertical permeability of the loamy layer in more detail.
 
-![](figures/tutorial/figure-PTK05.png){width=100%} 
+![Sensitivity of drawdown in building pit to pameter value distributions of sheetpile resistance Rshp, silt layer resistance czba, basic peat layer resistance cbasis and permeability of Holocene sand khol.](figures/tutorial/figure-PTK-Sensitivity01.png){width=100% #fig-figure-PTK-Sensitivity01} 
+
+However, with this model we get a varying outcome for the level in the building pit and this is not realistic for a practical situation. In real projects, the dewatering contractor would like to know what the effect on dewatering demand and interaction with environment would be if the aim is to reach the designed groundwater head in the building pit while adjusting the rate of extraction in the wells. <br> 
+We can do this quite simply with the aid of the python file. To perform this analysis we follow the assumption that the relation between drawdown and well extraction is linear.<br>
+
+(@) We add the following lines to the code: 
+
+``pb0  = observation_peilbuis_0[0]`` <br>
+``fact = pb0d/pb0``<br>
+``Qtot = 8*Qws*fact``<br>
+``pb1  = observation_peilbuis_1[0]*fact``<br>
+
+(@) Then we recalculate the sensitivity.
+
+Again, we see that the parameter value for the hydraulic resistance of the loamy clay layer is most relevant to the variation of the outcome, not only for the drawdown effect in the area surrounding the building pit (next figure, upper part) but also for the flow to the extraction wells (next figure, lower part).
+
+![Sensitivity of drawdown outside building pit due to pameter value distributions of sheetpile resistance Rshp, silt layer resistance czba, basic peat layer resistance cbasis and permeability of Holocene sand khol with constant lowering inside the building pit.](figures/tutorial/figure-PTK-Sensitivity02.png){width=100& #fig-figure-PTK-Sensitivity02}
+ 
+![Sensitivity of groundwater extraction from the building pit due to pameter value distributions of sheetpile resistance Rshp, silt layer resistance czba, basic peat layer resistance cbasis and permeability of Holocene sand khol, with constant lowering inside the building pit.](figures/tutorial/figure-PTK-Sensitivity03.png){width=100& #fig-figure-PTK-Sensitivity03}
+
+Based on the same statistic distributions for the parameter values we now are also able to calculate the uncertainty in output for this case, using a sheet pile wall in the first aquifer. <br>
+The distribution of the results for drawdown just outside the building pit is given in @fig-figure-PTK-Uncertainty01, which in the lower part shows the distribution for total flow rate from the dewatering in the building pit.
+ 
+![Uncertainty in drawdown outside building pit due to pameter value distributions of sheetpile resistance Rshp, silt layer resistance czba, basic peat layer resistance cbasis and permeability of Holocene sand khol with constant lowering inside the building pit](figures/tutorial/figure-PTK-Uncertainty01.png){width=100& #fig-figure-PTK-Uncertainty01}
+
+![Uncertainty in groundwater extraction from the building pit due to pameter value distributions of sheetpile resistance Rshp, silt layer resistance czba, basic peat layer resistance cbasis and permeability of Holocene sand khol with constant lowering inside the building pit](figures/tutorial/figure-PTK-Uncertainty02.png){width=100& #fig-figure-PTK-Uncertainty02}
+
+The probabilistic model gives a 50% probability on a flow of 297 m3/d, even with a 10% chance of an overrun to 659 m3/d. The groundwater drawdown at the standpipe outside the building pit amounts -0.44 m with 50% probability but with 10% value of -1.10 m. <br>
+The studied layout of the building pit plus dewatering will not meet the demands of the local authorities regarding the limitations on drawdown. By waterlocking the sheet pile wall we can hardly expect a satisfactory decrease of drawdown effects around the building site, therefore, the best solution is to install the sheet pile wall to a deeper level. <br>
+
+(@) Repeating the calculations with sheetpile wall in 2 layers the results will meet the demands.
+
+## Creating a transient model
+At this moment, it is not possible to create a transient (time dependent) model with correct answers to case studies with sheetpile walls. The TTIM solution needs to be updated. Nevertheless in this section we want to guide you on setting up a basic transient model. 
+
+(@) If we want to perform a transient calculation, first we have to turn on the option "transient" in the tab *Compute*. 
+(@) After enabling the transient option, go back to the "timml aquifer" properties. Select the layer in the layers panel and as can be seen in the next table matrix of properties is extended in the transient mode with cells for transient parameters, like specific storage coefficients (aquitard_s, and aquifer_s) and porosities (aquitard_npor and aquifer_npor). 
+
+Take care that specific storage coefficient is a storage per meter layer thickness. In older MWell course material a speadsheet is presented for estimation of coefficient values. But there we calculated storage coefficients per whole layer. Those values should be divided by layer thickness.
+
+In the TTIM section in the Layers panel we can select the input modules for transient calculations:
+In the TTIM Temporal Settings: Aquifer the length of the time series is specified. The starting time is set to 0 but calculations take place for the range of time steps between time_min and time_max. The time unit is according to central settings in the project, mostly time in days. Time_min should not be zero but given a slight offset.
+Here we also find a Stehfest_M number, related to the number of terms in the calculation method performing transformation of formulas in solving differential equations.
+A reference date can be set to relate the calculation to real time data.
+
+ 
+
+Note: In QGIS it is an obligation to use a Reference date to get the model running and present outcomes!
+
+In the TTIM Computation Times:Domain the time values are set for time steps where we want to get calculations of spatially distributed heads in mesh or raster points and contours. 
+
+ 
+
+For this case we will leave this table blank, because calculating several head distributions at different time steps is rather time consuming during this course.
+
+In the TTIM Observation:peilbuis we can set the time steps for a time series at certain points we want to monitor the calculation results. We set points at intervals that follow a (approximately) logarithmic increase in time intervals. Proposed values are shown in the next table.
+
+ 
+
+Don’t choose exactly the same time as when changing the flow. So if 60 is an end value, choose 59.9.
+
+In the TTIM Well:Putten we can set the discharge amount. The value might change during time when excavation is considered or construction is performed in phases. For each change we have to add a line of input. We just leave this option without any change.
+
+Another way of inserting stress periods for wells is by going to the Timml Well:Putten layer. But fill in a general value of 0 m3/d for TimML attributes of the well element when you want to use changing flow in TTIM. Remember: Solution of TTIM is superposed on solution of TIMml.
 
 
 
