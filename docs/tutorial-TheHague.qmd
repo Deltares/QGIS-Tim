@@ -68,12 +68,12 @@ Calculation of a pumping well extraction.
 In the old city centre of The Hague a building plan with a parking basement is constructed.
 The dimensions of the building pit are **34.2 m * 83.2 m.** The area is shown in @fig-TheHagueCityCentre.
 
-![Schematization of the building area in The Hague city centre (orange: building pit)](figures/tutorial/photo-TheHagueCityCentre.png){width=80% #fig-TheHagueCityCentre fig-align="left"} 
+![Schematization of the building area in The Hague city centre (orange: building pit)](figures/tutorial/photo-TheHagueCityCentre.png){width=60% #fig-TheHagueCityCentre fig-align="left"} 
 
 To carry out the construction in dry conditions, the groundwater level needs to be lowered by **3.5 m.** The required drainage time is 4 months. <br> 
 The environment is vulnerable with valuable buildings and monuments (see @fig-TheMonumentalEnvironment) that have a shallow foundation. The subsoil consists of sandy layers which locally contain shallow peat/clay/silt layers and deeper layers of clay/silt. The builder contractor must use a sheet pile wall that needs to be installed in a water-retarding layer (aquitard).
 
-![The monumental environment](figures/tutorial/photo-TheMonumentalEnvironment.png){width=70% #fig-TheMonumentalEnvironment fig-align="left"} 
+![The monumental environment](figures/tutorial/photo-TheMonumentalEnvironment.png){width=60% #fig-TheMonumentalEnvironment fig-align="left"} 
 
 **The questions to be elaborated in the hydrogeological advice is:** <br>
 *"How deep should a sheet pile wall be placed to prevent damage? Can risks arise from a leak?"*
@@ -82,7 +82,7 @@ Applications of a sheet pile wall (with a hydraulic resistance of 100 days) and 
 
 The soil profile has been investigated with borings and CPTs. An example of a CPT is shown in @fig-CPT01.
 
-![CPT to a depth of NAP -20 m](figures/tutorial/figure-CPT01.png ){width=80% #fig-CPT01 fig-align="left"} 
+![CPT to a depth of NAP -20 m](figures/tutorial/figure-CPT01.png ){width=70% #fig-CPT01 fig-align="left"} 
 
 The interpretation of the CPT and borings gives the following soil layer scheme:
 
@@ -350,7 +350,7 @@ Two important remarks before drawing the sheet pile:
 (@) In the pop-up window, fill in the well parameters discharge (50 m3/d), radius (0.1 m), resistance (1 d) and layer (0).
 (@) Now add the other 7 wells locations in a fast way: do not import parameters with every single point. We will do that later. Just click *OK* on each *Feature Attribute* window. 
 
-![Schematization of the pumping wells, sheet piles and observation locations](figures/tutorial/figure_SchematizationTheHague.png){width=80% #fig-SchematizationTheHague} 
+![Schematization of the pumping wells, sheet piles and observation locations](figures/tutorial/figure_SchematizationTheHague.png){width=60% #fig-SchematizationTheHague} 
 
 (@) In the *Layers* panel right select layer *timml Well:pumping_wells* and open the *Attribute Table (F6)*. 
 (@) Start the editing mode and fill in the values shown in @fig-WellAttributeTable. Don't forget the column 'Label'. <br> The discharge value in the table is a first guess to be adjusted later to desired level of -3.5 m groundwater lowering in the building pit.
@@ -367,7 +367,7 @@ When you finished the input of the wells and their parameters, you have to look 
 
  @fig-figure_SheetPileExtraPoints shows the result of positioned extra points in the line.
 
-![Extra points for segmentation of the sheet pile element](figures/tutorial/figure_SheetPileExtraPoints.png ){width=100% #fig-figure_SheetPileExtraPoints} 
+![Extra points for segmentation of the sheet pile element](figures/tutorial/figure_SheetPileExtraPoints.png ){width=80% #fig-figure_SheetPileExtraPoints} 
 
 ## Computing the groundwater head drawdown
 
@@ -390,7 +390,7 @@ After the calculation you see that the result is automatically added to the *Lay
 (@) Uncheck mesh and raster to only visualize contours on the base map.
 (@) Uncheck contour lines of layer 1 and 2 to get only the result for layer 0 on screen as in @fig-DrawdownConstructionPit_v01.
 
-![Updated results of groundwater head lowering contours due to 8 wells 50 m3/d and a sheet pile wall with 100 d wall resistance.](figures/tutorial/figure_DrawdownConstructionPit_v01.png){width=90% #fig-DrawdownConstructionPit_v01  fig-align="left"} 
+![Updated results of groundwater head lowering contours due to 8 wells 50 m3/d and a sheet pile wall with 100 d wall resistance.](figures/tutorial/figure_DrawdownConstructionPit_v01.png){width=80% #fig-DrawdownConstructionPit_v01  fig-align="left"} 
 
 The lowering in the building pit is shown to be around -6.20 m. To get it around -3.50 m as demanded, the well discharge should be decreased accordingly. An extra calculation with half the flow per well will be sufficient. 
 
@@ -526,7 +526,7 @@ The list with coordinates appears in the vertex editor at the lower left corner 
 
 When the coordinates differ a gap results, in the studied case we created a 0.2 m wide gap. It might be elaborate to perform but the result is shown in the next figure. The result is calculated by using a small grid spacing. At this created gap a large flow results in the corner of the building pit, leading to an insufficient drawdown in the building pit and a 0.1 – 0.2 m larger lowering outside the building pit at that location. 
 
-![Calculated effect of leakage at one corner in the building pit](figures/tutorial/figure_LeakageEffectCorner.png){width=100% #fig-figure_LeakageEffectCorner}
+![Calculated effect of leakage at one corner in the building pit](figures/tutorial/figure_LeakageEffectCorner.png){width=80% #fig-figure_LeakageEffectCorner}
 
 When the contractor wants to restore the dewatering level inside the building pit, the drawdown outside the gap will even grow further.
 
@@ -539,11 +539,11 @@ QGIS-Tim offers the opportunity to export the geopackage of the created model to
 (@) At the bottom press the button *Convert GeoPackage to Python script*. 
 (@) After a short period for translation in Python the explorer panel appears where you can enter the name you want to give for the python file, e.g. “case-TheHague.py” and store it in a directory you choose to save your work. The file looks like:
 
-![Python script, first part.](figures/tutorial/figure_PythonExport01.png){width=70% #fig-figure_PythonExport01}
+![Python script, first part.](figures/tutorial/figure_PythonExport01.png){width=55% #fig-figure_PythonExport01}
 
 As can be seen the converted Python file start with calls (e.g. import timml) to main necessary Python packages. After that, for each timm element in the model, all data coordinates and parameter values follow. At the end of the Python file the "model.solve" command is stated after which all head values in the domain with the desired mesh density are determined and also at demanded observation points.
 
-![Python script, last part.](figures/tutorial/figure_PythonExport02.png){width=70%  #fig-figure_PythonExport01}
+![Python script, last part.](figures/tutorial/figure_PythonExport02.png){width=55% #fig-figure_PythonExport01}
 
 As can be seen the Python script for TimML is written in a very dedicated and condensed manner.
 
@@ -572,7 +572,7 @@ The parameters that seem to be important are:
 - The permeability of the sand layer k01.
 - The resistance c2 of the second clay layer at -14 m NAP.
 
-![Declaration of Variables to control the analysis and first guess for values.](figures/tutorial/figure-PTK-VariableNameValue.png ){width=100% #fig-figure-PTK-VariableNameValue} 
+![Declaration of Variables to control the analysis and first guess for values.](figures/tutorial/figure-PTK-VariableNameValue.png ){width=80% #fig-figure-PTK-VariableNameValue} 
 
 In PTK we have to set these parameters:
 
@@ -585,7 +585,7 @@ In PTK we have to set these parameters:
 ``c2    = cbasis`` 
 (@) Finaly, replace the fixed value (**NB**, 2 times "Rwall") in the Python code for the parameter name (see red elements in @fig-figure-PTK02). 
 
-![Replace parameters in the Python code.](figures/tutorial/figure-PTK02.png){width=100% #fig-figure-PTK02} 
+![Replace parameters in the Python code.](figures/tutorial/figure-PTK02.png){width=80% #fig-figure-PTK02} 
 
 (@) At the end of the source code, eliminate the following lines from the converted file:
 
@@ -610,7 +610,7 @@ In the tab *Run model* we find the results of our calculation.
 
 (@) Check if it complies with your earlier calculations in QGIS-Tim.
 
-![Result of test run in PTK to check model outcome.](figures/tutorial/figure-PTK03.png){width=50% #fig-figure-PTK03} 
+![Result of test run in PTK to check model outcome.](figures/tutorial/figure-PTK03.png){width=40% #fig-figure-PTK03} 
 
 If results are as expected, we can step to a sensitivity analyses. 
 
