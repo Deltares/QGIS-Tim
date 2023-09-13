@@ -1141,7 +1141,7 @@ table {
 <ol start="142" class="example" type="1">
 <li>In the panel <em>Output</em> of the PTK use the <em>Add</em> button (<img src="figures/tutorial/button-PTK-add.png" class="img-fluid" style="width:3.0%">) the new defined variables “pb0” and “pb1”.</li>
 <li>Check if the program works properly. Field <em>Analysis</em> must contain “Run model”, field <em>Results</em> must contain “Single run”</li>
-<li>Press thet START button (<img src="figures/tutorial/button-PTK-START.png" class="img-fluid" style="width:3.0%">) to calculate the model.</li>
+<li>Press the RUN button (<img src="figures/tutorial/button-PTK-START.png" class="img-fluid" style="width:3.0%">) to calculate the model.</li>
 </ol>
 <p>In the tab <em>Run model</em> we find the results of our calculation.</p>
 <ol start="145" class="example" type="1">
@@ -1175,90 +1175,157 @@ table {
 <div id="fig-figure-PTK-graph01" class="quarto-figure quarto-figure-center anchored">
 <figure class="figure">
 <p><img src="figures/tutorial/figure-PTK-graph01.png" class="img-fluid figure-img" style="width:100.0%"></p>
-<figcaption class="figure-caption">Figure&nbsp;21: Pameter value distributions of sheetpile resistance Rshp</figcaption>
+<figcaption class="figure-caption">Figure&nbsp;21: Parameter value distributions of sheetpile resistance Rshp</figcaption>
 </figure>
 </div>
 <div id="fig-figure-PTK-graph02" class="quarto-figure quarto-figure-center anchored">
 <figure class="figure">
 <p><img src="figures/tutorial/figure-PTK-graph02.png" class="img-fluid figure-img" style="width:100.0%"></p>
-<figcaption class="figure-caption">Figure&nbsp;22: Pameter value distributions of silt layer resistance czba</figcaption>
+<figcaption class="figure-caption">Figure&nbsp;22: Parameter value distributions of silt layer resistance czba</figcaption>
 </figure>
 </div>
 <div id="fig-figure-PTK-graph03" class="quarto-figure quarto-figure-center anchored">
 <figure class="figure">
 <p><img src="figures/tutorial/figure-PTK-graph03.png" class="img-fluid figure-img" style="width:100.0%"></p>
-<figcaption class="figure-caption">Figure&nbsp;23: Pameter value distributions of basic peat layer resistance cbasis</figcaption>
+<figcaption class="figure-caption">Figure&nbsp;23: Parameter value distributions of basic peat layer resistance cbasis</figcaption>
 </figure>
 </div>
 <div id="fig-figure-PTK-graph04" class="quarto-figure quarto-figure-center anchored">
 <figure class="figure">
 <p><img src="figures/tutorial/figure-PTK-graph04.png" class="img-fluid figure-img" style="width:100.0%"></p>
-<figcaption class="figure-caption">Figure&nbsp;24: Pameter value distributions of permeability of Holocene sand khol</figcaption>
+<figcaption class="figure-caption">Figure&nbsp;24: Parameter value distributions of permeability of Holocene sand khol</figcaption>
 </figure>
 </div>
-<p>Low and high value of resistivity are set in the Calculation tab to 10 and 90%.</p>
-<p>In the tab <em>Sensitivity</em> we can find in what extent parameter variations contribute to model results. In the next graph it is shown what parameter variation means for drawdown in the building pit. We conclude that for a situation with a sheet pile wall in only the first sand layer the variation of the resistance of the loamy layer determines the drawdown, and with that this factor determines the amount of extraction in that situation for the largest part. Translated to practical considerations, it is worthwhile to spend extra budget on determining the homogeneity of that layer and the vertical permeability of the loamy layer in more detail.</p>
+<p>Low and high value of resistivity are set in the tab <em>Calculation</em> to 10% and 90%.</p>
+<ol start="150" class="example" type="1">
+<li>Press RUN (<img src="figures/tutorial/button-PTK-START.png" class="img-fluid" style="width:3.0%">) to recalculate the model in the Sensitivity mode.</li>
+<li>After the run is finished, a new tab <em>Sensitivity</em> is visible. Go to the tab.</li>
+</ol>
+<p>Here we can find what extent parameter variations contribute to model results. In <a href="#fig-figure-PTK-Sensitivity01">Figure&nbsp;25</a> it is shown what parameter variation means for drawdown in the building pit. We conclude that for a situation with a sheet pile wall in only the first sand layer the variation of the resistance of the loamy layer (czba) determines the drawdown, and with that this factor determines the amount of extraction in that situation for the largest part. Translated to practical considerations, it is worthwhile to spend extra budget on determining the homogeneity of that layer and the vertical permeability of the loamy layer in more detail.</p>
 <div id="fig-figure-PTK-Sensitivity01" class="quarto-figure quarto-figure-center anchored">
 <figure class="figure">
 <p><img src="figures/tutorial/figure-PTK-Sensitivity01.png" class="img-fluid figure-img" style="width:100.0%"></p>
-<figcaption class="figure-caption">Figure&nbsp;25: Sensitivity of drawdown in building pit to pameter value distributions of sheetpile resistance Rshp, silt layer resistance czba, basic peat layer resistance cbasis and permeability of Holocene sand khol.</figcaption>
+<figcaption class="figure-caption">Figure&nbsp;25: Sensitivity of drawdown in building pit to parameter value distributions of sheetpile resistance (Rshp), silt layer resistance (czba), basic peat layer resistance (cbasis) and permeability of Holocene sand (khol).</figcaption>
 </figure>
 </div>
-<p>However, with this model we get a varying outcome for the level in the building pit and this is not realistic for a practical situation. In real projects, the dewatering contractor would like to know what the effect on dewatering demand and interaction with environment would be if the aim is to reach the designed groundwater head in the building pit while adjusting the rate of extraction in the wells. <br> We can do this quite simply with the aid of the python file. To perform this analysis we follow the assumption that the relation between drawdown and well extraction is linear.<br></p>
-<ol start="150" class="example" type="1">
-<li>We add the following lines to the code:</li>
+<p>However, with this model we get a varying outcome for the level in the building pit and this is not realistic for a practical situation. In real projects, the dewatering contractor would like to know what the effect on dewatering demand and interaction with environment would be if the aim is to reach the designed groundwater head in the building pit while adjusting the rate of extraction in the wells. <br> We can do this quite simply with the aid of the Python file. To perform this analysis we follow the assumption that the relation between drawdown and well extraction is linear.<br></p>
+<ol start="152" class="example" type="1">
+<li>Go to the tab <em>Model</em> and in the panel <em>Model code</em> remove the line for pb0 and the line for pb1.</li>
+<li>Now add the following lines to the code:</li>
 </ol>
-<p><code>pb0  = observation_peilbuis_0[0]</code> <br> <code>fact = pb0d/pb0</code><br> <code>Qtot = 8*Qws*fact</code><br> <code>pb1  = observation_peilbuis_1[0]*fact</code><br></p>
-<ol start="151" class="example" type="1">
-<li>Then we recalculate the sensitivity.</li>
+<p><code>pb0  = observation_observations_0[0]</code> <br> <code>fact = pb1/pb0</code><br> <code>Qtot = 8*Qw*fact</code><br> <code>pb1  = observation_observations_1[0]*fact</code><br></p>
+<ol start="154" class="example" type="1">
+<li>Recalculate the sensitivity.</li>
 </ol>
 <p>Again, we see that the parameter value for the hydraulic resistance of the loamy clay layer is most relevant to the variation of the outcome, not only for the drawdown effect in the area surrounding the building pit (next figure, upper part) but also for the flow to the extraction wells (next figure, lower part).</p>
 <div id="fig-figure-PTK-Sensitivity02" class="quarto-figure quarto-figure-center anchored">
 <figure class="figure">
-<p><img src="figures/tutorial/figure-PTK-Sensitivity02.png" class="img-fluid figure-img"></p>
-<figcaption class="figure-caption">Figure&nbsp;26: Sensitivity of drawdown outside building pit due to pameter value distributions of sheetpile resistance Rshp, silt layer resistance czba, basic peat layer resistance cbasis and permeability of Holocene sand khol with constant lowering inside the building pit.</figcaption>
+<p><img src="figures/tutorial/figure-PTK-Sensitivity02.png" class="img-fluid figure-img" style="width:100.0%"></p>
+<figcaption class="figure-caption">Figure&nbsp;26: Sensitivity of drawdown outside building pit due to parameter value distributions of sheetpile resistance Rshp, silt layer resistance czba, basic peat layer resistance cbasis and permeability of Holocene sand khol with constant lowering inside the building pit.</figcaption>
 </figure>
 </div>
 <div id="fig-figure-PTK-Sensitivity03" class="quarto-figure quarto-figure-center anchored">
 <figure class="figure">
-<p><img src="figures/tutorial/figure-PTK-Sensitivity03.png" class="img-fluid figure-img"></p>
-<figcaption class="figure-caption">Figure&nbsp;27: Sensitivity of groundwater extraction from the building pit due to pameter value distributions of sheetpile resistance Rshp, silt layer resistance czba, basic peat layer resistance cbasis and permeability of Holocene sand khol, with constant lowering inside the building pit.</figcaption>
+<p><img src="figures/tutorial/figure-PTK-Sensitivity03.png" class="img-fluid figure-img" style="width:100.0%"></p>
+<figcaption class="figure-caption">Figure&nbsp;27: Sensitivity of groundwater extraction from the building pit due to parameter value distributions of sheetpile resistance Rshp, silt layer resistance czba, basic peat layer resistance cbasis and permeability of Holocene sand khol, with constant lowering inside the building pit.</figcaption>
 </figure>
 </div>
 <p>Based on the same statistic distributions for the parameter values we now are also able to calculate the uncertainty in output for this case, using a sheet pile wall in the first aquifer. <br> The distribution of the results for drawdown just outside the building pit is given in <a href="#fig-figure-PTK-Uncertainty01">Figure&nbsp;28</a>, which in the lower part shows the distribution for total flow rate from the dewatering in the building pit.</p>
 <div id="fig-figure-PTK-Uncertainty01" class="quarto-figure quarto-figure-center anchored">
 <figure class="figure">
-<p><img src="figures/tutorial/figure-PTK-Uncertainty01.png" class="img-fluid figure-img"></p>
-<figcaption class="figure-caption">Figure&nbsp;28: Uncertainty in drawdown outside building pit due to pameter value distributions of sheetpile resistance Rshp, silt layer resistance czba, basic peat layer resistance cbasis and permeability of Holocene sand khol with constant lowering inside the building pit</figcaption>
+<p><img src="figures/tutorial/figure-PTK-Uncertainty01.png" class="img-fluid figure-img" style="width:100.0%"></p>
+<figcaption class="figure-caption">Figure&nbsp;28: Uncertainty in drawdown outside building pit due to parameter value distributions of sheetpile resistance Rshp, silt layer resistance czba, basic peat layer resistance cbasis and permeability of Holocene sand khol with constant lowering inside the building pit</figcaption>
 </figure>
 </div>
 <div id="fig-figure-PTK-Uncertainty02" class="quarto-figure quarto-figure-center anchored">
 <figure class="figure">
-<p><img src="figures/tutorial/figure-PTK-Uncertainty02.png" class="img-fluid figure-img"></p>
-<figcaption class="figure-caption">Figure&nbsp;29: Uncertainty in groundwater extraction from the building pit due to pameter value distributions of sheetpile resistance Rshp, silt layer resistance czba, basic peat layer resistance cbasis and permeability of Holocene sand khol with constant lowering inside the building pit</figcaption>
+<p><img src="figures/tutorial/figure-PTK-Uncertainty02.png" class="img-fluid figure-img" style="width:100.0%"></p>
+<figcaption class="figure-caption">Figure&nbsp;29: Uncertainty in groundwater extraction from the building pit due to parameter value distributions of sheetpile resistance Rshp, silt layer resistance czba, basic peat layer resistance cbasis and permeability of Holocene sand khol with constant lowering inside the building pit</figcaption>
 </figure>
 </div>
-<p>The probabilistic model gives a 50% probability on a flow of 297 m3/d, even with a 10% chance of an overrun to 659 m3/d.&nbsp;The groundwater drawdown at the standpipe outside the building pit amounts -0.44 m with 50% probability but with 10% value of -1.10 m. <br> The studied layout of the building pit plus dewatering will not meet the demands of the local authorities regarding the limitations on drawdown. By waterlocking the sheet pile wall we can hardly expect a satisfactory decrease of drawdown effects around the building site, therefore, the best solution is to install the sheet pile wall to a deeper level. <br></p>
-<ol start="152" class="example" type="1">
-<li>Repeating the calculations with sheetpile wall in 2 layers the results will meet the demands.</li>
+<p>The probabilistic model gives a 50% probability on a flow of 297 m3/d, even with a 10% chance of an overrun to 659 m3/d.&nbsp;The groundwater drawdown at the standpipe outside the building pit amounts -0.44 m with 50% probability but with 10% value of -1.10 m. <br></p>
+<p>Moreover, it is possible to perform a calculation of reliability with the PTK.</p>
+<ol start="155" class="example" type="1">
+<li>Go to the tab <em>Analysis</em> and select the option <em>Reliability</em>.</li>
+<li>Then we check the variable distributions again. Next, we open the tab <em>Calculation</em>.</li>
 </ol>
+<p>This gives the possibility to introduce a failure criterium for certain variable, like in our case pb1. We choose a less strict criterium because with a shallow sheetpile wall it is not possible to meet the requirements anyhow.</p>
+<ol start="157" class="example" type="1">
+<li>Choose a comparison with undershooting a critical value of REF -0.5 m for the groundwater head in pb1 (see <a href="#fig-figure-PTK-Calculation01">Figure&nbsp;30</a>).</li>
+</ol>
+<p>At the right hand side in the settings window a calculation method needs to be selected. Many statistical methods are available, like Monte Carlo method etc. They are described in the help of the PTK in the main menu. We chose FORM (First Order Reliability Method) as a fast method because it is an automated intelligent iteration process to find a design point for reliability by using first calculated realisations (p.97 in the Help manual, see PTK menu).</p>
+<div id="fig-figure-PTK-Calculation01" class="quarto-figure quarto-figure-center anchored">
+<figure class="figure">
+<p><img src="figures/tutorial/figure-PTK-Calculation01.png" class="img-fluid figure-img" style="width:90.0%"></p>
+<figcaption class="figure-caption">Figure&nbsp;30: Setting up a reliability calculation by choosing a failure criterium and selecting a calculation method.</figcaption>
+</figure>
+</div>
+<ol start="158" class="example" type="1">
+<li>Recalculate the model and go to the tab <em>Reliability</em>.</li>
+</ol>
+<p>From the result (see <a href="#fig-figure-PTK-Reliability01">Figure&nbsp;31</a>) we conclude that the FORM method is able to find a solution in just a few iterations.</p>
+<div id="fig-figure-PTK-Reliability01" class="quarto-figure quarto-figure-center anchored">
+<figure class="figure">
+<p><img src="figures/tutorial/figure-PTK-Reliability01.png" class="img-fluid figure-img" style="width:100.0%"></p>
+<figcaption class="figure-caption">Figure&nbsp;31: Result of the reliability analysis for the selected failure criterium.</figcaption>
+</figure>
+</div>
+<p>It follows that the probability of failure for even a not very discriminating criterium as a drawdown outside the building pit of REF-0.5 m is 42%. The calculation method also returns the contributions of all relevant parameters to the outcome. It is obvious that the loamy layer at shallow depth below the building pit does not deliver enough hydraulic resistance to isolate the building activities from surrounding monuments. <br> As is clear, the studied layout of the building pit plus dewatering will not meet the demands of the local authorities regarding the limitations on drawdown. By waterlocking the sheet pile wall we can hardly expect a satisfactory decrease of drawdown effects around the building site, therefore, the best solution is to install the sheet pile wall to a deeper level. <br> Repeating the calculations with sheetpile wall in 2 layers the results will prove the possibility to meet the demands on groundwater effects with that building pit design.<br> This description of the possibilities like exporting a Python script from Qgis-Tim and using this in statistical analysis is just a short peek into all the options. To find more information we must refer to the manual of the Probabilistic toolkit PTK.</p>
 </section>
 <section id="creating-a-transient-model" class="level2">
 <h2 class="anchored" data-anchor-id="creating-a-transient-model">Creating a transient model</h2>
-<p>At this moment, it is not possible to create a transient (time dependent) model with correct answers to case studies with sheetpile walls. The TTIM solution needs to be updated. Nevertheless in this section we want to guide you on setting up a basic transient model.</p>
-<ol start="153" class="example" type="1">
-<li>If we want to perform a transient calculation, first we have to turn on the option “transient” in the tab <em>Compute</em>.</li>
-<li>After enabling the transient option, go back to the “timml aquifer” properties. Select the layer in the layers panel and as can be seen in the next table matrix of properties is extended in the transient mode with cells for transient parameters, like specific storage coefficients (aquitard_s, and aquifer_s) and porosities (aquitard_npor and aquifer_npor).</li>
+<p>At this moment, it is not possible to create a transient (time dependent) model with correct answers to case studies with sheetpile walls. The TTIM solution needs to be updated. <br> Nevertheless in this section we want to guide you on setting up a basic transient model. <br></p>
+<ol start="159" class="example" type="1">
+<li>Return to QGIS and in the QGIS-Tim panel go to the tab <em>Compute</em>.</li>
+<li>In the section <em>Output</em> turn on the option “Transient”.</li>
+<li>In the panel <em>Layers</em> select <em>timml Aquifer:Aquifer</em>.</li>
 </ol>
-<p>Take care that specific storage coefficient is a storage per meter layer thickness. In older MWell course material a speadsheet is presented for estimation of coefficient values. But there we calculated storage coefficients per whole layer. Those values should be divided by layer thickness.</p>
-<p>In the TTIM section in the Layers panel we can select the input modules for transient calculations: In the TTIM Temporal Settings: Aquifer the length of the time series is specified. The starting time is set to 0 but calculations take place for the range of time steps between time_min and time_max. The time unit is according to central settings in the project, mostly time in days. Time_min should not be zero but given a slight offset. Here we also find a Stehfest_M number, related to the number of terms in the calculation method performing transformation of formulas in solving differential equations. A reference date can be set to relate the calculation to real time data.</p>
-<p>Note: In QGIS it is an obligation to use a Reference date to get the model running and present outcomes!</p>
-<p>In the TTIM Computation Times:Domain the time values are set for time steps where we want to get calculations of spatially distributed heads in mesh or raster points and contours.</p>
+<p>As can be seen in <a href="#fig-Panel-TimmlAquiferAttrTable_v02">Figure&nbsp;32</a>, the matrix of properties is extended in the transient mode with cells for transient parameters, like specific storage coefficients (aquitard_s, and aquifer_s) and porosities (aquitard_npor and aquifer_npor). Take care that specific storage coefficient is a storage per meter layer thickness. In older MWell course material a speadsheet is presented for estimation of coefficient values but there we calculated storage coefficients per whole layer. Those values should be divided by layer thickness.</p>
+<div id="fig-Panel-TimmlAquiferAttrTable_v02" class="quarto-figure quarto-figure-center anchored">
+<figure class="figure">
+<p><img src="figures/tutorial/Panel-Timml AquiferAttrTable_v02.png" class="img-fluid figure-img" style="width:100.0%"></p>
+<figcaption class="figure-caption">Figure&nbsp;32: Attribute Table for Aquifer in transient condition.</figcaption>
+</figure>
+</div>
+<ol start="162" class="example" type="1">
+<li>Fill in the Table with the corresponding values.</li>
+<li>In the TTIM section in the <em>Layers panel</em> go to the list of elements for transient calculations.</li>
+<li>Select <em>ttim Temporal Settings:Aquifer</em> and open its <em>Attribute Table</em> (F6). Here the length of the time series is specified.</li>
+<li>Set the starting time to 0.</li>
+</ol>
+<p>But calculations take place for the range of time steps between “time_min” and “time_max”. The time unit is according to central settings in the project, mostly time in days. “Time_min” should not be zero but given a slight offset. Here we also find a “Stehfest_M” number, related to the number of terms in the calculation method performing transformation of formulas in solving differential equations. A reference date can be set to relate the calculation to real time data.</p>
+<ol start="166" class="example" type="1">
+<li>Fill in the table according to <a href="#fig-Panel-TIMMAquiferAttrTable_v01">Figure&nbsp;33</a>.</li>
+</ol>
+<div id="fig-Panel-TIMMAquiferAttrTable_v01" class="quarto-figure quarto-figure-center anchored">
+<figure class="figure">
+<p><img src="figures/tutorial/Panel-TIMM AquiferAttrTable_v01.png" class="img-fluid figure-img" style="width:90.0%"></p>
+<figcaption class="figure-caption">Figure&nbsp;33: Table for <em>ttim Temporal Settings:Aquifer</em></figcaption>
+</figure>
+</div>
+<p><strong>Note</strong>: In QGIS it is an obligation to use a Reference date to get the model running and present outcomes!</p>
+<ol start="167" class="example" type="1">
+<li>Select <em>ttim Computation Times:Domain</em> and set the time values for time steps where we want to get calculations of spatially distributed heads in mesh or raster points and contours.</li>
+</ol>
+<div id="fig-Panel-TIMM_DomainAttrTable_v01" class="quarto-figure quarto-figure-center anchored">
+<figure class="figure">
+<p><img src="figures/tutorial/Panel-TIMM_DomainAttrTable_v01.png" class="img-fluid figure-img" style="width:40.0%"></p>
+<figcaption class="figure-caption">Figure&nbsp;34: Table for <em>ttim Computation Times:Domain</em></figcaption>
+</figure>
+</div>
 <p>For this case we will leave this table blank, because calculating several head distributions at different time steps is rather time consuming during this course.</p>
-<p>In the TTIM Observation:peilbuis we can set the time steps for a time series at certain points we want to monitor the calculation results. We set points at intervals that follow a (approximately) logarithmic increase in time intervals. Proposed values are shown in the next table.</p>
+<ol start="168" class="example" type="1">
+<li>Select <em>ttim Observation:observations</em> and here we can set the time steps for a time series at certain points we want to monitor the calculation results. We set points at intervals that follow a (approximately) logarithmic increase in time intervals. Proposed values are shown in the next table.</li>
+</ol>
+<div id="fig-Panel-TIMM_ObservationsAttrTable_v01" class="quarto-figure quarto-figure-center anchored">
+<figure class="figure">
+<p><img src="figures/tutorial/Panel-TIMM_ObservationsAttrTable_v01.png" class="img-fluid figure-img" style="width:40.0%"></p>
+<figcaption class="figure-caption">Figure&nbsp;35: Table for <em>ttim Observation:observations</em></figcaption>
+</figure>
+</div>
 <p>Don’t choose exactly the same time as when changing the flow. So if 60 is an end value, choose 59.9.</p>
-<p>In the TTIM Well:Putten we can set the discharge amount. The value might change during time when excavation is considered or construction is performed in phases. For each change we have to add a line of input. We just leave this option without any change.</p>
-<p>Another way of inserting stress periods for wells is by going to the Timml Well:Putten layer. But fill in a general value of 0 m3/d for TimML attributes of the well element when you want to use changing flow in TTIM. Remember: Solution of TTIM is superposed on solution of TIMml.</p>
+<p>In the <em>Attribute Table</em> of layer <em>ttim Well:pumping_wells</em> we can set the discharge amount. The value might change during time when excavation is considered or construction is performed in phases. For each change we have to add a line of input. <br> We just leave this option without any change.</p>
+<p>Another way of inserting stress periods for wells is by going to the <em>timml Well:pumping_wells</em> layer. <br> But fill in a general value of 0 m3/d for TimML attributes of the well element when you want to use changing flow in TTIM. Remember: Solution of TTIM is superposed on solution of TIMml.</p>
 
 
 </section>
