@@ -295,7 +295,7 @@ class SemiConfined(IterableSchema):
 
 
 class SingleRow(IterableSchema):
-    def validate(self, data, other=None) -> MaybeError:
+    def validate(self, data, _=None) -> MaybeError:
         if len(data) != 1:
             return "Table may contain only one row."
         return None

@@ -1,7 +1,7 @@
 from PyQt5.QtCore import QVariant
 from qgis.core import QgsDefaultValue, QgsField, QgsSingleSymbolRenderer
 from qgistim.core.elements.colors import BLUE
-from qgistim.core.elements.element import TransientElement
+from qgistim.core.elements.element import ElementSchema, TransientElement
 from qgistim.core.schemata import (
     AllOrNone,
     Membership,
@@ -13,23 +13,20 @@ from qgistim.core.schemata import (
 )
 
 
-class HeadLineSinkSchema:
-    schemata = {
+class HeadLineSinkSchema(ElementSchema):
+    timml_schemata = {
         "head": Required(),
         "resistance": Required(Positive()),
         "width": Required(Positive()),
         "order": Required(Positive()),
-        "layer": Required(Membership("layers")),
+        "layer": Required(Membership("aquifer layers")),
     }
-
-
-class TransientHeadLineSinkSchema:
-    consistency_schemata = (
+    ttim_consistency_schemata = (
         AllOrNone("time_start", "time_end", "head_transient"),
         NotBoth("time_start", "timeseries_id"),
         Time(),
     )
-    schemata = {
+    ttim_schemata = {
         "time_start": Optional(Time()),
         "time_end": Optional(Time()),
     }
@@ -64,27 +61,22 @@ class HeadLineSink(TransientElement):
         "head_transient",
         "timeseries_id",
     )
+    schema = HeadLineSinkSchema()
 
     @property
     def renderer(self) -> QgsSingleSymbolRenderer:
         return self.line_renderer(color=BLUE, width="0.75")
 
-    def to_timml(self):
-        data = self.to_dict(self.timml_layer)
-        sinks = []
-        for row in data:
-            sinks.append(
-                {
-                    "xy": self.linestring_xy(row),
-                    "hls": row["head"],
-                    "res": row["resistance"],
-                    "wh": row["width"],
-                    "order": row["order"],
-                    "layers": row["layer"],
-                    "label": row["label"],
-                }
-            )
-        return sinks
+    def process_timml_row(self, row):
+        return {
+            "xy": self.linestring_xy(row),
+            "hls": row["head"],
+            "res": row["resistance"],
+            "wh": row["width"],
+            "order": row["order"],
+            "layers": row["layer"],
+            "label": row["label"],
+        }
 
     def to_ttim(self, time_start):
         data = self.to_dict(self.timml_layer)

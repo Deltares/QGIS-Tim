@@ -8,6 +8,12 @@ from qgistim.core.elements.aquifer import Aquifer
 from qgistim.core.elements.constant import Constant
 from qgistim.core.elements.domain import Domain
 from qgistim.core.elements.element import Element
+from qgistim.core.elements.head_line_sink import HeadLineSink
+from qgistim.core.elements.headwell import HeadWell
+from qgistim.core.elements.impermeable_line_doublet import ImpermeableLineDoublet
+from qgistim.core.elements.leaky_line_doublet import LeakyLineDoublet
+from qgistim.core.elements.line_sink_ditch import LineSinkDitch
+from qgistim.core.elements.observation import Observation
 from qgistim.core.elements.uniform_flow import UniformFlow
 from qgistim.core.elements.well import Well
 
@@ -19,6 +25,12 @@ ELEMENTS = {
         Constant,
         UniformFlow,
         Well,
+        HeadWell,
+        HeadLineSink,
+        LineSinkDitch,
+        LeakyLineDoublet,
+        ImpermeableLineDoublet,
+        Observation,
     )
 }
 

@@ -6,10 +6,11 @@ from qgistim.core.schemata import Membership, Required, SingleRow
 
 
 class ConstantSchema(ElementSchema):
-    consistency_schemata = (SingleRow(),)
-    schemata = {
+    timml_consistency_schemata = (SingleRow(),)
+    timml_schemata = {
+        "geometry": Required(),
         "head": Required(),
-        "layer": Membership("layers"),
+        "layer": Required(Membership("aquifer layers")),
     }
 
 
@@ -21,19 +22,18 @@ class Constant(Element):
         QgsField("layer", QVariant.Int),
         QgsField("label", QVariant.String),
     )
+    schema = ConstantSchema()
 
     @property
     def renderer(self) -> QgsSingleSymbolRenderer:
         return self.marker_renderer(color=RED, name="star", size="5")
 
-    def to_timml(self):
-        data = self.to_dict()
-        # TODO: validate
-        data = data[0]
+    def process_timml_row(self, row):
+        x, y = self.point_xy(row)
         return {
-            "xr": data["geometry"][0][0],
-            "yr": data["geometry"][0][1],
-            "hr": data["head"],
-            "layer": data["layer"],
-            "label": data["label"],
+            "xr": x,
+            "yr": y,
+            "hr": row["head"],
+            "layer": row["layer"],
+            "label": row["label"],
         }

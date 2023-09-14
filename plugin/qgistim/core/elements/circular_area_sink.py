@@ -1,7 +1,7 @@
 class CircularAreaSinkSchema:
     schemata = {
         "rate": Required(),
-        "layer": Required(Membership("layers")),
+        "layer": Required(Membership("aquifer layers")),
     }
 
 

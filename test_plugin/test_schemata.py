@@ -17,6 +17,7 @@ from qgistim.core.schemata import (
     Range,
     Required,
     SemiConfined,
+    SingleRow,
     StrictlyDecreasing,
     StrictlyIncreasing,
 )
@@ -251,3 +252,11 @@ class TestSemiConfined(TestCase):
             schema.validate(d),
             "semiconf_top must be greater than first aquifer_top.",
         )
+
+
+class TestSingleRow(TestCase):
+    def test_single_row(self):
+        schema = SingleRow()
+        self.assertIsNone(schema.validate([{"a": 1}]))
+        data = [{"a": 1}, {"a": 2}]
+        self.assertEqual(schema.validate(data), "Table may contain only one row.")

@@ -1,6 +1,6 @@
 import abc
 from collections import defaultdict
-from typing import Any, Dict
+from typing import Any, Dict, List
 
 from qgis.core import NULL
 
@@ -24,7 +24,7 @@ class ExtractorMixin(abc.ABC):
         return coordinates
 
     @classmethod
-    def to_dict(cls, layer) -> Dict[str, Any]:
+    def to_dict(cls, layer) -> List[Dict[str, Any]]:
         features = []
         for feature in layer.getFeatures():
             data = feature.attributeMap()
@@ -46,11 +46,11 @@ class ExtractorMixin(abc.ABC):
                     features[key].append(value)
 
         # Sort by layer if present.
-        if "layer" in features:
-            order = cls.argsort(features["layer"])
-            return {k: [v[i] for i in order] for k, v in features.items()}
-        else:
-            return features
+        # TODO: is this smart? A user may easily miss the layer column.
+        # if "layer" in features:
+        #    order = cls.argsort(features["layer"])
+        #    return {k: [v[i] for i in order] for k, v in features.items()}
+        return features
 
     @staticmethod
     def point_xy(row):

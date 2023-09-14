@@ -10,11 +10,12 @@ from qgis.core import (
 )
 from qgistim.core.elements.colors import BLACK
 from qgistim.core.elements.element import ElementSchema, TransientElement
-from qgistim.core.schemata import SingleRow
+from qgistim.core.schemata import Required, SingleRow
 
 
 class DomainSchema(ElementSchema):
-    timml_consistency_schemata = (SingleRow,)
+    timml_schemata = {"geometry": Required()}
+    timml_consistency_schemata = (SingleRow(),)
 
 
 class Domain(TransientElement):
@@ -61,9 +62,9 @@ class Domain(TransientElement):
         canvas.refresh()
         return ymax, ymin
 
-    def to_timml(self):
+    def to_timml(self, other):
         data = self.to_dict(self.timml_layer)
-        errors = self.schema.validate_timml(data)
+        errors = self.schema.validate_timml(data, other)
         if errors:
             return errors, None
         else:

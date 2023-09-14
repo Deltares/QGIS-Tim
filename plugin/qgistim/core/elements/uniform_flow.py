@@ -1,6 +1,14 @@
 from PyQt5.QtCore import QVariant
 from qgis.core import QgsField
-from qgistim.core.elements.element import Element
+from qgistim.core.elements.element import Element, ElementSchema
+from qgistim.core.schemata import Required
+
+
+class UniformFlowSchema(ElementSchema):
+    timml_schemata = {
+        "slope": Required(),
+        "angle": Required(),
+    }
 
 
 class UniformFlow(Element):
@@ -11,11 +19,8 @@ class UniformFlow(Element):
         QgsField("angle", QVariant.Double),
         QgsField("label", QVariant.String),
     )
+    schema = UniformFlowSchema()
 
-    def to_timml(self):
-        data = self.to_dict(self.timml_layer)
-        return {
-            "slope": data["slope"],
-            "angle": data["angle"],
-            "label": data["label"],
-        }
+    def process_timml_row(self, row):
+        # No renaming or changes required
+        return row

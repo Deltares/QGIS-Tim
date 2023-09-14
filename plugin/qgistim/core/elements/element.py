@@ -53,7 +53,7 @@ when it has no features.
 
 import abc
 from collections import defaultdict
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Tuple
 
 from PyQt5.QtWidgets import (
     QDialog,
@@ -75,14 +75,40 @@ from qgistim.core.extractor import ExtractorMixin
 
 
 class ElementSchema(abc.ABC):
-    timml_schemata = {}
-    timml_consistency_schemata = {}
-    ttim_schemata = {}
-    ttim_consistency_schemata = {}
+    timml_schemata: Dict[str, Any] = {}
+    timml_consistency_schemata: Tuple[Any] = ()
+    ttim_schemata: Dict[str, Any] = {}
+    ttim_consistency_schemata: Tuple[Any] = ()
 
-    def validate_timml(self, data, other=None) -> Dict[str, List]:
+    def _validate_timml_rows(self, data, other=None):
+        errors = {}
+
+        _errors = []
+        for schema in self.timml_consistency_schemata:
+            _error = schema.validate(data, other)
+            if _error is not None:
+                _errors.append(_error)
+        if _errors:
+            errors["Table:"] = _errors
+
+        for i, row in enumerate(data):
+            row_errors = defaultdict(list)
+            for variable, schema in self.timml_schemata.items():
+                _error = schema.validate(row[variable], other)
+                if _error is not None:
+                    row_errors[variable].append(_error)
+
+            if row_errors:
+                errors[f"Row {i + 1}:"] = row_errors
+
+        if errors:
+            return errors
+        else:
+            return None
+
+    def _validate_timml_table(self, data, other=None):
         if len(data) == 0:
-            return {"table": ["Table is empty."]}
+            return {"Table:": ["Table is empty."]}
 
         errors = defaultdict(list)
         for variable, schema in self.timml_schemata.items():
@@ -90,16 +116,28 @@ class ElementSchema(abc.ABC):
             if _errors is not None:
                 errors[variable].extend(_errors)
 
+        # The consistency schema rely on the row input being valid.
+        # Hence, they are tested second.
         if not errors:
             for schema in self.timml_consistency_schemata:
                 _error = schema.validate(data, other)
                 if _error:
-                    errors["table"].append(_error)
+                    errors["Table:"].append(_error)
 
         if errors:
             return errors
         else:
             return None
+
+    def validate_timml(self, data, other=None) -> Dict[str, Any]:
+        if isinstance(data, list):
+            return self._validate_timml_rows(data, other)
+        elif isinstance(data, dict):
+            return self._validate_timml_table(data, other)
+        else:
+            raise TypeError(
+                f"Data should be list or dict, received: {type(data).__name__}"
+            )
 
     def validate_ttim(self, data, other=None) -> Dict[str, List]:
         raise NotImplementedError
@@ -274,8 +312,16 @@ class Element(ExtractorMixin):
         self.timml_layer.setAttributeTableConfig(config)
         return
 
-    @abc.abstractmethod
     def to_timml(self, other=None):
+        data = self.to_dict(self.timml_layer)
+        errors = self.schema.validate_timml(data, other)
+        if errors:
+            return errors, data
+        else:
+            elements = [self.process_timml_row(row) for row in data]
+            return None, elements
+
+    def to_ttim(self, other=None):
         pass
 
     @staticmethod
@@ -323,12 +369,11 @@ class Element(ExtractorMixin):
         porosity = interleave(data["aquitard_npor"], data["aquifer_npor"])
         s_aquifer = data["aquifer_s"]
         s_aquitard = data["aquitard_s"]
-        topboundary = "semi"
 
         if semiconfined:
-            topboundary = "conf"
-        else:
             topboundary = "semi"
+        else:
+            topboundary = "conf"
             z.pop(0)
             c.pop(0)
             porosity.pop(0)

@@ -206,8 +206,20 @@ class DatasetTreeWidget(QTreeWidget):
         }
         data = {}
         errors = {}
+
+        # First convert the aquifer, since we need its data to validate
+        # other elements.
+        name = "timml Aquifer:Aquifer"
+        aquifer = elements.pop(name)
+        _errors, raw_data = aquifer.to_timml()
+        other = {"aquifer layers": raw_data["layer"]}
+        if _errors:
+            errors[name] = _errors
+        else:
+            data[name] = aquifer.aquifer_data(raw_data, transient=False)
+
         for name, element in elements.items():
-            _errors, _data = element.to_timml()
+            _errors, _data = element.to_timml(other)
             if _errors:
                 errors[name] = _errors
             else:
@@ -467,6 +479,17 @@ class DatasetWidget(QWidget):
             self.validation_dialog = ValidationDialog(errors)
             return
 
-        json_string = json.dumps(data, indent=4)
+        # TODO
+        data["timml Domain:Domain"][
+            "cellsize"
+        ] = self.parent.compute_widget.cellsize_spin_box.value()
+
+        from qgistim.core.formatting import to_json, to_script_string
+
+        to_python = to_script_string(data)
+        print(to_python)
+
+        json_data = to_json(data)
+        json_string = json.dumps(json_data, indent=4)
         print(json_string)
         return

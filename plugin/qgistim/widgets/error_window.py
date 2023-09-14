@@ -3,14 +3,26 @@ from typing import Any, Dict
 from PyQt5.QtWidgets import QDialog, QHBoxLayout, QPushButton, QTextBrowser, QVBoxLayout
 
 
+def format_list(errors: Dict[str, Any]):
+    """Recursive formatting"""
+    messages = []
+    for variable, var_errors in errors.items():
+        if isinstance(var_errors, list):
+            messages.append(f"<p>{variable}</p><ul>")
+            messages.extend(f"<li>{error}</li>" for error in var_errors)
+            messages.append("</ul>")
+        else:
+            messages.append(f"<p>{variable}</p><ul><li>")
+            messages.extend(format_list(var_errors))
+            messages.append("</ul></li>")
+    return messages
+
+
 def format_errors(errors: Dict[str, Dict[str, Any]]):
     messages = []
     for element, element_errors in errors.items():
         messages.append(f"<b>{element}</b>")
-        for variable, var_errors in element_errors.items():
-            messages.append("<ul>")
-            messages.extend(f"<li>{variable}: {error}</li>" for error in var_errors)
-            messages.append("</ul>")
+        messages.extend(format_list(element_errors))
     return "".join(messages)
 
 

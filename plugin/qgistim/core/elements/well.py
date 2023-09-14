@@ -1,7 +1,9 @@
+from typing import Any, Dict
+
 from PyQt5.QtCore import QVariant
 from qgis.core import QgsDefaultValue, QgsField, QgsSingleSymbolRenderer
 from qgistim.core.elements.colors import GREEN
-from qgistim.core.elements.element import TransientElement
+from qgistim.core.elements.element import ElementSchema, TransientElement
 from qgistim.core.schemata import (
     AllOrNone,
     Membership,
@@ -13,17 +15,15 @@ from qgistim.core.schemata import (
 )
 
 
-class WellSchema:
-    schemata = {
+class WellSchema(ElementSchema):
+    timml_schemata = {
+        "geometry": Required(),
         "discharge": Required(),
-        "radius": Required(),
-        "resistance": Required(),
-        "layer": Required(Membership("layers")),
+        "radius": Required(Positive()),
+        "resistance": Required(Positive()),
+        "layer": Required(Membership("aquifer layers")),
     }
-
-
-class TransientWellSchema:
-    schemata = {
+    ttim_schemata = {
         "caisson_radius": Required(Positive),
         "slug": Required(),
         "time_start": Optional(Time()),
@@ -71,28 +71,23 @@ class Well(TransientElement):
         "slug",
         "timeseries_id",
     )
+    schema = WellSchema()
 
     @property
     def renderer(self) -> QgsSingleSymbolRenderer:
         return self.marker_renderer(color=GREEN, size="3")
 
-    def to_timml(self):
-        data = self.to_dict(self.timml_layer)
-        wells = []
-        for row in data:
-            x, y = self.point_xy(row)
-            wells.append(
-                {
-                    "xw": x,
-                    "yw": y,
-                    "Q": row["discharge"],
-                    "rw": row["radius"],
-                    "res": row["resistance"],
-                    "layers": row["layer"],
-                    "label": row["label"],
-                }
-            )
-        return wells
+    def process_timml_row(self, row) -> Dict[str, Any]:
+        x, y = self.point_xy(row)
+        return {
+            "xw": x,
+            "yw": y,
+            "Qw": row["discharge"],
+            "rw": row["radius"],
+            "res": row["resistance"],
+            "layers": row["layer"],
+            "label": row["label"],
+        }
 
     def to_ttim(self, time_start):
         data = self.to_dict(self.timml_layer)

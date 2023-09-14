@@ -93,15 +93,9 @@ class Aquifer(TransientElement):
     def to_timml(self):
         data = self.table_to_dict(self.timml_layer)
         errors = self.schema.validate_timml(data)
-        if errors:
-            return errors, None
-        else:
-            return None, self.aquifer_data(data, transient=False)
+        return errors, data
 
     def to_ttim(self):
         data = self.table_to_dict(self.timml_layer)
         errors = self.schema.validate_ttim(data)
-        if errors:
-            return errors, None
-        else:
-            return None, self.aquifer_data(data, transient=False)
+        return errors, data
