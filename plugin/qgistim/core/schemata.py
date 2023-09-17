@@ -13,15 +13,14 @@ OPERATORS = {
 
 
 MaybeError = Union[None, str]
-MaybeErrorList = Union[None, List[str]]
+ErrorList = List[str]
 
 
 def format(data) -> str:
     return ", ".join(map(str, data))
 
 
-def discard_none(data):
-    return [v for v in data if v is not None]
+# Base classes
 
 
 class BaseSchema(abc.ABC):
@@ -34,85 +33,106 @@ class BaseSchema(abc.ABC):
     def validate(self, data, other) -> MaybeError:
         pass
 
-    def validate_many(self, data, other) -> MaybeErrorList:
+    def validate_many(self, data, other) -> ErrorList:
         errors = []
         for value in data:
             error = self.validate(value, other)
             if error is not None:
                 errors.append(error)
 
-        if errors:
-            return errors
-        else:
-            return None
+        return errors
 
 
-class IterableSchema(BaseSchema, abc.ABC):
+class IterableSchema(abc.ABC):
     """Base class for collection of values."""
 
-    def validate_many(self, data, other) -> MaybeErrorList:
-        error = self.validate(data, other)
-        if error:
-            if isinstance(error, list):
-                return error
-            else:
-                return [error]
-        else:
-            return None
-
-
-class SchemaContainer(IterableSchema):
     def __init__(self, *schemata):
         self.schemata = schemata
 
-    def _validate_schemata(self, data, other=None) -> MaybeErrorList:
+    def validate_many(self, data, other) -> ErrorList:
+        error = self.validate(data, other)
+        if error:
+            return [error]
+        else:
+            return []
+
+
+class SchemaContainer(abc.ABC):
+    def __init__(self, *schemata):
+        self.schemata = schemata
+
+    @abc.abstractmethod
+    def validate(self):
+        pass
+
+    def _validate_schemata(self, data, other=None) -> ErrorList:
         errors = []
         for schema in self.schemata:
-            if isinstance(data, list):
-                _errors = schema.validate_many(data, other)
-                if _errors:
-                    errors.extend(_errors)
-            else:
-                _error = schema.validate(data, other)
-                if _error:
-                    errors.append(_error)
-
-        if errors:
-            return errors
-
-        return None
+            _error = schema.validate(data, other)
+            if _error:
+                errors.append(_error)
+        return errors
 
 
-# SchemataContainer for a single value.
+class IterableSchemaContainer(abc.ABC):
+    def __init__(self, *schemata):
+        self.schemata = schemata
+
+    @abc.abstractmethod
+    def validate(self):
+        pass
+
+    def _validate_schemata(self, data, other=None) -> ErrorList:
+        errors = []
+        for schema in self.schemata:
+            _errors = schema.validate_many(data, other)
+            if _errors:
+                errors.extend(_errors)
+        return errors
+
+
+# Schema containers for a single value.
+
+
+class OptionalFirstOnly(SchemaContainer):
+    """Exclusively the first value must be provided."""
+
+    def validate(self, data, other=None) -> ErrorList:
+        if any(v is not None for v in data[1:]):
+            return ["Only the first value may be filled in."]
+        elif data[0] is None:
+            return []
+        else:
+            return self._validate_schemata(data[0], other)
 
 
 class Optional(SchemaContainer):
-    def validate(self, data, other=None) -> MaybeError:
+    def validate(self, data, other=None) -> ErrorList:
         if data is None:
-            return None
+            return []
         return self._validate_schemata(data, other)
 
 
 class Required(SchemaContainer):
-    def validate(self, data, other=None) -> MaybeError:
+    def validate(self, data, other=None) -> ErrorList:
         if data is None:
-            return "a value is required."
+            return ["a value is required."]
         return self._validate_schemata(data, other)
 
 
 # SchemataContainer for multiple values.
 
 
-class AllRequired(SchemaContainer):
-    def validate(self, data, other=None) -> MaybeErrorList:
+class AllRequired(IterableSchemaContainer):
+    def validate(self, data, other=None) -> ErrorList:
         missing = [i + 1 for i, v in enumerate(data) if v is None]
         if missing:
             return [f"No values provided at row(s): {format(missing)}"]
         return self._validate_schemata(data, other)
 
 
-class OffsetAllRequired(SchemaContainer):
-    def validate(self, data, other=None) -> MaybeErrorList:
+class OffsetAllRequired(IterableSchemaContainer):
+    def validate(self, data, other=None) -> ErrorList:
         missing = [i + 2 for i, v in enumerate(data[1:]) if v is None]
         if missing:
             return [f"No values provided at row(s): {format(missing)}"]
@@ -122,11 +142,11 @@ class OffsetAllRequired(SchemaContainer):
             return self._validate_schemata(data, other)
 
 
-class AllOptional(SchemaContainer):
-    def validate(self, data, other=None) -> MaybeErrorList:
+class AllOptional(IterableSchemaContainer):
+    def validate(self, data, other=None) -> ErrorList:
         missing = [i + 1 for i, v in enumerate(data) if v is None]
         if len(missing) == len(data):
-            return None
+            return []
         return self._validate_schemata(data, other)
 
 
@@ -137,15 +157,6 @@ class Positive(BaseSchema):
     def validate(self, data, _=None) -> MaybeError:
         if data < 0:
             return f"Non-positive value: {data}"
-        return None
-
-
-class Time(BaseSchema):
-    def validate(self, data, other=None) -> MaybeError:
-        start = other["start"]
-        end = other["end"]
-        if not (start < data < end):
-            return f"time does not fall in model time window: {start} to {end}"
         return None
 
 
@@ -161,19 +172,6 @@ class AllOrNone(BaseSchema):
                 "Exactly all or none of the following variables must be "
                 f"provided: {vars}"
             )
-        return None
-
-
-class Xor(BaseSchema):
-    "One or the other should be provided"
-
-    def __init__(self, x: str, y: str):
-        self.x = x
-        self.y = y
-
-    def validate(self, data, _=None) -> MaybeError:
-        if not ((data[self.x] is None) ^ (data[self.y] is None)):
-            return f"Either {self.x} or {self.y} should be provided, not both."
         return None
 
 
@@ -200,6 +198,26 @@ class Membership(BaseSchema):
             return (
                 f"Value {data} not found in {self.members_key}: {format(member_values)}"
             )
+        return None
+
+
+class CircularGeometry(BaseSchema):
+    def validate(self, data, _=None) -> MaybeError:
+        coordinates = data
+        # Compute centroid.
+        n_vertex = len(data)
+        x_mean = 0.0
+        y_mean = 0.0
+        for x, y in coordinates:
+            x_mean += x / n_vertex
+            y_mean += y / n_vertex
+        # Compute distances to centroid.
+        distances = [(x - x_mean) ** 2 + (y - y_mean) ** 2 for (x, y) in coordinates]
+        min_distance = min(distances) ** 0.5
+        max_distance = max(distances) ** 0.5
+        # Accept 1% deviation in squared distance from a circle.
+        if (max_distance - min_distance) > (0.01 * min_distance):
+            return "Geometry is not circular."
         return None
 
 
@@ -260,19 +278,10 @@ class AllGreaterEqual(IterableSchema):
         return None
 
 
-class FirstOnly(SchemaContainer):
-    """Exclusively the first value must be provided."""
-
-    def validate(self, data, other=None) -> Union[MaybeError, MaybeErrorList]:
-        if any(v is not None for v in data[1:]):
-            return "Only the first value may be filled in."
-        return self._validate_schemata(data[0], other)
-
-
 # Consistency schemata
 
 
-class SemiConfined(IterableSchema):
+class SemiConfined(BaseSchema):
     def validate(self, data, _=None) -> MaybeError:
         semiconf_data = {
             "aquitard_c": data["aquitard_c"][0],
@@ -294,7 +303,7 @@ class SemiConfined(IterableSchema):
         return None
 
 
-class SingleRow(IterableSchema):
+class SingleRow(BaseSchema):
     def validate(self, data, _=None) -> MaybeError:
         if len(data) != 1:
             return "Table may contain only one row."

@@ -6,12 +6,12 @@ from qgistim.core.elements.colors import GREEN
 from qgistim.core.elements.element import ElementSchema, TransientElement
 from qgistim.core.schemata import (
     AllOrNone,
+    AllRequired,
     Membership,
     NotBoth,
     Optional,
     Positive,
     Required,
-    Time,
 )
 
 
@@ -26,14 +26,19 @@ class WellSchema(ElementSchema):
     ttim_schemata = {
         "caisson_radius": Required(Positive),
         "slug": Required(),
-        "time_start": Optional(Time()),
-        "time_end": Optional(Time()),
+        "time_start": Optional(Positive()),
+        "time_end": Optional(Positive()),
         "timeseries_id": Optional(Membership("timeseries_ids")),
     }
     consistency_schemata = (
         AllOrNone(("time_start", "time_end", "discharge_transient")),
         NotBoth("time_start", "timeseries_id"),
     )
+    timeseries_schemata = {
+        "timeseries_id": AllRequired(),
+        "time_start": AllRequired(Positive()),
+        "discharge": AllRequired(),
+    }
 
 
 class Well(TransientElement):

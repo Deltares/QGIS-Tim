@@ -1,18 +1,17 @@
 from unittest import TestCase
 
-from qgistim.core import schemata
 from qgistim.core.schemata import (
     AllGreaterEqual,
     AllOptional,
     AllOrNone,
     AllRequired,
     Decreasing,
-    FirstOnly,
     Increasing,
     Membership,
     NotBoth,
     OffsetAllRequired,
     Optional,
+    OptionalFirstOnly,
     Positive,
     Range,
     Required,
@@ -21,15 +20,6 @@ from qgistim.core.schemata import (
     StrictlyDecreasing,
     StrictlyIncreasing,
 )
-
-
-class TestDiscardNone(TestCase):
-    def test_discard(self):
-        actual = schemata.discard_none([1, 2])
-        self.assertTrue(actual == [1, 2])
-
-        actual = schemata.discard_none([None, 1, None, 2, None])
-        self.assertTrue(actual == [1, 2])
 
 
 class TestPositive(TestCase):
@@ -41,18 +31,18 @@ class TestPositive(TestCase):
 
 class TestOptional(TestCase):
     def test_optional(self):
-        self.assertIsNone(Optional(Positive()).validate(None))
-        self.assertIsNone(Optional(Positive()).validate(0))
-        self.assertIsNone(Optional(Positive()).validate(1))
+        self.assertEqual(Optional(Positive()).validate(None), [])
+        self.assertEqual(Optional(Positive()).validate(0), [])
+        self.assertEqual(Optional(Positive()).validate(1), [])
         self.assertEqual(Optional(Positive()).validate(-1), ["Non-positive value: -1"])
 
 
 class TestRequired(TestCase):
     def test_required(self):
-        self.assertEqual(Required(Positive()).validate(None), "a value is required.")
+        self.assertEqual(Required(Positive()).validate(None), ["a value is required."])
         self.assertEqual(Required(Positive()).validate(-1), ["Non-positive value: -1"])
-        self.assertIsNone(Required(Positive()).validate(0))
-        self.assertIsNone(Required(Positive()).validate(1))
+        self.assertEqual(Required(Positive()).validate(0), [])
+        self.assertEqual(Required(Positive()).validate(1), [])
 
 
 class TestAllOrNone(TestCase):
@@ -98,7 +88,7 @@ class TestMembership(TestCase):
 class TestAllRequired(TestCase):
     def test_all_required(self):
         schema = AllRequired(Positive())
-        self.assertIsNone(schema.validate([1, 2, 3]))
+        self.assertEqual(schema.validate([1, 2, 3]), [])
         self.assertEqual(
             schema.validate([None, 2, None]), ["No values provided at row(s): 1, 3"]
         )
@@ -108,7 +98,7 @@ class TestAllRequired(TestCase):
 class TestOffsetAllRequired(TestCase):
     def test_offset_all_required(self):
         schema = OffsetAllRequired(Positive())
-        self.assertIsNone(schema.validate([None, 2, 3]))
+        self.assertEqual(schema.validate([None, 2, 3]), [])
         self.assertEqual(
             schema.validate([None, 2, None]), ["No values provided at row(s): 3"]
         )
@@ -118,22 +108,22 @@ class TestOffsetAllRequired(TestCase):
 class TestAllOptional(TestCase):
     def test_all_optional(self):
         schema = AllOptional(Positive())
-        self.assertIsNone(schema.validate([None, None, None]))
-        self.assertIsNone(schema.validate([1, 2, 3]))
+        self.assertEqual(schema.validate([None, None, None]), [])
+        self.assertEqual(schema.validate([1, 2, 3]), [])
         self.assertEqual(schema.validate([-1, 2, 3]), ["Non-positive value: -1"])
 
     def test_all_optional_first_only(self):
-        schema = AllOptional(FirstOnly())
-        self.assertIsNone(schema.validate([None, None, None]))
-        self.assertIsNone(schema.validate([1, None, None]))
+        schema = OptionalFirstOnly()
+        self.assertEqual(schema.validate([None, None, None]), [])
+        self.assertEqual(schema.validate([1, None, None]), [])
         self.assertEqual(
             schema.validate([1, 1, None]), ["Only the first value may be filled in."]
         )
 
     def test_all_optional_first_only_positive(self):
-        schema = AllOptional(FirstOnly(Positive()))
-        self.assertIsNone(schema.validate([None, None, None]))
-        self.assertIsNone(schema.validate([1, None, None]))
+        schema = OptionalFirstOnly(Positive())
+        self.assertEqual(schema.validate([None, None, None]), [])
+        self.assertEqual(schema.validate([1, None, None]), [])
         self.assertEqual(
             schema.validate([1, 1, None]), ["Only the first value may be filled in."]
         )
@@ -209,13 +199,13 @@ class TestAllGreateEqual(TestCase):
         self.assertEqual(schema.validate(d), expected)
 
 
-class TestFirstOnly(TestCase):
+class TestOptionalFirstOnly(TestCase):
     def test_first_only(self):
-        schema = FirstOnly()
-        self.assertIsNone(schema.validate([None, None]))
-        self.assertIsNone(schema.validate([1, None]))
+        schema = OptionalFirstOnly()
+        self.assertEqual(schema.validate([None, None]), [])
+        self.assertEqual(schema.validate([1, None]), [])
         self.assertEqual(
-            schema.validate([1, 1]), "Only the first value may be filled in."
+            schema.validate([1, 1]), ["Only the first value may be filled in."]
         )
 
 

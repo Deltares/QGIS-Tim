@@ -155,6 +155,21 @@ def to_script_string(data: Dict[str, Any]) -> str:
 
 
 def to_json(data: Dict[str, Any]) -> Dict[str, Any]:
+    """
+    Take the data and add:
+
+    * the TimML type
+    * the layer name
+
+    Parameters
+    ----------
+    data: Dict[str, Any]
+
+    Returns
+    -------
+    json_data: Dict[str, Any]
+        Data ready to dump to JSON.
+    """
     data = data.copy()  # avoid side-effects
     aquifer_data = data.pop("timml Aquifer:Aquifer")
     domain_data = data.pop("timml Domain:Domain")

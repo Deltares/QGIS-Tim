@@ -79,68 +79,78 @@ class ElementSchema(abc.ABC):
     timml_consistency_schemata: Tuple[Any] = ()
     ttim_schemata: Dict[str, Any] = {}
     ttim_consistency_schemata: Tuple[Any] = ()
+    timeseries_schemata: Dict[str, Any] = {}
 
-    def _validate_timml_rows(self, data, other=None):
-        errors = {}
+    @staticmethod
+    def _validate_rows(schemata, consistency_schemata, data, other=None):
+        errors = defaultdict(list)
 
-        _errors = []
-        for schema in self.timml_consistency_schemata:
+        for schema in consistency_schemata:
             _error = schema.validate(data, other)
-            if _error is not None:
-                _errors.append(_error)
-        if _errors:
-            errors["Table:"] = _errors
+            if _error:
+                errors["Table:"].append(_error)
 
         for i, row in enumerate(data):
             row_errors = defaultdict(list)
-            for variable, schema in self.timml_schemata.items():
-                _error = schema.validate(row[variable], other)
-                if _error is not None:
-                    row_errors[variable].append(_error)
+            for variable, schema in schemata.items():
+                _errors = schema.validate(row[variable], other)
+                if _errors:
+                    row_errors[variable].extend(_errors)
 
             if row_errors:
                 errors[f"Row {i + 1}:"] = row_errors
 
-        if errors:
-            return errors
-        else:
-            return None
+        return errors
 
-    def _validate_timml_table(self, data, other=None):
+    @staticmethod
+    def _validate_table(schemata, consistency_schemata, data, other=None):
         if len(data) == 0:
             return {"Table:": ["Table is empty."]}
 
         errors = defaultdict(list)
-        for variable, schema in self.timml_schemata.items():
+        for variable, schema in schemata.items():
             _errors = schema.validate(data[variable], other)
-            if _errors is not None:
+            if _errors:
                 errors[variable].extend(_errors)
 
         # The consistency schema rely on the row input being valid.
         # Hence, they are tested second.
         if not errors:
-            for schema in self.timml_consistency_schemata:
+            for schema in consistency_schemata:
                 _error = schema.validate(data, other)
                 if _error:
                     errors["Table:"].append(_error)
 
-        if errors:
-            return errors
-        else:
-            return None
+        return errors
 
-    def validate_timml(self, data, other=None) -> Dict[str, Any]:
+    @classmethod
+    def _validate(
+        cls, schemata, consistency_schemata, data, other=None
+    ) -> Dict[str, Any]:
         if isinstance(data, list):
-            return self._validate_timml_rows(data, other)
+            return cls._validate_rows(schemata, consistency_schemata, data, other)
         elif isinstance(data, dict):
-            return self._validate_timml_table(data, other)
+            return cls._validate_table(schemata, consistency_schemata, data, other)
         else:
             raise TypeError(
                 f"Data should be list or dict, received: {type(data).__name__}"
             )
 
-    def validate_ttim(self, data, other=None) -> Dict[str, List]:
-        raise NotImplementedError
+    @classmethod
+    def validate_timml(cls, data, other=None):
+        return cls._validate(
+            cls.timml_schemata, cls.timml_consistency_schemata, data, other
+        )
+
+    @classmethod
+    def validate_ttim(cls, data, other=None):
+        return cls._validate(
+            cls.ttim_schemata, cls.ttim_consistency_schemata, data, other
+        )
+
+    @classmethod
+    def validate_timeseries(cls, data, other=None):
+        return cls._validate_table(cls.timeseries_schemata, (), data, other)
 
 
 class NameDialog(QDialog):
@@ -298,18 +308,7 @@ class Element(ExtractorMixin):
     def remove_from_geopackage(self):
         geopackage.remove_layer(self.path, self.timml_name)
 
-    def on_transient_changed(self, transient: bool):
-        if len(self.transient_columns) == 0:
-            return
-
-        config = self.timml_layer.attributeTableConfig()
-        columns = config.columns()
-
-        for i, column in enumerate(columns):
-            if column.name in self.transient_columns:
-                config.setColumnHidden(i, not transient)
-
-        self.timml_layer.setAttributeTableConfig(config)
+    def on_transient_changed(self, _):
         return
 
     def to_timml(self, other=None):
@@ -319,35 +318,10 @@ class Element(ExtractorMixin):
             return errors, data
         else:
             elements = [self.process_timml_row(row) for row in data]
-            return None, elements
+            return [], elements
 
     def to_ttim(self, other=None):
-        pass
-
-    @staticmethod
-    def transient_input(row, all_timeseries, variable: str, time_start):
-        timeseries_id = row["timeseries_id"]
-        row_start = row["time_start"]
-        row_end = row["time_end"]
-        steady_value = row[variable]
-        transient_value = row[f"{variable}_transient"]
-
-        start_and_stop = (
-            row_start is not None
-            and row_end is not None
-            and transient_value is not None
-        )
-
-        if start_and_stop:
-            return [(row_start, transient_value - steady_value), (row_end, 0.0)]
-        elif timeseries_id is not None:
-            timeseries = all_timeseries[timeseries_id]
-            return [
-                (time, value - steady_value)
-                for time, value in zip(timeseries["time_start"], timeseries[variable])
-            ]
-        else:
-            return [(time_start), 0.0]
+        return self.to_timml(other)
 
     @staticmethod
     def aquifer_data(data, transient: bool):
@@ -438,6 +412,64 @@ class TransientElement(Element):
     def remove_from_geopackage(self):
         geopackage.remove_layer(self.path, self.timml_name)
         geopackage.remove_layer(self.path, self.ttim_name)
+
+    @staticmethod
+    def transient_input(row, all_timeseries, variable: str, time_start):
+        timeseries_id = row["timeseries_id"]
+        row_start = row["time_start"]
+        row_end = row["time_end"]
+        steady_value = row[variable]
+        transient_value = row[f"{variable}_transient"]
+
+        start_and_stop = (
+            row_start is not None
+            and row_end is not None
+            and transient_value is not None
+        )
+
+        if timeseries_id is not None:
+            timeseries = all_timeseries[timeseries_id]
+            return [
+                (time, value - steady_value)
+                for time, value in zip(timeseries["time_start"], timeseries[variable])
+            ]
+        elif start_and_stop:
+            return [(row_start, transient_value - steady_value), (row_end, 0.0)]
+        else:
+            return [(time_start), 0.0]
+
+    def on_transient_changed(self, transient: bool):
+        if len(self.transient_columns) == 0:
+            return
+
+        config = self.timml_layer.attributeTableConfig()
+        columns = config.columns()
+
+        for i, column in enumerate(columns):
+            if column.name in self.transient_columns:
+                config.setColumnHidden(i, not transient)
+
+        self.timml_layer.setAttributeTableConfig(config)
+        return
+
+    def to_ttim(self, other=None):
+        # Check timml input and timeseries input first.
+        timml_errors, data = self.to_timml(other)
+        timeseries = self.table_to_dict(self.ttim_layer)
+        timeseries_errors = self.schema.validate_timeseries(timeseries)
+        errors = timml_errors + timeseries_errors
+        if errors:
+            return errors, None
+
+        other = other.copy()
+        other["timeseries_ids"] = [row["timeseries_id"] for row in timeseries]
+        errors = self.schema.validate_ttim(data, other)
+        if errors:
+            return errors, None
+
+        grouped = self.groupby(timeseries, "timeseries_id")
+        elements = [self.process_ttim_row(row, grouped) for row in data]
+        return None, elements
 
 
 class AssociatedElement(Element):

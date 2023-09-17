@@ -21,7 +21,8 @@ class ExtractorMixin(abc.ABC):
         coordinates = []
         for vertex in geometry.vertices():
             coordinates.append((vertex.x(), vertex.y()))
-        return coordinates
+        centroid = geometry.centroid().asPoint()
+        return (centroid.x(), centroid.y()), coordinates
 
     @classmethod
     def to_dict(cls, layer) -> List[Dict[str, Any]]:
@@ -31,14 +32,13 @@ class ExtractorMixin(abc.ABC):
             for key, value in data.items():
                 if value == NULL:
                     data[key] = None
-            data["geometry"] = cls.extract_coordinates(feature)
+            data["centroid"], data["geometry"] = cls.extract_coordinates(feature)
             features.append(data)
         return features
 
     def table_to_dict(cls, layer) -> Dict[str, Any]:
         features = defaultdict(list)
         for feature in layer.getFeatures():
-            features["geometry"].append(cls.extract_coordinates(feature))
             for key, value in feature.attributeMap().items():
                 if value == NULL:
                     features[key].append(None)

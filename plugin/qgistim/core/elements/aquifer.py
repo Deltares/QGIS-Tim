@@ -4,13 +4,13 @@ from qgistim.core import geopackage
 from qgistim.core.elements.element import ElementSchema, TransientElement
 from qgistim.core.schemata import (
     AllGreaterEqual,
-    AllOptional,
     AllRequired,
-    FirstOnly,
     OffsetAllRequired,
+    OptionalFirstOnly,
     Positive,
     Range,
     SemiConfined,
+    SingleRow,
     StrictlyDecreasing,
 )
 
@@ -22,8 +22,8 @@ class AquiferSchema(ElementSchema):
         "aquifer_bottom": AllRequired(StrictlyDecreasing()),
         "aquitard_c": OffsetAllRequired(Positive()),
         "aquifer_k": AllRequired(Positive()),
-        "semiconf_top": AllOptional(FirstOnly()),
-        "semiconf_head": AllOptional(FirstOnly()),
+        "semiconf_top": OptionalFirstOnly(),
+        "semiconf_head": OptionalFirstOnly(),
     }
     timml_consistency_schemata = (
         SemiConfined(),
@@ -33,6 +33,7 @@ class AquiferSchema(ElementSchema):
         "aquitard_s": OffsetAllRequired(Positive()),
         "aquifer_s": AllRequired(Positive()),
     }
+    ttim_consistency_schemata = (SingleRow(),)
 
 
 class Aquifer(TransientElement):
@@ -53,16 +54,12 @@ class Aquifer(TransientElement):
     ]
     ttim_attributes = (
         QgsField("time_min", QVariant.Double),
-        QgsField("time_max", QVariant.Double),
-        QgsField("time_start", QVariant.Double),
-        QgsField("stehfest_M", QVariant.Int),
+        QgsField("laplace_inversion_M", QVariant.Int),
         QgsField("reference_date", QVariant.DateTime),
     )
     ttim_defaults = {
         "time_min": QgsDefaultValue("0.01"),
-        "time_max": QgsDefaultValue("10.0"),
-        "time_start": QgsDefaultValue("0.0"),
-        "stehfest_M": QgsDefaultValue("10"),
+        "laplace_inversion_M": QgsDefaultValue("10"),
     }
     transient_columns = (
         "aquitard_s",

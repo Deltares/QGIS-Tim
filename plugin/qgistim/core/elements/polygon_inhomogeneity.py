@@ -4,11 +4,10 @@ from qgistim.core.elements.colors import GREY, TRANSPARENT_GREY
 from qgistim.core.elements.element import AssociatedElement, ElementSchema
 from qgistim.core.schemata import (
     AllGreaterEqual,
-    AllOptional,
     AllRequired,
-    FirstOnly,
     Membership,
     OffsetAllRequired,
+    OptionalFirstOnly,
     Positive,
     Range,
     Required,
@@ -33,8 +32,8 @@ class AssociatedPolygonInhomogeneitySchema(ElementSchema):
         "aquifer_bottom": AllRequired(StrictlyDecreasing()),
         "aquitard_c": OffsetAllRequired(Positive()),
         "aquifer_k": AllRequired(Positive()),
-        "semiconf_top": AllOptional(FirstOnly()),
-        "semiconf_head": AllOptional(FirstOnly()),
+        "semiconf_top": OptionalFirstOnly(),
+        "semiconf_head": OptionalFirstOnly(),
     }
     timml_consistency_schemata = (
         SemiConfined(),

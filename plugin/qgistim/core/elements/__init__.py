@@ -5,6 +5,7 @@ from typing import List, Tuple
 
 from qgistim.core import geopackage
 from qgistim.core.elements.aquifer import Aquifer
+from qgistim.core.elements.circular_area_sink import CircularAreaSink
 from qgistim.core.elements.constant import Constant
 from qgistim.core.elements.domain import Domain
 from qgistim.core.elements.element import Element
@@ -28,8 +29,14 @@ ELEMENTS = {
         HeadWell,
         HeadLineSink,
         LineSinkDitch,
-        LeakyLineDoublet,
+        CircularAreaSink,
         ImpermeableLineDoublet,
+        LeakyLineDoublet,
+        # PolygonAreaSink,
+        # PolygonSemiConfinedTop,
+        # PolygonInhomogeneity,
+        # BuildingPit,
+        # LeakyBuildingPit,
         Observation,
     )
 }

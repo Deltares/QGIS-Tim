@@ -4,7 +4,14 @@ from PyQt5.QtCore import QVariant
 from qgis.core import QgsDefaultValue, QgsField, QgsSingleSymbolRenderer
 from qgistim.core.elements.colors import BLUE
 from qgistim.core.elements.element import ElementSchema, TransientElement
-from qgistim.core.schemata import AllOrNone, Membership, NotBoth, Positive, Required
+from qgistim.core.schemata import (
+    AllOrNone,
+    AllRequired,
+    Membership,
+    NotBoth,
+    Positive,
+    Required,
+)
 
 
 class HeadWellSchema(ElementSchema):
@@ -18,6 +25,11 @@ class HeadWellSchema(ElementSchema):
         AllOrNone(("time_start", "time_end", "head_transient")),
         NotBoth("time_start", "timeseries_id"),
     )
+    timeseries_schemata = {
+        "timeseries_id": AllRequired(),
+        "time_start": AllRequired(Positive()),
+        "head": AllRequired(),
+    }
 
 
 class HeadWell(TransientElement):

@@ -15,12 +15,12 @@ class TestAquiferSchema(TestCase):
             "semiconf_top": [None],
             "semiconf_head": [None],
         }
-        self.assertIsNone(schema.validate_timml(data))
+        self.assertEqual(schema.validate_timml(data), {})
 
     def test_validate_empty(self):
         schema = AquiferSchema()
         data = {}
-        self.assertEqual(schema.validate_timml(data), {"table": ["Table is empty."]})
+        self.assertEqual(schema.validate_timml(data), {"Table:": ["Table is empty."]})
 
     def test_validate_two_layer(self):
         schema = AquiferSchema()
@@ -33,7 +33,7 @@ class TestAquiferSchema(TestCase):
             "semiconf_top": [None],
             "semiconf_head": [None],
         }
-        self.assertIsNone(schema.validate_timml(data))
+        self.assertEqual(schema.validate_timml(data), {})
 
     def test_validate_two_layer_invalid(self):
         schema = AquiferSchema()
@@ -61,7 +61,7 @@ class TestAquiferSchema(TestCase):
             "semiconf_head": [None],
         }
         expected = {
-            "table": [
+            "Table:": [
                 "aquifer_top is not greater or equal to aquifer_bottom at row(s): 1, 2"
             ]
         }

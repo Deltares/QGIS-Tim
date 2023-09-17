@@ -10,12 +10,15 @@ from qgis.core import (
 )
 from qgistim.core.elements.colors import BLACK
 from qgistim.core.elements.element import ElementSchema, TransientElement
-from qgistim.core.schemata import Required, SingleRow
+from qgistim.core.schemata import AllRequired, Positive, Required, SingleRow
 
 
 class DomainSchema(ElementSchema):
     timml_schemata = {"geometry": Required()}
     timml_consistency_schemata = (SingleRow(),)
+    timeseries_schemata = {
+        "time": AllRequired(Positive()),
+    }
 
 
 class Domain(TransientElement):

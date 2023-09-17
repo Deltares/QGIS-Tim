@@ -2,12 +2,16 @@ from PyQt5.QtCore import QVariant
 from qgis.core import QgsDefaultValue, QgsField, QgsSingleSymbolRenderer
 from qgistim.core.elements.colors import LIGHT_BLUE
 from qgistim.core.elements.element import ElementSchema, TransientElement
-from qgistim.core.schemata import Required
+from qgistim.core.schemata import AllRequired, Positive, Required
 
 
 class ObservationSchema(ElementSchema):
     timml_schemata = {
         "geometry": Required(),
+    }
+    timeseries_schemata = {
+        "timeseries_id": AllRequired(),
+        "time": AllRequired(Positive()),
     }
 
 
