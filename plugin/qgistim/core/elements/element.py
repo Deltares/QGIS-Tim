@@ -80,6 +80,7 @@ from qgistim.core.schemata import (
 
 
 class ElementSchema(abc.ABC):
+    # TODO: check for presence of columns
     timml_schemata: Dict[str, SchemaContainer | IterableSchemaContainer] = {}
     timml_consistency_schemata: Tuple[ConsistencySchema] = ()
     ttim_schemata: Dict[str, SchemaContainer | IterableSchemaContainer] = {}
@@ -375,8 +376,6 @@ class Element(ExtractorMixin):
 
         if "resistance" in data:
             aquifer["res"] = data["resistance"][0]
-        if "rate" in data:
-            aquifer["N"] = data["rate"][0]
 
         return aquifer
 
@@ -462,12 +461,12 @@ class TransientElement(Element):
         timml_errors, data = self.to_timml(other)
         timeseries = self.table_to_dict(self.ttim_layer)
         timeseries_errors = self.schema.validate_timeseries(timeseries)
-        errors = timml_errors + timeseries_errors
+        errors = {**timml_errors, **timeseries_errors}
         if errors:
             return errors, None
 
         other = other.copy()
-        other["timeseries_ids"] = [row["timeseries_id"] for row in timeseries]
+        other["timeseries_ids"] = set([row["timeseries_id"] for row in timeseries])
         errors = self.schema.validate_ttim(data, other)
         if errors:
             return errors, None
@@ -514,3 +513,22 @@ class AssociatedElement(Element):
     def remove_from_geopackage(self):
         geopackage.remove_layer(self.path, self.timml_name)
         geopackage.remove_layer(self.path, self.assoc_name)
+
+    def to_timml(self, other):
+        properties = self.table_to_dict(self.assoc_layer)
+        errors = self.assoc_schema.validate_timml(properties)
+        if errors:
+            return errors, None
+
+        other = other.copy()
+        other["inhomogeneity_ids"] = set([row["timeseries_id"] for row in properties])
+        errors, data = super().to_timml(other)
+        if errors:
+            return errors, None
+
+        grouped = self.groupby(properties, "inhomogeneity_id")
+        elements = [self.process_timml_row(row, grouped) for row in data]
+        return None, elements
+
+    def to_ttim(self, _):
+        raise NotImplementedError(f"{type(self).__name__} is not supported in TTim.")

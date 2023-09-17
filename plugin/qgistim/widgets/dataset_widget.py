@@ -216,7 +216,9 @@ class DatasetTreeWidget(QTreeWidget):
         if _errors:
             errors[name] = _errors
         else:
-            data[name] = aquifer.aquifer_data(raw_data, transient=False)
+            aquifer_data = aquifer.aquifer_data(raw_data, transient=False)
+            data[name] = aquifer_data
+            other["global_aquifer"] = aquifer_data
 
         for name, element in elements.items():
             _errors, _data = element.to_timml(other)

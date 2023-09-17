@@ -1,3 +1,5 @@
+from typing import Any, Dict
+
 from PyQt5.QtCore import QVariant
 from qgis.core import QgsDefaultValue, QgsField, QgsSingleSymbolRenderer
 from qgistim.core.elements.colors import GREY, TRANSPARENT_GREY
@@ -34,14 +36,12 @@ class AssociatedPolygonInhomogeneitySchema(ElementSchema):
         "aquifer_k": AllRequired(Positive()),
         "semiconf_top": OptionalFirstOnly(),
         "semiconf_head": OptionalFirstOnly(),
+        "rate": OptionalFirstOnly(),
     }
     timml_consistency_schemata = (
         SemiConfined(),
         AllGreaterEqual("aquifer_top", "aquifer_bottom"),
     )
-
-
-# TODO: each group should have equal length
 
 
 class PolygonInhomogeneity(AssociatedElement):
@@ -101,22 +101,11 @@ class PolygonInhomogeneity(AssociatedElement):
         self.assoc_layer.setAttributeTableConfig(config)
         return
 
-    def to_timml(self):
-        data = self.to_dict(self.timml_layer)
-        assoc_data = self.table_to_dict(self.assoc_layer)
-        timml_errors = self.schema.validate_timml(data)
-        assoc_errors = self.assoc_schema.validate_timml(assoc_data)
-        errors = {**timml_errors, **assoc_errors}
-        if errors:
-            return errors, None
-        else:
-            grouped = self.groupby(assoc_data, "inhomogeneity_id")
-            inhoms = []
-            for row in data:
-                inhom_id = row["inhomogeneity_id"]
-                kwargs = self._aquifer_data(grouped[inhom_id])
-                kwargs["xy"] = self._polygon_xy(row)
-                kwargs["order"] = row["order"]
-                kwargs["ndeg"] = row["ndegrees"]
-                inhoms.append(kwargs)
-            return inhoms
+    def process_timml_row(self, row: Dict[str, Any], grouped: Dict[int, Any]):
+        inhom_id = row["inhomogeneity_id"]
+        return {
+            "xy": self._polygon_xy(row),
+            "order": row["order"],
+            "ndeg": row["ndegrees"],
+            **self._aquifer_data(grouped[inhom_id]),
+        }
