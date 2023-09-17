@@ -72,14 +72,19 @@ from qgis.core import (
 )
 from qgistim.core import geopackage
 from qgistim.core.extractor import ExtractorMixin
+from qgistim.core.schemata import (
+    ConsistencySchema,
+    IterableSchemaContainer,
+    SchemaContainer,
+)
 
 
 class ElementSchema(abc.ABC):
-    timml_schemata: Dict[str, Any] = {}
-    timml_consistency_schemata: Tuple[Any] = ()
-    ttim_schemata: Dict[str, Any] = {}
-    ttim_consistency_schemata: Tuple[Any] = ()
-    timeseries_schemata: Dict[str, Any] = {}
+    timml_schemata: Dict[str, SchemaContainer | IterableSchemaContainer] = {}
+    timml_consistency_schemata: Tuple[ConsistencySchema] = ()
+    ttim_schemata: Dict[str, SchemaContainer | IterableSchemaContainer] = {}
+    ttim_consistency_schemata: Tuple[ConsistencySchema] = ()
+    timeseries_schemata: Dict[str, SchemaContainer | IterableSchemaContainer] = {}
 
     @staticmethod
     def _validate_rows(schemata, consistency_schemata, data, other=None):

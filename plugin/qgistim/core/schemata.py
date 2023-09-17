@@ -43,6 +43,10 @@ class BaseSchema(abc.ABC):
         return errors
 
 
+class ConsistencySchema(BaseSchema, abc.ABC):
+    pass
+
+
 class IterableSchema(abc.ABC):
     """Base class for collection of values."""
 
@@ -281,7 +285,7 @@ class AllGreaterEqual(IterableSchema):
 # Consistency schemata
 
 
-class SemiConfined(BaseSchema):
+class SemiConfined(ConsistencySchema):
     def validate(self, data, _=None) -> MaybeError:
         semiconf_data = {
             "aquitard_c": data["aquitard_c"][0],
@@ -303,7 +307,7 @@ class SemiConfined(BaseSchema):
         return None
 
 
-class SingleRow(BaseSchema):
+class SingleRow(ConsistencySchema):
     def validate(self, data, _=None) -> MaybeError:
         if len(data) != 1:
             return "Table may contain only one row."
