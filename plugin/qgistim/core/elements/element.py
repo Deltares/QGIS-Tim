@@ -53,7 +53,8 @@ when it has no features.
 
 import abc
 from collections import defaultdict
-from typing import Any, Dict, List, Tuple
+from copy import deepcopy
+from typing import Any, Dict, List, Tuple, Union
 
 from PyQt5.QtWidgets import (
     QDialog,
@@ -81,11 +82,11 @@ from qgistim.core.schemata import (
 
 class ElementSchema(abc.ABC):
     # TODO: check for presence of columns
-    timml_schemata: Dict[str, SchemaContainer | IterableSchemaContainer] = {}
+    timml_schemata: Dict[str, Union[SchemaContainer, IterableSchemaContainer]] = {}
     timml_consistency_schemata: Tuple[ConsistencySchema] = ()
-    ttim_schemata: Dict[str, SchemaContainer | IterableSchemaContainer] = {}
+    ttim_schemata: Dict[str, Union[SchemaContainer, IterableSchemaContainer]] = {}
     ttim_consistency_schemata: Tuple[ConsistencySchema] = ()
-    timeseries_schemata: Dict[str, SchemaContainer | IterableSchemaContainer] = {}
+    timeseries_schemata: Dict[str, Union[SchemaContainer, IterableSchemaContainer]] = {}
 
     @staticmethod
     def _validate_rows(schemata, consistency_schemata, data, other=None):
@@ -180,7 +181,7 @@ class NameDialog(QDialog):
         self.setLayout(layout)
 
 
-class Element(ExtractorMixin):
+class Element(ExtractorMixin, abc.ABC):
     """
     Abstract base class for "ordinary" timml elements.
     """
@@ -317,13 +318,24 @@ class Element(ExtractorMixin):
     def on_transient_changed(self, _):
         return
 
+    @staticmethod
+    def groupby(data: Dict[str, Any], key: str):
+        # TODO: sort by layer or time?
+        data = deepcopy(data)
+        grouper = data.pop(key)
+        grouped = {k: defaultdict(list) for k in grouper}
+        for key, values in data.items():
+            for groupkey, value in zip(grouper, values):
+                grouped[groupkey][key].append(value)
+        return grouped
+
     def to_timml(self, other=None):
         data = self.to_dict(self.timml_layer)
         errors = self.schema.validate_timml(data, other)
         if errors:
             return errors, data
         else:
-            elements = [self.process_timml_row(row) for row in data]
+            elements = [self.process_timml_row(row=row, other=other) for row in data]
             return [], elements
 
     def to_ttim(self, other=None):
@@ -334,6 +346,7 @@ class Element(ExtractorMixin):
         def interleave(a, b):
             return [value for pair in zip(a, b) for value in pair]
 
+        data = deepcopy(data)  # Avoid side-effects
         hstar = data["semiconf_head"][0]
         semiconfined = (
             data["aquitard_c"][0] is not None
@@ -357,7 +370,8 @@ class Element(ExtractorMixin):
             z.pop(0)
             c.pop(0)
             porosity.pop(0)
-            s_aquitard.pop(0)
+            if transient:
+                s_aquitard.pop(0)
 
         aquifer = {
             "kaq": kaq,
@@ -380,7 +394,7 @@ class Element(ExtractorMixin):
         return aquifer
 
 
-class TransientElement(Element):
+class TransientElement(Element, abc.ABC):
     """
     Abstract base class for transient (ttim) elements.
     """
@@ -476,7 +490,7 @@ class TransientElement(Element):
         return None, elements
 
 
-class AssociatedElement(Element):
+class AssociatedElement(Element, abc.ABC):
     """
     Abstract class for elements that require associated tables such as
     Inhomogenities.
@@ -520,14 +534,15 @@ class AssociatedElement(Element):
         if errors:
             return errors, None
 
-        other = other.copy()
-        other["inhomogeneity_ids"] = set([row["timeseries_id"] for row in properties])
-        errors, data = super().to_timml(other)
+        other = other.copy()  # Avoid side-effects
+        other["properties inhomogeneity_id"] = list(set(properties["inhomogeneity_id"]))
+        data = self.to_dict(self.timml_layer)
+        errors = self.schema.validate_timml(data, other)
         if errors:
             return errors, None
 
         grouped = self.groupby(properties, "inhomogeneity_id")
-        elements = [self.process_timml_row(row, grouped) for row in data]
+        elements = [self.process_timml_row(row=row, grouped=grouped) for row in data]
         return None, elements
 
     def to_ttim(self, _):

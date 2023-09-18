@@ -163,13 +163,18 @@ def compute(args) -> None:
     with open(jsonpath, "r") as f:
         data = json.loads(f.read())
 
-    gistim.compute(
-        inpath=data["inpath"],
-        outpath=data["outpath"],
-        cellsize=data["cellsize"],
-        mode=data["mode"],
-        active_elements=data["active_elements"],
-    )
+    if data["mode"] == "steady-state":
+        gistim.compute_steady(
+            inpath=data["inpath"],
+            outpath=data["outpath"],
+        )
+    elif data["mode"] == "transient":
+        gistim.compute_transient(
+            inpath=data["inpath"],
+            outpath=data["outpath"],
+        )
+    else:
+        raise ValueError("Mode should be transient or steady-state.")
     return
 
 

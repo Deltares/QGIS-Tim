@@ -71,7 +71,7 @@ class HeadLineSink(TransientElement):
     def renderer(self) -> QgsSingleSymbolRenderer:
         return self.line_renderer(color=BLUE, width="0.75")
 
-    def process_timml_row(self, row):
+    def process_timml_row(self, row, other=None):
         return {
             "xy": self.linestring_xy(row),
             "hls": row["head"],

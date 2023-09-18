@@ -69,7 +69,7 @@ class CircularAreaSink(TransientElement):
             color=TRANSPARENT_GREEN, color_border=GREEN, width_border="0.75"
         )
 
-    def process_timml_row(self, row) -> Dict[str, Any]:
+    def process_timml_row(self, row, other=None) -> Dict[str, Any]:
         # Take the first vertex.
         x, y = self.point_xy(row)
         # Compare with the centroid to derive radius.

@@ -99,13 +99,25 @@ class IterableSchemaContainer(abc.ABC):
 
 
 class OptionalFirstOnly(SchemaContainer):
-    """Exclusively the first value must be provided."""
+    """Exclusively the first value may be provided."""
 
     def validate(self, data, other=None) -> ErrorList:
         if any(v is not None for v in data[1:]):
             return ["Only the first value may be filled in."]
         elif data[0] is None:
             return []
+        else:
+            return self._validate_schemata(data[0], other)
+
+
+class RequiredFirstOnly(SchemaContainer):
+    """Exclusively the first value must be provided."""
+
+    def validate(self, data, other=None) -> ErrorList:
+        if data[0] is None:
+            return ["The first value must be filled in."]
+        elif any(v is not None for v in data[1:]):
+            return ["Only the first value may be filled in."]
         else:
             return self._validate_schemata(data[0], other)
 
@@ -185,6 +197,8 @@ class NotBoth(BaseSchema):
         self.y = y
 
     def validate(self, data, _=None) -> MaybeError:
+        print(data[self.x])
+        print(data[self.y])
         if (data[self.x] is not None) and (data[self.y] is not None):
             return f"Either {self.x} or {self.y} should be provided, not both."
         return None
@@ -304,6 +318,9 @@ class SemiConfined(ConsistencySchema):
         semitop = data["semiconf_top"][0]
         if semitop is not None and semitop <= data["aquifer_top"][0]:
             return "semiconf_top must be greater than first aquifer_top."
+        if "rate" in data:
+            if data["rate"][0] is not None and semitop:
+                return "A rate cannot be given when a semi-confined is enabled."
         return None
 
 

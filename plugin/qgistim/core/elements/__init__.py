@@ -5,6 +5,7 @@ from typing import List, Tuple
 
 from qgistim.core import geopackage
 from qgistim.core.elements.aquifer import Aquifer
+from qgistim.core.elements.building_pit import BuildingPit
 from qgistim.core.elements.circular_area_sink import CircularAreaSink
 from qgistim.core.elements.constant import Constant
 from qgistim.core.elements.domain import Domain
@@ -12,9 +13,13 @@ from qgistim.core.elements.element import Element
 from qgistim.core.elements.head_line_sink import HeadLineSink
 from qgistim.core.elements.headwell import HeadWell
 from qgistim.core.elements.impermeable_line_doublet import ImpermeableLineDoublet
+from qgistim.core.elements.leaky_building_pit import LeakyBuildingPit
 from qgistim.core.elements.leaky_line_doublet import LeakyLineDoublet
 from qgistim.core.elements.line_sink_ditch import LineSinkDitch
 from qgistim.core.elements.observation import Observation
+from qgistim.core.elements.polygon_area_sink import PolygonAreaSink
+from qgistim.core.elements.polygon_inhomogeneity import PolygonInhomogeneity
+from qgistim.core.elements.polygon_semi_confined_top import PolygonSemiConfinedTop
 from qgistim.core.elements.uniform_flow import UniformFlow
 from qgistim.core.elements.well import Well
 
@@ -32,11 +37,11 @@ ELEMENTS = {
         CircularAreaSink,
         ImpermeableLineDoublet,
         LeakyLineDoublet,
-        # PolygonAreaSink,
-        # PolygonSemiConfinedTop,
-        # PolygonInhomogeneity,
-        # BuildingPit,
-        # LeakyBuildingPit,
+        PolygonAreaSink,
+        PolygonSemiConfinedTop,
+        PolygonInhomogeneity,
+        BuildingPit,
+        LeakyBuildingPit,
         Observation,
     )
 }
@@ -62,7 +67,7 @@ def parse_name(layername: str) -> Tuple[str, str, str]:
         "Temporal Settings": "Aquifer",
         "Polygon Inhomogeneity Properties": "Polygon Inhomogeneity",
         "Building Pit Properties": "Building Pit",
-        "Leaky Building Pit Properties": "Building Pit",
+        "Leaky Building Pit Properties": "Leaky Building Pit",
     }
     element_type = mapping.get(element_type, element_type)
     if "timml" in prefix:

@@ -31,9 +31,9 @@ from PyQt5.QtWidgets import (
     QVBoxLayout,
     QWidget,
 )
-from qgis.core import QgsApplication, QgsProject, QgsTask
+from qgis.core import Qgis, QgsProject
 from qgistim.core.elements import Aquifer, Domain, load_elements_from_geopackage
-from qgistim.core.task import BaseServerTask
+from qgistim.core.formatting import to_json, to_script_string
 from qgistim.widgets.error_window import ValidationDialog
 
 SUPPORTED_TTIM_ELEMENTS = set(
@@ -52,12 +52,6 @@ SUPPORTED_TTIM_ELEMENTS = set(
         "Observation",
     ]
 )
-
-
-class ConvertTask(BaseServerTask):
-    @property
-    def task_description(self):
-        return "converting GeoPackage to Python script"
 
 
 class DatasetTreeWidget(QTreeWidget):
@@ -212,20 +206,30 @@ class DatasetTreeWidget(QTreeWidget):
         name = "timml Aquifer:Aquifer"
         aquifer = elements.pop(name)
         _errors, raw_data = aquifer.to_timml()
-        other = {"aquifer layers": raw_data["layer"]}
+        other = {"aquifer layers": raw_data["layer"], "global_aquifer": raw_data}
         if _errors:
             errors[name] = _errors
         else:
             aquifer_data = aquifer.aquifer_data(raw_data, transient=False)
             data[name] = aquifer_data
-            other["global_aquifer"] = aquifer_data
 
         for name, element in elements.items():
-            _errors, _data = element.to_timml(other)
-            if _errors:
-                errors[name] = _errors
-            else:
-                data[name] = _data
+            try:
+                _errors, _data = element.to_timml(other)
+                if _errors:
+                    errors[name] = _errors
+                elif _data:  # skip empty tables
+                    data[name] = _data
+            except RuntimeError as e:
+                if (
+                    e.args[0]
+                    == "wrapped C/C++ object of type QgsVectorLayer has been deleted"
+                ):
+                    # Delay of Qt garbage collection to blame?
+                    pass
+                else:
+                    raise e
+
         return errors, data
 
 
@@ -235,7 +239,6 @@ class DatasetWidget(QWidget):
         self.parent = parent
         self.dataset_tree = DatasetTreeWidget()
         self.start_task = None
-        self.convert_task = None
         self.dataset_tree.setSizePolicy(QSizePolicy.Preferred, QSizePolicy.Expanding)
         self.dataset_line_edit = QLineEdit()
         self.dataset_line_edit.setEnabled(False)  # Just used as a viewing port
@@ -252,7 +255,7 @@ class DatasetWidget(QWidget):
         self.remove_button.clicked.connect(self.remove_geopackage_layer)
         self.add_button.clicked.connect(self.add_selection_to_qgis)
         self.convert_button = QPushButton("Convert GeoPackage to Python script")
-        self.convert_button.clicked.connect(self.convert_to_json)
+        self.convert_button.clicked.connect(self.convert_to_python)
         # Layout
         dataset_layout = QVBoxLayout()
         dataset_row = QHBoxLayout()
@@ -279,7 +282,6 @@ class DatasetWidget(QWidget):
     def reset(self):
         # Set state back to defaults
         self.start_task = None
-        self.convert_task = None
         self.dataset_line_edit.setText("")
         self.dataset_tree.reset()
         return
@@ -333,8 +335,6 @@ class DatasetWidget(QWidget):
         self.dataset_tree.sortByColumn(0, Qt.SortOrder.AscendingOrder)
         self.parent.toggle_element_buttons(True)
         self.parent.on_transient_changed()
-        return
-
         return
 
     def new_geopackage(self) -> None:
@@ -446,52 +446,52 @@ class DatasetWidget(QWidget):
         self.parent.set_interpreter_interaction(value)
         return
 
-    def convert(self) -> None:
-        outpath, _ = QFileDialog.getSaveFileName(self, "Select file", "", "*.py")
-        if outpath == "":  # Empty string in case of cancel button press
-            return
-
-        data = {
-            "operation": "convert",
-            "inpath": self.path,
-            "outpath": outpath,
-        }
-        self.convert_task = ConvertTask(self, data, self.parent.message_bar)
-        self.start_task = self.parent.start_interpreter_task()
-        if self.start_task is not None:
-            self.convert_task.addSubTask(
-                self.start_task, [], QgsTask.ParentDependsOnSubTask
-            )
-
-        self.parent.set_interpreter_interaction(False)
-        QgsApplication.taskManager().addTask(self.convert_task)
-        return
-
-    def convert_to_json(self) -> None:
+    def _convert(self, transient: bool) -> None:
         if self.validation_dialog:
             self.validation_dialog.close()
             self.validation_dialog = None
 
-        outpath, _ = QFileDialog.getSaveFileName(self, "Select file", "", "*.py")
-        if outpath == "":  # Empty string in case of cancel button press
-            return
-
         errors, data = self.dataset_tree.convert_to_timml()
         if errors:
             self.validation_dialog = ValidationDialog(errors)
+            return None
+
+        return data
+
+    def convert_to_python(self, transient: bool) -> None:
+        outpath, _ = QFileDialog.getSaveFileName(self, "Select file", "", "*.py")
+        if outpath == "":  # Empty string in case of cancel button press
+            return
+        data = self._convert(transient=transient)
+        if data is None:
             return
 
-        # TODO
-        data["timml Domain:Domain"][
-            "cellsize"
-        ] = self.parent.compute_widget.cellsize_spin_box.value()
+        script = to_script_string(data)
+        with open(outpath, "w") as f:
+            f.write(script)
 
-        from qgistim.core.formatting import to_json, to_script_string
+        self.parent.message_bar.pushMessage(
+            title="Info",
+            text=f"Converted geopackage to Python script: {outpath}",
+            level=Qgis.Info,
+        )
+        return
 
-        to_python = to_script_string(data)
-        print(to_python)
+    def convert_to_json(self, path: str, cellsize: float, transient: bool) -> None:
+        data = self._convert(transient=transient)
+        if data is None:
+            return
 
-        json_data = to_json(data)
-        json_string = json.dumps(json_data, indent=4)
-        print(json_string)
+        json_data = to_json(data, cellsize=cellsize)
+        # Collect EPSG code.
+        # TODO: use toWkt() instead?
+        json_data["crs"] = self.parent.crs.authid()
+        with open(path, "w") as fp:
+            json.dump(json_data, fp=fp, indent=4)
+
+        self.parent.message_bar.pushMessage(
+            title="Info",
+            text=f"Converted geopackage to JSON: {path}",
+            level=Qgis.Info,
+        )
         return

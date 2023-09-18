@@ -71,7 +71,7 @@ class LineSinkDitch(TransientElement):
     def renderer(self) -> QgsSingleSymbolRenderer:
         return self.line_renderer(color=GREEN, width="0.75")
 
-    def process_timml_row(self, row):
+    def process_timml_row(self, row, other=None):
         return {
             "xy": self.linestring_xy(row),
             "Qls": row["discharge"],

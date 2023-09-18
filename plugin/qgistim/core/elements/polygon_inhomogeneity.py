@@ -8,6 +8,7 @@ from qgistim.core.schemata import (
     AllGreaterEqual,
     AllRequired,
     Membership,
+    NotBoth,
     OffsetAllRequired,
     OptionalFirstOnly,
     Positive,
@@ -18,9 +19,9 @@ from qgistim.core.schemata import (
 )
 
 
-class PolygonInhomgeneitySchema(ElementSchema):
+class PolygonInhomogeneitySchema(ElementSchema):
     timml_schemata = {
-        "inhomogeneity_id": Required(Membership("inhomogeneity_id")),
+        "inhomogeneity_id": Required(Membership("properties inhomogeneity_id")),
         "order": Required(Positive()),
         "ndegrees": Required(Positive()),
     }
@@ -62,8 +63,6 @@ class PolygonInhomogeneity(AssociatedElement):
         QgsField("semiconf_top", QVariant.Double),
         QgsField("semiconf_head", QVariant.Double),
         QgsField("rate", QVariant.Double),
-        QgsField("aquitard_s", QVariant.Double),
-        QgsField("aquifer_s", QVariant.Double),
         QgsField("aquitard_npor", QVariant.Double),
         QgsField("aquifer_npor", QVariant.Double),
     ]
@@ -75,13 +74,7 @@ class PolygonInhomogeneity(AssociatedElement):
     assoc_defaults = {
         "inhomogeneity_id": QgsDefaultValue("1"),
     }
-    transient_columns = (
-        "aquitard_s",
-        "aquifer_s",
-        "aquitard_npor",
-        "aquifer_npor",
-    )
-    schema = PolygonInhomgeneitySchema()
+    schema = PolygonInhomogeneitySchema()
     assoc_schema = AssociatedPolygonInhomogeneitySchema()
 
     @property
@@ -90,22 +83,13 @@ class PolygonInhomogeneity(AssociatedElement):
             color=TRANSPARENT_GREY, color_border=GREY, width_border="0.75"
         )
 
-    def on_transient_changed(self, transient: bool):
-        config = self.assoc_layer.attributeTableConfig()
-        columns = config.columns()
-
-        for i, column in enumerate(columns):
-            if column.name in self.transient_columns:
-                config.setColumnHidden(i, not transient)
-
-        self.assoc_layer.setAttributeTableConfig(config)
-        return
-
     def process_timml_row(self, row: Dict[str, Any], grouped: Dict[int, Any]):
         inhom_id = row["inhomogeneity_id"]
+        raw_data = grouped[inhom_id]
+        aquifer_data = self.aquifer_data(raw_data, transient=False)
         return {
-            "xy": self._polygon_xy(row),
+            "xy": self.polygon_xy(row),
             "order": row["order"],
             "ndeg": row["ndegrees"],
-            **self._aquifer_data(grouped[inhom_id]),
+            **aquifer_data,
         }

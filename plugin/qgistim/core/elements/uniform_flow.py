@@ -21,6 +21,6 @@ class UniformFlow(Element):
     )
     schema = UniformFlowSchema()
 
-    def process_timml_row(self, row):
+    def process_timml_row(self, row, other=None):
         # No renaming or changes required
         return row

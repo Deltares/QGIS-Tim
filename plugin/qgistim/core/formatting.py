@@ -154,7 +154,7 @@ def to_script_string(data: Dict[str, Any]) -> str:
     return "\n".join(strings)
 
 
-def to_json(data: Dict[str, Any]) -> Dict[str, Any]:
+def to_json(data: Dict[str, Any], cellsize: float) -> Dict[str, Any]:
     """
     Take the data and add:
 
@@ -176,7 +176,7 @@ def to_json(data: Dict[str, Any]) -> Dict[str, Any]:
 
     json_data = {
         "ModelMaq": aquifer_data,
-        "headgrid": headgrid_entry(domain_data, domain_data["cellsize"]),
+        "headgrid": headgrid_entry(domain_data, cellsize),
     }
 
     for layername, element_data in data.items():

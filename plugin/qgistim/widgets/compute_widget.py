@@ -239,18 +239,17 @@ class ComputeWidget(QWidget):
         Run a TimML computation with the current state of the currently active
         GeoPackage dataset.
         """
-        active_elements = self.parent.active_elements()
         cellsize = self.cellsize_spin_box.value()
-        inpath = Path(self.parent.path).absolute()
-        outpath = Path(self.output_line_edit.text()).absolute()
-        mode = self.transient_combo_box.currentText().lower()
+        transient = self.transient_combo_box.currentText().lower()
+        is_transient = transient == "transient"
+        path = Path(self.output_line_edit.text()).absolute().with_suffix(".json")
+        self.parent.dataset_widget.convert_to_json(
+            path, cellsize=cellsize, transient=is_transient
+        )
         data = {
             "operation": "compute",
-            "inpath": str(inpath),
-            "outpath": str(outpath),
-            "cellsize": cellsize,
-            "mode": mode,
-            "active_elements": active_elements,
+            "path": str(path),
+            "mode": transient,
         }
         # import json
         # print(json.dumps(data))
@@ -264,7 +263,8 @@ class ComputeWidget(QWidget):
         # task.finished(result)
 
         # Remove the output layers from QGIS, otherwise they cannot be overwritten.
-        gpkg_path = str(outpath)
+        return
+        gpkg_path = str(path)
         for layer in QgsProject.instance().mapLayers().values():
             if Path(gpkg_path) == Path(layer.source()):
                 QgsProject.instance().removeMapLayer(layer.id())
