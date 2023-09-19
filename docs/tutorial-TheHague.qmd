@@ -48,7 +48,7 @@ title: "Tutorial The Hague building pit"
 ## Requirements
 - Be sure QGIS version 3.22.00 or higher is installed. 
 - Be sure the ``gistim`` Python package is installed (see [installation](install.qmd) for instructions). 
-- Download the tutorial material. [Follow this link.](https://deltares.thegood.cloud/s/zryWnfjT43Ryoea)
+- Download the tutorial material. <a href="https://deltares.thegood.cloud/s/JWsmtC82zZjSRx3" target="_blank">Follow this link.</a>
 - Installation of the QGIS-Tim plugin and the MOD plugin is part of this Tutorial. The necessary ZIP files are included in the tutorial material. 
 - Internet connections is optional during this Tutorial. It is only required for installation of additional plugins and the use of an online topographic background map.  
 
@@ -109,9 +109,8 @@ table {
 ||Aquifer|-60||25|0.00001|
 : Geohydrological model of the subsoil {#tbl-GeohydrologicalModelSubsoil}
 
-According to <a href="https://www.dinoloket.nl" target="_blank">DINOloket</a> the average groundwater level on site is NAP -0.5 m. There are strict demands from authorities for allowable groundwater lowering. The maximum allowed drawdown outside the construction pit is 0.1 m. <br> To perform the calculation, dewatering is schematized to 8 wells. 
+According to <a href="https://www.dinoloket.nl" target="_blank">DINO loket</a> the average groundwater level on site is NAP -0.5 m. There are strict demands from authorities for allowable groundwater lowering. The maximum allowed drawdown outside the construction pit is 0.1 m. <br> To perform the calculation, dewatering is schematized to 8 wells. **Tip: Don't place the wells in the model too close to the sheet piles.** <br>
 
-**Tip: Don't place the wells in the model too close to the sheet piles.**
 Tasks:
 
 - Which element from the Tim package would you use to place the wells and sheet piles?
@@ -165,9 +164,9 @@ This is the moment to download/import four plugins needed for this tutorial. Thi
 
 (@) Go to *Plugins* from the main menu and select *Manage and Install Plugins…* to open the plugin window. 
 (@) On the left section select *Install from ZIP*.
-(@) Click the *Browse* button (![](figures/tutorial/button-Qgis-browse.png){width=4%}) and from the tutorial dataset select the ZIP file "QGIS-Tim_Tutorial\\QGIS-iMOD-plugin.zip". 
+(@) Click the *Browse* button (![](figures/tutorial/button-Qgis-browse.png){width=4%}) and from the tutorial dataset select the ZIP file "QGIS-Tim_Tutorial-TheHague\\QGIS-iMOD-plugin.zip". 
 (@) Click *Install Plugin*.
-(@) In the same way, install the QGIS-Tim plugin using the ZIP file "QGIS-Tim_Tutorial\\QGIS-Tim-plugin.zip". 
+(@) In the same way, install the QGIS-Tim plugin using the ZIP file "QGIS-Tim_Tutorial-TheHague\\QGIS-Tim-plugin.zip". 
 
 If you have an internet connection continue with the installation of the next two plugins from the QGIS plugin library.
 
@@ -195,13 +194,13 @@ For navigation purposes, let's load a topographic map for The Netherlands from t
 > No internet connection? Follow the next steps to import a simple PNG file as a background. 
 >
 > - Go to *Layer* in the main menu, go to *Add layer* and select *Add Raster layer*.
-> - Use the *Browse* button (![](figures/tutorial/button-Qgis-browse.png){width=4%}) and from the tutorial material select “…\\QGIS-Tim_Tutorial\\dbase\\TopographicMapTheHague.png”.
+> - Use the *Browse* button (![](figures/tutorial/button-Qgis-browse.png){width=4%}) and from the tutorial material select “…\\QGIS-Tim_Tutorial-TheHague\\TopographicMapTheHague.png”.
 > - Click on *Add* and *Close* the window.
 > - If you do not see the map, select the layer "TopographicMapTheHague", click your right mouse button and select "Zoom to Layer(s)".
 > - Continue after step @continuewithoutinternet.
 
 (@) If you do have an internet connection click on the PDOK plugin button (![](figures/tutorial/button-PDOK.png){width=4%}) to open the "PDOK Services Plugin" window. 
-(@) From the tab *PDOK Services* search for "pastel" and you will find a WMTS type layer called "BTRM Achtergrondkaart WMTS". 
+(@) From the tab *PDOK Services* search for "pastel" and you will find a WMTS type layer called "BRT Achtergrondkaart WMTS". 
 (@) Select the layer.
 (@) In the section "laag toevoegen" click the button *Onder*. 
 (@) Close the PDOK window.
@@ -214,7 +213,7 @@ Our project area is in the centre of the city of The Hague so let's navigate to 
 Let's now open a shape file containing the circumference of the building location.
 
 (@) Go to *Layer* in the main menu, go to *Add layer* and select *Add Vector layer*.
-(@) Use the *Browse* button (![](figures/tutorial/button-Qgis-browse.png){width=4%}) and from the tutorial material select “…\\QGIS-Tim_Tutorial\\dbase\\building_pit.shp”.
+(@) Use the *Browse* button (![](figures/tutorial/button-Qgis-browse.png){width=4%}) and from the tutorial material select “…\\QGIS-Tim_Tutorial-TheHague\\building_pit.shp”.
 (@) Click on *Add* and *Close* the window.
 
 ![](figures/tutorial/emoji-tip.png){width=3%} **Tip:** a fast alternative for adding layers: from the menu *View > Toolbar* add the *Manage Layers Toolbar* and use the button ![](figures/tutorial/button-Qgis-VectorLayer.png){width=4%}.
@@ -226,14 +225,14 @@ Let's now open a shape file containing the circumference of the building locatio
 
 Let's save this project to be able to return to it later or in case of a crash of QGIS.
 
-(@) Go to *Project* in the main menu, select *Save As* and select a folder and a file name for your project, e.g. “…\\QGIS-Tim_Tutorial\\TheHague.qgz”
+(@) Go to *Project* in the main menu, select *Save As* and select a folder and a file name for your project, e.g. “…\\QGIS-Tim_Tutorial-TheHague\\TheHague.qgz”
 
 ### Open the QGIS-Tim panel
 Now we are ready to activate the QGIS-Tim plugin. 
 
 (@) Click on the QGIS-Tim plugin button (![](figures/tutorial/button-Qgis-tim.png){width=4%}) and the QGIS-Tim panel appears.
 (@) Go to the tab *GeoPackage*. <br> Here we will create an empty database (geopackage) to store all elements and parameters for the model. 
-(@) Click the *New* button to create the GeoPackage and save it for instance in the folder with your tutorial data, e.g. "..\\QGIS-Tim_Tutorial\\dbase\\case-TheHague.gpkg".
+(@) Click the *New* button to create the GeoPackage and save it for instance in the folder with your tutorial data, e.g. "..\\QGIS-Tim_Tutorial-TheHague\\case-TheHague.gpkg".
 
 Your window looks like in @fig-Panel-QGIS-Tim_v02.
 
@@ -252,21 +251,22 @@ If you had no introduction to the Tim plugin, read the Intermezzo below for a ge
 
 Let's save this project to be able to return to it later or in case of a crash of QGIS.
 
-(@) Go to *Project* in the main menu, select *Save As* and select a folder and a file name for your project, e.g. “…\\QGIS-Tim_Tutorial\\TheHague.qgz”
+(@) Go to *Project* in the main menu, select *Save As* and select a folder and a file name for your project, e.g. “…\\QGIS-Tim_Tutorial-TheHague\\TheHague.qgz”
 
 ## Checking available data from LHM
-We will now research what possible layer info is available from the LHM database (Landelijk hydrologisch model). Information from LHM is made available in the provided file “…\\QGIS-Tim_Tutorial\\LHM4.1-ondergrondmodel.nc". The file contains rasterdata of both the 3D geological layering within The Netherlands and the corresponding geological parameterization (permeability, resistance, thickness). 
+We will now research what possible layer info is available from the LHM database (Landelijk hydrologisch model). Information from LHM is made available in the provided file “…\\QGIS-Tim_Tutorial-TheHague\\LHM4.1-ondergrondmodel.nc". The file contains rasterdata of both the 3D geological layering within The Netherlands and the corresponding geological parameterization (permeability, resistance, thickness). 
 
 (@) In the QGIS-Tim panel go to the *Extract* tab. 
-(@) Open the file "..\\QGIS-Tim_Tutorial\\dbase\\LHM4.1-ondergrondmodel.nc" (this may take a minute because the file is 350 MB). 
+(@) Open the file "..\\QGIS-Tim_Tutorial-TheHague\\LHM4.1-ondergrondmodel.nc" (this may take a minute because the file is 350 MB). 
 (@) Click the button *Select by Polygon* and draw a large polygon (> 250x250m) to select the area around the building location between *Parkstraat* and *Oranjestraat* (see @fig-TheHagueCityCentre). Left-click several times and close the polygon with a right click.  
-(@) Then click the *Extract* button and save the extracted subsoil data to a CSV file, e.g. "Ex2DH.csv". <br> A separate python window is opened and the selection is performed. You can follow the progress in your tool bar. 
+(@) Then click the *Extract* button and save the extracted subsoil data to a CSV file, e.g. "Ex2DH.csv". 
+(@) A separate python window is opened and the selection is performed. You can follow the progress in your tool bar. There is no message indicating the process has ended. Just ignore the black screen and continue with the next step.
 
 > ![](figures/tutorial/figure_ExtractionError.png){width=90% #fig-figure_ExtractionError} <br> QGIS displays this error message in case your polygon is too small. In that case redraw your polygon for a larger area. 
 
 Automatically 2 CSV files will be created. One with average values for bottom and top of layers and aquifer permeabilities and aquitard resistances. The other contains statistics on the data. 
 
-(@) From a file manager on your laptop (e.g. Explorer) open the CVS files. 
+(@) From a file manager on your laptop (e.g. Explorer) open the CSV files. 
 
 An example of values from the first CSV are presented in @tbl-SubsoilCharacteristicsLHM. In each LHM layer the Aquitard information is positioned on top of Aquifer. 
 
