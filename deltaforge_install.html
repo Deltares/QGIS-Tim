@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>QGIS-Tim - Install</title>
+<title>QGIS-Tim - Install iMOD Python with Deltaforge</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -85,7 +85,7 @@ ul.task-list li input[type="checkbox"] {
           <div class="collapse navbar-collapse" id="navbarCollapse">
             <ul class="navbar-nav navbar-nav-scroll me-auto">
   <li class="nav-item">
-    <a class="nav-link active" href="./install.html" rel="" target="" aria-current="page">
+    <a class="nav-link" href="./install.html" rel="" target="">
  <span class="menu-text">Installation</span></a>
   </li>  
   <li class="nav-item">
@@ -115,17 +115,9 @@ ul.task-list li input[type="checkbox"] {
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#install-qgis" id="toc-install-qgis" class="nav-link active" data-scroll-target="#install-qgis">1. Install QGIS</a></li>
-  <li><a href="#install-gistim-in-a-seperate-python-environment" id="toc-install-gistim-in-a-seperate-python-environment" class="nav-link" data-scroll-target="#install-gistim-in-a-seperate-python-environment">2. Install <code>gistim</code> in a seperate Python environment</a>
-  <ul class="collapse">
-  <li><a href="#method-1-with-deltaforge-recommended" id="toc-method-1-with-deltaforge-recommended" class="nav-link" data-scroll-target="#method-1-with-deltaforge-recommended">Method 1: with Deltaforge (recommended)</a></li>
-  <li><a href="#method-2-with-miniforge" id="toc-method-2-with-miniforge" class="nav-link" data-scroll-target="#method-2-with-miniforge">Method 2: with Miniforge</a></li>
-  </ul></li>
-  <li><a href="#install-the-qgis-plugin" id="toc-install-the-qgis-plugin" class="nav-link" data-scroll-target="#install-the-qgis-plugin">3. Install the QGIS plugin</a>
-  <ul class="collapse">
-  <li><a href="#method-1-from-the-gqis-plugin-database" id="toc-method-1-from-the-gqis-plugin-database" class="nav-link" data-scroll-target="#method-1-from-the-gqis-plugin-database">Method 1: From the GQIS plugin database</a></li>
-  <li><a href="#method-2-from-zip-recommended" id="toc-method-2-from-zip-recommended" class="nav-link" data-scroll-target="#method-2-from-zip-recommended">Method 2: From Zip (recommended)</a></li>
-  </ul></li>
+  <li><a href="#what-is-deltaforge" id="toc-what-is-deltaforge" class="nav-link active" data-scroll-target="#what-is-deltaforge">What is Deltaforge?</a></li>
+  <li><a href="#installation" id="toc-installation" class="nav-link" data-scroll-target="#installation">Installation</a></li>
+  <li><a href="#using-deltaforge" id="toc-using-deltaforge" class="nav-link" data-scroll-target="#using-deltaforge">Using Deltaforge</a></li>
   </ul>
 </nav>
     </div>
@@ -134,7 +126,7 @@ ul.task-list li input[type="checkbox"] {
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title">Install</h1>
+<h1 class="title">Install iMOD Python with Deltaforge</h1>
 </div>
 
 
@@ -149,63 +141,67 @@ ul.task-list li input[type="checkbox"] {
 
 </header>
 
-<p>QGIS-Tim consists of two parts: A QGIS plugin and the <code>gistim</code> Python package, which runs in a separate Python environment. The installation of QGIS-Tim therfore consists of three steps:</p>
-<section id="install-qgis" class="level2">
-<h2 class="anchored" data-anchor-id="install-qgis">1. Install QGIS</h2>
-<p>Download and install a recent version of QGIS (&gt;3.22): <a href="https://www.qgis.org/en/site/forusers/download.html" target="_blank">https://www.qgis.org/en/site/forusers/download.html</a></p>
+<section id="what-is-deltaforge" class="level2">
+<h2 class="anchored" data-anchor-id="what-is-deltaforge">What is Deltaforge?</h2>
+<p>Deltaforge is a python distribution which includes iMOD Python and all its dependencies. It is provided as an installer and makes installing iMOD Python easy. You can download the Deltaforge installer <a href="https://download.deltares.nl/imod-suite/">on the Deltares download portal</a>.</p>
 </section>
-<section id="install-gistim-in-a-seperate-python-environment" class="level2">
-<h2 class="anchored" data-anchor-id="install-gistim-in-a-seperate-python-environment">2. Install <code>gistim</code> in a seperate Python environment</h2>
-<p><code>gistim</code> requires a seperate Python environment, because it depends on packages incompatible with the packages in QGIS’ own Python environment. There are two approaches: either using the fully-fletched Deltaforge distribution (Recommended) or the leaner Miniforge distribution.</p>
-<section id="method-1-with-deltaforge-recommended" class="level3">
-<h3 class="anchored" data-anchor-id="method-1-with-deltaforge-recommended">Method 1: with Deltaforge (recommended)</h3>
-<ol type="1">
-<li><a href="https://download.deltares.nl/imod-suite/" target="_blank">Download and install Deltaforge</a>. <strong>Make sure you use Deltaforge version 0.3.0 or higher!</strong></li>
-<li>Open the Deltaforge prompt (search in Windows Start for "Deltaforge Prompt").</li>
-<li>Configure the gistim installation, so that the QGIS plugin is able to find it. Run: <code>python -m gistim configure</code></li>
-</ol>
+<section id="installation" class="level2">
+<h2 class="anchored" data-anchor-id="installation">Installation</h2>
+<p>To install Deltaforge, double-click the executable, this will open the installation Wizard. You will be greeted with the welcome screen.</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="figures/deltaforge/1_welcome_screen.png" class="img-fluid figure-img"></p>
+<figcaption class="figure-caption">The welcome screen</figcaption>
+</figure>
+</div>
+<p>Click "Next", and then "I agree" in the license agreement.</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="figures/deltaforge/2_license.png" class="img-fluid figure-img"></p>
+<figcaption class="figure-caption">License agreement screen</figcaption>
+</figure>
+</div>
+<p>Next, you get to decide what type of installation you want. On your local machine it suffices to select <span class="title-ref">Just me</span>. If you are an admin of a server and you want to let others enjoy the Deltaforge installation as well, click <span class="title-ref">All Users</span>.</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="figures/deltaforge/3_installation_type.png" class="img-fluid figure-img"></p>
+<figcaption class="figure-caption">The installation type screen</figcaption>
+</figure>
+</div>
+<p>Next you get to decide where the python environment is installed. The default location is usually fine.</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="figures/deltaforge/4_install_location.png" class="img-fluid figure-img"></p>
+<figcaption class="figure-caption">The location of the python installation</figcaption>
+</figure>
+</div>
+<p>Finally, some further configuration is possible. The screenshots contains the options we recommend.</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="figures/deltaforge/5_installation_options.png" class="img-fluid figure-img"></p>
+<figcaption class="figure-caption">Installation options with the recommended options selected.</figcaption>
+</figure>
+</div>
 </section>
-<section id="method-2-with-miniforge" class="level3">
-<h3 class="anchored" data-anchor-id="method-2-with-miniforge">Method 2: with Miniforge</h3>
-<ol type="1">
-<li><a href="https://github.com/conda-forge/miniforge" target="_blank">Download and install a miniforge Python installation</a></li>
-<li>Open the miniforge prompt (search in Windows Start for "Miniforge Prompt").</li>
-<li>Create a new conda environment, run: <code>conda create \--name tim python=3.9</code></li>
-<li>Activate the environment: <code>conda activate tim</code></li>
-<li>Run: <code>conda install -c conda-forge gistim</code></li>
-<li>Configure the gistim installation, so that the QGIS plugin is able to find it. Run: <code>python -m gistim configure</code></li>
-</ol>
-</section>
-</section>
-<section id="install-the-qgis-plugin" class="level2">
-<h2 class="anchored" data-anchor-id="install-the-qgis-plugin">3. Install the QGIS plugin</h2>
-<section id="method-1-from-the-gqis-plugin-database" class="level3">
-<h3 class="anchored" data-anchor-id="method-1-from-the-gqis-plugin-database">Method 1: From the GQIS plugin database</h3>
-<p><strong>NB</strong> Due to ongoing developments new features and bug fixes might not be part of this release. Consider installation method 2.</p>
-<ol type="1">
-<li>Open QGIS.</li>
-<li>At the top, find the Plugins menu (~sixth object in the menubar).</li>
-<li>Find "Manage and Install plugins" (~first object in drop-down).</li>
-<li>Find "All" (~first in left section).</li>
-<li>Search for "Qgis-Tim".</li>
-<li>Click "Install Plugin".</li>
-</ol>
-</section>
-<section id="method-2-from-zip-recommended" class="level3">
-<h3 class="anchored" data-anchor-id="method-2-from-zip-recommended">Method 2: From Zip (recommended)</h3>
-<ol type="1">
-<li>Download the "QGIS-TIM-plugin.zip" (do not unzip!) from the <a href="https://deltares.thegood.cloud/s/AefTz97ZHbWS4RT" target="_blank">iMOD-Suite download portal.</a></li>
-<li>Open QGIS.</li>
-<li>At the top, find the Plugins menu (~sixth object in the menubar).</li>
-<li>Find "Manage and Install plugins" (~first object in drop-down).</li>
-<li>Find "Install from ZIP" (~fourth in left section).</li>
-<li>Enter the path to the file "QGIS-TIM-plugin.zip".</li>
-<li>Click "Install Plugin".</li>
-</ol>
-<p>This will add an icon to the toolbar(s). <img src="figures/tutorial/button-Qgis-tim.png" class="img-fluid" style="width:6.0%"> By clicking the icon, the plugin is started. <br> The QGIS plugin automatically starts an extra window for the background calculation of a TIM model. This black window is called <em>Python.exe</em> and can be minimized or even closed after the calculation.</p>
+<section id="using-deltaforge" class="level2">
+<h2 class="anchored" data-anchor-id="using-deltaforge">Using Deltaforge</h2>
+<p>The easiest way to start your environment is by pressing the Windows Key and start typing <span class="title-ref">deltaforge</span>. This will let you select the <span class="title-ref">Deltaforge Prompt</span>. Select this.</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="figures/deltaforge/6_deltaforge_start_menu.png" class="img-fluid figure-img"></p>
+<figcaption class="figure-caption">The Deltaforge Prompt should be findable in the Windows start menu</figcaption>
+</figure>
+</div>
+<p>This will start a command prompt screen (<code>cmd.exe</code>), where at startup the Deltaforge python environment is activated.</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="figures/deltaforge/7_deltaforge_prompt.png" class="img-fluid figure-img"></p>
+<figcaption class="figure-caption">The Deltaforge prompt. You can type <code>mamba list</code> to view all the packages installed.</figcaption>
+</figure>
+</div>
+<p>To view all the packages installed in the environment you can type <code>mamba list</code> and press Enter. This will list all packages installed in the environment. If you want to start coding, you can type <code>spyder</code>, which will start Spyder, a Python scientific development environment.</p>
 
 
-</section>
 </section>
 
 </main> <!-- /main -->

@@ -6,8 +6,9 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
+<meta name="description" content="Learn how to use QGIS Tim plugin">
 
-<title>QGIS-Tim - Install</title>
+<title>QGIS-Tim -  Tutorials</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -30,6 +31,9 @@ ul.task-list li input[type="checkbox"] {
 <script src="site_libs/quarto-search/fuse.min.js"></script>
 <script src="site_libs/quarto-search/quarto-search.js"></script>
 <meta name="quarto:offset" content="./">
+<link href="./tutorial_QGIS_Tim.html" rel="next">
+<script src="site_libs/quarto-listing/list.min.js"></script>
+<script src="site_libs/quarto-listing/quarto-listing.js"></script>
 <script src="site_libs/quarto-html/quarto.js"></script>
 <script src="site_libs/quarto-html/popper.min.js"></script>
 <script src="site_libs/quarto-html/tippy.umd.min.js"></script>
@@ -39,6 +43,8 @@ ul.task-list li input[type="checkbox"] {
 <script src="site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
 <link href="site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<link href="site_libs/quarto-contrib/fontawesome6-0.1.0/all.css" rel="stylesheet">
+<link href="site_libs/quarto-contrib/fontawesome6-0.1.0/latex-fontsize.css" rel="stylesheet">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -59,12 +65,43 @@ ul.task-list li input[type="checkbox"] {
     "search-label": "Search"
   }
 }</script>
+<script>
 
+  window.document.addEventListener("DOMContentLoaded", function (_event) {
+    const listingTargetEl = window.document.querySelector('#listing-listing .list');
+    if (!listingTargetEl) {
+      // No listing discovered, do not attach.
+      return; 
+    }
+
+    const options = {
+      valueNames: ['listing-title','listing-author','listing-image','listing-description',{ data: ['index'] },{ data: ['categories'] },{ data: ['listing-date-sort'] },{ data: ['listing-file-modified-sort'] }],
+      
+      searchColumns: ["listing-title","listing-author","listing-image","listing-description"],
+    };
+
+    window['quarto-listings'] = window['quarto-listings'] || {};
+    window['quarto-listings']['listing-listing'] = new List('listing-listing', options);
+
+    if (window['quarto-listing-loaded']) {
+      window['quarto-listing-loaded']();
+    }
+  });
+
+  window.addEventListener('hashchange',() => {
+    if (window['quarto-listing-loaded']) {
+      window['quarto-listing-loaded']();
+    }
+  })
+  </script>
+
+  <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
 
 <link rel="stylesheet" href="_static/styles.css">
 </head>
 
-<body class="nav-fixed">
+<body class="nav-sidebar floating nav-fixed">
 
 <div id="quarto-search-results"></div>
   <header id="quarto-header" class="headroom fixed-top">
@@ -85,11 +122,11 @@ ul.task-list li input[type="checkbox"] {
           <div class="collapse navbar-collapse" id="navbarCollapse">
             <ul class="navbar-nav navbar-nav-scroll me-auto">
   <li class="nav-item">
-    <a class="nav-link active" href="./install.html" rel="" target="" aria-current="page">
+    <a class="nav-link" href="./install.html" rel="" target="">
  <span class="menu-text">Installation</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link" href="./tutorial.html" rel="" target="">
+    <a class="nav-link active" href="./tutorial.html" rel="" target="" aria-current="page">
  <span class="menu-text">Tutorials</span></a>
   </li>  
 </ul>
@@ -105,38 +142,62 @@ ul.task-list li input[type="checkbox"] {
           </div> <!-- /navcollapse -->
       </div> <!-- /container-fluid -->
     </nav>
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+      <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./tutorial.html"><i class="fa-solid fa-book" aria-label="book"></i> Tutorials</a></li></ol></nav>
+      <a class="flex-grow-1" role="button" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+      </a>
+    </div>
+  </nav>
 </header>
 <!-- content -->
 <div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
 <!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal sidebar-navigation floating overflow-auto">
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./tutorial.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text"><i class="fa-solid fa-book" aria-label="book"></i> Tutorials</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./tutorial_QGIS_Tim.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Tutorial Building Pit</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./tutorial_TheHague.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Tutorial The Hague building pit</span></a>
+  </div>
+</li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass"></div>
 <!-- margin-sidebar -->
     <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
-        <nav id="TOC" role="doc-toc" class="toc-active">
-    <h2 id="toc-title">On this page</h2>
-   
-  <ul>
-  <li><a href="#install-qgis" id="toc-install-qgis" class="nav-link active" data-scroll-target="#install-qgis">1. Install QGIS</a></li>
-  <li><a href="#install-gistim-in-a-seperate-python-environment" id="toc-install-gistim-in-a-seperate-python-environment" class="nav-link" data-scroll-target="#install-gistim-in-a-seperate-python-environment">2. Install <code>gistim</code> in a seperate Python environment</a>
-  <ul class="collapse">
-  <li><a href="#method-1-with-deltaforge-recommended" id="toc-method-1-with-deltaforge-recommended" class="nav-link" data-scroll-target="#method-1-with-deltaforge-recommended">Method 1: with Deltaforge (recommended)</a></li>
-  <li><a href="#method-2-with-miniforge" id="toc-method-2-with-miniforge" class="nav-link" data-scroll-target="#method-2-with-miniforge">Method 2: with Miniforge</a></li>
-  </ul></li>
-  <li><a href="#install-the-qgis-plugin" id="toc-install-the-qgis-plugin" class="nav-link" data-scroll-target="#install-the-qgis-plugin">3. Install the QGIS plugin</a>
-  <ul class="collapse">
-  <li><a href="#method-1-from-the-gqis-plugin-database" id="toc-method-1-from-the-gqis-plugin-database" class="nav-link" data-scroll-target="#method-1-from-the-gqis-plugin-database">Method 1: From the GQIS plugin database</a></li>
-  <li><a href="#method-2-from-zip-recommended" id="toc-method-2-from-zip-recommended" class="nav-link" data-scroll-target="#method-2-from-zip-recommended">Method 2: From Zip (recommended)</a></li>
-  </ul></li>
-  </ul>
-</nav>
+        
     </div>
 <!-- main -->
 <main class="content" id="quarto-document-content">
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title">Install</h1>
+<h1 class="title"><i class="fa-solid fa-book" aria-label="book"></i> Tutorials</h1>
 </div>
 
+<div>
+  <div class="description">
+    Learn how to use QGIS Tim plugin
+  </div>
+</div>
 
 
 <div class="quarto-title-meta">
@@ -149,66 +210,57 @@ ul.task-list li input[type="checkbox"] {
 
 </header>
 
-<p>QGIS-Tim consists of two parts: A QGIS plugin and the <code>gistim</code> Python package, which runs in a separate Python environment. The installation of QGIS-Tim therfore consists of three steps:</p>
-<section id="install-qgis" class="level2">
-<h2 class="anchored" data-anchor-id="install-qgis">1. Install QGIS</h2>
-<p>Download and install a recent version of QGIS (&gt;3.22): <a href="https://www.qgis.org/en/site/forusers/download.html" target="_blank">https://www.qgis.org/en/site/forusers/download.html</a></p>
-</section>
-<section id="install-gistim-in-a-seperate-python-environment" class="level2">
-<h2 class="anchored" data-anchor-id="install-gistim-in-a-seperate-python-environment">2. Install <code>gistim</code> in a seperate Python environment</h2>
-<p><code>gistim</code> requires a seperate Python environment, because it depends on packages incompatible with the packages in QGIS’ own Python environment. There are two approaches: either using the fully-fletched Deltaforge distribution (Recommended) or the leaner Miniforge distribution.</p>
-<section id="method-1-with-deltaforge-recommended" class="level3">
-<h3 class="anchored" data-anchor-id="method-1-with-deltaforge-recommended">Method 1: with Deltaforge (recommended)</h3>
-<ol type="1">
-<li><a href="https://download.deltares.nl/imod-suite/" target="_blank">Download and install Deltaforge</a>. <strong>Make sure you use Deltaforge version 0.3.0 or higher!</strong></li>
-<li>Open the Deltaforge prompt (search in Windows Start for "Deltaforge Prompt").</li>
-<li>Configure the gistim installation, so that the QGIS plugin is able to find it. Run: <code>python -m gistim configure</code></li>
-</ol>
-</section>
-<section id="method-2-with-miniforge" class="level3">
-<h3 class="anchored" data-anchor-id="method-2-with-miniforge">Method 2: with Miniforge</h3>
-<ol type="1">
-<li><a href="https://github.com/conda-forge/miniforge" target="_blank">Download and install a miniforge Python installation</a></li>
-<li>Open the miniforge prompt (search in Windows Start for "Miniforge Prompt").</li>
-<li>Create a new conda environment, run: <code>conda create \--name tim python=3.9</code></li>
-<li>Activate the environment: <code>conda activate tim</code></li>
-<li>Run: <code>conda install -c conda-forge gistim</code></li>
-<li>Configure the gistim installation, so that the QGIS plugin is able to find it. Run: <code>python -m gistim configure</code></li>
-</ol>
-</section>
-</section>
-<section id="install-the-qgis-plugin" class="level2">
-<h2 class="anchored" data-anchor-id="install-the-qgis-plugin">3. Install the QGIS plugin</h2>
-<section id="method-1-from-the-gqis-plugin-database" class="level3">
-<h3 class="anchored" data-anchor-id="method-1-from-the-gqis-plugin-database">Method 1: From the GQIS plugin database</h3>
-<p><strong>NB</strong> Due to ongoing developments new features and bug fixes might not be part of this release. Consider installation method 2.</p>
-<ol type="1">
-<li>Open QGIS.</li>
-<li>At the top, find the Plugins menu (~sixth object in the menubar).</li>
-<li>Find "Manage and Install plugins" (~first object in drop-down).</li>
-<li>Find "All" (~first in left section).</li>
-<li>Search for "Qgis-Tim".</li>
-<li>Click "Install Plugin".</li>
-</ol>
-</section>
-<section id="method-2-from-zip-recommended" class="level3">
-<h3 class="anchored" data-anchor-id="method-2-from-zip-recommended">Method 2: From Zip (recommended)</h3>
-<ol type="1">
-<li>Download the "QGIS-TIM-plugin.zip" (do not unzip!) from the <a href="https://deltares.thegood.cloud/s/AefTz97ZHbWS4RT" target="_blank">iMOD-Suite download portal.</a></li>
-<li>Open QGIS.</li>
-<li>At the top, find the Plugins menu (~sixth object in the menubar).</li>
-<li>Find "Manage and Install plugins" (~first object in drop-down).</li>
-<li>Find "Install from ZIP" (~fourth in left section).</li>
-<li>Enter the path to the file "QGIS-TIM-plugin.zip".</li>
-<li>Click "Install Plugin".</li>
-</ol>
-<p>This will add an icon to the toolbar(s). <img src="figures/tutorial/button-Qgis-tim.png" class="img-fluid" style="width:6.0%"> By clicking the icon, the plugin is started. <br> The QGIS plugin automatically starts an extra window for the background calculation of a TIM model. This black window is called <em>Python.exe</em> and can be minimized or even closed after the calculation.</p>
 
 
-</section>
-</section>
 
-</main> <!-- /main -->
+
+<div class="quarto-listing quarto-listing-container-grid" id="listing-listing">
+<div class="list grid quarto-listing-cols-3">
+<div class="g-col-1" data-index="0" data-listing-file-modified-sort="1695194246665" data-listing-reading-time-sort="30">
+<a href="./tutorial_QGIS_Tim.html" class="quarto-grid-link">
+<div class="quarto-grid-item card h-100 card-left">
+<p class="card-img-top"><img src="figures/tutorial/GeoTOP-Verticaledoorsnede.png" style="height: 150px;"  class="thumbnail-image card-img"/></p>
+<div class="card-body post-contents">
+<h5 class="no-anchor card-title listing-title">
+Tutorial Building Pit
+</h5>
+<div class="card-text listing-description">
+In this tutorial, you will learn how to:
+</div>
+<div class="card-attribution card-text-small start">
+<div class="listing-author">
+
+</div>
+</div>
+</div>
+</div>
+</a>
+</div>
+<div class="g-col-1" data-index="1" data-listing-file-modified-sort="1695194246665" data-listing-reading-time-sort="46">
+<a href="./tutorial_TheHague.html" class="quarto-grid-link">
+<div class="quarto-grid-item card h-100 card-left">
+<p class="card-img-top"><img src="figures/tutorial/photo-TheHagueCityCentre.png" style="height: 150px;"  class="thumbnail-image card-img"/></p>
+<div class="card-body post-contents">
+<h5 class="no-anchor card-title listing-title">
+Tutorial The Hague building pit
+</h5>
+<div class="card-text listing-description">
+In this tutorial, you will learn how to:
+</div>
+<div class="card-attribution card-text-small start">
+<div class="listing-author">
+
+</div>
+</div>
+</div>
+</div>
+</a>
+</div>
+</div>
+<div class="listing-no-matching d-none">
+No matching items
+</div>
+</div></main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">
 window.document.addEventListener("DOMContentLoaded", function (event) {
   const toggleBodyColorMode = (bsSheetEl) => {
@@ -442,6 +494,15 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
   }
 });
 </script>
+<nav class="page-navigation">
+  <div class="nav-page nav-page-previous">
+  </div>
+  <div class="nav-page nav-page-next">
+      <a href="./tutorial_QGIS_Tim.html" class="pagination-link">
+        <span class="nav-page-text">Tutorial Building Pit</span> <i class="bi bi-arrow-right-short"></i>
+      </a>
+  </div>
+</nav>
 </div> <!-- /content -->
 
 

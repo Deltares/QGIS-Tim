@@ -1,0 +1,16 @@
+[
+  {
+    "listing": "/tutorial.html",
+    "items": [
+      "/tutorial_QGIS_Tim.html",
+      "/tutorial_TheHague.html"
+    ]
+  },
+  {
+    "listing": "/index.html",
+    "items": [
+      "/tutorial.html",
+      "/install.html"
+    ]
+  }
+]
