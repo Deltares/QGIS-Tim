@@ -4,7 +4,6 @@ listing:
     type: grid
     image-height: 250px
     contents:
-        - install.qmd
         - tutorial.qmd
     sort: "index"
 ---
