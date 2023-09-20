@@ -6,7 +6,7 @@ book:
   chapters:
     - index.qmd
     - tutorial.qmd
-    - tutorial_QGIS_Tim.qmd
+    - tutorial_Rijsenhout.qmd
     - tutorial_TheHague.qmd
 
 format:

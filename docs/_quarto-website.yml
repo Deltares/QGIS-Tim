@@ -31,7 +31,7 @@ website:
       align: left
       contents:
         - href: tutorial.qmd
-        - href: tutorial_QGIS_Tim.qmd
+        - href: tutorial_Rijsenhout.qmd
         - href: tutorial_TheHague.qmd
 
 format:

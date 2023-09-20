@@ -3,13 +3,13 @@ title: "{{< fa solid book >}} Tutorials"
 listing:
     type: grid
     contents:
-      - tutorial_QGIS_Tim.qmd
+      - tutorial_Rijsenhout.qmd
       - tutorial_TheHague.qmd
 image: figures/logo/iMOD-tutorial.svg
 description: 'Learn how to use QGIS Tim plugin'
 index: "5"
 ---
-Modelling with analytic elements is not very common. The QGIS-Tim plugin makes it more easy to build your model in a graphical user interface starting from simple and making it as complex as you like. 
+Modelling with analytic elements is not very common. The QGIS-Tim plugin makes it more easy to build your model in a graphical user interface starting from simple and making it as complex as you like.
 
 Therefore, we have compiled a set of tutorials to help you get started and give you an overview of the capabilities of analytical elements.
 
