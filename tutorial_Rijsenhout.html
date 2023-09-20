@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>QGIS-Tim - Tutorial Building Pit</title>
+<title>QGIS-Tim - Building Pit Rijsenhout</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -114,7 +114,7 @@ ul.task-list li input[type="checkbox"] {
       <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-      <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./tutorial_QGIS_Tim.html">Tutorial Building Pit</a></li></ol></nav>
+      <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./tutorial_Rijsenhout.html">Building Pit Rijsenhout</a></li></ol></nav>
       <a class="flex-grow-1" role="button" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
       </a>
     </div>
@@ -134,14 +134,14 @@ ul.task-list li input[type="checkbox"] {
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./tutorial_QGIS_Tim.html" class="sidebar-item-text sidebar-link active">
- <span class="menu-text">Tutorial Building Pit</span></a>
+  <a href="./tutorial_Rijsenhout.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text">Building Pit Rijsenhout</span></a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./tutorial_TheHague.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Tutorial The Hague building pit</span></a>
+ <span class="menu-text">Building Pit The Hague</span></a>
   </div>
 </li>
     </ul>
@@ -182,7 +182,7 @@ ul.task-list li input[type="checkbox"] {
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title">Tutorial Building Pit</h1>
+<h1 class="title">Building Pit Rijsenhout</h1>
 </div>
 
 
@@ -462,8 +462,7 @@ ul.task-list li input[type="checkbox"] {
 <li>Click the button <em>Set to current extent</em>.</li>
 <li>Start the calculation with a click on <em>Compute</em>.</li>
 </ol>
-<p>A black Python.exe window pops up indicating that the TIM calculation started on the background. You can ignore this window but keep it open. Of course you van minimize it. If the calculation was completed successful, you will see this echo in QGIS.<br>
-<img src="figures/tutorial/Panel-QGIS-Tim-completion.png" class="img-fluid" style="width:80.0%">.</p>
+<p>A black Python.exe window pops up indicating that the TIM calculation started on the background. You can ignore this window but keep it open. Of course you van minimize it. If the calculation was completed successful, you will see this echo in QGIS. <img src="figures/tutorial/Panel-QGIS-Tim-completion.png" class="img-fluid" style="width:80.0%">.</p>
 <p>After the calculation you see that the result is automatically added to a new geopackage, probably called “case-Rijsenhout output”. Results are saved both as mesh and raster. For each format a separate sub group is created. Although these layers / groups are checked, the data is not visible. That is because the geopackage was added last, and QGIS adds layers at the end of the list. Let’s move the layer “pastel” to the background.</p>
 <ol start="51" class="example" type="1">
 <li>Select the layer “pastel” and drag it with your left mouse button to the bottom of the list of layers.</li>
@@ -815,16 +814,14 @@ ul.task-list li input[type="checkbox"] {
 <li>In your geopackage select the layer “ttim Temporal Settings:Aquifer” to define the temporal properties of the model.</li>
 <li>Open its table, start the editing mode and add a new feature.</li>
 <li>Make sure that tmin=0.01, tmax=30, tstart=0, reference_date=2023-03-23 00:00:00.</li>
-<li>In your geopackage select the layer “ttim Computation Times:Domain” in order to define the moments in time for which raster output is saved.<br>
-</li>
+<li>In your geopackage select the layer “ttim Computation Times:Domain” in order to define the moments in time for which raster output is saved.</li>
 <li>Open its table, start the editing mode and add 7 features / periods (click 7 times “Add feature”).</li>
 <li>In the column “time” add the moments 1,2,5,10, 15, 20 and 30.</li>
 <li>Save and Close the table.</li>
 </ol>
 <p>For the observations we can define a different set of output moments.</p>
 <ol start="166" class="example" type="1">
-<li>In your geopackage select the layer “ttim Observation:Piezometers”.<br>
-</li>
+<li>In your geopackage select the layer “ttim Observation:Piezometers”.</li>
 <li>Open its table, start the editing mode and add 10 features / periods (click 10 times “Add feature”).</li>
 <li>In the column “time” add the moments 1,2,3,4,5,10,15,20,25 and 30.</li>
 <li>Save and Close the table.</li>
@@ -836,8 +833,7 @@ ul.task-list li input[type="checkbox"] {
 </ul>
 <p>In this tutorial we show you the simple version.</p>
 <ol start="170" class="example" type="1">
-<li>In your geopackage select the layer “timml Well:DewateringWell”.<br>
-</li>
+<li>In your geopackage select the layer “timml Well:DewateringWell”.</li>
 <li>Open its table, start the editing mode and see that columns with time dependent parameters are visible now.</li>
 <li>Switch off the Steady State abstraction, make discharge = 0.</li>
 <li>Switch on the Transient abstraction: time_start = 2, time_end = 30, discharge_transient = 2000, caisson_radius = 1.</li>
@@ -856,8 +852,7 @@ ul.task-list li input[type="checkbox"] {
 <ol start="181" class="example" type="1">
 <li>Go to the iMOD Time Series panel.</li>
 <li>Be sure the layer “case-Rijsenhout-head_layer_0” is selected.</li>
-<li>For “variable:” select <em>head</em> and for “layers:” select <em>0</em>.<br>
-</li>
+<li>For “variable:” select <em>head</em> and for “layers:” select <em>0</em>.</li>
 <li>Click the button <em>Select Points</em>, your mouse changes into a <img src="figures/tutorial/mouse_plus.png" class="img-fluid">. Be sure <em>Update on Selection</em> is checked and hover over the mesh. The graph shows the timeseries at the location of your mouse.</li>
 <li>Deselect the checkbox <em>Update on Selection</em>.</li>
 <li>Click the button <em>Select Points</em> (your mouse becomes a <img src="figures/tutorial/mouse_plus.png" class="img-fluid"> and with the left mouse button select 3 points ad random.</li>
@@ -866,8 +861,7 @@ ul.task-list li input[type="checkbox"] {
 <p>In the same way you can display the time series from the Observations.</p>
 <ol start="188" class="example" type="1">
 <li>In the iMOD time series panel select the layer “case-Rijsenhout-ttim Observation:Piezometers”.</li>
-<li>For “ID column:” select <em>label</em> and for “Variable:” select <em>head_layer0</em>. Don’t forget to <strong>deselect <em>fid</em></strong>.<br>
-</li>
+<li>For “ID column:” select <em>label</em> and for “Variable:” select <em>head_layer0</em>. Don’t forget to <strong>deselect <em>fid</em></strong>.</li>
 <li>Click the button <em>Select Points</em> and draw a box with your mouse to select one or more observation points.</li>
 <li>Click the <em>Plot</em> button and the selected timeseries are added to the chart.</li>
 </ol>
@@ -1143,7 +1137,7 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
   </div>
   <div class="nav-page nav-page-next">
       <a href="./tutorial_TheHague.html" class="pagination-link">
-        <span class="nav-page-text">Tutorial The Hague building pit</span> <i class="bi bi-arrow-right-short"></i>
+        <span class="nav-page-text">Building Pit The Hague</span> <i class="bi bi-arrow-right-short"></i>
       </a>
   </div>
 </nav>

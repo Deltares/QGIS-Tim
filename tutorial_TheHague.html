@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>QGIS-Tim - Tutorial The Hague building pit</title>
+<title>QGIS-Tim - Building Pit The Hague</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -30,7 +30,7 @@ ul.task-list li input[type="checkbox"] {
 <script src="site_libs/quarto-search/fuse.min.js"></script>
 <script src="site_libs/quarto-search/quarto-search.js"></script>
 <meta name="quarto:offset" content="./">
-<link href="./tutorial_QGIS_Tim.html" rel="prev">
+<link href="./tutorial_Rijsenhout.html" rel="prev">
 <script src="site_libs/quarto-html/quarto.js"></script>
 <script src="site_libs/quarto-html/popper.min.js"></script>
 <script src="site_libs/quarto-html/tippy.umd.min.js"></script>
@@ -113,7 +113,7 @@ ul.task-list li input[type="checkbox"] {
       <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-      <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./tutorial_TheHague.html">Tutorial The Hague building pit</a></li></ol></nav>
+      <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./tutorial_TheHague.html">Building Pit The Hague</a></li></ol></nav>
       <a class="flex-grow-1" role="button" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
       </a>
     </div>
@@ -133,14 +133,14 @@ ul.task-list li input[type="checkbox"] {
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./tutorial_QGIS_Tim.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Tutorial Building Pit</span></a>
+  <a href="./tutorial_Rijsenhout.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Building Pit Rijsenhout</span></a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./tutorial_TheHague.html" class="sidebar-item-text sidebar-link active">
- <span class="menu-text">Tutorial The Hague building pit</span></a>
+ <span class="menu-text">Building Pit The Hague</span></a>
   </div>
 </li>
     </ul>
@@ -188,7 +188,7 @@ ul.task-list li input[type="checkbox"] {
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title">Tutorial The Hague building pit</h1>
+<h1 class="title">Building Pit The Hague</h1>
 </div>
 
 
@@ -549,8 +549,7 @@ table {
 <ol start="40" class="example" type="1">
 <li>In the QGIS-Tim panel go to the <em>Extract</em> tab.</li>
 <li>Open the file “..\QGIS-Tim_Tutorial-TheHague\LHM4.1-ondergrondmodel.nc” (this may take a minute because the file is 350 MB).</li>
-<li>Click the button <em>Select by Polygon</em> and draw a large polygon (&gt; 250x250m) to select the area around the building location between <em>Parkstraat</em> and <em>Oranjestraat</em> (see <a href="#fig-TheHagueCityCentre">Figure&nbsp;1</a>). Left-click several times and close the polygon with a right click.<br>
-</li>
+<li>Click the button <em>Select by Polygon</em> and draw a large polygon (&gt; 250x250m) to select the area around the building location between <em>Parkstraat</em> and <em>Oranjestraat</em> (see <a href="#fig-TheHagueCityCentre">Figure&nbsp;1</a>). Left-click several times and close the polygon with a right click.</li>
 <li>Then click the <em>Extract</em> button and save the extracted subsoil data to a CSV file, e.g.&nbsp;“Ex2DH.csv”.</li>
 <li>A separate python window is opened and the selection is performed. You can follow the progress in your tool bar. There is no message indicating the process has ended. Just ignore the black screen and continue with the next step.</li>
 </ol>
@@ -755,8 +754,7 @@ table {
 <li>In order to make a closed area surrounded with the sheet piles, the first and last point must have the same coordinate and intersect. For this we must activate the Snapping option in QGIS.</li>
 </ul>
 <ol start="56" class="example" type="1">
-<li>In the main menu go to <em>Project</em> and select <em>Snapping Options..</em>.<br>
-</li>
+<li>In the main menu go to <em>Project</em> and select <em>Snapping Options..</em>.</li>
 <li>From the new toolbar (see <a href="#fig-button_ToolbarSnappingSettings">Figure&nbsp;6</a>), click on the <em>Enable Snapping</em> button (<img src="figures/tutorial/button_EnableSnapping.png" class="img-fluid" style="width:3.0%">).</li>
 </ol>
 <div id="fig-button_ToolbarSnappingSettings" class="quarto-figure quarto-figure-center anchored">
@@ -780,8 +778,7 @@ table {
 <p>Remarks to the provided values: <br> * Because of a known issue in the TimML software, until this issue is resolved, the value of the resistance must be multiplied by the permeability. For normal sheet pile walls a resistance value of 100-250 d for interlock leakage is a good choice. In this case the chosen value needs to be increased by multiplying with the applicable aquifer permeability in the effected layer (R=100 d becomes R=10*100 d). <br> ** In the real-world counting starts with 1. However, Tim is programmed in Python and in Python counting starts with 0. You will get used to it.</p>
 </blockquote>
 <ol start="61" class="example" type="1">
-<li>Close the editing mode with a click on (<img src="figures/tutorial/button-Qgis-AttributeTable-StartEditingMode.png" class="img-fluid" style="width:4.0%">) and you are asked to save your changes.<br>
-</li>
+<li>Close the editing mode with a click on (<img src="figures/tutorial/button-Qgis-AttributeTable-StartEditingMode.png" class="img-fluid" style="width:4.0%">) and you are asked to save your changes.</li>
 <li>Open the attribute table for <em>Leaky Line Doublet</em> (click <img src="figures/tutorial/button-Qgis-OpenAttributeTable.png" class="img-fluid" style="width:3.0%"> or press F6) to check hydraulic resistance values for the sheet pile walls.</li>
 </ol>
 </section>
@@ -841,8 +838,7 @@ table {
 <li>Set the increment for contouring to a proper value: 0.5, 0.25 or 0.1 as applicable for your study.</li>
 <li>Press the <em>Compute</em> button to have the program perform the calculations.</li>
 </ol>
-<p>A black Python.exe window pops up indicating that the TIM calculation started on the background. You can ignore this window but keep it open. Of course you van minimize it. If the calculation was completed successful, you will see this echo in QGIS.<br>
-<img src="figures/tutorial/Panel-QGIS-Tim-completion.png" class="img-fluid" style="width:80.0%">.</p>
+<p>A black Python.exe window pops up indicating that the TIM calculation started on the background. You can ignore this window but keep it open. Of course you van minimize it. If the calculation was completed successful, you will see this echo in QGIS. <img src="figures/tutorial/Panel-QGIS-Tim-completion.png" class="img-fluid" style="width:80.0%">.</p>
 </section>
 <section id="studying-output-results" class="level2">
 <h2 class="anchored" data-anchor-id="studying-output-results">Studying output results</h2>
@@ -905,7 +901,7 @@ table {
 <p>To check whether the wall resistance or the bottom resistance of the layer 1 (below the building pit) is more important we can make 2 variations; one with C-clay=200 d and one with R-wall=500 d.&nbsp;<br> Of course you can change your model input, rerun the model and overwrite your model results. The next steps show you how to change the model input and save the results in separate <em>.gpkg and </em>.nc files.</p>
 <ol start="103" class="example" type="1">
 <li>In the input group select layer <em>timml Aquifer:…</em></li>
-<li>Open the <em>Attrribute Table</em> (F6) and change the value for “aquitard_c” in layer 1 into 200 d.&nbsp;</li>
+<li>Open the <em>Attrribute Table</em> (F6) and change the value for “aquitard_c” in layer 1 into 200 d.</li>
 <li>In the QGIS-Tim panel go to the tab <em>Compute</em> and change the name of the output, e.g.&nbsp;case-TheHague_v1.</li>
 <li>Click <em>Compute</em> to run variant 1.</li>
 </ol>
@@ -988,7 +984,7 @@ table {
 <p>* Known issue in TimML: you have to multiply Rw by layer permeability (Rw*10).</p>
 <p>Let’s now run Variant 2.</p>
 <ol start="108" class="example" type="1">
-<li>In layer <em>timml Aquifer:…</em> reset the value for “aquitard_c” in layer 1 to the default of 40 d.&nbsp;</li>
+<li>In layer <em>timml Aquifer:…</em> reset the value for “aquitard_c” in layer 1 to the default of 40 d.</li>
 <li>In layer <em>timml Leaky Line Doublet:…</em> change the value for “resistance” into 5000 d (500x10).</li>
 <li>In the QGIS-Tim panel go to the tab <em>Compute</em> and change the name of the output, e.g.&nbsp;case-TheHague_v2.</li>
 <li>Click <em>Compute</em> to run variant 2.</li>
@@ -1007,12 +1003,10 @@ table {
 <p>How to copy the sheet pile wall to an extra <em>Leaky Line Doublet</em> element?</p>
 <ol start="113" class="example" type="1">
 <li>In the QGIS-Tim panel go to the tab <em>Elements</em> and add a second <em>Leaky Line Doublet</em> and give it a name, e.g.&nbsp;“sheet_pile_L1”</li>
-<li>Go to the tab <em>GeoPackage</em> and see that the element separately is added to the list. Here is can switch this element on / off for a calculation.<br>
-</li>
+<li>Go to the tab <em>GeoPackage</em> and see that the element separately is added to the list. Here is can switch this element on / off for a calculation.</li>
 <li>In the <em>Layers</em> panel select the new layer <em>timml Leaky Line Doublet:sheet_pile_l1</em>.</li>
 <li>Open its <em>Attribute Table</em> (F6) and start the editing mode. The table is empty.</li>
-<li>Also open the <em>Attribute Table</em> of the first <em>Leaky Line Doublet</em> and select the existing element.<br>
-</li>
+<li>Also open the <em>Attribute Table</em> of the first <em>Leaky Line Doublet</em> and select the existing element.</li>
 <li>Click on the <em>Copy</em> button (<img src="figures/tutorial/button_Copy_Selected_Row.png" class="img-fluid" style="width:3.0%">) in the source table to copy the selected row to the clipboard.</li>
 </ol>
 <p><img src="figures/tutorial/figure_Leakylinedoublet_copy.png" class="img-fluid" style="width:70.0%"></p>
@@ -1608,8 +1602,8 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 </script>
 <nav class="page-navigation">
   <div class="nav-page nav-page-previous">
-      <a href="./tutorial_QGIS_Tim.html" class="pagination-link">
-        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">Tutorial Building Pit</span>
+      <a href="./tutorial_Rijsenhout.html" class="pagination-link">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">Building Pit Rijsenhout</span>
       </a>          
   </div>
   <div class="nav-page nav-page-next">
