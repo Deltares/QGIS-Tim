@@ -1,0 +1,61 @@
+---
+title: Install iMOD Python with Deltaforge
+---
+
+## What is Deltaforge?
+
+Deltaforge is a python distribution which includes iMOD Python and all
+its dependencies. It is provided as an installer and makes installing
+iMOD Python easy. You can download the Deltaforge installer [on the Deltares download
+portal](https://download.deltares.nl/imod-suite/).
+
+## Installation
+
+To install Deltaforge, double-click the executable, this will open the
+installation Wizard. You will be greeted with the welcome screen.
+
+![The welcome screen](figures/deltaforge/1_welcome_screen.png)
+
+Click \"Next\", and then \"I agree\" in the license agreement.
+
+![License agreement screen](figures/deltaforge/2_license.png)
+
+Next, you get to decide what type of installation you want. On your
+local machine it suffices to select [Just me]{.title-ref}. If you are an
+admin of a server and you want to let others enjoy the Deltaforge
+installation as well, click [All Users]{.title-ref}.
+
+![The installation type
+screen](figures/deltaforge/3_installation_type.png)
+
+Next you get to decide where the python environment is installed. The
+default location is usually fine.
+
+![The location of the python
+installation](figures/deltaforge/4_install_location.png)
+
+Finally, some further configuration is possible. The screenshots
+contains the options we recommend.
+
+![Installation options with the recommended options
+selected.](figures/deltaforge/5_installation_options.png)
+
+## Using Deltaforge
+
+The easiest way to start your environment is by pressing the Windows Key
+and start typing [deltaforge]{.title-ref}. This will let you select the
+[Deltaforge Prompt]{.title-ref}. Select this.
+
+![The Deltaforge Prompt should be findable in the Windows start
+menu](figures/deltaforge/6_deltaforge_start_menu.png)
+
+This will start a command prompt screen (`cmd.exe`), where at startup
+the Deltaforge python environment is activated.
+
+![The Deltaforge prompt. You can type `mamba list` to view all the
+packages installed.](figures/deltaforge/7_deltaforge_prompt.png)
+
+To view all the packages installed in the environment you can type
+`mamba list` and press Enter. This will list all packages installed in
+the environment. If you want to start coding, you can type `spyder`,
+which will start Spyder, a Python scientific development environment.

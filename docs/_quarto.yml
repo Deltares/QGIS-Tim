@@ -2,5 +2,5 @@ project:
   output-dir: _build
 
 profile:
-  group: 
-    - [website]
+  group:
+    - [website, tutorial]

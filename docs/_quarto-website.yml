@@ -3,18 +3,36 @@ project:
 
 website:
   title: "QGIS-Tim"
+  page-navigation: true
   navbar:
     background: "#080c80"
-    logo: _static/QGIS-Tim-logo.svg
+    logo: _static/iMOD-doc-logo.svg
     left:
-      - text: "Installation"
+      - text: Installation
         href: install.qmd
-      - text: "Tutorials"
-        href: tutorial-QGIS-Tim.qmd
+      - text: Tutorials
+        href: tutorial.qmd
     right:
       - icon: github
         href: https://github.com/Deltares/QGIS-Tim
         aria-label: GitHub
+
+  sidebar:
+    - id: Installation
+      title: "Installation"
+      style: "floating"
+      collapse-level: 2
+      align: left
+
+    - id: tutorial
+      title: "Tutorials"
+      style: "floating"
+      collapse-level: 2
+      align: left
+      contents:
+        - href: tutorial.qmd
+        - href: tutorial_QGIS_Tim.qmd
+        - href: tutorial_TheHague.qmd
 
 format:
   html:
@@ -22,3 +40,4 @@ format:
     css: _static/styles.css
     toc: true
     code-fold: true
+

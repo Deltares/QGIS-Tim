@@ -1,5 +1,12 @@
 ---
 title: "QGIS-Tim"
+listing:
+    type: grid
+    image-height: 250px
+    contents:
+        - install.qmd
+        - tutorial.qmd
+    sort: "index"
 ---
 
 QGIS-Tim is an open source project for multi-layer groundwater flow

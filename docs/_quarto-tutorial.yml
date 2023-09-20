@@ -1,0 +1,15 @@
+project:
+  type: book
+
+book:
+  title: "QGIS Tim Tutorial"
+  chapters:
+    - index.qmd
+    - tutorial.qmd
+    - tutorial_QGIS_Tim.qmd
+    - tutorial_TheHague.qmd
+
+format:
+  pdf:
+    documentclass: scrreprt
+    top-level-division: chapter
