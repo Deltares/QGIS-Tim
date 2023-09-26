@@ -81,21 +81,12 @@ def handle(line) -> None:
     # print(json.dumps(data, indent=4))
 
     operation = data.pop("operation")
-
     if operation == "compute":
-        gistim.compute(
-            inpath=data["inpath"],
-            outpath=data["outpath"],
-            cellsize=data["cellsize"],
+        gistim.compute.compute(
+            path=data["path"],
             mode=data["mode"],
-            active_elements=data["active_elements"],
         )
-        response = "Computation of {inpath} to {outpath}".format(**data)
-    elif operation == "convert":
-        inpath = data["inpath"]
-        outpath = data["outpath"]
-        gistim.convert_to_script(inpath, outpath)
-        response = "Conversion of {inpath} to {outpath}".format(**data)
+        response = "Computation of {path}".format(**data)
     elif operation == "extract":
         inpath = data["inpath"]
         outpath = data["outpath"]
@@ -148,33 +139,8 @@ def extract(args) -> None:
     gistim.data_extraction.netcdf_to_table(inpath, outpath, wkt_geometry)
 
 
-def convert(args) -> None:
-    """
-    Convert a Geopackage into a Python script.
-    """
-    inpath = args.inpath[0]
-    outpath = args.outpath[0]
-    gistim.convert_to_script(inpath, outpath)
-
-
 def compute(args) -> None:
-    jsonpath = args.jsonpath[0]
-
-    with open(jsonpath, "r") as f:
-        data = json.loads(f.read())
-
-    if data["mode"] == "steady-state":
-        gistim.compute_steady(
-            inpath=data["inpath"],
-            outpath=data["outpath"],
-        )
-    elif data["mode"] == "transient":
-        gistim.compute_transient(
-            inpath=data["inpath"],
-            outpath=data["outpath"],
-        )
-    else:
-        raise ValueError("Mode should be transient or steady-state.")
+    gistim.compute.compute(path=args.path[0], transient=args.transient[0])
     return
 
 
@@ -197,12 +163,10 @@ if __name__ == "__main__":
     parser_extract.add_argument("outpath", type=str, nargs=1, help="outpath")
     parser_extract.add_argument("wkt", type=str, nargs=1, help="wkt")
 
-    parser_convert.set_defaults(func=convert)
-    parser_convert.add_argument("inpath", type=str, nargs=1, help="inpath")
-    parser_convert.add_argument("outpath", type=str, nargs=1, help="outpath")
-
     parser_compute.set_defaults(func=compute)
-    parser_compute.add_argument("jsonpath", type=str, nargs=1, help="jsonpath")
+    parser_compute.add_argument("path", type=str, nargs=1, help="path to JSON file")
+    parser_compute.add_argument("--transient", action=argparse.BooleanOptionalAction)
+    parser.set_defaults(transient=False)
 
     # Parse and call the appropriate function
     args = parser.parse_args()

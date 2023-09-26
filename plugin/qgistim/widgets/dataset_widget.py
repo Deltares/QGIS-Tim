@@ -483,9 +483,14 @@ class DatasetWidget(QWidget):
             return
 
         json_data = to_json(data, cellsize=cellsize)
-        # Collect EPSG code.
-        # TODO: use toWkt() instead?
-        json_data["crs"] = self.parent.crs.authid()
+        crs = self.parent.crs
+        organization, srs_id = crs.authid().split(":")
+        json_data["crs"] = {
+            "description": crs.description(),
+            "organization": organization,
+            "srs_id": srs_id,
+            "wkt": crs.toWkt(),
+        }
         with open(path, "w") as fp:
             json.dump(json_data, fp=fp, indent=4)
 

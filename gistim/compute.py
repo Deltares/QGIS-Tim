@@ -1,15 +1,16 @@
 import json
 import pathlib
+from collections import defaultdict
 from typing import Dict, Union
 
-import geopandas as gpd
 import numpy as np
-import rioxarray  # noqa # pylint: disable=unused-import
+import pandas as pd
 import timml
 import tqdm
 import ttim
 import xarray as xr
 
+from gistim.geopackage import CoordinateReferenceSystem, write_geopackage
 from gistim.ugrid import to_ugrid2d
 
 TIMML_MAPPING = {
@@ -30,30 +31,45 @@ TIMML_MAPPING = {
 
 def write_raster(
     head: xr.DataArray,
-    crs: int,
+    crs: CoordinateReferenceSystem,
     outpath: Union[pathlib.Path, str],
 ) -> None:
-    out = head.rio.write_crs(crs).rio.write_coordinate_system()
-    out.to_netcdf(outpath.with_suffix(".nc"))
+    # Write GDAL required metadata.
+    head["spatial_ref"] = xr.DataArray(
+        np.int32(0), attrs={"crs_wkt": crs.wkt, "spatial_ref": crs.wkt}
+    )
+    head.attrs["grid_mapping"] = "spatial_ref"
+    head["x"].attrs = {
+        "axis": "X",
+        "long_name": "x coordinate of projection",
+        "standard_name": "projection_x_coordinate",
+    }
+    head["y"].attrs = {
+        "axis": "Y",
+        "long_name": "y coordinate of projection",
+        "standard_name": "projection_y_coordinate",
+    }
+    head.to_netcdf(outpath.with_suffix(".nc"), format="NETCDF3_CLASSIC")
     return
 
 
 def write_ugrid(
     head: xr.DataArray,
-    crs: int,
+    crs: CoordinateReferenceSystem,
     outpath: Union[pathlib.Path, str],
 ) -> None:
     ugrid_head = to_ugrid2d(head)
+    # Write MDAL required metadata.
     ugrid_head["projected_coordinate_system"] = xr.DataArray(
         data=np.int32(0),
-        attrs={"epsg": np.int32(crs.to_epsg())},
+        attrs={"epsg": np.int32(crs.srs_id)},
     )
-    ugrid_head.to_netcdf(outpath.with_suffix(".ugrid.nc"))
+    ugrid_head.to_netcdf(outpath.with_suffix(".ugrid.nc"), format="NETCDF3_CLASSIC")
     return
 
 
 def write_vector(
-    gdf_head: gpd.GeoDataFrame,
+    gdf_head,
     crs: int,
     outpath: Union[pathlib.Path, str],
     layername: str,
@@ -71,35 +87,29 @@ def write_vector(
 def initialize_timml(data):
     aquifer = data.pop("ModelMaq")
     timml_model = timml.ModelMaq(**aquifer)
-    for elementtype, entry in data.items():
-        klass = TIMML_MAPPING[elementtype]
+    elements = defaultdict(list)
+    for name, entry in data.items():
+        klass = TIMML_MAPPING[entry["type"]]
         for kwargs in entry["data"]:
             element = klass(model=timml_model, **kwargs)
-    return timml_model
+            elements[name].append(element)
+    return timml_model, elements
 
 
-def timml_head_observations(model: timml.Model, observations: Dict) -> gpd.GeoDataFrame:
-    geodataframes = {}
-    for name, kwargs_collection in observations.items():
-        heads = []
-        xx = []
-        yy = []
-        labels = []
-        for kwargs in kwargs_collection:
-            x = kwargs["x"]
-            y = kwargs["y"]
-            heads.append(model.head(x=x, y=y))
-            xx.append(x)
-            yy.append(y)
-            labels.append(kwargs["label"])
-
-        d = {"geometry": gpd.points_from_xy(xx, yy), "label": labels}
-        for i, layerhead in enumerate(np.vstack(heads).T):
-            d[f"head_layer{i}"] = layerhead
-
-        geodataframes[name] = gpd.GeoDataFrame(d)
-
-    return geodataframes
+def timml_head_observations(
+    model: timml.Model, observations: Dict
+) -> Dict[str, pd.DataFrame]:
+    d = {"geometry": [], "labels": []}
+    heads = []
+    for kwargs in observations:
+        x = kwargs["x"]
+        y = kwargs["y"]
+        heads.append(model.head(x=x, y=y))
+        d["geometry"].append({"type": "point", "coordinates": [x, y]})
+        d["labels"].append(kwargs["label"])
+    for i, layerhead in enumerate(np.vstack(heads).T):
+        d[f"head_layer{i}"] = layerhead
+    return pd.DataFrame(d)
 
 
 def timml_headgrid(model: timml.Model, xmin, xmax, ymin, ymax, spacing) -> xr.DataArray:
@@ -137,30 +147,33 @@ def timml_headgrid(model: timml.Model, xmin, xmax, ymin, ymax, spacing) -> xr.Da
 
 
 def compute_steady(
-    inpath: Union[pathlib.Path, str],
-    outpath: Union[pathlib.Path, str],
+    path: Union[pathlib.Path, str],
 ) -> None:
-    inpath = pathlib.Path(inpath)
-    outpath = pathlib.Path(outpath)
-
-    with open(inpath, "r") as f:
+    with open(path, "r") as f:
         data = json.load(f)
 
-    crs = data.pop("crs")
-    observations = data.pop("Observations", None)
+    crs = CoordinateReferenceSystem(**data.pop("crs"))
+    observation_names = [
+        key for key, value in data.items() if value.get("type") == "Observation"
+    ]
+    observations = {name: data.pop(name) for name in observation_names}
     headgrid = data.pop("headgrid")
-    timml_model = initialize_timml(data)
+    timml_model, elements = initialize_timml(data)
     timml_model.solve()
 
-    gdfs_obs = timml_head_observations(timml_model, observations)
+    # Compute gridded head data and write to netCDF.
     head = timml_headgrid(timml_model, **headgrid)
+    write_raster(head, crs, path)
+    write_ugrid(head, crs, path)
 
-    write_raster(head, crs, outpath)
-    write_ugrid(head, crs, outpath)
+    # Compute observations and discharge, and write to geopackage.
+    tables = {}
+    if observations:
+        for layername, content in observations.items():
+            tables[layername] = timml_head_observations(timml_model, content["data"])
+    # TODO: Compute discharges...
 
-    for name, gdf in gdfs_obs.items():
-        write_vector(gdf, crs, outpath, layername=name)
-
+    write_geopackage(tables, crs, path)
     return
 
 
@@ -206,4 +219,15 @@ def compute_transient(
     for name, gdf in gdfs_obs.items():
         write_vector(gdf, crs, outpath, layername=name)
 
+    return
+
+
+def compute(path: str, transient: bool):
+    path = pathlib.Path(path)
+    if not path.exists():
+        raise FileExistsError(path)
+    if transient:
+        compute_transient(path)
+    else:
+        compute_steady(path)
     return

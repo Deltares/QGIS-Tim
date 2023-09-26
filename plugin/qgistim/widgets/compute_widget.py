@@ -240,16 +240,15 @@ class ComputeWidget(QWidget):
         GeoPackage dataset.
         """
         cellsize = self.cellsize_spin_box.value()
-        transient = self.transient_combo_box.currentText().lower()
-        is_transient = transient == "transient"
+        transient = self.transient_combo_box.currentText().lower() == "transient"
         path = Path(self.output_line_edit.text()).absolute().with_suffix(".json")
         self.parent.dataset_widget.convert_to_json(
-            path, cellsize=cellsize, transient=is_transient
+            path, cellsize=cellsize, transient=transient
         )
         data = {
             "operation": "compute",
             "path": str(path),
-            "mode": transient,
+            "transient": transient,
         }
         # import json
         # print(json.dumps(data))
@@ -263,7 +262,6 @@ class ComputeWidget(QWidget):
         # task.finished(result)
 
         # Remove the output layers from QGIS, otherwise they cannot be overwritten.
-        return
         gpkg_path = str(path)
         for layer in QgsProject.instance().mapLayers().values():
             if Path(gpkg_path) == Path(layer.source()):
