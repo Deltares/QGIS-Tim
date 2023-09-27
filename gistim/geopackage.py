@@ -2,11 +2,12 @@
 Utilities to write data to a geopackage.
 """
 import itertools
+import shutil
 import sqlite3
 from pathlib import Path
-from typing import Dict, List, NamedTuple
+from typing import Dict, List, NamedTuple, Tuple
 
-import geomet
+import geomet.geopackage
 import pandas as pd
 
 
@@ -89,34 +90,60 @@ def create_gpkg_geometry_columns(
     )
 
 
-def points_bounding_box(points) -> BoundingBox:
-    x = [point[0] for point in points]
-    y = [point[1] for point in points]
+def collect_bounding_box(features, geometry_type) -> BoundingBox:
+    if geometry_type == "Point":
+        x = []
+        y = []
+        for point in features:
+            coordinates = point["coordinates"]
+            x.append(coordinates[0])
+            y.append(coordinates[1])
+    else:
+        x, y = zip(
+            *itertools.chain.from_iterable(line["coordinates"] for line in features)
+        )
     return BoundingBox(xmin=min(x), ymin=min(y), xmax=max(x), ymax=max(y))
 
 
-def lines_bounding_box(lines) -> BoundingBox:
-    x, y = zip(*itertools.chain.from_iterable(line["coordinates"] for line in lines))
-    return BoundingBox(xmin=min(x), ymin=min(y), xmax=max(x), ymax=max(y))
+def process_table(dataframe: pd.DataFrame) -> Tuple[pd.DataFrame, BoundingBox, str]:
+    geometry = dataframe.pop("geometry").to_numpy()
+    geometry_type = set(f["type"] for f in geometry)
+    if len(geometry_type) != 1:
+        raise ValueError(
+            f"Table should contain exactly one geometry type. Received: {geometry_type}"
+        )
+    # Get first (and only) member of set.
+    geometry_type = next(iter(geometry_type))
+    bounding_box = collect_bounding_box(geometry, geometry_type)
+    dataframe["geom"] = [geomet.geopackage.dumps(f) for f in geometry]
+    return dataframe, bounding_box, geometry_type
 
 
 def write_geopackage(
     tables: Dict[str, pd.DataFrame], crs: CoordinateReferenceSystem, path: Path
 ) -> None:
+    # We write all tables to a temporary GeoPackage with a dot prefix, and at
+    # the end move this over the target file. This does not throw a
+    # PermissionError if the file is open in QGIS.
+    gpkg_path = path.with_suffix(".output.gpkg")
+    temp_path = gpkg_path.with_stem(".")
+    # avoid adding tables to existing geopackage.
+    temp_path.unlink(missing_ok=True)
+
     try:
-        connection = sqlite3.connect(database=path.with_suffix(".output.gpkg"))
+        connection = sqlite3.connect(database=temp_path)
         connection.execute(f"PRAGMA application_id = {APPLICATION_ID};")
         connection.execute(f"PRAGMA user_version = {USER_VERSION};")
 
         table_names = []
         geometry_types = []
         bounding_boxes = []
-        for layername, layerdata in tables.items():
-            # TODO:
-            # * gather bounding boxes
-            # * gather geometry types
-            # * convert to geopackage WKB using geomet
+        for layername, dataframe in tables.items():
+            dataframe, bounding_box, geometry_type = process_table(dataframe)
             table_names.append(layername)
+            geometry_types.append(geometry_type)
+            bounding_boxes.append(bounding_box)
+            dataframe.to_sql(layername, con=connection)
 
         # Create mandatory geopackage tables.
         gpkg_contents = create_gpkg_contents(
@@ -137,4 +164,5 @@ def write_geopackage(
         connection.commit()
         connection.close()
 
+    shutil.move(temp_path, gpkg_path)
     return

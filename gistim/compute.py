@@ -105,8 +105,8 @@ def timml_head_observations(
         x = kwargs["x"]
         y = kwargs["y"]
         heads.append(model.head(x=x, y=y))
-        d["geometry"].append({"type": "point", "coordinates": [x, y]})
-        d["labels"].append(kwargs["label"])
+        d["geometry"].append({"type": "Point", "coordinates": [x, y]})
+        d["label"].append(kwargs["label"])
     for i, layerhead in enumerate(np.vstack(heads).T):
         d[f"head_layer{i}"] = layerhead
     return pd.DataFrame(d)
