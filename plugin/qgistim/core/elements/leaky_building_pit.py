@@ -7,6 +7,7 @@ from qgistim.core.elements.element import AssociatedElement, ElementSchema
 from qgistim.core.schemata import (
     AllGreaterEqual,
     AllRequired,
+    AtleastOneTrue,
     Membership,
     OffsetAllRequired,
     OptionalFirstOnly,
@@ -38,6 +39,7 @@ class AssociatedLeakyBuildingPitchema(ElementSchema):
         "semiconf_top": OptionalFirstOnly(),
         "semiconf_head": OptionalFirstOnly(),
         "resistance": RequiredFirstOnly(),
+        "wall_in_layer": AllRequired(AtleastOneTrue()),
     }
     timml_consistency_schemata = (
         SemiConfined(),

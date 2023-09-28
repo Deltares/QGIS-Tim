@@ -19,7 +19,7 @@ class HeadWellSchema(ElementSchema):
         "head": Required(),
         "radius": Required(Positive()),
         "resistance": Required(Positive()),
-        "layer": Required(Membership("aquifer_layers")),
+        "layer": Required(Membership("aquifer layers")),
     }
     ttim_consistency_schemata = (
         AllOrNone(("time_start", "time_end", "head_transient")),
@@ -72,9 +72,9 @@ class HeadWell(TransientElement):
         return {
             "xw": x,
             "yw": y,
-            "hw": row["discharge"],
+            "hw": row["head"],
             "rw": row["radius"],
-            "res": row["head"],
+            "res": row["resistance"],
             "layers": row["layer"],
             "label": row["label"],
         }

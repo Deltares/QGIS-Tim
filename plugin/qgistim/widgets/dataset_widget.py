@@ -477,10 +477,25 @@ class DatasetWidget(QWidget):
         )
         return
 
-    def convert_to_json(self, path: str, cellsize: float, transient: bool) -> None:
+    def convert_to_json(self, path: str, cellsize: float, transient: bool) -> bool:
+        """
+        Parameters
+        ----------
+        path: str
+            Path to JSON file to write.
+        cellsize: float
+            Cell size to use to compute the head grid.
+        transient: bool
+            Steady-state (False) or transient (True).
+
+        Returns
+        -------
+        invalid_input: bool
+            Whether validation has succeeded.
+        """
         data = self._convert(transient=transient)
         if data is None:
-            return
+            return True
 
         json_data = to_json(data, cellsize=cellsize)
         crs = self.parent.crs
@@ -499,4 +514,4 @@ class DatasetWidget(QWidget):
             text=f"Converted geopackage to JSON: {path}",
             level=Qgis.Info,
         )
-        return
+        return False

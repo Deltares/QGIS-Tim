@@ -296,6 +296,13 @@ class AllGreaterEqual(IterableSchema):
         return None
 
 
+class AtleastOneTrue(IterableSchema):
+    def validate(self, data, _=None) -> MaybeError:
+        if not any(value for value in data):
+            return "Atleast one row value must be true."
+        return None
+
+
 # Consistency schemata
 
 

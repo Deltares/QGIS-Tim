@@ -19,7 +19,7 @@ TIMML_MAPPING = {
     "CircAreaSink": timml.CircAreaSink,
     "Well": timml.Well,
     "HeadWell": timml.HeadWell,
-    "PolygonInhom": timml.PolygonInhomMaq,
+    "PolygonInhomMaq": timml.PolygonInhomMaq,
     "HeadLineSinkString": timml.HeadLineSinkString,
     "LineSinkDitchString": timml.LineSinkDitchString,
     "LeakyLineDoubletString": timml.LeakyLineDoubletString,
@@ -173,7 +173,8 @@ def compute_steady(
             tables[layername] = timml_head_observations(timml_model, content["data"])
     # TODO: Compute discharges...
 
-    write_geopackage(tables, crs, path)
+    if tables:
+        write_geopackage(tables, crs, path)
     return
 
 

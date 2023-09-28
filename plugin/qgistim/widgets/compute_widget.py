@@ -242,9 +242,13 @@ class ComputeWidget(QWidget):
         cellsize = self.cellsize_spin_box.value()
         transient = self.transient_combo_box.currentText().lower() == "transient"
         path = Path(self.output_line_edit.text()).absolute().with_suffix(".json")
-        self.parent.dataset_widget.convert_to_json(
+        invalid_input = self.parent.dataset_widget.convert_to_json(
             path, cellsize=cellsize, transient=transient
         )
+        # Early return in case some problems are found.
+        if invalid_input:
+            return
+
         data = {
             "operation": "compute",
             "path": str(path),

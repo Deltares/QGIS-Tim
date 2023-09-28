@@ -7,6 +7,7 @@ from qgistim.core.elements.element import AssociatedElement, ElementSchema
 from qgistim.core.schemata import (
     AllGreaterEqual,
     AllRequired,
+    AtleastOneTrue,
     Membership,
     OffsetAllRequired,
     OptionalFirstOnly,
@@ -36,6 +37,7 @@ class AssociatedBuildingPitSchema(ElementSchema):
         "aquifer_k": AllRequired(Positive()),
         "semiconf_top": OptionalFirstOnly(),
         "semiconf_head": OptionalFirstOnly(),
+        "wall_in_layer": AllRequired(AtleastOneTrue()),
     }
     timml_consistency_schemata = (
         SemiConfined(),

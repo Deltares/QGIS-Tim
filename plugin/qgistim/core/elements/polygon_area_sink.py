@@ -45,6 +45,6 @@ class PolygonAreaSink(Element):
             "xy": self.polygon_xy(row),
             "order": row["order"],
             "ndeg": row["ndegrees"],
-            "rate": row["rate"],
+            "N": row["rate"],
             **aquifer_data,
         }
