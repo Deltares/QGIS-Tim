@@ -22,5 +22,8 @@ class UniformFlow(Element):
     schema = UniformFlowSchema()
 
     def process_timml_row(self, row, other=None):
-        # No renaming or changes required
-        return row
+        return {
+            "slope": row["slope"],
+            "angle": row["angle"],
+            "label": row["label"],
+        }

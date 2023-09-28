@@ -32,7 +32,10 @@ class ExtractorMixin(abc.ABC):
             for key, value in data.items():
                 if value == NULL:
                     data[key] = None
-            data["centroid"], data["geometry"] = cls.extract_coordinates(feature)
+            geomtype = layer.geometryType()
+            # Skip if no geometry is present.
+            if geomtype != geomtype.Null:
+                data["centroid"], data["geometry"] = cls.extract_coordinates(feature)
             features.append(data)
         return features
 

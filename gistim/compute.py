@@ -99,7 +99,7 @@ def initialize_timml(data):
 def timml_head_observations(
     model: timml.Model, observations: Dict
 ) -> Dict[str, pd.DataFrame]:
-    d = {"geometry": [], "labels": []}
+    d = {"geometry": [], "label": []}
     heads = []
     for kwargs in observations:
         x = kwargs["x"]

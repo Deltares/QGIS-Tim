@@ -59,9 +59,9 @@ class ComputeTask(BaseServerTask):
         self.parent.set_interpreter_interaction(True)
         if result:
             self.push_success_message()
-            self.parent.load_mesh_result(self.data["outpath"])
-            self.parent.load_raster_result(self.data["outpath"])
-            self.parent.load_vector_result(self.data["outpath"])
+            self.parent.load_mesh_result(self.data["path"])
+            self.parent.load_raster_result(self.data["path"])
+            self.parent.load_vector_result(self.data["path"])
         else:
             self.push_failure_message()
         return

@@ -84,7 +84,7 @@ def handle(line) -> None:
     if operation == "compute":
         gistim.compute.compute(
             path=data["path"],
-            mode=data["mode"],
+            transient=data["transient"],
         )
         response = "Computation of {path}".format(**data)
     elif operation == "extract":
