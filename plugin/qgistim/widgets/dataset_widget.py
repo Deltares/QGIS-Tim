@@ -293,7 +293,7 @@ class DatasetWidget(QWidget):
         suppress = self.suppress_popup_checkbox.isChecked()
         # Start adding the layers
         maplayer = self.parent.input_group.add_layer(
-            element.timml_layer, "timml", element.renderer, suppress
+            element.timml_layer, "timml", element.renderer(), suppress
         )
         self.parent.input_group.add_layer(element.ttim_layer, "ttim")
         self.parent.input_group.add_layer(element.assoc_layer, "timml")

@@ -67,9 +67,9 @@ class LineSinkDitch(TransientElement):
     )
     schema = LineSinkDitchSchema()
 
-    @property
-    def renderer(self) -> QgsSingleSymbolRenderer:
-        return self.line_renderer(color=GREEN, width="0.75")
+    @classmethod
+    def renderer(cls) -> QgsSingleSymbolRenderer:
+        return cls.line_renderer(color=GREEN, width="0.75")
 
     def process_timml_row(self, row, other=None):
         return {

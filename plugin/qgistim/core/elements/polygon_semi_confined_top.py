@@ -33,9 +33,9 @@ class PolygonSemiConfinedTop(Element):
     }
     schema = PolygonSemiConfinedTopSchema()
 
-    @property
-    def renderer(self) -> QgsSingleSymbolRenderer:
-        return self.polygon_renderer(
+    @classmethod
+    def renderer(cls) -> QgsSingleSymbolRenderer:
+        return cls.polygon_renderer(
             color=TRANSPARENT_BLUE, color_border=BLUE, width_border="0.75"
         )
 

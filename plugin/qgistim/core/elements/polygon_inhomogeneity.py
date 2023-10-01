@@ -77,9 +77,9 @@ class PolygonInhomogeneity(AssociatedElement):
     schema = PolygonInhomogeneitySchema()
     assoc_schema = AssociatedPolygonInhomogeneitySchema()
 
-    @property
-    def renderer(self) -> QgsSingleSymbolRenderer:
-        return self.polygon_renderer(
+    @classmethod
+    def renderer(cls) -> QgsSingleSymbolRenderer:
+        return cls.polygon_renderer(
             color=TRANSPARENT_GREY, color_border=GREY, width_border="0.75"
         )
 

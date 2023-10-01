@@ -27,9 +27,9 @@ class LeakyLineDoublet(Element):
     }
     schema = LeakyLineDoubletSchema()
 
-    @property
-    def renderer(self) -> QgsSingleSymbolRenderer:
-        return self.line_renderer(color=RED, width="0.75", outline_style="dash")
+    @classmethod
+    def renderer(cls) -> QgsSingleSymbolRenderer:
+        return cls.line_renderer(color=RED, width="0.75", outline_style="dash")
 
     def process_timml_row(self, row, other=None):
         return {

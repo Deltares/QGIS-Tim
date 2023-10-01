@@ -295,7 +295,7 @@ class QgisTimWidget(QWidget):
         self.input_group.add_layer(
             element.timml_layer,
             "timml",
-            renderer=element.renderer,
+            renderer=element.renderer(),
             suppress=suppress,
         )
         self.input_group.add_layer(element.ttim_layer, "ttim")

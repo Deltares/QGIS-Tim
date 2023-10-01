@@ -78,9 +78,9 @@ class Well(TransientElement):
     )
     schema = WellSchema()
 
-    @property
-    def renderer(self) -> QgsSingleSymbolRenderer:
-        return self.marker_renderer(color=GREEN, size="3")
+    @classmethod
+    def renderer(cls) -> QgsSingleSymbolRenderer:
+        return cls.marker_renderer(color=GREEN, size="3")
 
     def process_timml_row(self, row, other=None) -> Dict[str, Any]:
         x, y = self.point_xy(row)

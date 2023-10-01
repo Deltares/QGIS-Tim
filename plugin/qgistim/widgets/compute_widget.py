@@ -33,6 +33,7 @@ from qgis.core import (
 from qgis.gui import QgsMapLayerComboBox
 from qgistim.core import geopackage, layer_styling
 from qgistim.core.dummy_ugrid import write_dummy_ugrid
+from qgistim.core.elements import ELEMENTS, parse_name
 from qgistim.core.processing import mesh_contours
 from qgistim.core.task import BaseServerTask
 
@@ -445,14 +446,13 @@ class ComputeWidget(QWidget):
             if add:
                 if "timml Observation:" in layername or "ttim Observation" in layername:
                     labels = layer_styling.number_labels("head_layer0")
-                    light_blue = "166,206,227,255"
-                    symbol = QgsMarkerSymbol.createSimple(
-                        dict(color=light_blue, name="triangle", size="3")
-                    )
-                    renderer = QgsSingleSymbolRenderer(symbol)
+                elif "discharge-" in layername:
+                    labels = layer_styling.number_labels("discharge_layer0")
                 else:
                     labels = None
-                    renderer = None
+
+                _, element_type, _ = parse_name(layername)
+                renderer = ELEMENTS[element_type].renderer()
                 self.parent.output_group.add_layer(
                     layer, "vector", renderer=renderer, labels=labels
                 )

@@ -24,9 +24,9 @@ class Constant(Element):
     )
     schema = ConstantSchema()
 
-    @property
-    def renderer(self) -> QgsSingleSymbolRenderer:
-        return self.marker_renderer(color=RED, name="star", size="5")
+    @classmethod
+    def renderer(cls) -> QgsSingleSymbolRenderer:
+        return cls.marker_renderer(color=RED, name="star", size="5")
 
     def process_timml_row(self, row, other=None):
         x, y = self.point_xy(row)

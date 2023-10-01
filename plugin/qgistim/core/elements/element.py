@@ -28,7 +28,7 @@ Each element is (optionally) represented in multiple places:
   and edit its data.
 
 Some elements require specific rendering in QGIS (e.g. no fill polygons), which
-are supplied by the `.renderer` property.
+are supplied by the `.renderer()` staticmethod.
 
 The coupling of separate tables (geometry table and time series table) is only
 explicit in the Dataset Tree. The only way of knowing that tables are
@@ -284,8 +284,8 @@ class Element(ExtractorMixin, abc.ABC):
         symbol = QgsFillSymbol.createSimple(kwargs)
         return QgsSingleSymbolRenderer(symbol)
 
-    @property
-    def renderer(self):
+    @classmethod
+    def renderer(cls):
         return None
 
     def timml_layer_from_geopackage(self) -> QgsVectorLayer:

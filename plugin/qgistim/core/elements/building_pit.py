@@ -78,9 +78,9 @@ class BuildingPit(AssociatedElement):
     schema = BuildingPitSchema()
     assoc_schema = AssociatedBuildingPitSchema()
 
-    @property
-    def renderer(self) -> QgsSingleSymbolRenderer:
-        return self.polygon_renderer(
+    @classmethod
+    def renderer(cls) -> QgsSingleSymbolRenderer:
+        return cls.polygon_renderer(
             color=TRANSPARENT_RED, color_border=RED, width_border="0.75"
         )
 

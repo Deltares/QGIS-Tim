@@ -29,9 +29,9 @@ class PolygonAreaSink(Element):
     }
     schema = PolygonAreaSinkSchema()
 
-    @property
-    def renderer(self) -> QgsSingleSymbolRenderer:
-        return self.polygon_renderer(
+    @classmethod
+    def renderer(cls) -> QgsSingleSymbolRenderer:
+        return cls.polygon_renderer(
             color=TRANSPARENT_GREEN, color_border=GREEN, width_border="0.75"
         )
 

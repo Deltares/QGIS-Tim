@@ -81,9 +81,9 @@ class LeakyBuildingPit(AssociatedElement):
     schema = LeakyBuildingPitSchema()
     assoc_schema = AssociatedLeakyBuildingPitchema()
 
-    @property
-    def renderer(self) -> QgsSingleSymbolRenderer:
-        return self.polygon_renderer(
+    @classmethod
+    def renderer(cls) -> QgsSingleSymbolRenderer:
+        return cls.polygon_renderer(
             color=TRANSPARENT_RED,
             color_border=RED,
             width_border="0.75",

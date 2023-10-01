@@ -37,7 +37,7 @@ def create_gpkg_contents(
     return pd.DataFrame(
         data={
             "table_name": table_names,
-            "data_type": ["features"],
+            "data_type": "features",
             "identifier": table_names,
             "description": "",
             "last_change": pd.Timestamp.now(),

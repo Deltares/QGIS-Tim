@@ -1,7 +1,7 @@
 import json
 import pathlib
 from collections import defaultdict
-from typing import Dict, Union
+from typing import Any, Dict, Union
 
 import numpy as np
 import pandas as pd
@@ -112,6 +112,12 @@ def timml_head_observations(
     return pd.DataFrame(d)
 
 
+def timml_discharges(elements: Dict[str, Any]) -> Dict[str, pd.DataFrame]:
+    discharges = {}
+    for layername, content in elements.items():
+        first_element = content[0]
+
+
 def timml_headgrid(model: timml.Model, xmin, xmax, ymin, ymax, spacing) -> xr.DataArray:
     """
     Compute the headgrid of the TimML model, and store the results
@@ -146,6 +152,47 @@ def timml_headgrid(model: timml.Model, xmin, xmax, ymin, ymax, spacing) -> xr.Da
     )
 
 
+def extract_discharges(elements, nlayers):
+    tables = {}
+    for layername, content in elements.items():
+        sample = content[0]
+
+        if isinstance(sample, timml.WellBase):
+            table_rows = []
+            for well in content:
+                row = {f"discharge_layer{i}": q for i, q in enumerate(well.discharge())}
+                row["geometry"] = {
+                    "type": "Point",
+                    "coordinates": [well.xc[0], well.yc[0]],
+                }
+                table_rows.append(row)
+            tables[f"discharge-{layername}"] = pd.DataFrame.from_records(table_rows)
+
+        elif isinstance(sample, (timml.LineSinkDitchString, timml.HeadLineSinkString)):
+            table_rows = []
+            for linestring in content:
+                # Workaround for: https://github.com/mbakker7/timml/issues/85
+                discharges = np.zeros((linestring.nls, nlayers))
+                Q = (
+                    (linestring.parameters[:, 0] * linestring.dischargeinf())
+                    .reshape((linestring.nls, linestring.nlayers, linestring.order + 1))
+                    .sum(axis=2)
+                )
+                discharges[:, linestring.layers[0]] = Q
+
+                xy = linestring.xy
+                for q_layered, vertex0, vertex1 in zip(discharges, xy[:-1], xy[1:]):
+                    row = {f"discharge_layer{i}": q for i, q in enumerate(q_layered)}
+                    row["geometry"] = {
+                        "type": "LineString",
+                        "coordinates": [vertex0, vertex1],
+                    }
+                    table_rows.append(row)
+            tables[f"discharge-{layername}"] = pd.DataFrame.from_records(table_rows)
+
+    return tables
+
+
 def compute_steady(
     path: Union[pathlib.Path, str],
 ) -> None:
@@ -167,11 +214,10 @@ def compute_steady(
     write_ugrid(head, crs, path)
 
     # Compute observations and discharge, and write to geopackage.
-    tables = {}
+    tables = extract_discharges(elements, timml_model.aq.nlayers)
     if observations:
         for layername, content in observations.items():
             tables[layername] = timml_head_observations(timml_model, content["data"])
-    # TODO: Compute discharges...
 
     if tables:
         write_geopackage(tables, crs, path)

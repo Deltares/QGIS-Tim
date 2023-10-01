@@ -28,7 +28,7 @@ Each element is (optionally) represented in multiple places:
   and edit its data.
 
 Some elements require specific rendering in QGIS (e.g. no fill polygons), which
-are supplied by the `.renderer` property.
+are supplied by the `.renderer()` staticmethod.
 
 The coupling of separate tables (geometry table and time series table) is only
 explicit in the Dataset Tree. The only way of knowing that tables are
@@ -219,8 +219,8 @@ class Element:
         symbol = QgsFillSymbol.createSimple(kwargs)
         return QgsSingleSymbolRenderer(symbol)
 
-    @property
-    def renderer(self):
+    @classmethod
+    def renderer(cls):
         return None
 
     def timml_layer_from_geopackage(self) -> QgsVectorLayer:
@@ -352,12 +352,12 @@ class Domain(TransientElement):
         self.timml_name = f"timml {self.element_type}:Domain"
         self.ttim_name = "ttim Computation Times:Domain"
 
-    @property
-    def renderer(self) -> QgsSingleSymbolRenderer:
+    @classmethod
+    def renderer(cls) -> QgsSingleSymbolRenderer:
         """
         Results in transparent fill, with a medium thick black border line.
         """
-        return self.polygon_renderer(
+        return cls.polygon_renderer(
             color="255,0,0,0", color_border=BLACK, width_border="0.75"
         )
 
@@ -460,9 +460,9 @@ class Constant(Element):
         QgsField("label", QVariant.String),
     )
 
-    @property
-    def renderer(self) -> QgsSingleSymbolRenderer:
-        return self.marker_renderer(color=RED, name="star", size="5")
+    @classmethod
+    def renderer(cls) -> QgsSingleSymbolRenderer:
+        return cls.marker_renderer(color=RED, name="star", size="5")
 
 
 class Observation(TransientElement):
@@ -484,9 +484,9 @@ class Observation(TransientElement):
     }
     transient_columns = ("timeseries_id",)
 
-    @property
-    def renderer(self) -> QgsSingleSymbolRenderer:
-        return self.marker_renderer(color=LIGHT_BLUE, name="triangle", size="3")
+    @classmethod
+    def renderer(cls) -> QgsSingleSymbolRenderer:
+        return cls.marker_renderer(color=LIGHT_BLUE, name="triangle", size="3")
 
 
 class Well(TransientElement):
@@ -525,9 +525,9 @@ class Well(TransientElement):
         "timeseries_id",
     )
 
-    @property
-    def renderer(self) -> QgsSingleSymbolRenderer:
-        return self.marker_renderer(color=GREEN, size="3")
+    @classmethod
+    def renderer(cls) -> QgsSingleSymbolRenderer:
+        return cls.marker_renderer(color=GREEN, size="3")
 
 
 class HeadWell(TransientElement):
@@ -560,9 +560,9 @@ class HeadWell(TransientElement):
         "timeseries_id",
     )
 
-    @property
-    def renderer(self) -> QgsSingleSymbolRenderer:
-        return self.marker_renderer(color=BLUE, size="3")
+    @classmethod
+    def renderer(cls) -> QgsSingleSymbolRenderer:
+        return cls.marker_renderer(color=BLUE, size="3")
 
 
 class HeadLineSink(TransientElement):
@@ -595,9 +595,9 @@ class HeadLineSink(TransientElement):
         "timeseries_id",
     )
 
-    @property
-    def renderer(self) -> QgsSingleSymbolRenderer:
-        return self.line_renderer(color=BLUE, width="0.75")
+    @classmethod
+    def renderer(cls) -> QgsSingleSymbolRenderer:
+        return cls.line_renderer(color=BLUE, width="0.75")
 
 
 class LineSinkDitch(TransientElement):
@@ -630,9 +630,9 @@ class LineSinkDitch(TransientElement):
         "timeseries_id",
     )
 
-    @property
-    def renderer(self) -> QgsSingleSymbolRenderer:
-        return self.line_renderer(color=GREEN, width="0.75")
+    @classmethod
+    def renderer(cls) -> QgsSingleSymbolRenderer:
+        return cls.line_renderer(color=GREEN, width="0.75")
 
 
 class ImpermeableLineDoublet(Element):
@@ -647,9 +647,9 @@ class ImpermeableLineDoublet(Element):
         "order": QgsDefaultValue("4"),
     }
 
-    @property
-    def renderer(self) -> QgsSingleSymbolRenderer:
-        return self.line_renderer(color=RED, width="0.75")
+    @classmethod
+    def renderer(cls) -> QgsSingleSymbolRenderer:
+        return cls.line_renderer(color=RED, width="0.75")
 
 
 class LeakyLineDoublet(Element):
@@ -665,9 +665,9 @@ class LeakyLineDoublet(Element):
         "order": QgsDefaultValue("4"),
     }
 
-    @property
-    def renderer(self) -> QgsSingleSymbolRenderer:
-        return self.line_renderer(color=RED, width="0.75", outline_style="dash")
+    @classmethod
+    def renderer(cls) -> QgsSingleSymbolRenderer:
+        return cls.line_renderer(color=RED, width="0.75", outline_style="dash")
 
 
 class CircularAreaSink(TransientElement):
@@ -694,9 +694,9 @@ class CircularAreaSink(TransientElement):
         "timeseries_id",
     )
 
-    @property
-    def renderer(self):
-        return self.polygon_renderer(
+    @classmethod
+    def renderer(cls):
+        return cls.polygon_renderer(
             color=TRANSPARENT_GREEN, color_border=GREEN, width_border="0.75"
         )
 
@@ -714,9 +714,9 @@ class PolygonAreaSink(Element):
         "ndegrees": QgsDefaultValue("6"),
     }
 
-    @property
-    def renderer(self) -> QgsSingleSymbolRenderer:
-        return self.polygon_renderer(
+    @classmethod
+    def renderer(cls) -> QgsSingleSymbolRenderer:
+        return cls.polygon_renderer(
             color=TRANSPARENT_GREEN, color_border=GREEN, width_border="0.75"
         )
 
@@ -736,9 +736,9 @@ class PolygonSemiConfinedTop(Element):
         "ndegrees": QgsDefaultValue("6"),
     }
 
-    @property
-    def renderer(self) -> QgsSingleSymbolRenderer:
-        return self.polygon_renderer(
+    @classmethod
+    def renderer(cls) -> QgsSingleSymbolRenderer:
+        return cls.polygon_renderer(
             color=TRANSPARENT_BLUE, color_border=BLUE, width_border="0.75"
         )
 
@@ -781,9 +781,9 @@ class PolygonInhomogeneity(AssociatedElement):
         "aquifer_npor",
     )
 
-    @property
-    def renderer(self) -> QgsSingleSymbolRenderer:
-        return self.polygon_renderer(
+    @classmethod
+    def renderer(cls) -> QgsSingleSymbolRenderer:
+        return cls.polygon_renderer(
             color=TRANSPARENT_GREY, color_border=GREY, width_border="0.75"
         )
 
@@ -847,9 +847,9 @@ class BuildingPit(AbstractBuildingPit):
         QgsField("semiconf_head", QVariant.Double),
     ]
 
-    @property
-    def renderer(self) -> QgsSingleSymbolRenderer:
-        return self.polygon_renderer(
+    @classmethod
+    def renderer(cls) -> QgsSingleSymbolRenderer:
+        return cls.polygon_renderer(
             color=TRANSPARENT_RED, color_border=RED, width_border="0.75"
         )
 
@@ -868,9 +868,9 @@ class LeakyBuildingPit(AbstractBuildingPit):
         QgsField("semiconf_head", QVariant.Double),
     ]
 
-    @property
-    def renderer(self) -> QgsSingleSymbolRenderer:
-        return self.polygon_renderer(
+    @classmethod
+    def renderer(cls) -> QgsSingleSymbolRenderer:
+        return cls.polygon_renderer(
             color=TRANSPARENT_RED,
             color_border=RED,
             width_border="0.75",

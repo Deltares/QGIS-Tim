@@ -67,9 +67,9 @@ class HeadLineSink(TransientElement):
     )
     schema = HeadLineSinkSchema()
 
-    @property
-    def renderer(self) -> QgsSingleSymbolRenderer:
-        return self.line_renderer(color=BLUE, width="0.75")
+    @classmethod
+    def renderer(cls) -> QgsSingleSymbolRenderer:
+        return cls.line_renderer(color=BLUE, width="0.75")
 
     def process_timml_row(self, row, other=None):
         return {

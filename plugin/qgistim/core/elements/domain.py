@@ -32,12 +32,12 @@ class Domain(TransientElement):
         self.timml_name = f"timml {self.element_type}:Domain"
         self.ttim_name = "ttim Computation Times:Domain"
 
-    @property
-    def renderer(self) -> QgsSingleSymbolRenderer:
+    @classmethod
+    def renderer(cls) -> QgsSingleSymbolRenderer:
         """
         Results in transparent fill, with a medium thick black border line.
         """
-        return self.polygon_renderer(
+        return cls.polygon_renderer(
             color="255,0,0,0", color_border=BLACK, width_border="0.75"
         )
 

@@ -63,9 +63,9 @@ class CircularAreaSink(TransientElement):
     )
     schema = CircularAreaSinkSchema()
 
-    @property
-    def renderer(self):
-        return self.polygon_renderer(
+    @classmethod
+    def renderer(cls):
+        return cls.polygon_renderer(
             color=TRANSPARENT_GREEN, color_border=GREEN, width_border="0.75"
         )
 

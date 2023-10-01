@@ -63,9 +63,9 @@ class HeadWell(TransientElement):
     )
     schema = HeadWellSchema()
 
-    @property
-    def renderer(self) -> QgsSingleSymbolRenderer:
-        return self.marker_renderer(color=BLUE, size="3")
+    @classmethod
+    def renderer(cls) -> QgsSingleSymbolRenderer:
+        return cls.marker_renderer(color=BLUE, size="3")
 
     def process_timml_row(self, row, other=None) -> Dict[str, Any]:
         x, y = self.point_xy(row)
