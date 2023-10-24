@@ -465,8 +465,8 @@ class Constant(Element):
         return cls.marker_renderer(color=RED, name="star", size="5")
 
 
-class Observation(TransientElement):
-    element_type = "Observation"
+class HeadObservation(TransientElement):
+    element_type = "Head Observation"
     geometry_type = "Point"
     timml_attributes = (
         QgsField("label", QVariant.String),
@@ -897,7 +897,7 @@ ELEMENTS = {
         PolygonInhomogeneity,
         BuildingPit,
         LeakyBuildingPit,
-        Observation,
+        HeadObservation,
     )
 }
 

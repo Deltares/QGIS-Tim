@@ -13,12 +13,13 @@ disabled (such as inhomogeneities).
 import json
 from pathlib import Path
 from shutil import copy
-from typing import List, Set
+from typing import Dict, List, Set
 
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import (
     QAbstractItemView,
     QCheckBox,
+    QComboBox,
     QFileDialog,
     QHBoxLayout,
     QHeaderView,
@@ -49,7 +50,7 @@ SUPPORTED_TTIM_ELEMENTS = set(
         "Circular Area Sink",
         "Impermeable Line Doublet",
         "Leaky Line Doublet",
-        "Observation",
+        "Head Observation",
     ]
 )
 
@@ -245,7 +246,10 @@ class DatasetWidget(QWidget):
         self.new_geopackage_button = QPushButton("New")
         self.open_geopackage_button = QPushButton("Open")
         self.copy_geopackage_button = QPushButton("Copy")
-        self.remove_button = QPushButton("Remove from Dataset")
+        self.transient_combo_box = QComboBox()
+        self.transient_combo_box.addItems(["Steady-state", "Transient"])
+        self.transient_combo_box.currentTextChanged.connect(self.on_transient_changed)
+        self.remove_button = QPushButton("Remove from GeoPackage")
         self.add_button = QPushButton("Add to QGIS")
         self.new_geopackage_button.clicked.connect(self.new_geopackage)
         self.open_geopackage_button.clicked.connect(self.open_geopackage)
@@ -254,10 +258,11 @@ class DatasetWidget(QWidget):
         self.suppress_popup_checkbox.stateChanged.connect(self.suppress_popup_changed)
         self.remove_button.clicked.connect(self.remove_geopackage_layer)
         self.add_button.clicked.connect(self.add_selection_to_qgis)
-        self.convert_button = QPushButton("Convert GeoPackage to Python script")
+        self.convert_button = QPushButton("Export to Python script")
         self.convert_button.clicked.connect(self.convert_to_python)
         # Layout
         dataset_layout = QVBoxLayout()
+        mode_row = QHBoxLayout()
         dataset_row = QHBoxLayout()
         layer_row = QHBoxLayout()
         dataset_row.addWidget(self.dataset_line_edit)
@@ -265,6 +270,8 @@ class DatasetWidget(QWidget):
         dataset_row.addWidget(self.new_geopackage_button)
         dataset_row.addWidget(self.copy_geopackage_button)
         dataset_layout.addLayout(dataset_row)
+        mode_row.addWidget(self.transient_combo_box)
+        dataset_layout.addLayout(mode_row)
         dataset_layout.addWidget(self.dataset_tree)
         dataset_layout.addWidget(self.suppress_popup_checkbox)
         layer_row.addWidget(self.add_button)
@@ -328,13 +335,14 @@ class DatasetWidget(QWidget):
         for element in elements:
             self.dataset_tree.add_element(element)
 
+        transient = self.transient
         for item in self.dataset_tree.items():
             self.add_item_to_qgis(item)
-            item.element.on_transient_changed(self.parent.transient)
+            item.element.on_transient_changed(transient)
 
         self.dataset_tree.sortByColumn(0, Qt.SortOrder.AscendingOrder)
         self.parent.toggle_element_buttons(True)
-        self.parent.on_transient_changed()
+        self.on_transient_changed()
         return
 
     def new_geopackage(self) -> None:
@@ -400,6 +408,14 @@ class DatasetWidget(QWidget):
         self.dataset_tree.remove_geopackage_layers()
         return
 
+    @property
+    def transient(self) -> bool:
+        return self.transient_combo_box.currentText() == "Transient"
+
+    def on_transient_changed(self) -> None:
+        self.dataset_tree.on_transient_changed(self.transient)
+        return
+
     def suppress_popup_changed(self):
         suppress = self.suppress_popup_checkbox.isChecked()
         for item in self.dataset_tree.items():
@@ -433,10 +449,6 @@ class DatasetWidget(QWidget):
             if item.assoc_item is not None and item.assoc_item not in selection:
                 selection.append(item.assoc_item)
         return set([item.element.name for item in selection])
-
-    def on_transient_changed(self, transient: bool) -> None:
-        self.dataset_tree.on_transient_changed(transient)
-        return
 
     def add_element(self, element) -> None:
         self.dataset_tree.add_element(element)
@@ -477,7 +489,13 @@ class DatasetWidget(QWidget):
         )
         return
 
-    def convert_to_json(self, path: str, cellsize: float, transient: bool) -> bool:
+    def convert_to_json(
+        self,
+        path: str,
+        cellsize: float,
+        transient: bool,
+        output_options: Dict[str, bool],
+    ) -> bool:
         """
         Parameters
         ----------
@@ -497,7 +515,7 @@ class DatasetWidget(QWidget):
         if data is None:
             return True
 
-        json_data = to_json(data, cellsize=cellsize)
+        json_data = to_json(data, cellsize=cellsize, output_options=output_options)
         crs = self.parent.crs
         organization, srs_id = crs.authid().split(":")
         json_data["crs"] = {

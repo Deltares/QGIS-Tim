@@ -37,7 +37,7 @@ class LayersPanelGroup:
         self.root = root
         self.subgroups = {}
         self.create_group()
-
+        
     def create_group(self):
         self.group = self.root.addGroup(self.name)
         return
@@ -184,9 +184,9 @@ class QgisTimWidget(QWidget):
         self.layout = QVBoxLayout()
         self.tabwidget = QTabWidget()
         self.layout.addWidget(self.tabwidget)
-        self.tabwidget.addTab(self.dataset_widget, "GeoPackage")
+        self.tabwidget.addTab(self.dataset_widget, "Model Manager")
         self.tabwidget.addTab(self.elements_widget, "Elements")
-        self.tabwidget.addTab(self.compute_widget, "Compute")
+        self.tabwidget.addTab(self.compute_widget, "Results")
         self.tabwidget.addTab(self.extraction_widget, "Extract")
         self.layout.addWidget(self.config_button, stretch=0, alignment=Qt.AlignRight)
         self.setLayout(self.layout)
@@ -244,11 +244,6 @@ class QgisTimWidget(QWidget):
             self.server_handler.kill()
         return
 
-    def on_transient_changed(self) -> None:
-        transient = self.compute_widget.transient
-        self.dataset_widget.on_transient_changed(transient)
-        return
-
     @property
     def path(self) -> str:
         return self.dataset_widget.path
@@ -303,19 +298,15 @@ class QgisTimWidget(QWidget):
 
     # QGIS layers
     # -----------
-    def create_input_group(self, name: str):
+    def create_input_group(self, name: str) -> None:
         root = QgsProject.instance().layerTreeRoot()
         self.input_group = LayersPanelGroup(root, f"{name} input")
         self.input_group.create_subgroup("timml")
         self.input_group.create_subgroup("ttim")
         return
 
-    def create_output_group(self, name: str):
+    def create_output_group(self, name: str) -> None:
         root = QgsProject.instance().layerTreeRoot()
         self.output_group = LayersPanelGroup(root, f"{name} output")
-        # Pre-create the groups here to make sure the vector group ends up on top.
-        # Apparently moving it destroys the group?
-        self.output_group.create_subgroup("vector")
-        self.output_group.create_subgroup("mesh")
-        self.output_group.create_subgroup("raster")
         return
+ 

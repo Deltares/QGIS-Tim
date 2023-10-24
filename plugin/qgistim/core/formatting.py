@@ -24,7 +24,8 @@ MAPPING = {
     "Impermeable Line Doublet": "ImpLineDoubletString",
     "Building Pit": "BuildingPit",
     "Leaky Building Pit": "LeakyBuildingPit",
-    "Observation": "Observation",
+    "Head Observation": "Head Observation",
+    "Discharge Observation": "Discharge Observation",
 }
 PREFIX = "    "
 
@@ -131,7 +132,7 @@ def to_script_string(data: Dict[str, Any]) -> str:
         timml_name = MAPPING[plugin_name]
 
         for i, kwargs in enumerate(element_data):
-            if plugin_name == "Observation":
+            if plugin_name == "Head Observation":
                 # Should not be added to the model.
                 kwargs.pop("label")
                 observations.append(
@@ -154,7 +155,7 @@ def to_script_string(data: Dict[str, Any]) -> str:
     return "\n".join(strings)
 
 
-def to_json(data: Dict[str, Any], cellsize: float) -> Dict[str, Any]:
+def to_json(data: Dict[str, Any], cellsize: float, output_options: Dict[str, bool]) -> Dict[str, Any]:
     """
     Take the data and add:
 
@@ -177,6 +178,7 @@ def to_json(data: Dict[str, Any], cellsize: float) -> Dict[str, Any]:
     json_data = {
         "ModelMaq": aquifer_data,
         "headgrid": headgrid_entry(domain_data, cellsize),
+        "output_options": output_options,
     }
 
     for layername, element_data in data.items():
@@ -184,5 +186,5 @@ def to_json(data: Dict[str, Any], cellsize: float) -> Dict[str, Any]:
         plugin_name = re.split("timml |ttim ", prefix)[1]
         timml_name = MAPPING[plugin_name]
         json_data[layername] = {"type": timml_name, "name": name, "data": element_data}
-
+    
     return json_data

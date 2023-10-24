@@ -6,7 +6,6 @@ from typing import Tuple, Union
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import (
     QCheckBox,
-    QComboBox,
     QDoubleSpinBox,
     QFileDialog,
     QGroupBox,
@@ -20,12 +19,10 @@ from PyQt5.QtWidgets import (
 from qgis.core import (
     QgsApplication,
     QgsMapLayerProxyModel,
-    QgsMarkerSymbol,
     QgsMeshDatasetIndex,
     QgsMeshLayer,
     QgsProject,
     QgsRasterLayer,
-    QgsSingleSymbolRenderer,
     QgsTask,
     QgsVectorLayer,
     QgsVectorLayerTemporalProperties,
@@ -60,9 +57,17 @@ class ComputeTask(BaseServerTask):
         self.parent.set_interpreter_interaction(True)
         if result:
             self.push_success_message()
-            self.parent.load_mesh_result(self.data["path"])
-            self.parent.load_raster_result(self.data["path"])
+
+            # Load whatever data is available in the geopackage.
             self.parent.load_vector_result(self.data["path"])
+
+            if self.data["load_mesh"]:
+                self.parent.load_mesh_result(
+                    self.data["path"], self.data["load_contours"]
+                )
+            if self.data["load_raster"]:
+                self.parent.load_raster_result(self.data["path"])
+
         else:
             self.push_failure_message()
         return
@@ -79,24 +84,40 @@ class ComputeWidget(QWidget):
         write_dummy_ugrid(self.dummy_ugrid_path)
 
         self.domain_button = QPushButton("Set to current extent")
-        self.transient_combo_box = QComboBox()
-        self.transient_combo_box.addItems(["Steady-state", "Transient"])
-        self.transient_combo_box.currentTextChanged.connect(self.on_transient_changed)
         self.compute_button = QPushButton("Compute")
         self.compute_button.clicked.connect(self.compute)
+
+        self.raster_checkbox = QCheckBox("Raster")
+        self.mesh_checkbox = QCheckBox("Mesh")
+        self.contours_checkbox = QCheckBox("Contours")
+        self.head_observations_checkbox = QCheckBox("Head Observations")
+        self.discharge_checkbox = QCheckBox("Discharge")
+        self.discharge_observations_checkbox = QCheckBox("Discharge Observations")
+
         self.cellsize_spin_box = QDoubleSpinBox()
         self.cellsize_spin_box.setMinimum(0.0)
         self.cellsize_spin_box.setMaximum(10_000.0)
         self.cellsize_spin_box.setSingleStep(1.0)
         self.cellsize_spin_box.setValue(25.0)
         self.domain_button.clicked.connect(self.domain)
+        # By default: all output
+        self.raster_checkbox.setChecked(True)
+        self.mesh_checkbox.setChecked(True)
+        self.contours_checkbox.setChecked(True)
+        self.head_observations_checkbox.setChecked(True)
+        self.discharge_checkbox.setChecked(True)
+
+        self.mesh_checkbox.toggled.connect(self.contours_checkbox.setEnabled)
+        self.mesh_checkbox.toggled.connect(
+            lambda checked: not checked and self.contours_checkbox.setChecked(False)
+        )
+
         # self.mesh_checkbox = QCheckBox("Trimesh")
         self.output_line_edit = QLineEdit()
         self.output_button = QPushButton("Set path as ...")
         self.output_button.clicked.connect(self.set_output_path)
-        self.contour_checkbox = QCheckBox("Auto-generate contours")
-        self.contour_button = QPushButton("Export contours")
-        self.contour_button.clicked.connect(self.export_contours)
+        self.contour_button = QPushButton("Redraw contours")
+        self.contour_button.clicked.connect(self.redraw_contours)
         self.contour_layer = QgsMapLayerComboBox()
         self.contour_layer.setFilters(QgsMapLayerProxyModel.MeshLayer)
         self.contour_min_box = QDoubleSpinBox()
@@ -129,14 +150,21 @@ class ComputeWidget(QWidget):
         domain_layout.addWidget(self.domain_button)
         domain_layout.addLayout(domain_row)
 
-        result_row1 = QHBoxLayout()
-        result_row1.addWidget(self.transient_combo_box)
-        result_row1.addWidget(self.compute_button)
-        result_row2 = QHBoxLayout()
-        result_row2.addWidget(self.output_line_edit)
-        result_row2.addWidget(self.output_button)
-        result_layout.addLayout(result_row1)
-        result_layout.addLayout(result_row2)
+        output_row = QHBoxLayout()
+        output_row.addWidget(self.output_line_edit)
+        output_row.addWidget(self.output_button)
+
+        button_row = QHBoxLayout()
+        button_row.addWidget(self.compute_button)
+        result_layout.addLayout(output_row)
+
+        result_layout.addWidget(self.raster_checkbox)
+        result_layout.addWidget(self.mesh_checkbox)
+        result_layout.addWidget(self.contours_checkbox)
+        result_layout.addWidget(self.head_observations_checkbox)
+        result_layout.addWidget(self.discharge_checkbox)
+
+        result_layout.addLayout(button_row)
 
         contour_row1 = QHBoxLayout()
         to_label = QLabel("to")
@@ -151,7 +179,6 @@ class ComputeWidget(QWidget):
         contour_row2 = QHBoxLayout()
         contour_row2.addWidget(self.contour_layer)
         contour_row2.addWidget(self.contour_button)
-        contour_layout.addWidget(self.contour_checkbox)
         contour_layout.addLayout(contour_row1)
         contour_layout.addLayout(contour_row2)
 
@@ -163,9 +190,13 @@ class ComputeWidget(QWidget):
 
     def reset(self):
         self.cellsize_spin_box.setValue(25.0)
-        self.contour_checkbox.setCheckState(False)
         self.transient_combo_box.setCurrentIndex(0)
         self.output_line_edit.setText("")
+        self.raster_checkbox.setCheckState(True)
+        self.mesh_checkbox.setCheckState(True)
+        self.contours_checkbox.setCheckState(True)
+        self.head_observations_checkbox.setCheckState(True)
+        self.discharge_checkbox.setCheckState(True)
         self.contour_min_box.setValue(-5.0)
         self.contour_max_box.setValue(5.0)
         self.contour_step_box.setValue(0.5)
@@ -176,13 +207,6 @@ class ComputeWidget(QWidget):
 
     def shutdown_server(self):
         self.parent.shutdown_server()
-
-    @property
-    def transient(self) -> bool:
-        return self.transient_combo_box.currentText() == "Transient"
-
-    def on_transient_changed(self) -> None:
-        self.parent.on_transient_changed()
 
     def contour_range(self) -> Tuple[float, float, float]:
         return (
@@ -199,8 +223,13 @@ class ComputeWidget(QWidget):
         self.parent.output_group.add_layer(
             layer, "vector", renderer=renderer, on_top=True, labels=labels
         )
+        
+    @property
+    def output_path(self) -> str:
+        return self.output_line_edit.text()
 
-    def export_contours(self) -> None:
+    def redraw_contours(self) -> None:
+        path = Path(self.output_path)
         layer = self.contour_layer.currentLayer()
         renderer = layer.rendererSettings()
         index = renderer.activeScalarDatasetGroup()
@@ -208,6 +237,7 @@ class ComputeWidget(QWidget):
         name = layer.datasetGroupMetadata(qgs_index).name()
         start, stop, step = self.contour_range()
         layer = mesh_contours(
+            gpkg_path=str(path.with_suffix(".output.gpkg")),
             layer=layer,
             index=index,
             name=name,
@@ -219,10 +249,13 @@ class ComputeWidget(QWidget):
         return
 
     def set_output_path(self) -> None:
-        current = self.output_line_edit.text()
-        path, _ = QFileDialog.getSaveFileName(self, "Save output as...", current, "*")
+        current = self.output_path
+        path, _ = QFileDialog.getSaveFileName(
+            self, "Save output as...", current, "*.gpkg"
+        )
+
         if path != "":  # Empty string in case of cancel button press
-            self.output_line_edit.setText(path)
+            self.output_line_edit.setText(str(Path(path).with_suffix("")))
             # Note: Qt does pretty good validity checking of the Path in the
             # Dialog, there is no real need to validate path here.
 
@@ -241,10 +274,18 @@ class ComputeWidget(QWidget):
         GeoPackage dataset.
         """
         cellsize = self.cellsize_spin_box.value()
-        transient = self.transient_combo_box.currentText().lower() == "transient"
-        path = Path(self.output_line_edit.text()).absolute().with_suffix(".json")
+        transient = self.parent.dataset_widget.transient
+        output_options = {
+            "raster": self.raster_checkbox.isChecked(),
+            "mesh": self.mesh_checkbox.isChecked(),
+            "contours": self.contours_checkbox.isChecked(),
+            "head_observations": self.head_observations_checkbox.isChecked(),
+            "discharge": self.discharge_checkbox.isChecked(),
+        }
+
+        path = Path(self.output_path).absolute().with_suffix(".json")
         invalid_input = self.parent.dataset_widget.convert_to_json(
-            path, cellsize=cellsize, transient=transient
+            path, cellsize=cellsize, transient=transient, output_options=output_options
         )
         # Early return in case some problems are found.
         if invalid_input:
@@ -254,6 +295,9 @@ class ComputeWidget(QWidget):
             "operation": "compute",
             "path": str(path),
             "transient": transient,
+            "load_raster": output_options["raster"],
+            "load_mesh": output_options["mesh"],
+            "load_contours": output_options["contours"],
         }
         # import json
         # print(json.dumps(data))
@@ -303,17 +347,13 @@ class ComputeWidget(QWidget):
             dy = round(dy)
         self.cellsize_spin_box.setValue(dy)
 
-    def contouring(self) -> Tuple[bool, float, float, float]:
-        contour = self.contour_checkbox.isChecked()
-        start, stop, step = self.contour_range()
-        return contour, start, stop, step
-
-    def load_mesh_result(self, path: Union[Path, str]) -> None:
+    def load_mesh_result(self, path: Union[Path, str], load_contours: bool) -> None:
         path = Path(path)
         # String for QGIS functions
         netcdf_path = str(path.with_suffix(".ugrid.nc"))
-        # Loop through layers first. If the path already exists as a layer source, remove it.
-        # Otherwise QGIS will not the load the new result (this feels like a bug?).
+        # Loop through layers first. If the path already exists as a layer
+        # source, remove it. Otherwise QGIS will not the load the new result
+        # (this feels like a bug?).
         for layer in QgsProject.instance().mapLayers().values():
             if Path(netcdf_path) == Path(layer.source()):
                 QgsProject.instance().removeMapLayer(layer.id())
@@ -322,10 +362,7 @@ class ComputeWidget(QWidget):
 
         layer = QgsMeshLayer(netcdf_path, f"{path.stem}", "mdal")
         indexes = layer.datasetGroupsIndexes()
-
-        contour, start, stop, step = self.contouring()
         contour_layers = []
-
         for index in indexes:
             qgs_index = QgsMeshDatasetIndex(group=index, dataset=0)
             name = layer.datasetGroupMetadata(qgs_index).name()
@@ -342,8 +379,14 @@ class ComputeWidget(QWidget):
             index_layer.setRendererSettings(renderer)
             self.parent.output_group.add_layer(index_layer, "mesh")
 
-            if contour:
+            if load_contours:
+                # Should generally result in 20 contours.
+                start = scalar_settings.classificationMinimum()
+                stop = scalar_settings.classificationMaximum()
+                step = (stop - start) / 21
+
                 contour_layer = mesh_contours(
+                    gpkg_path=str(path.with_suffix(".output.gpkg")),
                     layer=index_layer,
                     index=index,
                     name=name,
@@ -354,7 +397,7 @@ class ComputeWidget(QWidget):
                 contour_layers.append(contour_layer)
 
         # Add the contours in the appropriate order: highest (deepest) layer first!
-        if contour:
+        if load_contours:
             for contour_layer in contour_layers[::-1]:
                 self.add_contour_layer(contour_layer)
 
@@ -444,7 +487,10 @@ class ComputeWidget(QWidget):
                 temporal_properties.setIsActive(False)
 
             if add:
-                if "timml Observation:" in layername or "ttim Observation" in layername:
+                if (
+                    "timml Head Observation:" in layername
+                    or "ttim Head Observation" in layername
+                ):
                     labels = layer_styling.number_labels("head_layer0")
                 elif "discharge-" in layername:
                     labels = layer_styling.number_labels("discharge_layer0")

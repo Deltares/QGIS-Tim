@@ -23,6 +23,8 @@ from qgis.core import (
     QgsVectorLayerTemporalProperties,
 )
 
+from qgistim.core import geopackage
+
 
 def raster_steady_contours(
     layer: QgsRasterLayer,
@@ -199,6 +201,7 @@ def transient_contours(
 
 
 def mesh_contours(
+    gpkg_path: str,
     layer: QgsMeshLayer,
     index: int,
     name: str,
@@ -207,6 +210,14 @@ def mesh_contours(
     step: float,
 ) -> QgsVectorLayer:
     if layer.firstValidTimeStep().isValid():
-        return transient_contours(layer, index, name, start, stop, step)
+        vector_layer = transient_contours(layer, index, name, start, stop, step)
     else:
-        return steady_contours(layer, index, name, start, stop, step)
+        vector_layer = steady_contours(layer, index, name, start, stop, step)
+    
+    written_layer = geopackage.write_layer(
+        path=gpkg_path,
+        layer=vector_layer,
+        layername=vector_layer.name(),
+        newfile=False,
+    )
+    return written_layer

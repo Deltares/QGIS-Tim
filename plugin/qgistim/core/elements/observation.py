@@ -5,7 +5,7 @@ from qgistim.core.elements.element import ElementSchema, TransientElement
 from qgistim.core.schemata import AllRequired, Positive, Required
 
 
-class ObservationSchema(ElementSchema):
+class HeadObservationSchema(ElementSchema):
     timml_schemata = {
         "geometry": Required(),
     }
@@ -15,8 +15,8 @@ class ObservationSchema(ElementSchema):
     }
 
 
-class Observation(TransientElement):
-    element_type = "Observation"
+class HeadObservation(TransientElement):
+    element_type = "Head Observation"
     geometry_type = "Point"
     timml_attributes = (
         QgsField("label", QVariant.String),
@@ -33,7 +33,7 @@ class Observation(TransientElement):
         "timeseries_id": QgsDefaultValue("1"),
     }
     transient_columns = ("timeseries_id",)
-    schema = ObservationSchema()
+    schema = HeadObservationSchema()
 
     @classmethod
     def renderer(cls) -> QgsSingleSymbolRenderer:

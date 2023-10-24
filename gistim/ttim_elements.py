@@ -416,7 +416,7 @@ def convert_to_script(spec: TtimModelSpecification) -> str:
 
         f_to_kwargs, element = MAPPING[elementtype]
         for i, kwargs in enumerate(f_to_kwargs(element_spec, modelkwargs["tstart"])):
-            if elementtype == "Observation":
+            if elementtype == "Head Observation":
                 kwargs.pop("label")
                 kwargs.pop("observation_id")
                 kwargs = dict_to_kwargs_code(kwargs)

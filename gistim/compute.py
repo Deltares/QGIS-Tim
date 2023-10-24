@@ -199,23 +199,32 @@ def compute_steady(
     with open(path, "r") as f:
         data = json.load(f)
 
+    output_options = data.pop("output_options")
+    headgrid = data.pop("headgrid")
     crs = CoordinateReferenceSystem(**data.pop("crs"))
     observation_names = [
-        key for key, value in data.items() if value.get("type") == "Observation"
+        key for key, value in data.items() if value.get("type") == "Head Observation"
     ]
     observations = {name: data.pop(name) for name in observation_names}
-    headgrid = data.pop("headgrid")
     timml_model, elements = initialize_timml(data)
     timml_model.solve()
 
     # Compute gridded head data and write to netCDF.
-    head = timml_headgrid(timml_model, **headgrid)
-    write_raster(head, crs, path)
-    write_ugrid(head, crs, path)
+    if output_options["raster"] or output_options["mesh"]:
+        head = timml_headgrid(timml_model, **headgrid)
+
+    if output_options["raster"]:
+        write_raster(head, crs, path)
+    if output_options["mesh"]:
+        write_ugrid(head, crs, path)
 
     # Compute observations and discharge, and write to geopackage.
-    tables = extract_discharges(elements, timml_model.aq.nlayers)
-    if observations:
+    if output_options["discharge"]:
+        tables = extract_discharges(elements, timml_model.aq.nlayers)
+    else:
+        tables = {}
+
+    if output_options["head_observations"] and observations:
         for layername, content in observations.items():
             tables[layername] = timml_head_observations(timml_model, content["data"])
 

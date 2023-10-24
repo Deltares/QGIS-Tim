@@ -16,7 +16,7 @@ from qgistim.core.elements.impermeable_line_doublet import ImpermeableLineDouble
 from qgistim.core.elements.leaky_building_pit import LeakyBuildingPit
 from qgistim.core.elements.leaky_line_doublet import LeakyLineDoublet
 from qgistim.core.elements.line_sink_ditch import LineSinkDitch
-from qgistim.core.elements.observation import Observation
+from qgistim.core.elements.observation import HeadObservation
 from qgistim.core.elements.polygon_area_sink import PolygonAreaSink
 from qgistim.core.elements.polygon_inhomogeneity import PolygonInhomogeneity
 from qgistim.core.elements.polygon_semi_confined_top import PolygonSemiConfinedTop
@@ -42,7 +42,7 @@ ELEMENTS = {
         PolygonInhomogeneity,
         BuildingPit,
         LeakyBuildingPit,
-        Observation,
+        HeadObservation,
     )
 }
 
