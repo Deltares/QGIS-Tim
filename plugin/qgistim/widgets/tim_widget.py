@@ -308,5 +308,10 @@ class QgisTimWidget(QWidget):
     def create_output_group(self, name: str) -> None:
         root = QgsProject.instance().layerTreeRoot()
         self.output_group = LayersPanelGroup(root, f"{name} output")
+        # Pre-create the groups here to make sure the vector group ends up on top.
+        # Apparently moving it destroys the group?
+        self.output_group.create_subgroup("vector")
+        self.output_group.create_subgroup("mesh")
+        self.output_group.create_subgroup("raster")
         return
  
