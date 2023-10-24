@@ -60,13 +60,11 @@ class ComputeTask(BaseServerTask):
 
             self.parent.clear_outdated_output(self.data["path"])
             # Load whatever data is available in the geopackage.
-            if self.data["head_observations"] or self.data["discharge"]: 
+            if self.data["head_observations"] or self.data["discharge"]:
                 self.parent.load_vector_result(self.data["path"])
 
             if self.data["mesh"]:
-                self.parent.load_mesh_result(
-                    self.data["path"], self.data["contours"]
-                )
+                self.parent.load_mesh_result(self.data["path"], self.data["contours"])
             if self.data["raster"]:
                 self.parent.load_raster_result(self.data["path"])
 
@@ -125,12 +123,13 @@ class ComputeWidget(QWidget):
         self.contour_min_box = QDoubleSpinBox()
         self.contour_max_box = QDoubleSpinBox()
         self.contour_step_box = QDoubleSpinBox()
+        self.contour_max_box.setMaximum(1000.0)
+        self.contour_max_box.setValue(5.0)
+        # Ensure the maximum cannot dip below the min box value.
+        self.contour_min_box.valueChanged.connect(self.set_minimum_contour_stop)
         self.contour_min_box.setMinimum(-1000.0)
         self.contour_min_box.setMaximum(1000.0)
         self.contour_min_box.setValue(-5.0)
-        self.contour_max_box.setMinimum(-1000.0)
-        self.contour_max_box.setMaximum(1000.0)
-        self.contour_max_box.setValue(5.0)
         self.contour_step_box.setSingleStep(0.1)
         self.contour_step_box.setValue(0.5)
 
@@ -203,6 +202,9 @@ class ComputeWidget(QWidget):
         self.contour_max_box.setValue(5.0)
         self.contour_step_box.setValue(0.5)
         return
+
+    def set_minimum_contour_stop(self) -> None:
+        self.contour_max_box.setMinimum(self.contour_min_box.value() + 0.05)
 
     def set_interpreter_interaction(self, value: bool):
         self.parent.set_interpreter_interaction(value)
