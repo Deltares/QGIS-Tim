@@ -112,7 +112,7 @@ def steady_contours(
         f.setGeometry(item.geometry)
         # Make sure to convert to the appropriate Qt types
         # e.g. no numpy floats allowed
-        f.setAttributes([float(item.head)])
+        f.setAttributes([round(float(item.head), 3)])
         provider.addFeature(f)
     contour_layer.updateExtents()
 
@@ -181,7 +181,7 @@ def transient_contours(
         # e.g. no numpy floats allowed
         f.setAttributes(
             [
-                float(item.head),
+                float(round(item.head, 3)),
                 QDateTime(item.datetime),
                 QDateTime(end_dates[item.datetime]),
             ]
@@ -214,7 +214,7 @@ def mesh_contours(
         vector_layer = transient_contours(layer, index, name, start, stop, step)
     else:
         vector_layer = steady_contours(layer, index, name, start, stop, step)
-    
+
     newfile = not Path(gpkg_path).exists()
     written_layer = geopackage.write_layer(
         path=gpkg_path,
