@@ -29,7 +29,7 @@ from qgistim.widgets.compute_widget import ComputeWidget
 from qgistim.widgets.dataset_widget import DatasetWidget
 from qgistim.widgets.elements_widget import ElementsWidget
 from qgistim.widgets.extraction_widget import DataExtractionWidget
-from qgistim.widgets.options_dialog import OptionsDialog
+from qgistim.widgets.version_dialog import VersionDialog
 
 PYQT_DELETED_ERROR = "wrapped C/C++ object of type QgsLayerTreeGroup has been deleted"
 
@@ -184,10 +184,10 @@ class QgisTimWidget(QWidget):
         self.dataset_widget = DatasetWidget(self)
         self.elements_widget = ElementsWidget(self)
         self.compute_widget = ComputeWidget(self)
-        self.options_dialog = OptionsDialog(self)
+        self.version_dialog = VersionDialog(self)
 
-        self.config_button = QPushButton("Options")
-        self.config_button.clicked.connect(self.options_dialog.show)
+        self.config_button = QPushButton("Versions")
+        self.config_button.clicked.connect(self.version_dialog.show)
         self.config_button.setIcon(QgsApplication.getThemeIcon("/mActionOptions.svg"))
 
         # Layout
@@ -230,7 +230,7 @@ class QgisTimWidget(QWidget):
 
     def start_interpreter_task(self) -> Union[StartTask, None]:
         if not self.server_handler.alive():
-            interpreter = self.options_dialog.interpreter_combo_box.currentText()
+            interpreter = self.version_dialog.interpreter_combo_box.currentText()
             start_task = StartTask(self, {"interpreter": interpreter}, self.message_bar)
             return start_task
         else:

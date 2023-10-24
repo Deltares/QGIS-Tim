@@ -246,6 +246,8 @@ class ComputeWidget(QWidget):
     def redraw_contours(self) -> None:
         path = Path(self.output_path)
         layer = self.contour_layer.currentLayer()
+        if layer is None:
+            return
         renderer = layer.rendererSettings()
         index = renderer.activeScalarDatasetGroup()
         qgs_index = QgsMeshDatasetIndex(group=index, dataset=0)
