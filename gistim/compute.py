@@ -112,12 +112,6 @@ def timml_head_observations(
     return pd.DataFrame(d)
 
 
-def timml_discharges(elements: Dict[str, Any]) -> Dict[str, pd.DataFrame]:
-    discharges = {}
-    for layername, content in elements.items():
-        first_element = content[0]
-
-
 def timml_headgrid(model: timml.Model, xmin, xmax, ymin, ymax, spacing) -> xr.DataArray:
     """
     Compute the headgrid of the TimML model, and store the results
