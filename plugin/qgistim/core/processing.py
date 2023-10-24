@@ -5,6 +5,7 @@ Currently wraps the QGIS functions for turning grids / meshes of head results
 into line contours.
 """
 import datetime
+from pathlib import Path
 from typing import NamedTuple
 
 import numpy as np
@@ -95,7 +96,7 @@ def steady_contours(
             feature_data.append(SteadyContourData(geom, value))
 
     # Setup output layer
-    contour_layer = QgsVectorLayer("Linestring", f"contours-{name}", "memory")
+    contour_layer = QgsVectorLayer("Linestring", name, "memory")
     contour_layer.setCrs(layer.crs())
     provider = contour_layer.dataProvider()
     provider.addAttributes(
@@ -132,7 +133,7 @@ def transient_contours(
     contourer = QgsMeshContours(layer)
 
     # Setup output layer
-    contour_layer = QgsVectorLayer("Linestring", f"contours-{name}", "memory")
+    contour_layer = QgsVectorLayer("Linestring", name, "memory")
     contour_layer.setCrs(layer.crs())
     provider = contour_layer.dataProvider()
     provider.addAttributes(
@@ -214,10 +215,11 @@ def mesh_contours(
     else:
         vector_layer = steady_contours(layer, index, name, start, stop, step)
     
+    newfile = not Path(gpkg_path).exists()
     written_layer = geopackage.write_layer(
         path=gpkg_path,
         layer=vector_layer,
-        layername=vector_layer.name(),
-        newfile=False,
+        layername=name,
+        newfile=newfile,
     )
     return written_layer

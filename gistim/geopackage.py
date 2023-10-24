@@ -122,6 +122,24 @@ def process_table(dataframe: pd.DataFrame) -> Tuple[pd.DataFrame, BoundingBox, s
 def write_geopackage(
     tables: Dict[str, pd.DataFrame], crs: CoordinateReferenceSystem, path: Path
 ) -> None:
+    """
+    Write the content of the tables to a geopackage. Overwrites the geopackage
+    if it already exists.
+
+    Parameters
+    ----------
+    tables: Dict[str, pd.DataFrame]
+        Mapping of table name to contents, as a dataframe.
+        May be an empty dictionary.
+    crs: CoordinateReferenceSystem
+        Coordinate reference system of the geometries.
+    path: Path
+        Path to the geopackage to write.
+
+    Returns
+    -------
+    None
+    """
     # We write all tables to a temporary GeoPackage with a dot prefix, and at
     # the end move this over the target file. This does not throw a
     # PermissionError if the file is open in QGIS.

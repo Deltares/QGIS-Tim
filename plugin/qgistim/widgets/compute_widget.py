@@ -58,14 +58,16 @@ class ComputeTask(BaseServerTask):
         if result:
             self.push_success_message()
 
+            self.parent.clear_outdated_output(self.data["path"])
             # Load whatever data is available in the geopackage.
-            self.parent.load_vector_result(self.data["path"])
+            if self.data["head_observations"] or self.data["discharge"]: 
+                self.parent.load_vector_result(self.data["path"])
 
-            if self.data["load_mesh"]:
+            if self.data["mesh"]:
                 self.parent.load_mesh_result(
-                    self.data["path"], self.data["load_contours"]
+                    self.data["path"], self.data["contours"]
                 )
-            if self.data["load_raster"]:
+            if self.data["raster"]:
                 self.parent.load_raster_result(self.data["path"])
 
         else:
@@ -87,8 +89,8 @@ class ComputeWidget(QWidget):
         self.compute_button = QPushButton("Compute")
         self.compute_button.clicked.connect(self.compute)
 
-        self.raster_checkbox = QCheckBox("Raster")
         self.mesh_checkbox = QCheckBox("Mesh")
+        self.raster_checkbox = QCheckBox("Raster")
         self.contours_checkbox = QCheckBox("Contours")
         self.head_observations_checkbox = QCheckBox("Head Observations")
         self.discharge_checkbox = QCheckBox("Discharge")
@@ -101,11 +103,11 @@ class ComputeWidget(QWidget):
         self.cellsize_spin_box.setValue(25.0)
         self.domain_button.clicked.connect(self.domain)
         # By default: all output
-        self.raster_checkbox.setChecked(True)
         self.mesh_checkbox.setChecked(True)
-        self.contours_checkbox.setChecked(True)
+        self.raster_checkbox.setChecked(False)
+        self.contours_checkbox.setChecked(False)
         self.head_observations_checkbox.setChecked(True)
-        self.discharge_checkbox.setChecked(True)
+        self.discharge_checkbox.setChecked(False)
 
         self.mesh_checkbox.toggled.connect(self.contours_checkbox.setEnabled)
         self.mesh_checkbox.toggled.connect(
@@ -158,8 +160,8 @@ class ComputeWidget(QWidget):
         button_row.addWidget(self.compute_button)
         result_layout.addLayout(output_row)
 
-        result_layout.addWidget(self.raster_checkbox)
         result_layout.addWidget(self.mesh_checkbox)
+        result_layout.addWidget(self.raster_checkbox)
         result_layout.addWidget(self.contours_checkbox)
         result_layout.addWidget(self.head_observations_checkbox)
         result_layout.addWidget(self.discharge_checkbox)
@@ -192,11 +194,11 @@ class ComputeWidget(QWidget):
         self.cellsize_spin_box.setValue(25.0)
         self.transient_combo_box.setCurrentIndex(0)
         self.output_line_edit.setText("")
-        self.raster_checkbox.setCheckState(True)
+        self.raster_checkbox.setCheckState(False)
         self.mesh_checkbox.setCheckState(True)
-        self.contours_checkbox.setCheckState(True)
+        self.contours_checkbox.setCheckState(False)
         self.head_observations_checkbox.setCheckState(True)
-        self.discharge_checkbox.setCheckState(True)
+        self.discharge_checkbox.setCheckState(False)
         self.contour_min_box.setValue(-5.0)
         self.contour_max_box.setValue(5.0)
         self.contour_step_box.setValue(0.5)
@@ -223,10 +225,23 @@ class ComputeWidget(QWidget):
         self.parent.output_group.add_layer(
             layer, "vector", renderer=renderer, on_top=True, labels=labels
         )
-        
+
     @property
     def output_path(self) -> str:
         return self.output_line_edit.text()
+
+    def clear_outdated_output(self, path: str) -> None:
+        path = Path(path)
+        gpkg_path = path.with_suffix(".output.gpkg")
+        netcdf_paths = (path.with_suffix(".nc"), path.with_suffix(".ugrid.nc"))
+        for layer in QgsProject.instance().mapLayers().values():
+            source = layer.source()
+            if (
+                Path(source) in netcdf_paths
+                or Path(source.partition("|")[0]) == gpkg_path
+            ):
+                QgsProject.instance().removeMapLayer(layer.id())
+        return
 
     def redraw_contours(self) -> None:
         path = Path(self.output_path)
@@ -235,17 +250,33 @@ class ComputeWidget(QWidget):
         index = renderer.activeScalarDatasetGroup()
         qgs_index = QgsMeshDatasetIndex(group=index, dataset=0)
         name = layer.datasetGroupMetadata(qgs_index).name()
+        contours_name = f"{path.stem}-contours-{name}"
         start, stop, step = self.contour_range()
+        gpkg_path = str(path.with_suffix(".output.gpkg"))
+
         layer = mesh_contours(
-            gpkg_path=str(path.with_suffix(".output.gpkg")),
+            gpkg_path=gpkg_path,
             layer=layer,
             index=index,
-            name=name,
+            name=contours_name,
             start=start,
             stop=stop,
             step=step,
         )
-        self.add_contour_layer(layer)
+
+        # Re-use layer if it already exists. Otherwise add a new layer.
+        project_layers = {
+            layer.name(): layer for layer in QgsProject.instance().mapLayers().values()
+        }
+        project_layer = project_layers.get(contours_name)
+        if (
+            (project_layer is not None)
+            and (project_layer.name() == layer.name())
+            and (project_layer.source() == layer.source())
+        ):
+            project_layer.reload()
+        else:
+            self.add_contour_layer(layer)
         return
 
     def set_output_path(self) -> None:
@@ -295,13 +326,8 @@ class ComputeWidget(QWidget):
             "operation": "compute",
             "path": str(path),
             "transient": transient,
-            "load_raster": output_options["raster"],
-            "load_mesh": output_options["mesh"],
-            "load_contours": output_options["contours"],
+            **output_options,
         }
-        # import json
-        # print(json.dumps(data))
-        #
         # https://gis.stackexchange.com/questions/296175/issues-with-qgstask-and-task-manager
         # It seems the task goes awry when not associated with a Python object!
         # -- we just assign it to the widget here.
@@ -351,15 +377,6 @@ class ComputeWidget(QWidget):
         path = Path(path)
         # String for QGIS functions
         netcdf_path = str(path.with_suffix(".ugrid.nc"))
-        # Loop through layers first. If the path already exists as a layer
-        # source, remove it. Otherwise QGIS will not the load the new result
-        # (this feels like a bug?).
-        for layer in QgsProject.instance().mapLayers().values():
-            if Path(netcdf_path) == Path(layer.source()):
-                QgsProject.instance().removeMapLayer(layer.id())
-        # Ensure the file is properly released by loading a dummy
-        QgsMeshLayer(str(self.dummy_ugrid_path), "", "mdal")
-
         layer = QgsMeshLayer(netcdf_path, f"{path.stem}", "mdal")
         indexes = layer.datasetGroupsIndexes()
         contour_layers = []
@@ -389,7 +406,7 @@ class ComputeWidget(QWidget):
                     gpkg_path=str(path.with_suffix(".output.gpkg")),
                     layer=index_layer,
                     index=index,
-                    name=name,
+                    name=f"{path.stem}-contours-{name}",
                     start=start,
                     stop=stop,
                     step=step,
@@ -414,12 +431,6 @@ class ComputeWidget(QWidget):
         # String for QGIS functions
         path = Path(path)
         raster_path = str(path.with_suffix(".nc"))
-        for layer in QgsProject.instance().mapLayers().values():
-            if Path(raster_path) == Path(layer.source()):
-                QgsProject.instance().removeMapLayer(layer.id())
-
-        # contour, start, stop, step = self.contouring()
-
         layer = QgsRasterLayer(raster_path, "", "gdal")
 
         bands = [i + 1 for i in range(layer.bandCount())]
@@ -448,30 +459,17 @@ class ComputeWidget(QWidget):
 
     def load_vector_result(self, path: Union[Path, str]) -> None:
         path = Path(path)
-        project_layers = {
-            layer.name(): layer for layer in QgsProject.instance().mapLayers().values()
-        }
         gpkg_path = path.with_suffix(".output.gpkg")
 
         if not gpkg_path.exists():
             return
 
         for layername in geopackage.layers(str(gpkg_path)):
-            add = False
             layers_panel_name = f"{path.stem}-{layername}"
-            project_layer = project_layers.get(layers_panel_name)
-            if (
-                project_layer is not None
-                and Path(project_layer.source().partition("|")[0]) == gpkg_path
-            ):
-                # Shares name and source. Just reload the layer.
-                layer = project_layer
-                layer.reload()
-            else:
-                layer = QgsVectorLayer(
-                    f"{gpkg_path}|layername={layername}", layers_panel_name
-                )
-                add = True
+
+            layer = QgsVectorLayer(
+                f"{gpkg_path}|layername={layername}", layers_panel_name
+            )
 
             # Set the temporal properties if it's a temporal layer
             temporal_properties = layer.temporalProperties()
@@ -486,21 +484,20 @@ class ComputeWidget(QWidget):
             else:
                 temporal_properties.setIsActive(False)
 
-            if add:
-                if (
-                    "timml Head Observation:" in layername
-                    or "ttim Head Observation" in layername
-                ):
-                    labels = layer_styling.number_labels("head_layer0")
-                elif "discharge-" in layername:
-                    labels = layer_styling.number_labels("discharge_layer0")
-                else:
-                    labels = None
+            if (
+                "timml Head Observation:" in layername
+                or "ttim Head Observation" in layername
+            ):
+                labels = layer_styling.number_labels("head_layer0")
+            elif "discharge-" in layername:
+                labels = layer_styling.number_labels("discharge_layer0")
+            else:
+                labels = None
 
-                _, element_type, _ = parse_name(layername)
-                renderer = ELEMENTS[element_type].renderer()
-                self.parent.output_group.add_layer(
-                    layer, "vector", renderer=renderer, labels=labels
-                )
+            _, element_type, _ = parse_name(layername)
+            renderer = ELEMENTS[element_type].renderer()
+            self.parent.output_group.add_layer(
+                layer, "vector", renderer=renderer, labels=labels
+            )
 
         return
