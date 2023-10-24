@@ -15,7 +15,14 @@ from PyQt5.QtWidgets import (
     QVBoxLayout,
     QWidget,
 )
-from qgis.core import Qgis, QgsApplication, QgsMapLayer, QgsProject, QgsUnitTypes
+from qgis.core import (
+    Qgis,
+    QgsApplication,
+    QgsEditFormConfig,
+    QgsMapLayer,
+    QgsProject,
+    QgsUnitTypes,
+)
 from qgistim.core.server_handler import ServerHandler
 from qgistim.core.task import BaseServerTask
 from qgistim.widgets.compute_widget import ComputeWidget
@@ -37,7 +44,7 @@ class LayersPanelGroup:
         self.root = root
         self.subgroups = {}
         self.create_group()
-        
+
     def create_group(self):
         self.group = self.root.addGroup(self.name)
         return
@@ -132,8 +139,11 @@ class LayersPanelGroup:
         maplayer = QgsProject.instance().addMapLayer(layer, False)
         if suppress is not None:
             config = maplayer.editFormConfig()
-            config.setSuppress(suppress)
-            maplayer.setEditFormConfig(config)
+            config.setSuppress(
+                QgsEditFormConfig.SuppressOn
+                if suppress
+                else QgsEditFormConfig.SuppressDefault
+            )
         if renderer is not None:
             maplayer.setRenderer(renderer)
         if labels is not None:
@@ -314,4 +324,3 @@ class QgisTimWidget(QWidget):
         self.output_group.create_subgroup("mesh")
         self.output_group.create_subgroup("raster")
         return
- 
