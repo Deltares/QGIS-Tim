@@ -7,8 +7,9 @@ import sqlite3
 from pathlib import Path
 from typing import Dict, List, NamedTuple, Tuple
 
-import geomet.geopackage
 import pandas as pd
+
+from gistim.geomet import geopackage
 
 
 class CoordinateReferenceSystem(NamedTuple):
@@ -115,7 +116,7 @@ def process_table(dataframe: pd.DataFrame) -> Tuple[pd.DataFrame, BoundingBox, s
     # Get first (and only) member of set.
     geometry_type = next(iter(geometry_type))
     bounding_box = collect_bounding_box(geometry, geometry_type)
-    dataframe["geom"] = [geomet.geopackage.dumps(f) for f in geometry]
+    dataframe["geom"] = [geopackage.dumps(f) for f in geometry]
     return dataframe, bounding_box, geometry_type
 
 
