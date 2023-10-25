@@ -222,8 +222,7 @@ def compute_steady(
         for layername, content in observations.items():
             tables[layername] = timml_head_observations(timml_model, content["data"])
 
-    if tables:
-        write_geopackage(tables, crs, path)
+    write_geopackage(tables, crs, path)
     return
 
 
