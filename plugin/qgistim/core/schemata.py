@@ -197,8 +197,6 @@ class NotBoth(BaseSchema):
         self.y = y
 
     def validate(self, data, _=None) -> MaybeError:
-        print(data[self.x])
-        print(data[self.y])
         if (data[self.x] is not None) and (data[self.y] is not None):
             return f"Either {self.x} or {self.y} should be provided, not both."
         return None

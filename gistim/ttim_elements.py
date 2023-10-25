@@ -388,7 +388,6 @@ def initialize_model(spec: TtimModelSpecification, timml_model) -> TimModel:
         if (not element_spec.active) or (elementtype not in MAPPING):
             continue
 
-        # print(f"adding {name} as {elementtype}")
         f_to_kwargs, element = MAPPING[elementtype]
         for i, kwargs in enumerate(f_to_kwargs(element_spec, model.tstart)):
             if elementtype == "Observation":
