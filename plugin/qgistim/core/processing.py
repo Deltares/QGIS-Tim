@@ -23,7 +23,6 @@ from qgis.core import (
     QgsVectorLayer,
     QgsVectorLayerTemporalProperties,
 )
-
 from qgistim.core import geopackage
 
 

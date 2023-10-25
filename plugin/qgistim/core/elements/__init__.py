@@ -11,7 +11,7 @@ from qgistim.core.elements.constant import Constant
 from qgistim.core.elements.domain import Domain
 from qgistim.core.elements.element import Element
 from qgistim.core.elements.head_line_sink import HeadLineSink
-from qgistim.core.elements.headwell import HeadWell
+from qgistim.core.elements.headwell import HeadWell, RemoteHeadWell
 from qgistim.core.elements.impermeable_line_doublet import ImpermeableLineDoublet
 from qgistim.core.elements.leaky_building_pit import LeakyBuildingPit
 from qgistim.core.elements.leaky_line_doublet import LeakyLineDoublet
@@ -32,6 +32,7 @@ ELEMENTS = {
         UniformFlow,
         Well,
         HeadWell,
+        RemoteHeadWell,
         HeadLineSink,
         LineSinkDitch,
         CircularAreaSink,

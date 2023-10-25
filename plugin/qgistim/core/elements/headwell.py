@@ -1,7 +1,14 @@
 from typing import Any, Dict
 
 from PyQt5.QtCore import QVariant
-from qgis.core import QgsDefaultValue, QgsField, QgsSingleSymbolRenderer
+from PyQt5.QtGui import QColor
+from qgis.core import (
+    QgsArrowSymbolLayer,
+    QgsDefaultValue,
+    QgsField,
+    QgsLineSymbol,
+    QgsSingleSymbolRenderer,
+)
 from qgistim.core.elements.colors import BLUE
 from qgistim.core.elements.element import ElementSchema, TransientElement
 from qgistim.core.schemata import (
@@ -77,4 +84,35 @@ class HeadWell(TransientElement):
             "res": row["resistance"],
             "layers": row["layer"],
             "label": row["label"],
+        }
+
+
+class RemoteHeadWell(HeadWell):
+    element_type = "Remote Head Well"
+    geometry_type = "Linestring"
+
+    @classmethod
+    def renderer(cls) -> QgsSingleSymbolRenderer:
+        arrow = QgsArrowSymbolLayer()
+        red, green, blue, _ = [int(v) for v in BLUE.split(",")]
+        arrow.setColor(QColor(red, green, blue))
+        arrow.setHeadLength(2.5)
+        symbol = QgsLineSymbol.createSimple({})
+        symbol.changeSymbolLayer(0, arrow)
+        return QgsSingleSymbolRenderer(symbol)
+
+    def process_timml_row(self, row, other=None) -> Dict[str, Any]:
+        xy = self.linestring_xy(row)
+        xw, yw = xy[-1]
+        xc, yc = xy[0]
+        return {
+            "xw": xw,
+            "yw": yw,
+            "hw": row["head"],
+            "rw": row["radius"],
+            "res": row["resistance"],
+            "layers": row["layer"],
+            "label": row["label"],
+            "xc": xc,
+            "yc": yc,
         }

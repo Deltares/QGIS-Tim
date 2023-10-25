@@ -15,6 +15,7 @@ MAPPING = {
     "Circular Area Sink": "CircAreaSink",
     "Well": "Well",
     "Head Well": "HeadWell",
+    "Remote Head Well": "HeadWell",
     "Polygon Inhomogeneity": "PolygonInhomMaq",
     "Polygon Area Sink": "PolygonInhomMaq",
     "Polygon Semi-Confined Top": "PolygonInhomMaq",
@@ -155,7 +156,9 @@ def to_script_string(data: Dict[str, Any]) -> str:
     return "\n".join(strings)
 
 
-def to_json(data: Dict[str, Any], cellsize: float, output_options: Dict[str, bool]) -> Dict[str, Any]:
+def to_json(
+    data: Dict[str, Any], cellsize: float, output_options: Dict[str, bool]
+) -> Dict[str, Any]:
     """
     Take the data and add:
 
@@ -186,5 +189,5 @@ def to_json(data: Dict[str, Any], cellsize: float, output_options: Dict[str, boo
         plugin_name = re.split("timml |ttim ", prefix)[1]
         timml_name = MAPPING[plugin_name]
         json_data[layername] = {"type": timml_name, "name": name, "data": element_data}
-    
+
     return json_data

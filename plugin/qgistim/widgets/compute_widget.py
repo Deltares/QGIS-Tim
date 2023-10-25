@@ -57,12 +57,9 @@ class ComputeTask(BaseServerTask):
         self.parent.set_interpreter_interaction(True)
         if result:
             self.push_success_message()
-
             self.parent.clear_outdated_output(self.data["path"])
-            # Load whatever data is available in the geopackage.
             if self.data["head_observations"] or self.data["discharge"]:
                 self.parent.load_vector_result(self.data["path"])
-
             if self.data["mesh"]:
                 self.parent.load_mesh_result(self.data["path"], self.data["contours"])
             if self.data["raster"]:
