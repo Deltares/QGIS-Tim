@@ -244,6 +244,11 @@ class QgisTimWidget(QWidget):
         return response
 
     def set_interpreter_interaction(self, value: bool) -> None:
+        """
+        Disable interaction with the external interpreter. Some task may take a
+        minute or so to run. No additional tasks should be scheduled in the
+        mean time.
+        """
         self.compute_widget.compute_button.setEnabled(value)
         self.dataset_widget.convert_button.setEnabled(value)
         self.extraction_widget.extract_button.setEnabled(value)
@@ -264,6 +269,11 @@ class QgisTimWidget(QWidget):
         Returns coordinate reference system of current mapview
 
         Returns None if the crs does not have meters as its units.
+
+        This is important since TimML and TTim always assume a Cartesian
+        reference plane, and variables such as conductivity are expressed in
+        units such as meter per day. As distances are inferred from the
+        geometry, the geometry must have appropriate units.
         """
         crs = self.iface.mapCanvas().mapSettings().destinationCrs()
         if crs.mapUnits() not in (

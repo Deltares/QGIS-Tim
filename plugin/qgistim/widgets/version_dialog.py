@@ -12,6 +12,10 @@ from qgistim.core.server_handler import ServerHandler
 
 
 class VersionDialog(QDialog):
+    """
+    Provides some basic info on what versions are used by the back-end.
+    """
+
     def __init__(self, parent=None):
         QDialog.__init__(self, parent)
         self.setWindowTitle("QGIS-Tim Version Info")

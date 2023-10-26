@@ -4,7 +4,11 @@ from PyQt5.QtWidgets import QDialog, QHBoxLayout, QPushButton, QTextBrowser, QVB
 
 
 def format_list(errors: Dict[str, Any]):
-    """Recursive formatting"""
+    """
+    Format the a list of errors to HTML lists.
+
+    Since the level of nesting may vary, this function is called recursively.
+    """
     messages = []
     for variable, var_errors in errors.items():
         if isinstance(var_errors, list):
@@ -19,6 +23,7 @@ def format_list(errors: Dict[str, Any]):
 
 
 def format_errors(errors: Dict[str, Dict[str, Any]]):
+    """Format the errors per element to HTML lists."""
     messages = []
     for element, element_errors in errors.items():
         messages.append(f"<b>{element}</b>")
@@ -27,6 +32,15 @@ def format_errors(errors: Dict[str, Dict[str, Any]]):
 
 
 class ValidationDialog(QDialog):
+    """
+    Presents the result of the validation by the schemata in an HTML window.
+
+    A QTextBrowser is used here since it has some useful properties:
+
+    * It features an automatic scrollbar.
+    * It uses HTML, so we may show nested lists.
+    """
+
     def __init__(self, errors: Dict[str, Dict[str, Any]]):
         super().__init__()
         self.cancel_button = QPushButton("Close")
