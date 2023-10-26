@@ -94,27 +94,20 @@ class Well(TransientElement):
             "label": row["label"],
         }
 
-    def to_ttim(self, time_start):
-        data = self.to_dict(self.timml_layer)
-        ttim_data = self.table_to_dict(self.ttim_layer)
-        grouped = self.groupby(ttim_data, "timeseries_id")
-        wells = []
-        for row in data:
-            x, y = self.point_xy(row)
-            wells.append(
-                {
-                    "xw": x,
-                    "yw": y,
-                    "tsandQ": self._transient_input(
-                        row, grouped, "discharge", time_start
-                    ),
-                    "hw": row["head"],
-                    "rw": row["radius"],
-                    "res": row["resistance"],
-                    "layers": row["layer"],
-                    "label": row["label"],
-                    "rc": row["caisson_radius"],
-                    "wbstype": "slug" if row["slug"] else "pumping",
-                }
-            )
-        return wells
+    def process_ttim_row(self, row, grouped):
+        x, y = self.point_xy(row)
+        return {
+            "xw": x,
+            "yw": y,
+            "tsandQ": self.transient_input(
+                row,
+                grouped,
+                "discharge",
+            ),
+            "rw": row["radius"],
+            "res": row["resistance"],
+            "layers": row["layer"],
+            "label": row["label"],
+            "rc": row["caisson_radius"],
+            "wbstype": "slug" if row["slug"] else "pumping",
+        }

@@ -81,3 +81,13 @@ class LineSinkDitch(TransientElement):
             "layers": row["layer"],
             "label": row["label"],
         }
+
+    def process_ttim_row(self, row, grouped):
+        return {
+            "xy": self.linestring_xy(row),
+            "tsandQ": self.transient_input(row, grouped, "discharge"),
+            "res": row["resistance"],
+            "wh": row["width"],
+            "layers": row["layer"],
+            "label": row["label"],
+        }

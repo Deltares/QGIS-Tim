@@ -320,7 +320,6 @@ class Element(ExtractorMixin, abc.ABC):
 
     @staticmethod
     def groupby(data: Dict[str, Any], key: str):
-        # TODO: sort by layer or time?
         data = deepcopy(data)
         grouper = data.pop(key)
         grouped = {k: defaultdict(list) for k in grouper}
@@ -330,7 +329,7 @@ class Element(ExtractorMixin, abc.ABC):
         return grouped
 
     def to_timml(self, other=None):
-        data = self.to_dict(self.timml_layer)
+        data = self.table_to_records(self.timml_layer)
         errors = self.schema.validate_timml(data, other)
         if errors:
             return errors, data
@@ -341,8 +340,16 @@ class Element(ExtractorMixin, abc.ABC):
     def to_ttim(self, other=None):
         return self.to_timml(other)
 
+    def extract_data(self, transient: bool, other=None) -> Union[List, Dict]:
+        if transient:
+            return self.to_ttim(other)
+        else:
+            return self.to_timml(other)
+
     @staticmethod
     def aquifer_data(data, transient: bool):
+        """Used by the Aquifer element and the Inhomogeneities."""
+
         def interleave(a, b):
             return [value for pair in zip(a, b) for value in pair]
 
@@ -377,15 +384,18 @@ class Element(ExtractorMixin, abc.ABC):
             "kaq": kaq,
             "z": z,
             "c": c,
-            "npor": porosity,
+            "topboundary": topboundary,
         }
 
         if transient:
             aquifer["Saq"] = s_aquifer
             aquifer["Sll"] = s_aquitard
             aquifer["phreatictop"] = True
+            aquifer["tmin"] = data["time_min"]
+            aquifer["tstart"] = 0.0
+            aquifer["M"] = data["laplace_inversion_M"]
         else:
-            aquifer["topboundary"] = topboundary
+            aquifer["npor"] = porosity
             aquifer["hstar"] = hstar
 
         if "resistance" in data:
@@ -431,8 +441,22 @@ class TransientElement(Element, abc.ABC):
         geopackage.remove_layer(self.path, self.timml_name)
         geopackage.remove_layer(self.path, self.ttim_name)
 
+    def on_transient_changed(self, transient: bool):
+        if len(self.transient_columns) == 0:
+            return
+
+        config = self.timml_layer.attributeTableConfig()
+        columns = config.columns()
+
+        for i, column in enumerate(columns):
+            if column.name in self.transient_columns:
+                config.setColumnHidden(i, not transient)
+
+        self.timml_layer.setAttributeTableConfig(config)
+        return
+
     @staticmethod
-    def transient_input(row, all_timeseries, variable: str, time_start):
+    def transient_input(row, all_timeseries: Dict[str, Any], variable: str):
         timeseries_id = row["timeseries_id"]
         row_start = row["time_start"]
         row_end = row["time_end"]
@@ -454,38 +478,29 @@ class TransientElement(Element, abc.ABC):
         elif start_and_stop:
             return [(row_start, transient_value - steady_value), (row_end, 0.0)]
         else:
-            return [(time_start), 0.0]
+            return [(0.0, 0.0)]
 
-    def on_transient_changed(self, transient: bool):
-        if len(self.transient_columns) == 0:
-            return
 
-        config = self.timml_layer.attributeTableConfig()
-        columns = config.columns()
-
-        for i, column in enumerate(columns):
-            if column.name in self.transient_columns:
-                config.setColumnHidden(i, not transient)
-
-        self.timml_layer.setAttributeTableConfig(config)
-        return
-
-    def to_ttim(self, other=None):
-        # Check timml input and timeseries input first.
-        timml_errors, data = self.to_timml(other)
+    def to_ttim(self, other):
         timeseries = self.table_to_dict(self.ttim_layer)
-        timeseries_errors = self.schema.validate_timeseries(timeseries)
-        errors = {**timml_errors, **timeseries_errors}
-        if errors:
-            return errors, None
+        if timeseries:
+            errors = self.schema.validate_timeseries(timeseries)
+            if errors:
+                return errors, None
 
-        other = other.copy()
-        other["timeseries_ids"] = set([row["timeseries_id"] for row in timeseries])
-        errors = self.schema.validate_ttim(data, other)
-        if errors:
-            return errors, None
+            grouped = self.groupby(timeseries, "timeseries_id")
+            # Store timeseries in other dict for validation.
+            other = other.copy()
+            other["timeseries_ids"] = set(timeseries["timeseries_id"])
 
-        grouped = self.groupby(timeseries, "timeseries_id")
+        else:
+            grouped = {}
+
+        data = self.table_to_records(self.timml_layer)
+        # errors = self.schema.validate_ttim(data, other)
+        # if errors:
+        #    return errors, None
+
         elements = [self.process_ttim_row(row, grouped) for row in data]
         return None, elements
 
@@ -536,7 +551,7 @@ class AssociatedElement(Element, abc.ABC):
 
         other = other.copy()  # Avoid side-effects
         other["properties inhomogeneity_id"] = list(set(properties["inhomogeneity_id"]))
-        data = self.to_dict(self.timml_layer)
+        data = self.table_to_records(self.timml_layer)
         errors = self.schema.validate_timml(data, other)
         if errors:
             return errors, None

@@ -86,6 +86,22 @@ class HeadWell(TransientElement):
             "label": row["label"],
         }
 
+    def process_ttim_row(self, row, grouped):
+        x, y = self.point_xy(row)
+        return {
+            "xw": x,
+            "yw": y,
+            "tsandh": self.transient_input(
+                row,
+                grouped,
+                "head",
+            ),
+            "rw": row["radius"],
+            "res": row["resistance"],
+            "layers": row["layer"],
+            "label": row["label"],
+        }
+
 
 class RemoteHeadWell(HeadWell):
     element_type = "Remote Head Well"

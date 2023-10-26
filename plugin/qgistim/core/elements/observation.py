@@ -46,3 +46,12 @@ class HeadObservation(TransientElement):
             "y": y,
             "label": row["label"],
         }
+
+    def process_ttim_row(self, row, grouped):
+        x, y = self.point_xy(row)
+        return {
+            "x": x,
+            "y": y,
+            "t": grouped[row["timeseries_id"]]["time"],
+            "label": row["label"],
+        }

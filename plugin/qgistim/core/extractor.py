@@ -1,6 +1,6 @@
 import abc
 from collections import defaultdict
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Tuple
 
 from qgis.core import NULL
 
@@ -11,6 +11,10 @@ def remove_zero_length(geometry):
 
 
 class ExtractorMixin(abc.ABC):
+    """
+    Mixin class to extract all data from QgsVectorLayers.
+    """
+
     @staticmethod
     def argsort(seq):
         return sorted(range(len(seq)), key=seq.__getitem__)
@@ -25,7 +29,7 @@ class ExtractorMixin(abc.ABC):
         return (centroid.x(), centroid.y()), coordinates
 
     @classmethod
-    def to_dict(cls, layer) -> List[Dict[str, Any]]:
+    def table_to_records(cls, layer) -> List[Dict[str, Any]]:
         features = []
         for feature in layer.getFeatures():
             data = feature.attributeMap()
@@ -47,23 +51,17 @@ class ExtractorMixin(abc.ABC):
                     features[key].append(None)
                 else:
                     features[key].append(value)
-
-        # Sort by layer if present.
-        # TODO: is this smart? A user may easily miss the layer column.
-        # if "layer" in features:
-        #    order = cls.argsort(features["layer"])
-        #    return {k: [v[i] for i in order] for k, v in features.items()}
         return features
 
     @staticmethod
-    def point_xy(row):
+    def point_xy(row) -> Tuple[List[float], List[float]]:
         point = row["geometry"][0]
         return point[0], point[1]
 
     @staticmethod
-    def linestring_xy(row):
+    def linestring_xy(row) -> List:
         return remove_zero_length(row["geometry"])
 
     @staticmethod
-    def polygon_xy(row):
+    def polygon_xy(row) -> List:
         return remove_zero_length(row["geometry"])

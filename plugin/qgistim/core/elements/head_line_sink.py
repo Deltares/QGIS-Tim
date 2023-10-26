@@ -82,21 +82,12 @@ class HeadLineSink(TransientElement):
             "label": row["label"],
         }
 
-    def to_ttim(self, time_start):
-        data = self.to_dict(self.timml_layer)
-        ttim_data = self.table_to_dict(self.ttim_layer)
-        grouped = self.groupby(ttim_data, "timeseries_id")
-        sinks = []
-        for row in data:
-            sinks.append(
-                {
-                    "xy": self.linestring_xy(row),
-                    "tsandh": self._transient_input(row, grouped, "head", time_start),
-                    "res": row["resistance"],
-                    "wh": row["width"],
-                    "order": row["order"],
-                    "layers": row["layer"],
-                    "label": row["label"],
-                }
-            )
-        return sinks
+    def process_ttim_row(self, row, grouped):
+        return {
+            "xy": self.linestring_xy(row),
+            "tsandh": self.transient_input(row, grouped, "head"),
+            "res": row["resistance"],
+            "wh": row["width"],
+            "layers": row["layer"],
+            "label": row["label"],
+        }

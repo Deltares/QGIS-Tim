@@ -66,7 +66,7 @@ class Domain(TransientElement):
         return ymax, ymin
 
     def to_timml(self, other):
-        data = self.to_dict(self.timml_layer)
+        data = self.table_to_records(self.timml_layer)
         errors = self.schema.validate_timml(data, other)
         if errors:
             return errors, None
@@ -80,8 +80,9 @@ class Domain(TransientElement):
                 "ymax": max(y),
             }
 
-    def to_ttim(self):
-        data = self.to_timml()
+    def to_ttim(self, other):
+        _, data = self.to_timml(other)
         ttim_data = self.table_to_dict(self.ttim_layer)
+        ttim_errors = self.schema.validate_ttim(ttim_data, other)
         data["time"] = ttim_data["time"]
-        return data
+        return ttim_errors, data

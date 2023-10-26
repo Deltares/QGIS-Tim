@@ -1,3 +1,5 @@
+from typing import Any, Dict
+
 from PyQt5.QtCore import QVariant
 from qgis.core import QgsDefaultValue, QgsField
 from qgistim.core import geopackage
@@ -33,7 +35,9 @@ class AquiferSchema(ElementSchema):
         "aquitard_s": OffsetAllRequired(Positive()),
         "aquifer_s": AllRequired(Positive()),
     }
-    ttim_consistency_schemata = (SingleRow(),)
+
+
+#    ttim_consistency_schemata = (SingleRow(),)
 
 
 class Aquifer(TransientElement):
@@ -95,4 +99,11 @@ class Aquifer(TransientElement):
     def to_ttim(self):
         data = self.table_to_dict(self.timml_layer)
         errors = self.schema.validate_ttim(data)
-        return errors, data
+        time_data = self.table_to_records(self.ttim_layer)[0]
+        return errors, {**data, **time_data}
+
+    def extract_data(self, transient: bool) -> Dict[str, Any]:
+        if transient:
+            return self.to_ttim()
+        else:
+            return self.to_timml()

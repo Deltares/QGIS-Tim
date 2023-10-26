@@ -13,7 +13,7 @@ disabled (such as inhomogeneities).
 import json
 from pathlib import Path
 from shutil import copy
-from typing import Dict, List, Set
+from typing import Any, Dict, List, Set, Tuple
 
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import (
@@ -34,7 +34,7 @@ from PyQt5.QtWidgets import (
 )
 from qgis.core import Qgis, QgsProject
 from qgistim.core.elements import Aquifer, Domain, load_elements_from_geopackage
-from qgistim.core.formatting import to_json, to_script_string
+from qgistim.core.formatting import data_to_json, data_to_script
 from qgistim.widgets.error_window import ValidationDialog
 
 SUPPORTED_TTIM_ELEMENTS = set(
@@ -193,30 +193,38 @@ class DatasetTreeWidget(QTreeWidget):
 
         return
 
-    def convert_to_timml(self):
+    def extract_data(self, transient: bool) -> Tuple[Dict[str, Any], Dict[str, Any]]:
+        """
+        Extract the data of the Geopackage.
+
+        Validates all data while converting, and returns a list of validation
+        errors if something is amiss.
+        """
+        data = {}
+        errors = {}
         elements = {
             item.text(1): item.element
             for item in self.items()
             if item.timml_checkbox.isChecked()
         }
-        data = {}
-        errors = {}
 
         # First convert the aquifer, since we need its data to validate
         # other elements.
         name = "timml Aquifer:Aquifer"
         aquifer = elements.pop(name)
-        _errors, raw_data = aquifer.to_timml()
-        other = {"aquifer layers": raw_data["layer"], "global_aquifer": raw_data}
+        _errors, raw_data = aquifer.extract_data(transient)
         if _errors:
             errors[name] = _errors
         else:
-            aquifer_data = aquifer.aquifer_data(raw_data, transient=False)
+            aquifer_data = aquifer.aquifer_data(raw_data, transient=transient)
             data[name] = aquifer_data
+            if transient:
+                data["reference_date"] = str(raw_data["reference_date"].toPyDateTime())
 
+        other = {"aquifer layers": raw_data["layer"], "global_aquifer": raw_data}
         for name, element in elements.items():
             try:
-                _errors, _data = element.to_timml(other)
+                _errors, _data = element.extract_data(transient, other)
                 if _errors:
                     errors[name] = _errors
                 elif _data:  # skip empty tables
@@ -458,27 +466,36 @@ class DatasetWidget(QWidget):
         self.parent.set_interpreter_interaction(value)
         return
 
-    def _convert(self, transient: bool) -> None:
+    def extract_data(self, transient: bool) -> Tuple[Dict[str, Any], Dict[str, Any]]:
         if self.validation_dialog:
             self.validation_dialog.close()
             self.validation_dialog = None
 
-        errors, data = self.dataset_tree.convert_to_timml()
+        errors, timml_data = self.dataset_tree.extract_data(transient=False)
         if errors:
             self.validation_dialog = ValidationDialog(errors)
-            return None
+            return None, None
 
-        return data
+        ttim_data = None
+        if transient:
+            errors, ttim_data = self.dataset_tree.extract_data(transient=True)
+            if errors:
+                self.validation_dialog = ValidationDialog(errors)
+                return None, None
 
-    def convert_to_python(self, transient: bool) -> None:
+        return timml_data, ttim_data
+
+    def convert_to_python(self) -> None:
+        transient = self.transient
         outpath, _ = QFileDialog.getSaveFileName(self, "Select file", "", "*.py")
         if outpath == "":  # Empty string in case of cancel button press
             return
-        data = self._convert(transient=transient)
-        if data is None:
+
+        timml_data, ttim_data = self.extract_data(transient=transient)
+        if timml_data is None:
             return
 
-        script = to_script_string(data)
+        script = data_to_script(timml_data, ttim_data)
         with open(outpath, "w") as f:
             f.write(script)
 
@@ -511,11 +528,17 @@ class DatasetWidget(QWidget):
         invalid_input: bool
             Whether validation has succeeded.
         """
-        data = self._convert(transient=transient)
-        if data is None:
+        timml_data, ttim_data = self.extract_data(transient=transient)
+        if timml_data is None:
             return True
 
-        json_data = to_json(data, cellsize=cellsize, output_options=output_options)
+        json_data = data_to_json(
+            timml_data,
+            ttim_data,
+            cellsize=cellsize,
+            output_options=output_options,
+        )
+
         crs = self.parent.crs
         organization, srs_id = crs.authid().split(":")
         json_data["crs"] = {
@@ -524,6 +547,7 @@ class DatasetWidget(QWidget):
             "srs_id": srs_id,
             "wkt": crs.toWkt(),
         }
+
         with open(path, "w") as fp:
             json.dump(json_data, fp=fp, indent=4)
 

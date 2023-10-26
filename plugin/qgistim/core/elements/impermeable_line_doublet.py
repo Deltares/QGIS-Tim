@@ -40,7 +40,7 @@ class ImpermeableLineDoublet(Element):
     def to_ttim(self, other):
         # TTim doesn't have an ImpermeableLineDoublet, we need to add "imp" as
         # the resistance entry.
-        data = self.to_timml(other)
+        _, data = self.to_timml(other)
         out = []
         for row in data:
             out.append(
@@ -51,4 +51,4 @@ class ImpermeableLineDoublet(Element):
                     "label": row["label"],
                 }
             )
-        return out
+        return None, out
