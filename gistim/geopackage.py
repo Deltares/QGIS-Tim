@@ -7,6 +7,7 @@ import sqlite3
 from pathlib import Path
 from typing import Dict, List, NamedTuple, Tuple
 
+import numpy as np
 import pandas as pd
 
 from gistim.geomet import geopackage
@@ -120,6 +121,18 @@ def process_table(dataframe: pd.DataFrame) -> Tuple[pd.DataFrame, BoundingBox, s
     return dataframe, bounding_box, geometry_type
 
 
+def force_sql_datetime(df: pd.DataFrame):
+    """
+    Pandas SQL writes datetimes as SQL Timestamps, which are not accepted by QGIS.
+    They have to SQL DATETIME instead.
+    """
+    return {
+        colname: "DATETIME"
+        for colname, dtype in df.dtypes.to_dict().items()
+        if np.issubdtype(dtype, np.datetime64)
+    }
+
+
 def write_geopackage(
     tables: Dict[str, pd.DataFrame], crs: CoordinateReferenceSystem, path: Path
 ) -> None:
@@ -162,7 +175,9 @@ def write_geopackage(
             table_names.append(layername)
             geometry_types.append(geometry_type)
             bounding_boxes.append(bounding_box)
-            dataframe.to_sql(layername, con=connection)
+            dataframe.to_sql(
+                layername, con=connection, dtype=force_sql_datetime(dataframe)
+            )
 
         # Create mandatory geopackage tables.
         gpkg_contents = create_gpkg_contents(
