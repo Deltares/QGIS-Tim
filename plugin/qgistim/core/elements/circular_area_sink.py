@@ -89,10 +89,12 @@ class CircularAreaSink(TransientElement):
 
     def process_ttim_row(self, row, grouped):
         xc, yc, radius = self._centroid_and_radius(row)
+        tsandN, tmax = self.transient_input(row, grouped, "rate")
+        self.times.append(tmax)
         return {
             "xc": xc,
             "yc": yc,
             "R": radius,
-            "tsandN": self.transient_input(row, grouped, "rate"),
+            "tsandN": tsandN,
             "label": row["label"],
         }

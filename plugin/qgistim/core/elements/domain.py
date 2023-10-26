@@ -28,6 +28,7 @@ class Domain(TransientElement):
     schema = DomainSchema()
 
     def __init__(self, path: str, name: str):
+        self.times = []
         self._initialize_default(path, name)
         self.timml_name = f"timml {self.element_type}:Domain"
         self.ttim_name = "ttim Computation Times:Domain"
@@ -85,4 +86,5 @@ class Domain(TransientElement):
         ttim_data = self.table_to_dict(self.ttim_layer)
         ttim_errors = self.schema.validate_ttim(ttim_data, other)
         data["time"] = ttim_data["time"]
+        self.times = [max(data["time"])]
         return ttim_errors, data

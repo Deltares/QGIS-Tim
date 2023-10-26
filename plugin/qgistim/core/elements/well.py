@@ -96,14 +96,12 @@ class Well(TransientElement):
 
     def process_ttim_row(self, row, grouped):
         x, y = self.point_xy(row)
+        tsandQ, tmax = self.transient_input(row, grouped, "discharge")
+        self.times.append(tmax)
         return {
             "xw": x,
             "yw": y,
-            "tsandQ": self.transient_input(
-                row,
-                grouped,
-                "discharge",
-            ),
+            "tsandQ": tsandQ,
             "rw": row["radius"],
             "res": row["resistance"],
             "layers": row["layer"],

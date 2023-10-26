@@ -83,9 +83,11 @@ class HeadLineSink(TransientElement):
         }
 
     def process_ttim_row(self, row, grouped):
+        tsandh, tmax = self.transient_input(row, grouped, "head")
+        self.times.append(tmax)
         return {
             "xy": self.linestring_xy(row),
-            "tsandh": self.transient_input(row, grouped, "head"),
+            "tsandh": tsandh,
             "res": row["resistance"],
             "wh": row["width"],
             "layers": row["layer"],

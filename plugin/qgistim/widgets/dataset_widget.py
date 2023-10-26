@@ -239,6 +239,14 @@ class DatasetTreeWidget(QTreeWidget):
                 else:
                     raise e
 
+        # Collect all the times. They have been set in the element while
+        # converting.
+        if transient:
+            times = []
+            for element in elements.values():
+                times.extend(element.times)
+            data["timml Aquifer:Aquifer"]["tmax"] = max(times)
+
         return errors, data
 
 

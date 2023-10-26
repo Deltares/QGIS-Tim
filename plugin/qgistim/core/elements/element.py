@@ -208,6 +208,7 @@ class Element(ExtractorMixin, abc.ABC):
         self.item = None
 
     def __init__(self, path: str, name: str):
+        self.times = []  # Store the times to get tmax for TTim.
         self._initialize_default(path, name)
         self.timml_name = f"timml {self.element_type}:{name}"
 
@@ -338,6 +339,7 @@ class Element(ExtractorMixin, abc.ABC):
             return [], elements
 
     def to_ttim(self, other=None):
+        self.times = []
         return self.to_timml(other)
 
     def extract_data(self, transient: bool, other=None) -> Union[List, Dict]:
@@ -456,7 +458,9 @@ class TransientElement(Element, abc.ABC):
         return
 
     @staticmethod
-    def transient_input(row, all_timeseries: Dict[str, Any], variable: str):
+    def transient_input(
+        row, all_timeseries: Dict[str, Any], variable: str
+    ) -> Tuple[List[Any], float]:
         timeseries_id = row["timeseries_id"]
         row_start = row["time_start"]
         row_end = row["time_end"]
@@ -474,14 +478,17 @@ class TransientElement(Element, abc.ABC):
             return [
                 (time, value - steady_value)
                 for time, value in zip(timeseries["time_start"], timeseries[variable])
-            ]
+            ], max(timeseries["time_start"])
         elif start_and_stop:
-            return [(row_start, transient_value - steady_value), (row_end, 0.0)]
+            return [
+                (row_start, transient_value - steady_value),
+                (row_end, 0.0),
+            ], row_end
         else:
-            return [(0.0, 0.0)]
-
+            return [(0.0, 0.0)], 0.0
 
     def to_ttim(self, other):
+        self.times = []
         timeseries = self.table_to_dict(self.ttim_layer)
         if timeseries:
             errors = self.schema.validate_timeseries(timeseries)

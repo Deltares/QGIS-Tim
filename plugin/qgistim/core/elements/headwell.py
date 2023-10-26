@@ -88,14 +88,12 @@ class HeadWell(TransientElement):
 
     def process_ttim_row(self, row, grouped):
         x, y = self.point_xy(row)
+        tsandh, tmax = self.transient_input(row, grouped, "head")
+        self.times.append(tmax)
         return {
             "xw": x,
             "yw": y,
-            "tsandh": self.transient_input(
-                row,
-                grouped,
-                "head",
-            ),
+            "tsandh": tsandh,
             "rw": row["radius"],
             "res": row["resistance"],
             "layers": row["layer"],
