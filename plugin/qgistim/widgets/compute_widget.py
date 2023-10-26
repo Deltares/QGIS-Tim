@@ -25,13 +25,12 @@ from qgis.core import (
     QgsRasterLayer,
     QgsTask,
     QgsVectorLayer,
-    QgsVectorLayerTemporalProperties,
 )
 from qgis.gui import QgsMapLayerComboBox
 from qgistim.core import geopackage, layer_styling
 from qgistim.core.dummy_ugrid import write_dummy_ugrid
 from qgistim.core.elements import ELEMENTS, parse_name
-from qgistim.core.processing import mesh_contours
+from qgistim.core.processing import mesh_contours, set_temporal_properties
 from qgistim.core.task import BaseServerTask
 
 
@@ -224,6 +223,7 @@ class ComputeWidget(QWidget):
         self.parent.output_group.add_layer(
             layer, "vector", renderer=renderer, on_top=True, labels=labels
         )
+        return
 
     @property
     def output_path(self) -> str:
@@ -290,6 +290,7 @@ class ComputeWidget(QWidget):
             self.output_line_edit.setText(str(Path(path).with_suffix("")))
             # Note: Qt does pretty good validity checking of the Path in the
             # Dialog, there is no real need to validate path here.
+        return
 
     def set_default_path(self, text: str) -> None:
         """
@@ -299,6 +300,7 @@ class ComputeWidget(QWidget):
             return
         path = Path(text)
         self.output_line_edit.setText(str(path.parent / path.stem))
+        return
 
     def compute(self) -> None:
         """
@@ -351,6 +353,7 @@ class ComputeWidget(QWidget):
             )
         self.set_interpreter_interaction(False)
         QgsApplication.taskManager().addTask(self.compute_task)
+        return
 
     def domain(self) -> None:
         """
@@ -360,6 +363,7 @@ class ComputeWidget(QWidget):
         ymax, ymin = item.element.update_extent(self.parent.iface)
         self.set_cellsize_from_domain(ymax, ymin)
         self.parent.iface.mapCanvas().refreshAllLayers()
+        return
 
     def set_cellsize_from_domain(self, ymax: float, ymin: float) -> None:
         # Guess a reasonable value for the cellsize: about 50 rows
@@ -373,6 +377,7 @@ class ComputeWidget(QWidget):
         elif dy > 1.0:
             dy = round(dy)
         self.cellsize_spin_box.setValue(dy)
+        return
 
     def load_mesh_result(self, path: Union[Path, str], load_contours: bool) -> None:
         path = Path(path)
@@ -446,16 +451,6 @@ class ComputeWidget(QWidget):
             layer.setRenderer(renderer)
             self.parent.output_group.add_layer(layer, "raster")
 
-        #            if contour:
-        #                contour_layer = raster_steady_contours(
-        #                    layer=layer,
-        #                    name=name,
-        #                    start=start,
-        #                    stop=stop,
-        #                    step=step,
-        #                )
-        #                self.add_contour_layer(contour_layer)
-
         return
 
     def load_vector_result(self, path: Union[Path, str]) -> None:
@@ -471,19 +466,8 @@ class ComputeWidget(QWidget):
             layer = QgsVectorLayer(
                 f"{gpkg_path}|layername={layername}", layers_panel_name
             )
-
             # Set the temporal properties if it's a temporal layer
-            temporal_properties = layer.temporalProperties()
-            fields = [field.name() for field in layer.fields()]
-            if ("datetime_start" in fields) and ("datetime_end" in fields):
-                temporal_properties.setStartField("datetime_start")
-                temporal_properties.setEndField("datetime_end")
-                temporal_properties.setMode(
-                    QgsVectorLayerTemporalProperties.ModeFeatureDateTimeStartAndEndFromFields
-                )
-                temporal_properties.setIsActive(True)
-            else:
-                temporal_properties.setIsActive(False)
+            set_temporal_properties(layer)
 
             if (
                 "timml Head Observation:" in layername

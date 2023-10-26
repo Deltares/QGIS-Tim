@@ -170,7 +170,7 @@ def transient_contours(
     end_dates = {
         a: b - datetime.timedelta(minutes=1) for a, b in zip(dates[:-1], dates[1:])
     }
-    end_dates[dates[-1]] = dates[-1] + datetime.timedelta(days=1)
+    end_dates[dates[-1]] = dates[-1] + datetime.timedelta(minutes=1)
 
     # Add items to layer
     for item in feature_data:
@@ -188,16 +188,20 @@ def transient_contours(
         provider.addFeature(f)
     contour_layer.updateExtents()
 
-    # Set the temporal properties
-    temporal_properties = contour_layer.temporalProperties()
-    temporal_properties.setStartField("datetime_start")
-    temporal_properties.setEndField("datetime_end")
-    temporal_properties.setMode(
-        QgsVectorLayerTemporalProperties.ModeFeatureDateTimeStartAndEndFromFields
-    )
-    temporal_properties.setIsActive(True)
-
     return contour_layer
+
+
+def set_temporal_properties(layer: QgsVectorLayer) -> None:
+    fields = [field.name() for field in layer.fields()]
+    if ("datetime_start" in fields) and ("datetime_end" in fields):
+        temporal_properties = layer.temporalProperties()
+        temporal_properties.setStartField("datetime_start")
+        temporal_properties.setEndField("datetime_end")
+        temporal_properties.setMode(
+            QgsVectorLayerTemporalProperties.ModeFeatureDateTimeStartAndEndFromFields
+        )
+        temporal_properties.setIsActive(True)
+    return
 
 
 def mesh_contours(
@@ -221,4 +225,5 @@ def mesh_contours(
         layername=name,
         newfile=newfile,
     )
+    set_temporal_properties(written_layer)
     return written_layer
