@@ -1,11 +1,11 @@
 """
 This module forms the high level DockWidget.
 
-It ensures the underlying widgets can talk to each other.  It also manages the
+It ensures the underlying widgets can talk to each other. It also manages the
 connection to the QGIS Layers Panel, and ensures there is a group for the Tim
 layers there.
 """
-from typing import Any, Dict, Union
+from typing import Any, Dict, Optional, Union
 
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import (
@@ -15,7 +15,13 @@ from PyQt5.QtWidgets import (
     QVBoxLayout,
     QWidget,
 )
-from qgis.core import QgsApplication, QgsEditFormConfig, QgsMapLayer, QgsProject
+from qgis.core import (
+    QgsApplication,
+    QgsEditFormConfig,
+    QgsLayerTreeGroup,
+    QgsMapLayer,
+    QgsProject,
+)
 from qgistim.core.server_handler import ServerHandler
 from qgistim.core.task import BaseServerTask
 from qgistim.widgets.compute_widget import ComputeWidget
@@ -32,13 +38,19 @@ class LayersPanelGroup:
         self,
         root,
         name: str,
+        group_name: Optional[QgsLayerTreeGroup] = None,
     ):
         self.name = name
         self.root = root
         self.subgroups = {}
-        self.create_group()
+        self.create_group(group_name)
 
-    def create_group(self):
+    def _create_group(self, group_name: str):
+        if group_name is not None:
+            self.group = self.root.findGroup(group_name)
+            if self.group is not None:
+                self.group.removeAllChildren()
+                return
         self.group = self.root.addGroup(self.name)
         return
 
@@ -147,6 +159,18 @@ class LayersPanelGroup:
         return maplayer
 
 
+class InputGroup(LayersPanelGroup):
+    def create_group(self, group=None):
+        QgsProject.instance().writeEntry("qgistim", "input_group", self.name)
+        self._create_group(group)
+
+
+class OutputGroup(LayersPanelGroup):
+    def create_group(self, group=None):
+        QgsProject.instance().writeEntry("qgistim", "output_group", self.name)
+        self._create_group(group)
+
+
 class StartTask(BaseServerTask):
     @property
     def task_description(self):
@@ -208,6 +232,10 @@ class QgisTimWidget(QWidget):
         # QGIS Layers Panel groups
         self.input_group = None
         self.output_group = None
+
+        # Connect to the project saved signal.
+        # Note that the project is a singleton instance, so it's always up to date.
+        self.qgs_project = QgsProject.instance()
         return
 
     # Inter-widget communication
@@ -293,16 +321,16 @@ class QgisTimWidget(QWidget):
 
     # QGIS layers
     # -----------
-    def create_input_group(self, name: str) -> None:
-        root = QgsProject.instance().layerTreeRoot()
-        self.input_group = LayersPanelGroup(root, f"{name} input")
+    def create_input_group(self, name: str, group: str = None) -> None:
+        root = self.qgs_project.layerTreeRoot()
+        self.input_group = InputGroup(root, f"{name} input", group)
         self.input_group.create_subgroup("timml")
         self.input_group.create_subgroup("ttim")
         return
 
-    def create_output_group(self, name: str) -> None:
-        root = QgsProject.instance().layerTreeRoot()
-        self.output_group = LayersPanelGroup(root, f"{name} output")
+    def create_output_group(self, name: str, group: str = None) -> None:
+        root = self.qgs_project.layerTreeRoot()
+        self.output_group = OutputGroup(root, f"{name} output", group)
         # Pre-create the groups here to make sure the vector group ends up on top.
         # Apparently moving it destroys the group?
         self.output_group.create_subgroup("vector")
