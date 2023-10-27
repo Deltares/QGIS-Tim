@@ -1,7 +1,8 @@
 from functools import partial
 
 from PyQt5.QtWidgets import QGridLayout, QPushButton, QVBoxLayout, QWidget
-from qgistim.core.tim_elements import ELEMENTS
+from qgis.core import Qgis
+from qgistim.core.elements import ELEMENTS
 
 
 class ElementsWidget(QWidget):
@@ -60,7 +61,13 @@ class ElementsWidget(QWidget):
         except ValueError:
             return
 
-        element = klass.dialog(self.parent.path, crs, self.parent.iface, names)
+        try:
+            element = klass.dialog(self.parent.path, crs, self.parent.iface, names)
+        except ValueError as e:
+            msg = str(e)
+            self.parent.message_bar.pushMessage("Error", msg, level=Qgis.Critical)
+            return
+
         if element is None:  # dialog cancelled
             return
         # Write to geopackage

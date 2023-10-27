@@ -15,14 +15,21 @@ from PyQt5.QtWidgets import (
     QVBoxLayout,
     QWidget,
 )
-from qgis.core import Qgis, QgsApplication, QgsMapLayer, QgsProject, QgsUnitTypes
+from qgis.core import (
+    Qgis,
+    QgsApplication,
+    QgsEditFormConfig,
+    QgsMapLayer,
+    QgsProject,
+    QgsUnitTypes,
+)
 from qgistim.core.server_handler import ServerHandler
 from qgistim.core.task import BaseServerTask
 from qgistim.widgets.compute_widget import ComputeWidget
 from qgistim.widgets.dataset_widget import DatasetWidget
 from qgistim.widgets.elements_widget import ElementsWidget
 from qgistim.widgets.extraction_widget import DataExtractionWidget
-from qgistim.widgets.options_dialog import OptionsDialog
+from qgistim.widgets.version_dialog import VersionDialog
 
 PYQT_DELETED_ERROR = "wrapped C/C++ object of type QgsLayerTreeGroup has been deleted"
 
@@ -132,8 +139,11 @@ class LayersPanelGroup:
         maplayer = QgsProject.instance().addMapLayer(layer, False)
         if suppress is not None:
             config = maplayer.editFormConfig()
-            config.setSuppress(suppress)
-            maplayer.setEditFormConfig(config)
+            config.setSuppress(
+                QgsEditFormConfig.SuppressOn
+                if suppress
+                else QgsEditFormConfig.SuppressDefault
+            )
         if renderer is not None:
             maplayer.setRenderer(renderer)
         if labels is not None:
@@ -174,19 +184,19 @@ class QgisTimWidget(QWidget):
         self.dataset_widget = DatasetWidget(self)
         self.elements_widget = ElementsWidget(self)
         self.compute_widget = ComputeWidget(self)
-        self.options_dialog = OptionsDialog(self)
+        self.version_dialog = VersionDialog(self)
 
-        self.config_button = QPushButton("Options")
-        self.config_button.clicked.connect(self.options_dialog.show)
+        self.config_button = QPushButton("Versions")
+        self.config_button.clicked.connect(self.version_dialog.show)
         self.config_button.setIcon(QgsApplication.getThemeIcon("/mActionOptions.svg"))
 
         # Layout
         self.layout = QVBoxLayout()
         self.tabwidget = QTabWidget()
         self.layout.addWidget(self.tabwidget)
-        self.tabwidget.addTab(self.dataset_widget, "GeoPackage")
+        self.tabwidget.addTab(self.dataset_widget, "Model Manager")
         self.tabwidget.addTab(self.elements_widget, "Elements")
-        self.tabwidget.addTab(self.compute_widget, "Compute")
+        self.tabwidget.addTab(self.compute_widget, "Results")
         self.tabwidget.addTab(self.extraction_widget, "Extract")
         self.layout.addWidget(self.config_button, stretch=0, alignment=Qt.AlignRight)
         self.setLayout(self.layout)
@@ -220,7 +230,7 @@ class QgisTimWidget(QWidget):
 
     def start_interpreter_task(self) -> Union[StartTask, None]:
         if not self.server_handler.alive():
-            interpreter = self.options_dialog.interpreter_combo_box.currentText()
+            interpreter = self.version_dialog.interpreter_combo_box.currentText()
             start_task = StartTask(self, {"interpreter": interpreter}, self.message_bar)
             return start_task
         else:
@@ -234,6 +244,11 @@ class QgisTimWidget(QWidget):
         return response
 
     def set_interpreter_interaction(self, value: bool) -> None:
+        """
+        Disable interaction with the external interpreter. Some task may take a
+        minute or so to run. No additional tasks should be scheduled in the
+        mean time.
+        """
         self.compute_widget.compute_button.setEnabled(value)
         self.dataset_widget.convert_button.setEnabled(value)
         self.extraction_widget.extract_button.setEnabled(value)
@@ -242,11 +257,6 @@ class QgisTimWidget(QWidget):
     def shutdown_server(self) -> None:
         if self.server_handler.process is not None:
             self.server_handler.kill()
-        return
-
-    def on_transient_changed(self) -> None:
-        transient = self.compute_widget.transient
-        self.dataset_widget.on_transient_changed(transient)
         return
 
     @property
@@ -259,6 +269,11 @@ class QgisTimWidget(QWidget):
         Returns coordinate reference system of current mapview
 
         Returns None if the crs does not have meters as its units.
+
+        This is important since TimML and TTim always assume a Cartesian
+        reference plane, and variables such as conductivity are expressed in
+        units such as meter per day. As distances are inferred from the
+        geometry, the geometry must have appropriate units.
         """
         crs = self.iface.mapCanvas().mapSettings().destinationCrs()
         if crs.mapUnits() not in (
@@ -295,7 +310,7 @@ class QgisTimWidget(QWidget):
         self.input_group.add_layer(
             element.timml_layer,
             "timml",
-            renderer=element.renderer,
+            renderer=element.renderer(),
             suppress=suppress,
         )
         self.input_group.add_layer(element.ttim_layer, "ttim")
@@ -303,14 +318,14 @@ class QgisTimWidget(QWidget):
 
     # QGIS layers
     # -----------
-    def create_input_group(self, name: str):
+    def create_input_group(self, name: str) -> None:
         root = QgsProject.instance().layerTreeRoot()
         self.input_group = LayersPanelGroup(root, f"{name} input")
         self.input_group.create_subgroup("timml")
         self.input_group.create_subgroup("ttim")
         return
 
-    def create_output_group(self, name: str):
+    def create_output_group(self, name: str) -> None:
         root = QgsProject.instance().layerTreeRoot()
         self.output_group = LayersPanelGroup(root, f"{name} output")
         # Pre-create the groups here to make sure the vector group ends up on top.

@@ -10,14 +10,16 @@ Not every TimML element has a TTim equivalent (yet). This means that when a
 user chooses the transient simulation mode, a number of elements must be
 disabled (such as inhomogeneities).
 """
+import json
 from pathlib import Path
 from shutil import copy
-from typing import List, Set
+from typing import Any, Dict, List, NamedTuple, Set, Tuple
 
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import (
     QAbstractItemView,
     QCheckBox,
+    QComboBox,
     QFileDialog,
     QHBoxLayout,
     QHeaderView,
@@ -30,9 +32,10 @@ from PyQt5.QtWidgets import (
     QVBoxLayout,
     QWidget,
 )
-from qgis.core import QgsApplication, QgsProject, QgsTask
-from qgistim.core.task import BaseServerTask
-from qgistim.core.tim_elements import Aquifer, Domain, load_elements_from_geopackage
+from qgis.core import Qgis, QgsProject
+from qgistim.core.elements import Aquifer, Domain, load_elements_from_geopackage
+from qgistim.core.formatting import data_to_json, data_to_script
+from qgistim.widgets.error_window import ValidationDialog
 
 SUPPORTED_TTIM_ELEMENTS = set(
     [
@@ -47,15 +50,15 @@ SUPPORTED_TTIM_ELEMENTS = set(
         "Circular Area Sink",
         "Impermeable Line Doublet",
         "Leaky Line Doublet",
-        "Observation",
+        "Head Observation",
     ]
 )
 
 
-class ConvertTask(BaseServerTask):
-    @property
-    def task_description(self):
-        return "converting GeoPackage to Python script"
+class Extraction(NamedTuple):
+    timml: Dict[str, Any] = None
+    ttim: Dict[str, Any] = None
+    success: bool = True
 
 
 class DatasetTreeWidget(QTreeWidget):
@@ -196,6 +199,66 @@ class DatasetTreeWidget(QTreeWidget):
 
         return
 
+    def extract_data(self, transient: bool) -> Tuple[Dict[str, Any], Dict[str, Any]]:
+        """
+        Extract the data of the Geopackage.
+
+        Validates all data while converting, and returns a list of validation
+        errors if something is amiss.
+        """
+        data = {}
+        errors = {}
+        elements = {
+            item.text(1): item.element
+            for item in self.items()
+            if item.timml_checkbox.isChecked()
+        }
+
+        # First convert the aquifer, since we need its data to validate
+        # other elements.
+        name = "timml Aquifer:Aquifer"
+        aquifer = elements.pop(name)
+        aquifer_extraction = aquifer.extract_data(transient)
+        if aquifer_extraction.errors:
+            errors[name] = aquifer_extraction.errors
+            return errors, None
+
+        raw_data = aquifer_extraction.data
+        aquifer_data = aquifer.aquifer_data(raw_data, transient=transient)
+        data[name] = aquifer_data
+        if transient:
+            data["reference_date"] = str(raw_data["reference_date"].toPyDateTime())
+
+        times = set()
+        other = {"aquifer layers": raw_data["layer"], "global_aquifer": raw_data}
+        for name, element in elements.items():
+            print(name)
+            try:
+                extraction = element.extract_data(transient, other)
+                if extraction.errors:
+                    errors[name] = extraction.errors
+                elif extraction.data:  # skip empty tables
+                    data[name] = extraction.data
+                    if extraction.times:
+                        times.update(extraction.times)
+            except RuntimeError as e:
+                if (
+                    e.args[0]
+                    == "wrapped C/C++ object of type QgsVectorLayer has been deleted"
+                ):
+                    # Delay of Qt garbage collection to blame?
+                    pass
+                else:
+                    raise e
+
+        if transient:
+            if times:
+                data["timml Aquifer:Aquifer"]["tmax"] = max(times)
+            else:
+                errors["Model"] = {"TTim input:": ["No transient forcing defined."]}
+
+        return errors, data
+
 
 class DatasetWidget(QWidget):
     def __init__(self, parent):
@@ -203,14 +266,16 @@ class DatasetWidget(QWidget):
         self.parent = parent
         self.dataset_tree = DatasetTreeWidget()
         self.start_task = None
-        self.convert_task = None
         self.dataset_tree.setSizePolicy(QSizePolicy.Preferred, QSizePolicy.Expanding)
         self.dataset_line_edit = QLineEdit()
         self.dataset_line_edit.setEnabled(False)  # Just used as a viewing port
         self.new_geopackage_button = QPushButton("New")
         self.open_geopackage_button = QPushButton("Open")
         self.copy_geopackage_button = QPushButton("Copy")
-        self.remove_button = QPushButton("Remove from Dataset")
+        self.transient_combo_box = QComboBox()
+        self.transient_combo_box.addItems(["Steady-state", "Transient"])
+        self.transient_combo_box.currentTextChanged.connect(self.on_transient_changed)
+        self.remove_button = QPushButton("Remove from GeoPackage")
         self.add_button = QPushButton("Add to QGIS")
         self.new_geopackage_button.clicked.connect(self.new_geopackage)
         self.open_geopackage_button.clicked.connect(self.open_geopackage)
@@ -219,10 +284,11 @@ class DatasetWidget(QWidget):
         self.suppress_popup_checkbox.stateChanged.connect(self.suppress_popup_changed)
         self.remove_button.clicked.connect(self.remove_geopackage_layer)
         self.add_button.clicked.connect(self.add_selection_to_qgis)
-        self.convert_button = QPushButton("Convert GeoPackage to Python script")
-        self.convert_button.clicked.connect(self.convert)
+        self.convert_button = QPushButton("Export to Python script")
+        self.convert_button.clicked.connect(self.convert_to_python)
         # Layout
         dataset_layout = QVBoxLayout()
+        mode_row = QHBoxLayout()
         dataset_row = QHBoxLayout()
         layer_row = QHBoxLayout()
         dataset_row.addWidget(self.dataset_line_edit)
@@ -230,6 +296,8 @@ class DatasetWidget(QWidget):
         dataset_row.addWidget(self.new_geopackage_button)
         dataset_row.addWidget(self.copy_geopackage_button)
         dataset_layout.addLayout(dataset_row)
+        mode_row.addWidget(self.transient_combo_box)
+        dataset_layout.addLayout(mode_row)
         dataset_layout.addWidget(self.dataset_tree)
         dataset_layout.addWidget(self.suppress_popup_checkbox)
         layer_row.addWidget(self.add_button)
@@ -237,6 +305,7 @@ class DatasetWidget(QWidget):
         dataset_layout.addLayout(layer_row)
         dataset_layout.addWidget(self.convert_button)
         self.setLayout(dataset_layout)
+        self.validation_dialog = None
 
     @property
     def path(self) -> str:
@@ -246,7 +315,6 @@ class DatasetWidget(QWidget):
     def reset(self):
         # Set state back to defaults
         self.start_task = None
-        self.convert_task = None
         self.dataset_line_edit.setText("")
         self.dataset_tree.reset()
         return
@@ -258,7 +326,7 @@ class DatasetWidget(QWidget):
         suppress = self.suppress_popup_checkbox.isChecked()
         # Start adding the layers
         maplayer = self.parent.input_group.add_layer(
-            element.timml_layer, "timml", element.renderer, suppress
+            element.timml_layer, "timml", element.renderer(), suppress
         )
         self.parent.input_group.add_layer(element.ttim_layer, "ttim")
         self.parent.input_group.add_layer(element.assoc_layer, "timml")
@@ -293,15 +361,14 @@ class DatasetWidget(QWidget):
         for element in elements:
             self.dataset_tree.add_element(element)
 
+        transient = self.transient
         for item in self.dataset_tree.items():
             self.add_item_to_qgis(item)
-            item.element.on_transient_changed(self.parent.transient)
+            item.element.on_transient_changed(transient)
 
         self.dataset_tree.sortByColumn(0, Qt.SortOrder.AscendingOrder)
         self.parent.toggle_element_buttons(True)
-        self.parent.on_transient_changed()
-        return
-
+        self.on_transient_changed()
         return
 
     def new_geopackage(self) -> None:
@@ -367,6 +434,14 @@ class DatasetWidget(QWidget):
         self.dataset_tree.remove_geopackage_layers()
         return
 
+    @property
+    def transient(self) -> bool:
+        return self.transient_combo_box.currentText() == "Transient"
+
+    def on_transient_changed(self) -> None:
+        self.dataset_tree.on_transient_changed(self.transient)
+        return
+
     def suppress_popup_changed(self):
         suppress = self.suppress_popup_checkbox.isChecked()
         for item in self.dataset_tree.items():
@@ -401,10 +476,6 @@ class DatasetWidget(QWidget):
                 selection.append(item.assoc_item)
         return set([item.element.name for item in selection])
 
-    def on_transient_changed(self, transient: bool) -> None:
-        self.dataset_tree.on_transient_changed(transient)
-        return
-
     def add_element(self, element) -> None:
         self.dataset_tree.add_element(element)
         return
@@ -413,23 +484,94 @@ class DatasetWidget(QWidget):
         self.parent.set_interpreter_interaction(value)
         return
 
-    def convert(self) -> None:
+    def _extract_data(self, transient: bool) -> Extraction:
+        if self.validation_dialog:
+            self.validation_dialog.close()
+            self.validation_dialog = None
+
+        errors, timml_data = self.dataset_tree.extract_data(transient=False)
+        if errors:
+            self.validation_dialog = ValidationDialog(errors)
+            return Extraction(success=False)
+
+        ttim_data = None
+        if transient:
+            errors, ttim_data = self.dataset_tree.extract_data(transient=True)
+            if errors:
+                self.validation_dialog = ValidationDialog(errors)
+                return Extraction(success=False)
+
+        return Extraction(timml=timml_data, ttim=ttim_data)
+
+    def convert_to_python(self) -> None:
+        transient = self.transient
         outpath, _ = QFileDialog.getSaveFileName(self, "Select file", "", "*.py")
         if outpath == "":  # Empty string in case of cancel button press
             return
 
-        data = {
-            "operation": "convert",
-            "inpath": self.path,
-            "outpath": outpath,
-        }
-        self.convert_task = ConvertTask(self, data, self.parent.message_bar)
-        self.start_task = self.parent.start_interpreter_task()
-        if self.start_task is not None:
-            self.convert_task.addSubTask(
-                self.start_task, [], QgsTask.ParentDependsOnSubTask
-            )
+        extraction = self._extract_data(transient=transient)
+        if not extraction.success:
+            return
 
-        self.parent.set_interpreter_interaction(False)
-        QgsApplication.taskManager().addTask(self.convert_task)
+        script = data_to_script(extraction.timml, extraction.ttim)
+        with open(outpath, "w") as f:
+            f.write(script)
+
+        self.parent.message_bar.pushMessage(
+            title="Info",
+            text=f"Converted geopackage to Python script: {outpath}",
+            level=Qgis.Info,
+        )
         return
+
+    def convert_to_json(
+        self,
+        path: str,
+        cellsize: float,
+        transient: bool,
+        output_options: Dict[str, bool],
+    ) -> bool:
+        """
+        Parameters
+        ----------
+        path: str
+            Path to JSON file to write.
+        cellsize: float
+            Cell size to use to compute the head grid.
+        transient: bool
+            Steady-state (False) or transient (True).
+
+        Returns
+        -------
+        invalid_input: bool
+            Whether validation has succeeded.
+        """
+        extraction = self._extract_data(transient=transient)
+        if not extraction.success:
+            return True
+
+        json_data = data_to_json(
+            extraction.timml,
+            extraction.ttim,
+            cellsize=cellsize,
+            output_options=output_options,
+        )
+
+        crs = self.parent.crs
+        organization, srs_id = crs.authid().split(":")
+        json_data["crs"] = {
+            "description": crs.description(),
+            "organization": organization,
+            "srs_id": srs_id,
+            "wkt": crs.toWkt(),
+        }
+
+        with open(path, "w") as fp:
+            json.dump(json_data, fp=fp, indent=4)
+
+        self.parent.message_bar.pushMessage(
+            title="Info",
+            text=f"Converted geopackage to JSON: {path}",
+            level=Qgis.Info,
+        )
+        return False

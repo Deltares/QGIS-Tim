@@ -5,6 +5,7 @@ Currently wraps the QGIS functions for turning grids / meshes of head results
 into line contours.
 """
 import datetime
+from pathlib import Path
 from typing import NamedTuple
 
 import numpy as np
@@ -22,6 +23,7 @@ from qgis.core import (
     QgsVectorLayer,
     QgsVectorLayerTemporalProperties,
 )
+from qgistim.core import geopackage
 
 
 def raster_steady_contours(
@@ -78,7 +80,6 @@ def steady_contours(
     stop: float,
     step: float,
 ) -> QgsVectorLayer:
-
     contourer = QgsMeshContours(layer)
 
     # Collect contours from mesh layer
@@ -94,7 +95,7 @@ def steady_contours(
             feature_data.append(SteadyContourData(geom, value))
 
     # Setup output layer
-    contour_layer = QgsVectorLayer("Linestring", f"contours-{name}", "memory")
+    contour_layer = QgsVectorLayer("Linestring", name, "memory")
     contour_layer.setCrs(layer.crs())
     provider = contour_layer.dataProvider()
     provider.addAttributes(
@@ -110,7 +111,7 @@ def steady_contours(
         f.setGeometry(item.geometry)
         # Make sure to convert to the appropriate Qt types
         # e.g. no numpy floats allowed
-        f.setAttributes([float(item.head)])
+        f.setAttributes([round(float(item.head), 3)])
         provider.addFeature(f)
     contour_layer.updateExtents()
 
@@ -131,7 +132,7 @@ def transient_contours(
     contourer = QgsMeshContours(layer)
 
     # Setup output layer
-    contour_layer = QgsVectorLayer("Linestring", f"contours-{name}", "memory")
+    contour_layer = QgsVectorLayer("Linestring", name, "memory")
     contour_layer.setCrs(layer.crs())
     provider = contour_layer.dataProvider()
     provider.addAttributes(
@@ -169,7 +170,7 @@ def transient_contours(
     end_dates = {
         a: b - datetime.timedelta(minutes=1) for a, b in zip(dates[:-1], dates[1:])
     }
-    end_dates[dates[-1]] = dates[-1] + datetime.timedelta(days=1)
+    end_dates[dates[-1]] = dates[-1] + datetime.timedelta(minutes=1)
 
     # Add items to layer
     for item in feature_data:
@@ -179,7 +180,7 @@ def transient_contours(
         # e.g. no numpy floats allowed
         f.setAttributes(
             [
-                float(item.head),
+                float(round(item.head, 3)),
                 QDateTime(item.datetime),
                 QDateTime(end_dates[item.datetime]),
             ]
@@ -187,19 +188,24 @@ def transient_contours(
         provider.addFeature(f)
     contour_layer.updateExtents()
 
-    # Set the temporal properties
-    temporal_properties = contour_layer.temporalProperties()
-    temporal_properties.setStartField("datetime_start")
-    temporal_properties.setEndField("datetime_end")
-    temporal_properties.setMode(
-        QgsVectorLayerTemporalProperties.ModeFeatureDateTimeStartAndEndFromFields
-    )
-    temporal_properties.setIsActive(True)
-
     return contour_layer
 
 
+def set_temporal_properties(layer: QgsVectorLayer) -> None:
+    fields = [field.name() for field in layer.fields()]
+    if ("datetime_start" in fields) and ("datetime_end" in fields):
+        temporal_properties = layer.temporalProperties()
+        temporal_properties.setStartField("datetime_start")
+        temporal_properties.setEndField("datetime_end")
+        temporal_properties.setMode(
+            QgsVectorLayerTemporalProperties.ModeFeatureDateTimeStartAndEndFromFields
+        )
+        temporal_properties.setIsActive(True)
+    return
+
+
 def mesh_contours(
+    gpkg_path: str,
     layer: QgsMeshLayer,
     index: int,
     name: str,
@@ -208,6 +214,16 @@ def mesh_contours(
     step: float,
 ) -> QgsVectorLayer:
     if layer.firstValidTimeStep().isValid():
-        return transient_contours(layer, index, name, start, stop, step)
+        vector_layer = transient_contours(layer, index, name, start, stop, step)
     else:
-        return steady_contours(layer, index, name, start, stop, step)
+        vector_layer = steady_contours(layer, index, name, start, stop, step)
+
+    newfile = not Path(gpkg_path).exists()
+    written_layer = geopackage.write_layer(
+        path=gpkg_path,
+        layer=vector_layer,
+        layername=name,
+        newfile=newfile,
+    )
+    set_temporal_properties(written_layer)
+    return written_layer
