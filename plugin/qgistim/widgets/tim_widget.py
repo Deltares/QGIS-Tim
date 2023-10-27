@@ -15,14 +15,7 @@ from PyQt5.QtWidgets import (
     QVBoxLayout,
     QWidget,
 )
-from qgis.core import (
-    Qgis,
-    QgsApplication,
-    QgsEditFormConfig,
-    QgsMapLayer,
-    QgsProject,
-    QgsUnitTypes,
-)
+from qgis.core import QgsApplication, QgsEditFormConfig, QgsMapLayer, QgsProject
 from qgistim.core.server_handler import ServerHandler
 from qgistim.core.task import BaseServerTask
 from qgistim.widgets.compute_widget import ComputeWidget
@@ -265,25 +258,7 @@ class QgisTimWidget(QWidget):
 
     @property
     def crs(self) -> Any:
-        """
-        Returns coordinate reference system of current mapview
-
-        Returns None if the crs does not have meters as its units.
-
-        This is important since TimML and TTim always assume a Cartesian
-        reference plane, and variables such as conductivity are expressed in
-        units such as meter per day. As distances are inferred from the
-        geometry, the geometry must have appropriate units.
-        """
-        crs = self.iface.mapCanvas().mapSettings().destinationCrs()
-        if crs.mapUnits() not in (
-            QgsUnitTypes.DistanceMeters,
-            QgsUnitTypes.DistanceFeet,
-        ):
-            msg = "Project Coordinate Reference System map units are not meters or feet"
-            self.message_bar.pushMessage("Error", msg, level=Qgis.Critical)
-            raise ValueError(msg)
-        return crs
+        return self.dataset_widget.model_crs
 
     @property
     def transient(self) -> bool:

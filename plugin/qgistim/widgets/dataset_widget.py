@@ -32,7 +32,7 @@ from PyQt5.QtWidgets import (
     QVBoxLayout,
     QWidget,
 )
-from qgis.core import Qgis, QgsProject
+from qgis.core import Qgis, QgsProject, QgsUnitTypes
 from qgistim.core.elements import Aquifer, Domain, load_elements_from_geopackage
 from qgistim.core.formatting import data_to_json, data_to_script
 from qgistim.widgets.error_window import ValidationDialog
@@ -232,7 +232,6 @@ class DatasetTreeWidget(QTreeWidget):
         times = set()
         other = {"aquifer layers": raw_data["layer"], "global_aquifer": raw_data}
         for name, element in elements.items():
-            print(name)
             try:
                 extraction = element.extract_data(transient, other)
                 if extraction.errors:
@@ -265,6 +264,7 @@ class DatasetWidget(QWidget):
         super().__init__(parent)
         self.parent = parent
         self.dataset_tree = DatasetTreeWidget()
+        self.model_crs = None
         self.start_task = None
         self.dataset_tree.setSizePolicy(QSizePolicy.Preferred, QSizePolicy.Expanding)
         self.dataset_line_edit = QLineEdit()
@@ -369,15 +369,26 @@ class DatasetWidget(QWidget):
         self.dataset_tree.sortByColumn(0, Qt.SortOrder.AscendingOrder)
         self.parent.toggle_element_buttons(True)
         self.on_transient_changed()
+
+        self.model_crs = self.domain_item().element.timml_layer.crs()
         return
 
     def new_geopackage(self) -> None:
         """
         Create a new GeoPackage file, and set it as the active dataset.
+
+        The CRS is important since TimML and TTim always assume a Cartesian
+        reference plane, and variables such as conductivity are expressed in
+        units such as meter per day. As distances are inferred from the
+        geometry, the geometry must have appropriate units.
         """
-        try:
-            crs = self.parent.crs
-        except ValueError:
+        crs = self.parent.iface.mapCanvas().mapSettings().destinationCrs()
+        if crs.mapUnits() not in (
+            QgsUnitTypes.DistanceMeters,
+            QgsUnitTypes.DistanceFeet,
+        ):
+            msg = "Project Coordinate Reference System map units are not meters or feet"
+            self.parent.message_bar.pushMessage("Error", msg, level=Qgis.Critical)
             return
 
         path, _ = QFileDialog.getSaveFileName(self, "Select file", "", "*.gpkg")
@@ -390,6 +401,7 @@ class DatasetWidget(QWidget):
                 instance.write()
             # Next, we load the newly written layers.
             self.load_geopackage()
+
         return
 
     def open_geopackage(self) -> None:

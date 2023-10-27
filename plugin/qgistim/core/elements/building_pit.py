@@ -17,7 +17,7 @@ from qgistim.core.schemata import (
     Required,
     SemiConfined,
     StrictlyDecreasing,
-    StrictlyPositive
+    StrictlyPositive,
 )
 
 

@@ -174,7 +174,7 @@ class Positive(BaseSchema):
         if data < 0:
             return f"Number is not positive (>=0): {data}"
         return None
-    
+
 
 class StrictlyPositive(BaseSchema):
     def validate(self, data, _=None) -> MaybeError:

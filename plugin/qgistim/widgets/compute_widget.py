@@ -1,5 +1,4 @@
 import datetime
-import tempfile
 from pathlib import Path
 from typing import Tuple, Union
 
@@ -95,7 +94,7 @@ class ComputeWidget(QWidget):
         # By default: all output
         self.mesh_checkbox.setChecked(True)
         self.raster_checkbox.setChecked(False)
-        self.contours_checkbox.setChecked(False)
+        self.contours_checkbox.setChecked(True)
         self.head_observations_checkbox.setChecked(True)
         self.discharge_checkbox.setChecked(False)
 

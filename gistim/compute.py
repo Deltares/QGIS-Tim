@@ -265,9 +265,7 @@ def write_output(
 
     # Compute observations and discharge, and write to geopackage.
     if output_options["discharge"]:
-        tables = extract_discharges(
-            elements, model.aq.nlayers, start_date=start_date
-        )
+        tables = extract_discharges(elements, model.aq.nlayers, start_date=start_date)
     else:
         tables = {}
 
