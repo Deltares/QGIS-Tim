@@ -2,7 +2,7 @@ import abc
 from collections import defaultdict
 from typing import Any, Dict, List, Tuple
 
-from qgis.core import NULL
+from qgis.core import NULL, QgsVectorLayer
 
 
 def remove_zero_length(geometry):
@@ -29,7 +29,7 @@ class ExtractorMixin(abc.ABC):
         return (centroid.x(), centroid.y()), coordinates
 
     @classmethod
-    def table_to_records(cls, layer) -> List[Dict[str, Any]]:
+    def table_to_records(cls, layer: QgsVectorLayer) -> List[Dict[str, Any]]:
         features = []
         for feature in layer.getFeatures():
             data = feature.attributeMap()
@@ -43,7 +43,7 @@ class ExtractorMixin(abc.ABC):
             features.append(data)
         return features
 
-    def table_to_dict(cls, layer) -> Dict[str, Any]:
+    def table_to_dict(cls, layer: QgsVectorLayer) -> Dict[str, Any]:
         features = defaultdict(list)
         for feature in layer.getFeatures():
             for key, value in feature.attributeMap().items():
