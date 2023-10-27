@@ -13,7 +13,7 @@ disabled (such as inhomogeneities).
 import json
 from pathlib import Path
 from shutil import copy
-from typing import Any, Dict, List, Set, Tuple
+from typing import Any, Dict, List, NamedTuple, Set, Tuple
 
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import (
@@ -53,6 +53,12 @@ SUPPORTED_TTIM_ELEMENTS = set(
         "Head Observation",
     ]
 )
+
+
+class Extraction(NamedTuple):
+    timml: Dict[str, Any] = None
+    ttim: Dict[str, Any] = None
+    success: bool = True
 
 
 class DatasetTreeWidget(QTreeWidget):
@@ -212,23 +218,29 @@ class DatasetTreeWidget(QTreeWidget):
         # other elements.
         name = "timml Aquifer:Aquifer"
         aquifer = elements.pop(name)
-        _errors, raw_data = aquifer.extract_data(transient)
-        if _errors:
-            errors[name] = _errors
-        else:
-            aquifer_data = aquifer.aquifer_data(raw_data, transient=transient)
-            data[name] = aquifer_data
-            if transient:
-                data["reference_date"] = str(raw_data["reference_date"].toPyDateTime())
+        aquifer_extraction = aquifer.extract_data(transient)
+        if aquifer_extraction.errors:
+            errors[name] = aquifer_extraction.errors
+            return errors, None
 
+        raw_data = aquifer_extraction.data
+        aquifer_data = aquifer.aquifer_data(raw_data, transient=transient)
+        data[name] = aquifer_data
+        if transient:
+            data["reference_date"] = str(raw_data["reference_date"].toPyDateTime())
+
+        times = set()
         other = {"aquifer layers": raw_data["layer"], "global_aquifer": raw_data}
         for name, element in elements.items():
+            print(name)
             try:
-                _errors, _data = element.extract_data(transient, other)
-                if _errors:
-                    errors[name] = _errors
-                elif _data:  # skip empty tables
-                    data[name] = _data
+                extraction = element.extract_data(transient, other)
+                if extraction.errors:
+                    errors[name] = extraction.errors
+                elif extraction.data:  # skip empty tables
+                    data[name] = extraction.data
+                    if extraction.times:
+                        times.update(extraction.times)
             except RuntimeError as e:
                 if (
                     e.args[0]
@@ -239,13 +251,11 @@ class DatasetTreeWidget(QTreeWidget):
                 else:
                     raise e
 
-        # Collect all the times. They have been set in the element while
-        # converting.
         if transient:
-            times = []
-            for element in elements.values():
-                times.extend(element.times)
-            data["timml Aquifer:Aquifer"]["tmax"] = max(times)
+            if times:
+                data["timml Aquifer:Aquifer"]["tmax"] = max(times)
+            else:
+                errors["Model"] = {"TTim input:": ["No transient forcing defined."]}
 
         return errors, data
 
@@ -474,7 +484,7 @@ class DatasetWidget(QWidget):
         self.parent.set_interpreter_interaction(value)
         return
 
-    def extract_data(self, transient: bool) -> Tuple[Dict[str, Any], Dict[str, Any]]:
+    def _extract_data(self, transient: bool) -> Extraction:
         if self.validation_dialog:
             self.validation_dialog.close()
             self.validation_dialog = None
@@ -482,16 +492,16 @@ class DatasetWidget(QWidget):
         errors, timml_data = self.dataset_tree.extract_data(transient=False)
         if errors:
             self.validation_dialog = ValidationDialog(errors)
-            return None, None
+            return Extraction(success=False)
 
         ttim_data = None
         if transient:
             errors, ttim_data = self.dataset_tree.extract_data(transient=True)
             if errors:
                 self.validation_dialog = ValidationDialog(errors)
-                return None, None
+                return Extraction(success=False)
 
-        return timml_data, ttim_data
+        return Extraction(timml=timml_data, ttim=ttim_data)
 
     def convert_to_python(self) -> None:
         transient = self.transient
@@ -499,11 +509,11 @@ class DatasetWidget(QWidget):
         if outpath == "":  # Empty string in case of cancel button press
             return
 
-        timml_data, ttim_data = self.extract_data(transient=transient)
-        if timml_data is None:
+        extraction = self._extract_data(transient=transient)
+        if not extraction.success:
             return
 
-        script = data_to_script(timml_data, ttim_data)
+        script = data_to_script(extraction.timml, extraction.ttim)
         with open(outpath, "w") as f:
             f.write(script)
 
@@ -536,13 +546,13 @@ class DatasetWidget(QWidget):
         invalid_input: bool
             Whether validation has succeeded.
         """
-        timml_data, ttim_data = self.extract_data(transient=transient)
-        if timml_data is None:
+        extraction = self._extract_data(transient=transient)
+        if not extraction.success:
             return True
 
         json_data = data_to_json(
-            timml_data,
-            ttim_data,
+            extraction.timml,
+            extraction.ttim,
             cellsize=cellsize,
             output_options=output_options,
         )

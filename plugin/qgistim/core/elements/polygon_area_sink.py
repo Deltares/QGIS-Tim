@@ -3,12 +3,14 @@ from copy import deepcopy
 from PyQt5.QtCore import QVariant
 from qgis.core import QgsDefaultValue, QgsField, QgsSingleSymbolRenderer
 from qgistim.core.elements.colors import GREEN, TRANSPARENT_GREEN
-from qgistim.core.elements.element import Element, ElementSchema
+from qgistim.core.elements.element import Element
+from qgistim.core.elements.schemata import RowWiseSchema
 from qgistim.core.schemata import Positive, Required
 
 
-class PolygonAreaSinkSchema(ElementSchema):
+class PolygonAreaSinkSchema(RowWiseSchema):
     timml_schemata = {
+        "geometry": Required(),
         "rate": Required(),
         "order": Required(Positive()),
         "ndegrees": Required(Positive()),

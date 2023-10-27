@@ -3,7 +3,8 @@ from typing import Any, Dict
 from PyQt5.QtCore import QVariant
 from qgis.core import QgsField
 from qgistim.core.elements.colors import GREEN, TRANSPARENT_GREEN
-from qgistim.core.elements.element import ElementSchema, TransientElement
+from qgistim.core.elements.element import TransientElement
+from qgistim.core.elements.schemata import RowWiseSchema
 from qgistim.core.schemata import (
     AllOrNone,
     AllRequired,
@@ -16,7 +17,7 @@ from qgistim.core.schemata import (
 )
 
 
-class CircularAreaSinkSchema(ElementSchema):
+class CircularAreaSinkSchema(RowWiseSchema):
     timml_schemata = {
         "geometry": Required(CircularGeometry()),
         "rate": Required(),
@@ -25,7 +26,7 @@ class CircularAreaSinkSchema(ElementSchema):
     ttim_schemata = {
         "time_start": Optional(Positive()),
         "time_end": Optional(Positive()),
-        "timeseries_id": Optional(Membership("timeseries_ids")),
+        "timeseries_id": Optional(Membership("ttim timeseries IDs")),
     }
     ttim_consistency_schemata = (
         AllOrNone("time_start", "time_end", "rate_transient"),
@@ -89,12 +90,11 @@ class CircularAreaSink(TransientElement):
 
     def process_ttim_row(self, row, grouped):
         xc, yc, radius = self._centroid_and_radius(row)
-        tsandN, tmax = self.transient_input(row, grouped, "rate")
-        self.times.append(tmax)
+        tsandN, times = self.transient_input(row, grouped, "rate")
         return {
             "xc": xc,
             "yc": yc,
             "R": radius,
             "tsandN": tsandN,
             "label": row["label"],
-        }
+        }, times

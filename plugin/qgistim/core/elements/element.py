@@ -54,7 +54,7 @@ when it has no features.
 import abc
 from collections import defaultdict
 from copy import deepcopy
-from typing import Any, Dict, List, Tuple, Union
+from typing import Any, Dict, List, NamedTuple, Optional, Set, Tuple, Union
 
 from PyQt5.QtWidgets import (
     QDialog,
@@ -73,91 +73,12 @@ from qgis.core import (
 )
 from qgistim.core import geopackage
 from qgistim.core.extractor import ExtractorMixin
-from qgistim.core.schemata import (
-    ConsistencySchema,
-    IterableSchemaContainer,
-    SchemaContainer,
-)
 
 
-class ElementSchema(abc.ABC):
-    # TODO: check for presence of columns
-    timml_schemata: Dict[str, Union[SchemaContainer, IterableSchemaContainer]] = {}
-    timml_consistency_schemata: Tuple[ConsistencySchema] = ()
-    ttim_schemata: Dict[str, Union[SchemaContainer, IterableSchemaContainer]] = {}
-    ttim_consistency_schemata: Tuple[ConsistencySchema] = ()
-    timeseries_schemata: Dict[str, Union[SchemaContainer, IterableSchemaContainer]] = {}
-
-    @staticmethod
-    def _validate_rows(schemata, consistency_schemata, data, other=None):
-        errors = defaultdict(list)
-
-        for schema in consistency_schemata:
-            _error = schema.validate(data, other)
-            if _error:
-                errors["Table:"].append(_error)
-
-        for i, row in enumerate(data):
-            row_errors = defaultdict(list)
-            for variable, schema in schemata.items():
-                _errors = schema.validate(row[variable], other)
-                if _errors:
-                    row_errors[variable].extend(_errors)
-
-            if row_errors:
-                errors[f"Row {i + 1}:"] = row_errors
-
-        return errors
-
-    @staticmethod
-    def _validate_table(schemata, consistency_schemata, data, other=None):
-        if len(data) == 0:
-            return {"Table:": ["Table is empty."]}
-
-        errors = defaultdict(list)
-        for variable, schema in schemata.items():
-            _errors = schema.validate(data[variable], other)
-            if _errors:
-                errors[variable].extend(_errors)
-
-        # The consistency schema rely on the row input being valid.
-        # Hence, they are tested second.
-        if not errors:
-            for schema in consistency_schemata:
-                _error = schema.validate(data, other)
-                if _error:
-                    errors["Table:"].append(_error)
-
-        return errors
-
-    @classmethod
-    def _validate(
-        cls, schemata, consistency_schemata, data, other=None
-    ) -> Dict[str, Any]:
-        if isinstance(data, list):
-            return cls._validate_rows(schemata, consistency_schemata, data, other)
-        elif isinstance(data, dict):
-            return cls._validate_table(schemata, consistency_schemata, data, other)
-        else:
-            raise TypeError(
-                f"Data should be list or dict, received: {type(data).__name__}"
-            )
-
-    @classmethod
-    def validate_timml(cls, data, other=None):
-        return cls._validate(
-            cls.timml_schemata, cls.timml_consistency_schemata, data, other
-        )
-
-    @classmethod
-    def validate_ttim(cls, data, other=None):
-        return cls._validate(
-            cls.ttim_schemata, cls.ttim_consistency_schemata, data, other
-        )
-
-    @classmethod
-    def validate_timeseries(cls, data, other=None):
-        return cls._validate_table(cls.timeseries_schemata, (), data, other)
+class ExtractionResult(NamedTuple):
+    errors: Optional[Dict[str, Any]] = None
+    data: Optional[Union[Dict[str, Any], List[Dict[str, Any]]]] = None
+    times: Optional[Set[float]] = None
 
 
 class NameDialog(QDialog):
@@ -208,7 +129,6 @@ class Element(ExtractorMixin, abc.ABC):
         self.item = None
 
     def __init__(self, path: str, name: str):
-        self.times = []  # Store the times to get tmax for TTim.
         self._initialize_default(path, name)
         self.timml_name = f"timml {self.element_type}:{name}"
 
@@ -329,20 +249,49 @@ class Element(ExtractorMixin, abc.ABC):
                 grouped[groupkey][key].append(value)
         return grouped
 
-    def to_timml(self, other=None):
-        data = self.table_to_records(self.timml_layer)
-        errors = self.schema.validate_timml(data, other)
+    @staticmethod
+    def _check_table_columns(attributes, layer) -> Dict[str, List]:
+        """
+        Check if any columns are missing from the table.
+
+        In that case, abort and present an error message.
+        """
+        fields = set(field.name() for field in layer.fields())
+        missing = set(attr.name() for attr in attributes) - fields
+        if missing:
+            columns = ",".join(missing)
+            msg = (
+                f"Table is missing columns: {columns}. "
+                "Remove and recreate the layer."
+            )
+            return {"Table:": [msg]}
+        return {}
+
+    def check_timml_columns(self):
+        return self._check_table_columns(
+            attributes=self.timml_attributes, layer=self.timml_layer
+        )
+
+    def to_timml(self, other=None) -> ExtractionResult:
+        missing = self.check_timml_columns()
+        if missing:
+            return ExtractionResult(errors=missing)
+
+        data = self.table_to_records(layer=self.timml_layer)
+        errors = self.schema.validate_timml(
+            name=self.timml_layer.name(), data=data, other=other
+        )
+
         if errors:
-            return errors, data
+            return ExtractionResult(errors=errors)
         else:
             elements = [self.process_timml_row(row=row, other=other) for row in data]
-            return [], elements
+            return ExtractionResult(data=elements)
 
-    def to_ttim(self, other=None):
-        self.times = []
+    def to_ttim(self, other=None) -> ExtractionResult:
         return self.to_timml(other)
 
-    def extract_data(self, transient: bool, other=None) -> Union[List, Dict]:
+    def extract_data(self, transient: bool, other=None) -> ExtractionResult:
         if transient:
             return self.to_ttim(other)
         else:
@@ -460,7 +409,7 @@ class TransientElement(Element, abc.ABC):
     @staticmethod
     def transient_input(
         row, all_timeseries: Dict[str, Any], variable: str
-    ) -> Tuple[List[Any], float]:
+    ) -> Tuple[List[Any], Set[float]]:
         timeseries_id = row["timeseries_id"]
         row_start = row["time_start"]
         row_end = row["time_end"]
@@ -478,38 +427,57 @@ class TransientElement(Element, abc.ABC):
             return [
                 (time, value - steady_value)
                 for time, value in zip(timeseries["time_start"], timeseries[variable])
-            ], max(timeseries["time_start"])
+            ], set(timeseries["time_start"])
         elif start_and_stop:
             return [
                 (row_start, transient_value - steady_value),
                 (row_end, 0.0),
-            ], row_end
+            ], {row_end}
         else:
-            return [(0.0, 0.0)], 0.0
+            return [(0.0, 0.0)], {0.0}
+
+    def check_ttim_columns(self):
+        return self._check_table_columns(
+            attributes=self.ttim_attributes, layer=self.ttim_layer
+        )
 
     def to_ttim(self, other):
-        self.times = []
+        missing = self.check_ttim_columns()
+        if missing:
+            return ExtractionResult(errors=missing)
+
+        other = other.copy()  # avoid side-effects
         timeseries = self.table_to_dict(self.ttim_layer)
         if timeseries:
-            errors = self.schema.validate_timeseries(timeseries)
+            errors = self.schema.validate_timeseries(
+                name=self.ttim_layer.name(), data=timeseries
+            )
             if errors:
-                return errors, None
+                return ExtractionResult(errors=errors)
 
             grouped = self.groupby(timeseries, "timeseries_id")
             # Store timeseries in other dict for validation.
-            other = other.copy()
-            other["timeseries_ids"] = set(timeseries["timeseries_id"])
+            other["ttim timeseries IDs"] = set(timeseries["timeseries_id"])
 
         else:
             grouped = {}
+            other["ttim timeseries IDs"] = {None}
 
         data = self.table_to_records(self.timml_layer)
-        # errors = self.schema.validate_ttim(data, other)
-        # if errors:
-        #    return errors, None
+        errors = self.schema.validate_ttim(
+            name=self.timml_layer.name(), data=data, other=other
+        )
+        if errors:
+            return ExtractionResult(errors=errors)
 
-        elements = [self.process_ttim_row(row, grouped) for row in data]
-        return None, elements
+        elements = []
+        times = set()
+        for row in data:
+            row_data, row_times = self.process_ttim_row(row, grouped)
+            elements.append(row_data)
+            times.update(row_times)
+
+        return ExtractionResult(data=elements, times=times)
 
 
 class AssociatedElement(Element, abc.ABC):
@@ -550,22 +518,35 @@ class AssociatedElement(Element, abc.ABC):
         geopackage.remove_layer(self.path, self.timml_name)
         geopackage.remove_layer(self.path, self.assoc_name)
 
-    def to_timml(self, other):
+    def to_timml(self, other) -> ExtractionResult:
+        missing = self._check_table_columns(
+            attributes=self.timml_attributes, layer=self.timml_layer
+        )
+        if missing:
+            return ExtractionResult(errors=missing)
+
         properties = self.table_to_dict(self.assoc_layer)
-        errors = self.assoc_schema.validate_timml(properties)
+        errors = self.assoc_schema.validate_timml(
+            name=self.assoc_layer.name(),
+            data=properties,
+        )
         if errors:
-            return errors, None
+            return ExtractionResult(errors=errors)
 
         other = other.copy()  # Avoid side-effects
         other["properties inhomogeneity_id"] = list(set(properties["inhomogeneity_id"]))
         data = self.table_to_records(self.timml_layer)
-        errors = self.schema.validate_timml(data, other)
+        errors = self.schema.validate_timml(
+            name=self.timml_layer.name(),
+            data=data,
+            other=other,
+        )
         if errors:
-            return errors, None
+            return ExtractionResult(errors=errors)
 
         grouped = self.groupby(properties, "inhomogeneity_id")
         elements = [self.process_timml_row(row=row, grouped=grouped) for row in data]
-        return None, elements
+        return ExtractionResult(data=elements)
 
     def to_ttim(self, _):
         raise NotImplementedError(f"{type(self).__name__} is not supported in TTim.")

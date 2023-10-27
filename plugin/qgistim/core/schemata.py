@@ -181,7 +181,7 @@ class AllOrNone(BaseSchema):
         self.variables = variables
 
     def validate(self, data, _=None) -> MaybeError:
-        present = [data[v] is not None for v in self.variables]
+        present = [data.get(v) is not None for v in self.variables]
         if any(present) != all(present):
             vars = ", ".join(self.variables)
             return (
@@ -197,7 +197,7 @@ class NotBoth(BaseSchema):
         self.y = y
 
     def validate(self, data, _=None) -> MaybeError:
-        if (data[self.x] is not None) and (data[self.y] is not None):
+        if (data.get(self.x) is not None) and (data.get(self.y) is not None):
             return f"Either {self.x} or {self.y} should be provided, not both."
         return None
 
@@ -331,6 +331,7 @@ class SemiConfined(ConsistencySchema):
 
 class SingleRow(ConsistencySchema):
     def validate(self, data, _=None) -> MaybeError:
-        if len(data) != 1:
-            return "Table may contain only one row."
+        nrow = len(data)
+        if nrow != 1:
+            return f"Table must contain one row, found {nrow} rows."
         return None

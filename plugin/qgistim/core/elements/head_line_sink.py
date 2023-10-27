@@ -1,7 +1,8 @@
 from PyQt5.QtCore import QVariant
 from qgis.core import QgsDefaultValue, QgsField, QgsSingleSymbolRenderer
 from qgistim.core.elements.colors import BLUE
-from qgistim.core.elements.element import ElementSchema, TransientElement
+from qgistim.core.elements.element import TransientElement
+from qgistim.core.elements.schemata import RowWiseSchema
 from qgistim.core.schemata import (
     AllOrNone,
     AllRequired,
@@ -13,8 +14,9 @@ from qgistim.core.schemata import (
 )
 
 
-class HeadLineSinkSchema(ElementSchema):
+class HeadLineSinkSchema(RowWiseSchema):
     timml_schemata = {
+        "geometry": Required(),
         "head": Required(),
         "resistance": Required(Positive()),
         "width": Required(Positive()),
@@ -28,6 +30,7 @@ class HeadLineSinkSchema(ElementSchema):
     ttim_schemata = {
         "time_start": Optional(Positive()),
         "time_end": Optional(Positive()),
+        "timeseries_id": Optional(Membership("ttim timeseries IDs")),
     }
     timeseries_schemata = {
         "timeseries_id": AllRequired(),
@@ -83,8 +86,7 @@ class HeadLineSink(TransientElement):
         }
 
     def process_ttim_row(self, row, grouped):
-        tsandh, tmax = self.transient_input(row, grouped, "head")
-        self.times.append(tmax)
+        tsandh, times = self.transient_input(row, grouped, "head")
         return {
             "xy": self.linestring_xy(row),
             "tsandh": tsandh,
@@ -92,4 +94,4 @@ class HeadLineSink(TransientElement):
             "wh": row["width"],
             "layers": row["layer"],
             "label": row["label"],
-        }
+        }, times

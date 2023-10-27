@@ -247,12 +247,16 @@ class ComputeWidget(QWidget):
         layer = self.contour_layer.currentLayer()
         if layer is None:
             return
+
+        start, stop, step = self.contour_range()
+        if (start == stop) or (step == 0.0):
+            return
+
         renderer = layer.rendererSettings()
         index = renderer.activeScalarDatasetGroup()
         qgs_index = QgsMeshDatasetIndex(group=index, dataset=0)
         name = layer.datasetGroupMetadata(qgs_index).name()
         contours_name = f"{path.stem}-contours-{name}"
-        start, stop, step = self.contour_range()
         gpkg_path = str(path.with_suffix(".output.gpkg"))
 
         layer = mesh_contours(
@@ -407,6 +411,9 @@ class ComputeWidget(QWidget):
                 start = scalar_settings.classificationMinimum()
                 stop = scalar_settings.classificationMaximum()
                 step = (stop - start) / 21
+                # If no head differences are present, no contours can be drawn.
+                if step == 0.0:
+                    return
 
                 contour_layer = mesh_contours(
                     gpkg_path=str(path.with_suffix(".output.gpkg")),

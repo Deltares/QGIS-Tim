@@ -1,12 +1,14 @@
 from PyQt5.QtCore import QVariant
 from qgis.core import QgsDefaultValue, QgsField, QgsSingleSymbolRenderer
 from qgistim.core.elements.colors import RED
-from qgistim.core.elements.element import Element, ElementSchema
+from qgistim.core.elements.element import Element
+from qgistim.core.elements.schemata import RowWiseSchema
 from qgistim.core.schemata import Membership, Positive, Required
 
 
-class ImpermeableLineDoubletSchema(ElementSchema):
+class ImpermeableLineDoubletSchema(RowWiseSchema):
     timml_schemata = {
+        "geometry": Required(),
         "order": Required(Positive()),
         "layer": Required(Membership("aquifer layers")),
     }

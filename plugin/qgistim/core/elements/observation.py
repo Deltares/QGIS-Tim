@@ -1,11 +1,12 @@
 from PyQt5.QtCore import QVariant
 from qgis.core import QgsDefaultValue, QgsField, QgsSingleSymbolRenderer
 from qgistim.core.elements.colors import LIGHT_BLUE
-from qgistim.core.elements.element import ElementSchema, TransientElement
+from qgistim.core.elements.element import TransientElement
+from qgistim.core.elements.schemata import RowWiseSchema
 from qgistim.core.schemata import AllRequired, Positive, Required
 
 
-class HeadObservationSchema(ElementSchema):
+class HeadObservationSchema(RowWiseSchema):
     timml_schemata = {
         "geometry": Required(),
     }
@@ -49,9 +50,10 @@ class HeadObservation(TransientElement):
 
     def process_ttim_row(self, row, grouped):
         x, y = self.point_xy(row)
+        times = grouped[row["timeseries_id"]]["time"]
         return {
             "x": x,
             "y": y,
-            "t": grouped[row["timeseries_id"]]["time"],
+            "t": times,
             "label": row["label"],
-        }
+        }, times

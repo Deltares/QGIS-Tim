@@ -1,9 +1,8 @@
-from typing import Any, Dict
-
 from PyQt5.QtCore import QVariant
 from qgis.core import QgsDefaultValue, QgsField
 from qgistim.core import geopackage
-from qgistim.core.elements.element import ElementSchema, TransientElement
+from qgistim.core.elements.element import ExtractionResult, TransientElement
+from qgistim.core.elements.schemata import SingleRowSchema, TableSchema
 from qgistim.core.schemata import (
     AllGreaterEqual,
     AllRequired,
@@ -11,13 +10,13 @@ from qgistim.core.schemata import (
     OptionalFirstOnly,
     Positive,
     Range,
+    Required,
     SemiConfined,
-    SingleRow,
     StrictlyDecreasing,
 )
 
 
-class AquiferSchema(ElementSchema):
+class AquiferSchema(TableSchema):
     timml_schemata = {
         "layer": AllRequired(Range()),
         "aquifer_top": AllRequired(StrictlyDecreasing()),
@@ -37,7 +36,12 @@ class AquiferSchema(ElementSchema):
     }
 
 
-#    ttim_consistency_schemata = (SingleRow(),)
+class TemporalSettingsSchema(SingleRowSchema):
+    ttim_schemata = {
+        "time_min": Required(Positive()),
+        "laplace_inversion_M": Required(Positive()),
+        "reference_date": Required(),
+    }
 
 
 class Aquifer(TransientElement):
@@ -72,6 +76,7 @@ class Aquifer(TransientElement):
         "aquifer_npor",
     )
     schema = AquiferSchema()
+    assoc_schema = TemporalSettingsSchema()
 
     def __init__(self, path: str, name: str):
         self._initialize_default(path, name)
@@ -91,18 +96,33 @@ class Aquifer(TransientElement):
         """This element may not be removed."""
         return
 
-    def to_timml(self):
-        data = self.table_to_dict(self.timml_layer)
-        errors = self.schema.validate_timml(data)
-        return errors, data
+    def to_timml(self) -> ExtractionResult:
+        missing = self.check_timml_columns()
+        if missing:
+            return ExtractionResult(errors=missing)
 
-    def to_ttim(self):
-        data = self.table_to_dict(self.timml_layer)
-        errors = self.schema.validate_ttim(data)
-        time_data = self.table_to_records(self.ttim_layer)[0]
-        return errors, {**data, **time_data}
+        data = self.table_to_dict(layer=self.timml_layer)
+        errors = self.schema.validate_timml(name=self.timml_layer.name(), data=data)
+        return ExtractionResult(errors=errors, data=data)
 
-    def extract_data(self, transient: bool) -> Dict[str, Any]:
+    def to_ttim(self) -> ExtractionResult:
+        missing = self.check_ttim_columns()
+        if missing:
+            return ExtractionResult(errors=missing)
+
+        data = self.table_to_dict(layer=self.timml_layer)
+        time_data = self.table_to_records(layer=self.ttim_layer)
+        errors = {
+            **self.schema.validate_ttim(name=self.timml_layer.name(), data=data),
+            **self.assoc_schema.validate_ttim(
+                name=self.ttim_layer.name(), data=time_data
+            ),
+        }
+        if errors:
+            return ExtractionResult(errors=errors)
+        return ExtractionResult(data={**data, **time_data[0]})
+
+    def extract_data(self, transient: bool) -> ExtractionResult:
         if transient:
             return self.to_ttim()
         else:

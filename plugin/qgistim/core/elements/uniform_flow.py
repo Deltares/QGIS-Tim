@@ -1,10 +1,11 @@
 from PyQt5.QtCore import QVariant
 from qgis.core import QgsField
-from qgistim.core.elements.element import Element, ElementSchema
+from qgistim.core.elements.element import Element
+from qgistim.core.elements.schemata import SingleRowSchema
 from qgistim.core.schemata import Required
 
 
-class UniformFlowSchema(ElementSchema):
+class UniformFlowSchema(SingleRowSchema):
     timml_schemata = {
         "slope": Required(),
         "angle": Required(),

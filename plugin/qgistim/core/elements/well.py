@@ -3,7 +3,8 @@ from typing import Any, Dict
 from PyQt5.QtCore import QVariant
 from qgis.core import QgsDefaultValue, QgsField, QgsSingleSymbolRenderer
 from qgistim.core.elements.colors import GREEN
-from qgistim.core.elements.element import ElementSchema, TransientElement
+from qgistim.core.elements.element import TransientElement
+from qgistim.core.elements.schemata import RowWiseSchema
 from qgistim.core.schemata import (
     AllOrNone,
     AllRequired,
@@ -15,7 +16,7 @@ from qgistim.core.schemata import (
 )
 
 
-class WellSchema(ElementSchema):
+class WellSchema(RowWiseSchema):
     timml_schemata = {
         "geometry": Required(),
         "discharge": Required(),
@@ -28,9 +29,9 @@ class WellSchema(ElementSchema):
         "slug": Required(),
         "time_start": Optional(Positive()),
         "time_end": Optional(Positive()),
-        "timeseries_id": Optional(Membership("timeseries_ids")),
+        "timeseries_id": Optional(Membership("ttim timeseries IDs")),
     }
-    consistency_schemata = (
+    ttim_consistency_schemata = (
         AllOrNone(("time_start", "time_end", "discharge_transient")),
         NotBoth("time_start", "timeseries_id"),
     )
@@ -96,8 +97,7 @@ class Well(TransientElement):
 
     def process_ttim_row(self, row, grouped):
         x, y = self.point_xy(row)
-        tsandQ, tmax = self.transient_input(row, grouped, "discharge")
-        self.times.append(tmax)
+        tsandQ, times = self.transient_input(row, grouped, "discharge")
         return {
             "xw": x,
             "yw": y,
@@ -108,4 +108,4 @@ class Well(TransientElement):
             "label": row["label"],
             "rc": row["caisson_radius"],
             "wbstype": "slug" if row["slug"] else "pumping",
-        }
+        }, times

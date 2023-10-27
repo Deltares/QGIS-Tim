@@ -1,12 +1,12 @@
 from PyQt5.QtCore import QVariant
 from qgis.core import QgsField, QgsSingleSymbolRenderer
 from qgistim.core.elements.colors import RED
-from qgistim.core.elements.element import Element, ElementSchema
-from qgistim.core.schemata import Membership, Required, SingleRow
+from qgistim.core.elements.element import Element
+from qgistim.core.elements.schemata import SingleRowSchema
+from qgistim.core.schemata import Membership, Required
 
 
-class ConstantSchema(ElementSchema):
-    timml_consistency_schemata = (SingleRow(),)
+class ConstantSchema(SingleRowSchema):
     timml_schemata = {
         "geometry": Required(),
         "head": Required(),

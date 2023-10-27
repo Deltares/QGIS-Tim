@@ -3,7 +3,8 @@ from typing import Any, Dict
 from PyQt5.QtCore import QVariant
 from qgis.core import QgsDefaultValue, QgsField, QgsSingleSymbolRenderer
 from qgistim.core.elements.colors import RED, TRANSPARENT_RED
-from qgistim.core.elements.element import AssociatedElement, ElementSchema
+from qgistim.core.elements.element import AssociatedElement
+from qgistim.core.elements.schemata import RowWiseSchema, TableSchema
 from qgistim.core.schemata import (
     AllGreaterEqual,
     AllRequired,
@@ -19,15 +20,16 @@ from qgistim.core.schemata import (
 )
 
 
-class BuildingPitSchema(ElementSchema):
+class BuildingPitSchema(RowWiseSchema):
     timml_schemata = {
+        "geometry": Required(),
         "inhomogeneity_id": Required(Membership("properties inhomogeneity_id")),
         "order": Required(Positive()),
         "ndegrees": Required(Positive()),
     }
 
 
-class AssociatedBuildingPitSchema(ElementSchema):
+class AssociatedBuildingPitSchema(TableSchema):
     timml_schemata = {
         "inhomogeneity_id": AllRequired(),
         "layer": AllRequired(Range()),

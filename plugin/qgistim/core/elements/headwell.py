@@ -10,23 +10,31 @@ from qgis.core import (
     QgsSingleSymbolRenderer,
 )
 from qgistim.core.elements.colors import BLUE
-from qgistim.core.elements.element import ElementSchema, TransientElement
+from qgistim.core.elements.element import TransientElement
+from qgistim.core.elements.schemata import RowWiseSchema
 from qgistim.core.schemata import (
     AllOrNone,
     AllRequired,
     Membership,
     NotBoth,
+    Optional,
     Positive,
     Required,
 )
 
 
-class HeadWellSchema(ElementSchema):
+class HeadWellSchema(RowWiseSchema):
     timml_schemata = {
+        "geometry": Required(),
         "head": Required(),
         "radius": Required(Positive()),
         "resistance": Required(Positive()),
         "layer": Required(Membership("aquifer layers")),
+    }
+    ttim_schemata = {
+        "time_start": Optional(Positive()),
+        "time_end": Optional(Positive()),
+        "timeseries_id": Optional(Membership("ttim timeseries IDs")),
     }
     ttim_consistency_schemata = (
         AllOrNone(("time_start", "time_end", "head_transient")),
@@ -88,8 +96,7 @@ class HeadWell(TransientElement):
 
     def process_ttim_row(self, row, grouped):
         x, y = self.point_xy(row)
-        tsandh, tmax = self.transient_input(row, grouped, "head")
-        self.times.append(tmax)
+        tsandh, times = self.transient_input(row, grouped, "head")
         return {
             "xw": x,
             "yw": y,
@@ -98,7 +105,7 @@ class HeadWell(TransientElement):
             "res": row["resistance"],
             "layers": row["layer"],
             "label": row["label"],
-        }
+        }, times
 
 
 class RemoteHeadWell(HeadWell):

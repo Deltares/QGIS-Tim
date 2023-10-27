@@ -9,15 +9,15 @@ from qgis.core import (
     QgsSingleSymbolRenderer,
 )
 from qgistim.core.elements.colors import BLACK
-from qgistim.core.elements.element import ElementSchema, TransientElement
-from qgistim.core.schemata import AllRequired, Positive, Required, SingleRow
+from qgistim.core.elements.element import ExtractionResult, TransientElement
+from qgistim.core.elements.schemata import SingleRowSchema
+from qgistim.core.schemata import AllRequired, Positive, Required, StrictlyIncreasing
 
 
-class DomainSchema(ElementSchema):
+class DomainSchema(SingleRowSchema):
     timml_schemata = {"geometry": Required()}
-    timml_consistency_schemata = (SingleRow(),)
     timeseries_schemata = {
-        "time": AllRequired(Positive()),
+        "time": AllRequired(Positive(), StrictlyIncreasing()),
     }
 
 
@@ -28,7 +28,6 @@ class Domain(TransientElement):
     schema = DomainSchema()
 
     def __init__(self, path: str, name: str):
-        self.times = []
         self._initialize_default(path, name)
         self.timml_name = f"timml {self.element_type}:Domain"
         self.ttim_name = "ttim Computation Times:Domain"
@@ -66,25 +65,38 @@ class Domain(TransientElement):
         canvas.refresh()
         return ymax, ymin
 
-    def to_timml(self, other):
-        data = self.table_to_records(self.timml_layer)
-        errors = self.schema.validate_timml(data, other)
+    def to_timml(self, other) -> ExtractionResult:
+        data = self.table_to_records(layer=self.timml_layer)
+        errors = self.schema.validate_timml(
+            name=self.timml_layer.name(), data=data, other=other
+        )
         if errors:
-            return errors, None
+            return ExtractionResult(errors=errors)
         else:
             x = [point[0] for point in data[0]["geometry"]]
             y = [point[1] for point in data[0]["geometry"]]
-            return None, {
-                "xmin": min(x),
-                "xmax": max(x),
-                "ymin": min(y),
-                "ymax": max(y),
-            }
+            return ExtractionResult(
+                data={
+                    "xmin": min(x),
+                    "xmax": max(x),
+                    "ymin": min(y),
+                    "ymax": max(y),
+                }
+            )
 
-    def to_ttim(self, other):
-        _, data = self.to_timml(other)
-        ttim_data = self.table_to_dict(self.ttim_layer)
-        ttim_errors = self.schema.validate_ttim(ttim_data, other)
-        data["time"] = ttim_data["time"]
-        self.times = [max(data["time"])]
-        return ttim_errors, data
+    def to_ttim(self, other) -> ExtractionResult:
+        timml_extraction = self.to_timml(other)
+        data = timml_extraction.data
+
+        timeseries = self.table_to_dict(layer=self.ttim_layer)
+        errors = self.schema.validate_timeseries(
+            name=self.ttim_layer.name(), data=timeseries
+        )
+        if errors:
+            return ExtractionResult(errors=errors)
+        if timeseries["time"]:
+            data["time"] = timeseries["time"]
+            times = set(timeseries["time"])
+        else:
+            times = set()
+        return ExtractionResult(data=data, times=times)

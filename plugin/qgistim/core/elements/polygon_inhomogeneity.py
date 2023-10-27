@@ -3,12 +3,12 @@ from typing import Any, Dict
 from PyQt5.QtCore import QVariant
 from qgis.core import QgsDefaultValue, QgsField, QgsSingleSymbolRenderer
 from qgistim.core.elements.colors import GREY, TRANSPARENT_GREY
-from qgistim.core.elements.element import AssociatedElement, ElementSchema
+from qgistim.core.elements.element import AssociatedElement
+from qgistim.core.elements.schemata import RowWiseSchema, TableSchema
 from qgistim.core.schemata import (
     AllGreaterEqual,
     AllRequired,
     Membership,
-    NotBoth,
     OffsetAllRequired,
     OptionalFirstOnly,
     Positive,
@@ -19,15 +19,16 @@ from qgistim.core.schemata import (
 )
 
 
-class PolygonInhomogeneitySchema(ElementSchema):
+class PolygonInhomogeneitySchema(RowWiseSchema):
     timml_schemata = {
+        "geometry": Required(),
         "inhomogeneity_id": Required(Membership("properties inhomogeneity_id")),
         "order": Required(Positive()),
         "ndegrees": Required(Positive()),
     }
 
 
-class AssociatedPolygonInhomogeneitySchema(ElementSchema):
+class AssociatedPolygonInhomogeneitySchema(TableSchema):
     timml_schemata = {
         "inhomogeneity_id": AllRequired(),
         "layer": AllRequired(Range()),
