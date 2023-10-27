@@ -227,7 +227,7 @@ class DatasetTreeWidget(QTreeWidget):
         aquifer_data = aquifer.aquifer_data(raw_data, transient=transient)
         data[name] = aquifer_data
         if transient:
-            data["reference_date"] = str(raw_data["reference_date"].toPyDateTime())
+            data["start_date"] = str(raw_data["start_date"].toPyDateTime())
 
         times = set()
         other = {"aquifer layers": raw_data["layer"], "global_aquifer": raw_data}

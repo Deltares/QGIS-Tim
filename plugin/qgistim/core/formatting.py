@@ -205,7 +205,7 @@ def ttim_script(timml_data: Dict[str, Any], ttim_data: Dict[str, Any]) -> str:
     data = ttim_data.copy()  # avoid side-effects
     aquifer_data = data.pop("timml Aquifer:Aquifer")
     domain_data = data.pop("timml Domain:Domain")
-    data.pop("reference_date")
+    data.pop("start_date")
 
     strings.append(
         f"\nttim_model = ttim.ModelMaq(\n{format_kwargs(aquifer_data)}\n{PREFIX}timmlmodel=timml_model,\n)"
@@ -302,12 +302,12 @@ def ttim_json(
 
     data = ttim_data.copy()
     domain_data = data.pop("timml Domain:Domain")
-    reference_date = data.pop("reference_date")
+    start_date = data.pop("start_date")
     ttim_json, observations = json_elements_and_observations(data, mapping=TTIM_MAPPING)
 
     json_data["ttim"] = ttim_json
     json_data["headgrid"] = headgrid_entry(domain_data, cellsize)
-    json_data["reference_date"] = reference_date
+    json_data["start_date"] = start_date
     json_data["observations"] = observations
     return json_data
 

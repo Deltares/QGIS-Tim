@@ -113,7 +113,7 @@ def _(
     ymin: float,
     ymax: float,
     spacing: float,
-    reference_date: str,
+    start_date: str,
     time: List[float],
 ) -> Union[None, xr.DataArray]:
     if time is None:
@@ -134,7 +134,7 @@ def _(
 
     # Other coordinates
     layer = [i for i in range(nlayer)]
-    time = pd.to_datetime(reference_date) + pd.to_timedelta(time, "D")
+    time = pd.to_datetime(start_date) + pd.to_timedelta(time, "D")
     return xr.DataArray(
         data=head,
         name="head",
@@ -169,7 +169,7 @@ def _(
 
 @head_observations.register
 def _(
-    model: ttim.ModelMaq, observations: Dict, reference_date: pd.Timestamp
+    model: ttim.ModelMaq, observations: Dict, start_date: pd.Timestamp
 ) -> Dict[str, pd.DataFrame]:
     d = {
         "geometry": [],
@@ -179,13 +179,13 @@ def _(
         "observation_id": [],
     }
     heads = []
-    reference_date = pd.to_datetime(reference_date, utc=False)
+    start_date = pd.to_datetime(start_date, utc=False)
     for observation_id, kwargs in enumerate(observations):
         x = kwargs["x"]
         y = kwargs["y"]
         t = kwargs["t"]
         n_time = len(t)
-        datetime = reference_date + pd.to_timedelta([0] + t, "day")
+        datetime = start_date + pd.to_timedelta([0] + t, "day")
         d["geometry"].extend([{"type": "Point", "coordinates": [x, y]}] * n_time)
         d["datetime_start"].extend(datetime[:-1])
         d["datetime_end"].extend(datetime[1:] - pd.to_timedelta(1, "minute"))
@@ -250,12 +250,12 @@ def write_output(
     crs = CoordinateReferenceSystem(**data["crs"])
     output_options = data["output_options"]
     observations = data["observations"]
-    reference_date = pd.to_datetime(data.get("reference_date"))
+    start_date = pd.to_datetime(data.get("start_date"))
 
     # Compute gridded head data and write to netCDF.
     head = None
     if output_options["raster"] or output_options["mesh"]:
-        head = headgrid(model, **data["headgrid"], reference_date=reference_date)
+        head = headgrid(model, **data["headgrid"], start_date=start_date)
 
     if head is not None:
         if output_options["raster"]:
@@ -266,7 +266,7 @@ def write_output(
     # Compute observations and discharge, and write to geopackage.
     if output_options["discharge"]:
         tables = extract_discharges(
-            elements, model.aq.nlayers, reference_date=reference_date
+            elements, model.aq.nlayers, start_date=start_date
         )
     else:
         tables = {}
@@ -274,7 +274,7 @@ def write_output(
     if output_options["head_observations"] and observations:
         for layername, content in observations.items():
             tables[layername] = head_observations(
-                model, content["data"], reference_date=reference_date
+                model, content["data"], start_date=start_date
             )
 
     write_geopackage(tables, crs, path)

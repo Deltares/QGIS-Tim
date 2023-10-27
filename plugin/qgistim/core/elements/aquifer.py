@@ -41,7 +41,7 @@ class TemporalSettingsSchema(SingleRowSchema):
     ttim_schemata = {
         "time_min": Required(StrictlyPositive()),
         "laplace_inversion_M": Required(StrictlyPositive()),
-        "reference_date": Required(),
+        "start_date": Required(),
     }
 
 
@@ -64,7 +64,7 @@ class Aquifer(TransientElement):
     ttim_attributes = (
         QgsField("time_min", QVariant.Double),
         QgsField("laplace_inversion_M", QVariant.Int),
-        QgsField("reference_date", QVariant.DateTime),
+        QgsField("start_date", QVariant.DateTime),
     )
     ttim_defaults = {
         "time_min": QgsDefaultValue("0.01"),
