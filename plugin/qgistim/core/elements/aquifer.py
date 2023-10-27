@@ -1,7 +1,7 @@
 from PyQt5.QtCore import QVariant
 from qgis.core import QgsDefaultValue, QgsField
 from qgistim.core import geopackage
-from qgistim.core.elements.element import ExtractionResult, TransientElement
+from qgistim.core.elements.element import ElementExtraction, TransientElement
 from qgistim.core.elements.schemata import SingleRowSchema, TableSchema
 from qgistim.core.schemata import (
     AllGreaterEqual,
@@ -96,19 +96,19 @@ class Aquifer(TransientElement):
         """This element may not be removed."""
         return
 
-    def to_timml(self) -> ExtractionResult:
+    def to_timml(self) -> ElementExtraction:
         missing = self.check_timml_columns()
         if missing:
-            return ExtractionResult(errors=missing)
+            return ElementExtraction(errors=missing)
 
         data = self.table_to_dict(layer=self.timml_layer)
         errors = self.schema.validate_timml(name=self.timml_layer.name(), data=data)
-        return ExtractionResult(errors=errors, data=data)
+        return ElementExtraction(errors=errors, data=data)
 
-    def to_ttim(self) -> ExtractionResult:
+    def to_ttim(self) -> ElementExtraction:
         missing = self.check_ttim_columns()
         if missing:
-            return ExtractionResult(errors=missing)
+            return ElementExtraction(errors=missing)
 
         data = self.table_to_dict(layer=self.timml_layer)
         time_data = self.table_to_records(layer=self.ttim_layer)
@@ -119,10 +119,10 @@ class Aquifer(TransientElement):
             ),
         }
         if errors:
-            return ExtractionResult(errors=errors)
-        return ExtractionResult(data={**data, **time_data[0]})
+            return ElementExtraction(errors=errors)
+        return ElementExtraction(data={**data, **time_data[0]})
 
-    def extract_data(self, transient: bool) -> ExtractionResult:
+    def extract_data(self, transient: bool) -> ElementExtraction:
         if transient:
             return self.to_ttim()
         else:

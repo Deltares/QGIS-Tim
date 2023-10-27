@@ -75,7 +75,7 @@ from qgistim.core import geopackage
 from qgistim.core.extractor import ExtractorMixin
 
 
-class ExtractionResult(NamedTuple):
+class ElementExtraction(NamedTuple):
     errors: Optional[Dict[str, Any]] = None
     data: Optional[Union[Dict[str, Any], List[Dict[str, Any]]]] = None
     times: Optional[Set[float]] = None
@@ -272,10 +272,10 @@ class Element(ExtractorMixin, abc.ABC):
             attributes=self.timml_attributes, layer=self.timml_layer
         )
 
-    def to_timml(self, other=None) -> ExtractionResult:
+    def to_timml(self, other=None) -> ElementExtraction:
         missing = self.check_timml_columns()
         if missing:
-            return ExtractionResult(errors=missing)
+            return ElementExtraction(errors=missing)
 
         data = self.table_to_records(layer=self.timml_layer)
         errors = self.schema.validate_timml(
@@ -283,15 +283,15 @@ class Element(ExtractorMixin, abc.ABC):
         )
 
         if errors:
-            return ExtractionResult(errors=errors)
+            return ElementExtraction(errors=errors)
         else:
             elements = [self.process_timml_row(row=row, other=other) for row in data]
-            return ExtractionResult(data=elements)
+            return ElementExtraction(data=elements)
 
-    def to_ttim(self, other=None) -> ExtractionResult:
+    def to_ttim(self, other=None) -> ElementExtraction:
         return self.to_timml(other)
 
-    def extract_data(self, transient: bool, other=None) -> ExtractionResult:
+    def extract_data(self, transient: bool, other=None) -> ElementExtraction:
         if transient:
             return self.to_ttim(other)
         else:
@@ -444,7 +444,7 @@ class TransientElement(Element, abc.ABC):
     def to_ttim(self, other):
         missing = self.check_ttim_columns()
         if missing:
-            return ExtractionResult(errors=missing)
+            return ElementExtraction(errors=missing)
 
         other = other.copy()  # avoid side-effects
         timeseries = self.table_to_dict(self.ttim_layer)
@@ -453,7 +453,7 @@ class TransientElement(Element, abc.ABC):
                 name=self.ttim_layer.name(), data=timeseries
             )
             if errors:
-                return ExtractionResult(errors=errors)
+                return ElementExtraction(errors=errors)
 
             grouped = self.groupby(timeseries, "timeseries_id")
             # Store timeseries in other dict for validation.
@@ -468,7 +468,7 @@ class TransientElement(Element, abc.ABC):
             name=self.timml_layer.name(), data=data, other=other
         )
         if errors:
-            return ExtractionResult(errors=errors)
+            return ElementExtraction(errors=errors)
 
         elements = []
         times = set()
@@ -477,7 +477,7 @@ class TransientElement(Element, abc.ABC):
             elements.append(row_data)
             times.update(row_times)
 
-        return ExtractionResult(data=elements, times=times)
+        return ElementExtraction(data=elements, times=times)
 
 
 class AssociatedElement(Element, abc.ABC):
@@ -518,12 +518,12 @@ class AssociatedElement(Element, abc.ABC):
         geopackage.remove_layer(self.path, self.timml_name)
         geopackage.remove_layer(self.path, self.assoc_name)
 
-    def to_timml(self, other) -> ExtractionResult:
+    def to_timml(self, other) -> ElementExtraction:
         missing = self._check_table_columns(
             attributes=self.timml_attributes, layer=self.timml_layer
         )
         if missing:
-            return ExtractionResult(errors=missing)
+            return ElementExtraction(errors=missing)
 
         properties = self.table_to_dict(self.assoc_layer)
         errors = self.assoc_schema.validate_timml(
@@ -531,7 +531,7 @@ class AssociatedElement(Element, abc.ABC):
             data=properties,
         )
         if errors:
-            return ExtractionResult(errors=errors)
+            return ElementExtraction(errors=errors)
 
         other = other.copy()  # Avoid side-effects
         other["properties inhomogeneity_id"] = list(set(properties["inhomogeneity_id"]))
@@ -542,11 +542,11 @@ class AssociatedElement(Element, abc.ABC):
             other=other,
         )
         if errors:
-            return ExtractionResult(errors=errors)
+            return ElementExtraction(errors=errors)
 
         grouped = self.groupby(properties, "inhomogeneity_id")
         elements = [self.process_timml_row(row=row, grouped=grouped) for row in data]
-        return ExtractionResult(data=elements)
+        return ElementExtraction(data=elements)
 
     def to_ttim(self, _):
         raise NotImplementedError(f"{type(self).__name__} is not supported in TTim.")

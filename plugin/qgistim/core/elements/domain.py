@@ -9,7 +9,7 @@ from qgis.core import (
     QgsSingleSymbolRenderer,
 )
 from qgistim.core.elements.colors import BLACK
-from qgistim.core.elements.element import ExtractionResult, TransientElement
+from qgistim.core.elements.element import ElementExtraction, TransientElement
 from qgistim.core.elements.schemata import SingleRowSchema
 from qgistim.core.schemata import AllRequired, Positive, Required, StrictlyIncreasing
 
@@ -65,17 +65,17 @@ class Domain(TransientElement):
         canvas.refresh()
         return ymax, ymin
 
-    def to_timml(self, other) -> ExtractionResult:
+    def to_timml(self, other) -> ElementExtraction:
         data = self.table_to_records(layer=self.timml_layer)
         errors = self.schema.validate_timml(
             name=self.timml_layer.name(), data=data, other=other
         )
         if errors:
-            return ExtractionResult(errors=errors)
+            return ElementExtraction(errors=errors)
         else:
             x = [point[0] for point in data[0]["geometry"]]
             y = [point[1] for point in data[0]["geometry"]]
-            return ExtractionResult(
+            return ElementExtraction(
                 data={
                     "xmin": min(x),
                     "xmax": max(x),
@@ -84,7 +84,7 @@ class Domain(TransientElement):
                 }
             )
 
-    def to_ttim(self, other) -> ExtractionResult:
+    def to_ttim(self, other) -> ElementExtraction:
         timml_extraction = self.to_timml(other)
         data = timml_extraction.data
 
@@ -93,10 +93,10 @@ class Domain(TransientElement):
             name=self.ttim_layer.name(), data=timeseries
         )
         if errors:
-            return ExtractionResult(errors=errors)
+            return ElementExtraction(errors=errors)
         if timeseries["time"]:
             data["time"] = timeseries["time"]
             times = set(timeseries["time"])
         else:
             times = set()
-        return ExtractionResult(data=data, times=times)
+        return ElementExtraction(data=data, times=times)
