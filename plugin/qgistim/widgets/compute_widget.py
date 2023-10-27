@@ -28,7 +28,6 @@ from qgis.core import (
 )
 from qgis.gui import QgsMapLayerComboBox
 from qgistim.core import geopackage, layer_styling
-from qgistim.core.dummy_ugrid import write_dummy_ugrid
 from qgistim.core.elements import ELEMENTS, parse_name
 from qgistim.core.processing import mesh_contours, set_temporal_properties
 from qgistim.core.task import BaseServerTask
@@ -75,9 +74,6 @@ class ComputeWidget(QWidget):
         self.compute_task = None
         self.start_task = None
         self.parent = parent
-
-        self.dummy_ugrid_path = Path(tempfile.mkdtemp()) / "qgistim-dummy-ugrid.nc"
-        write_dummy_ugrid(self.dummy_ugrid_path)
 
         self.domain_button = QPushButton("Set to current extent")
         self.compute_button = QPushButton("Compute")
@@ -476,6 +472,7 @@ class ComputeWidget(QWidget):
             # Set the temporal properties if it's a temporal layer
             set_temporal_properties(layer)
 
+            # Special-case the labelling for observations and discharge.
             if (
                 "timml Head Observation:" in layername
                 or "ttim Head Observation" in layername
