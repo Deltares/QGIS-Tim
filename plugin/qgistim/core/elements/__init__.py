@@ -57,9 +57,7 @@ def parse_name(layername: str) -> Tuple[str, str, str]:
     * what the user provided name is.
 
     For example:
-    parse_name("timml Headwell: drainage") -> ("timml", "Head Well", "drainage")
-
-    This function can also be found in gistim.common
+    parse_name("timml Headwell:drainage") -> ("timml", "Head Well", "drainage")
     """
     prefix, name = layername.split(":")
     element_type = re.split("timml |ttim ", prefix)[1]

@@ -1,8 +1,7 @@
 import pkg_resources
 
-from gistim.compute import compute_steady, compute_transient
-from gistim.data_extraction import as_aquifer_aquitard, layer_statistics
-from gistim.ugrid import to_ugrid2d
+import gistim.compute
+import gistim.data_extraction
 
 # version
 try:
