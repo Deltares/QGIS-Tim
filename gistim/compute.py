@@ -7,7 +7,6 @@ from typing import Any, Dict, List, Union
 import numpy as np
 import pandas as pd
 import timml
-import tqdm
 import ttim
 import xarray as xr
 
@@ -95,13 +94,9 @@ def _(
     x = np.arange(xmin, xmax, spacing) + 0.5 * spacing
     # In geospatial rasters, y is DECREASING with row number
     y = np.arange(ymax, ymin, -spacing) - 0.5 * spacing
+    head = model.headgrid(xg=x, yg=y)
     nlayer = model.aq.find_aquifer_data(x[0], y[0]).naq
     layer = [i for i in range(nlayer)]
-    head = np.empty((nlayer, y.size, x.size), dtype=np.float64)
-    for i in tqdm.tqdm(range(y.size)):
-        for j in range(x.size):
-            head[:, i, j] = model.head(x[j], y[i], layer)
-
     return xr.DataArray(
         data=head,
         name="head",
@@ -120,17 +115,25 @@ def _(
     spacing: float,
     reference_date: str,
     time: List[float],
-) -> xr.DataArray:
+) -> Union[None, xr.DataArray]:
+    if time is None:
+        return None
+
+    # Get coordinates ready
     x = np.arange(xmin, xmax, spacing) + 0.5 * spacing
     # In geospatial rasters, y is DECREASING with row number
     y = np.arange(ymax, ymin, -spacing) - 0.5 * spacing
     nlayer = model.aq.find_aquifer_data(x[0], y[0]).naq
-    layer = [i for i in range(nlayer)]
-    head = np.empty((nlayer, len(time), y.size, x.size), dtype=np.float64)
-    for i in tqdm.tqdm(range(y.size)):
-        for j in range(x.size):
-            head[:, :, i, j] = model.head(x[j], y[i], time, layer)
 
+    if 0.0 in time:
+        steady_head = model.timmlmodel.headgrid(xg=x, yg=y)[:, np.newaxis, :, :]
+        transient_head = model.headgrid(xg=x, yg=y, t=time[1:])
+        head = np.hstack((steady_head, transient_head))
+    else:
+        head = model.headgrid(xg=x, yg=y, t=time)
+
+    # Other coordinates
+    layer = [i for i in range(nlayer)]
     time = pd.to_datetime(reference_date) + pd.to_timedelta(time, "D")
     return xr.DataArray(
         data=head,
@@ -250,13 +253,15 @@ def write_output(
     reference_date = pd.to_datetime(data.get("reference_date"))
 
     # Compute gridded head data and write to netCDF.
+    head = None
     if output_options["raster"] or output_options["mesh"]:
         head = headgrid(model, **data["headgrid"], reference_date=reference_date)
 
-    if output_options["raster"]:
-        write_raster(head, crs, path)
-    if output_options["mesh"]:
-        write_ugrid(head, crs, path)
+    if head is not None:
+        if output_options["raster"]:
+            write_raster(head, crs, path)
+        if output_options["mesh"]:
+            write_ugrid(head, crs, path)
 
     # Compute observations and discharge, and write to geopackage.
     if output_options["discharge"]:
