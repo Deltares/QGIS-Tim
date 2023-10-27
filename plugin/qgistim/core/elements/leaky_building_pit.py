@@ -18,6 +18,7 @@ from qgistim.core.schemata import (
     RequiredFirstOnly,
     SemiConfined,
     StrictlyDecreasing,
+    StrictlyPositive,
 )
 
 
@@ -36,11 +37,11 @@ class AssociatedLeakyBuildingPitchema(TableSchema):
         "layer": AllRequired(Range()),
         "aquifer_top": AllRequired(StrictlyDecreasing()),
         "aquifer_bottom": AllRequired(StrictlyDecreasing()),
-        "aquitard_c": OffsetAllRequired(Positive()),
-        "aquifer_k": AllRequired(Positive()),
+        "aquitard_c": OffsetAllRequired(StrictlyPositive()),
+        "aquifer_k": AllRequired(StrictlyPositive()),
         "semiconf_top": OptionalFirstOnly(),
         "semiconf_head": OptionalFirstOnly(),
-        "resistance": RequiredFirstOnly(),
+        "resistance": RequiredFirstOnly(StrictlyPositive()),
         "wall_in_layer": AllRequired(AtleastOneTrue()),
     }
     timml_consistency_schemata = (

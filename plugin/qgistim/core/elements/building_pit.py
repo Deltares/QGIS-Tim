@@ -17,6 +17,7 @@ from qgistim.core.schemata import (
     Required,
     SemiConfined,
     StrictlyDecreasing,
+    StrictlyPositive
 )
 
 
@@ -35,8 +36,8 @@ class AssociatedBuildingPitSchema(TableSchema):
         "layer": AllRequired(Range()),
         "aquifer_top": AllRequired(StrictlyDecreasing()),
         "aquifer_bottom": AllRequired(StrictlyDecreasing()),
-        "aquitard_c": OffsetAllRequired(Positive()),
-        "aquifer_k": AllRequired(Positive()),
+        "aquitard_c": OffsetAllRequired(StrictlyPositive()),
+        "aquifer_k": AllRequired(StrictlyPositive()),
         "semiconf_top": OptionalFirstOnly(),
         "semiconf_head": OptionalFirstOnly(),
         "wall_in_layer": AllRequired(AtleastOneTrue()),

@@ -20,6 +20,7 @@ from qgistim.core.schemata import (
     Optional,
     Positive,
     Required,
+    StrictlyPositive,
 )
 
 
@@ -27,7 +28,7 @@ class HeadWellSchema(RowWiseSchema):
     timml_schemata = {
         "geometry": Required(),
         "head": Required(),
-        "radius": Required(Positive()),
+        "radius": Required(StrictlyPositive()),
         "resistance": Required(Positive()),
         "layer": Required(Membership("aquifer layers")),
     }

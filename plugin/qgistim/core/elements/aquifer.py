@@ -13,6 +13,7 @@ from qgistim.core.schemata import (
     Required,
     SemiConfined,
     StrictlyDecreasing,
+    StrictlyPositive,
 )
 
 
@@ -21,8 +22,8 @@ class AquiferSchema(TableSchema):
         "layer": AllRequired(Range()),
         "aquifer_top": AllRequired(StrictlyDecreasing()),
         "aquifer_bottom": AllRequired(StrictlyDecreasing()),
-        "aquitard_c": OffsetAllRequired(Positive()),
-        "aquifer_k": AllRequired(Positive()),
+        "aquitard_c": OffsetAllRequired(StrictlyPositive()),
+        "aquifer_k": AllRequired(StrictlyPositive()),
         "semiconf_top": OptionalFirstOnly(),
         "semiconf_head": OptionalFirstOnly(),
     }
@@ -38,8 +39,8 @@ class AquiferSchema(TableSchema):
 
 class TemporalSettingsSchema(SingleRowSchema):
     ttim_schemata = {
-        "time_min": Required(Positive()),
-        "laplace_inversion_M": Required(Positive()),
+        "time_min": Required(StrictlyPositive()),
+        "laplace_inversion_M": Required(StrictlyPositive()),
         "reference_date": Required(),
     }
 

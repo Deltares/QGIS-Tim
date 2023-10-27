@@ -172,7 +172,14 @@ class AllOptional(IterableSchemaContainer):
 class Positive(BaseSchema):
     def validate(self, data, _=None) -> MaybeError:
         if data < 0:
-            return f"Non-positive value: {data}"
+            return f"Number is not positive (>=0): {data}"
+        return None
+    
+
+class StrictlyPositive(BaseSchema):
+    def validate(self, data, _=None) -> MaybeError:
+        if data <= 0:
+            return f"Number is not strictly positive (>0): {data}"
         return None
 
 

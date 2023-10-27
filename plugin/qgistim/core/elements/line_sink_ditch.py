@@ -11,6 +11,7 @@ from qgistim.core.schemata import (
     Optional,
     Positive,
     Required,
+    StrictlyPositive,
 )
 
 
@@ -19,7 +20,7 @@ class LineSinkDitchSchema(RowWiseSchema):
         "geometry": Required(),
         "discharge": Required(),
         "resistance": Required(Positive()),
-        "width": Required(Positive()),
+        "width": Required(StrictlyPositive()),
         "order": Required(Positive()),
         "layer": Required(Membership("aquifer layers")),
     }

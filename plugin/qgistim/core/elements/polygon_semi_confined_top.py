@@ -5,13 +5,13 @@ from qgis.core import QgsDefaultValue, QgsField, QgsSingleSymbolRenderer
 from qgistim.core.elements.colors import BLUE, TRANSPARENT_BLUE
 from qgistim.core.elements.element import Element
 from qgistim.core.elements.schemata import RowWiseSchema
-from qgistim.core.schemata import Positive, Required
+from qgistim.core.schemata import Positive, Required, StrictlyPositive
 
 
 class PolygonSemiConfinedTopSchema(RowWiseSchema):
     timml_schemata = {
         "geometry": Required(),
-        "aquitard_c": Required(Positive()),
+        "aquitard_c": Required(StrictlyPositive()),
         "semiconf_top": Required(),
         "semiconf_head": Required(),
         "order": Required(Positive()),

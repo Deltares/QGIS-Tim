@@ -13,6 +13,7 @@ from qgistim.core.schemata import (
     Optional,
     Positive,
     Required,
+    StrictlyPositive,
 )
 
 
@@ -20,12 +21,12 @@ class WellSchema(RowWiseSchema):
     timml_schemata = {
         "geometry": Required(),
         "discharge": Required(),
-        "radius": Required(Positive()),
+        "radius": Required(StrictlyPositive()),
         "resistance": Required(Positive()),
         "layer": Required(Membership("aquifer layers")),
     }
     ttim_schemata = {
-        "caisson_radius": Required(Positive),
+        "caisson_radius": Required(StrictlyPositive),
         "slug": Required(),
         "time_start": Optional(Positive()),
         "time_end": Optional(Positive()),
@@ -66,8 +67,8 @@ class Well(TransientElement):
     timml_defaults = {
         "radius": QgsDefaultValue("0.1"),
         "resistance": QgsDefaultValue("0.0"),
-        "caisson_radius": QgsDefaultValue("0.0"),
-        "slug": QgsDefaultValue("True"),
+        "caisson_radius": QgsDefaultValue("0.1"),
+        "slug": QgsDefaultValue("False"),
     }
     transient_columns = (
         "time_start",

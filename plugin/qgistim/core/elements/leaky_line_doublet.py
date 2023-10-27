@@ -3,13 +3,13 @@ from qgis.core import QgsDefaultValue, QgsField, QgsSingleSymbolRenderer
 from qgistim.core.elements.colors import RED
 from qgistim.core.elements.element import Element
 from qgistim.core.elements.schemata import RowWiseSchema
-from qgistim.core.schemata import Membership, Positive, Required
+from qgistim.core.schemata import Membership, Positive, Required, StrictlyPositive
 
 
 class LeakyLineDoubletSchema(RowWiseSchema):
     timml_schemata = {
         "geometry": Required(),
-        "resistance": Required(Positive()),
+        "resistance": Required(StrictlyPositive()),
         "order": Required(Positive()),
         "layer": Required(Membership("aquifer layers")),
     }
