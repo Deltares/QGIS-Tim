@@ -113,7 +113,7 @@ class ComputeWidget(QWidget):
         self.contour_min_box.setMinimum(-1000.0)
         self.contour_min_box.setMaximum(1000.0)
         self.contour_step_box.setSingleStep(0.1)
-        
+
         # Set default values
         self.reset()
 
