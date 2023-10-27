@@ -89,15 +89,8 @@ class ComputeWidget(QWidget):
         self.cellsize_spin_box.setMinimum(0.0)
         self.cellsize_spin_box.setMaximum(10_000.0)
         self.cellsize_spin_box.setSingleStep(1.0)
-        self.cellsize_spin_box.setValue(25.0)
         self.domain_button.clicked.connect(self.domain)
         # By default: all output
-        self.mesh_checkbox.setChecked(True)
-        self.raster_checkbox.setChecked(False)
-        self.contours_checkbox.setChecked(True)
-        self.head_observations_checkbox.setChecked(True)
-        self.discharge_checkbox.setChecked(False)
-
         self.mesh_checkbox.toggled.connect(self.contours_checkbox.setEnabled)
         self.mesh_checkbox.toggled.connect(
             lambda checked: not checked and self.contours_checkbox.setChecked(False)
@@ -115,14 +108,14 @@ class ComputeWidget(QWidget):
         self.contour_max_box = QDoubleSpinBox()
         self.contour_step_box = QDoubleSpinBox()
         self.contour_max_box.setMaximum(1000.0)
-        self.contour_max_box.setValue(5.0)
         # Ensure the maximum cannot dip below the min box value.
         self.contour_min_box.valueChanged.connect(self.set_minimum_contour_stop)
         self.contour_min_box.setMinimum(-1000.0)
         self.contour_min_box.setMaximum(1000.0)
-        self.contour_min_box.setValue(-5.0)
         self.contour_step_box.setSingleStep(0.1)
-        self.contour_step_box.setValue(0.5)
+        
+        # Set default values
+        self.reset()
 
         # Layout
         layout = QVBoxLayout()
@@ -182,13 +175,12 @@ class ComputeWidget(QWidget):
 
     def reset(self):
         self.cellsize_spin_box.setValue(25.0)
-        self.transient_combo_box.setCurrentIndex(0)
         self.output_line_edit.setText("")
-        self.raster_checkbox.setCheckState(False)
-        self.mesh_checkbox.setCheckState(True)
-        self.contours_checkbox.setCheckState(False)
-        self.head_observations_checkbox.setCheckState(True)
-        self.discharge_checkbox.setCheckState(False)
+        self.mesh_checkbox.setChecked(True)
+        self.raster_checkbox.setChecked(False)
+        self.contours_checkbox.setChecked(True)
+        self.head_observations_checkbox.setChecked(True)
+        self.discharge_checkbox.setChecked(False)
         self.contour_min_box.setValue(-5.0)
         self.contour_max_box.setValue(5.0)
         self.contour_step_box.setValue(0.5)

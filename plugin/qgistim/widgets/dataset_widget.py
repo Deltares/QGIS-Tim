@@ -315,6 +315,7 @@ class DatasetWidget(QWidget):
     def reset(self):
         # Set state back to defaults
         self.start_task = None
+        self.transient_combo_box.setCurrentIndex(0)
         self.dataset_line_edit.setText("")
         self.dataset_tree.reset()
         return
