@@ -75,16 +75,16 @@ def round_spacing(ymin: float, ymax: float) -> float:
     return dy
 
 
-def round_extent(domain: Dict[str, float], cellsize: float) -> Tuple[float]:
+def round_extent(domain: Dict[str, float], spacing: float) -> Tuple[float]:
     """
     Increases the extent until all sides lie on a coordinate
-    divisible by cellsize.
+    divisible by spacing.
 
     Parameters
     ----------
     extent: Tuple[float]
         xmin, xmax, ymin, ymax
-    cellsize: float
+    spacing: float
         Desired cell size of the output head grids
 
     Returns
@@ -96,25 +96,25 @@ def round_extent(domain: Dict[str, float], cellsize: float) -> Tuple[float]:
     ymin = domain["ymin"]
     xmax = domain["xmax"]
     ymax = domain["ymax"]
-    xmin = np.floor(xmin / cellsize) * cellsize
-    ymin = np.floor(ymin / cellsize) * cellsize
-    xmax = np.ceil(xmax / cellsize) * cellsize
-    ymax = np.ceil(ymax / cellsize) * cellsize
-    xmin += 0.5 * cellsize
-    xmax += 0.5 * cellsize
-    ymax -= 0.5 * cellsize
-    xmin -= 0.5 * cellsize
+    xmin = np.floor(xmin / spacing) * spacing
+    ymin = np.floor(ymin / spacing) * spacing
+    xmax = np.ceil(xmax / spacing) * spacing
+    ymax = np.ceil(ymax / spacing) * spacing
+    xmin += 0.5 * spacing
+    xmax += 0.5 * spacing
+    ymax -= 0.5 * spacing
+    xmin -= 0.5 * spacing
     return xmin, xmax, ymin, ymax
 
 
-def headgrid_entry(domain: Dict[str, float], cellsize: float) -> Dict[str, float]:
-    (xmin, xmax, ymin, ymax) = round_extent(domain, cellsize)
+def headgrid_entry(domain: Dict[str, float], spacing: float) -> Dict[str, float]:
+    (xmin, xmax, ymin, ymax) = round_extent(domain, spacing)
     return {
         "xmin": xmin,
         "xmax": xmax,
         "ymin": ymin,
         "ymax": ymax,
-        "spacing": cellsize,
+        "spacing": spacing,
         "time": domain.get("time"),
     }
 
@@ -259,7 +259,6 @@ def json_elements_and_observations(data, mapping: Dict[str, str]):
 
 def timml_json(
     timml_data: Dict[str, Any],
-    cellsize: float,
     output_options: Dict[str, bool],
 ) -> Dict[str, Any]:
     """
@@ -285,20 +284,21 @@ def timml_json(
     )
     json_data = {
         "timml": timml_json,
-        "output_options": output_options,
-        "headgrid": headgrid_entry(domain_data, cellsize),
         "observations": observations,
+        "window": domain_data,
     }
+    if output_options:
+        json_data["output_options"] = output_options._asdict()
+        json_data["headgrid"] = headgrid_entry(domain_data, output_options.spacing)
     return json_data
 
 
 def ttim_json(
     timml_data: Dict[str, Any],
     ttim_data: Dict[str, Any],
-    cellsize: float,
     output_options: Dict[str, bool],
 ) -> Dict[str, Any]:
-    json_data = timml_json(timml_data, cellsize, output_options)
+    json_data = timml_json(timml_data, output_options)
 
     data = ttim_data.copy()
     domain_data = data.pop("timml Domain:Domain")
@@ -306,19 +306,19 @@ def ttim_json(
     ttim_json, observations = json_elements_and_observations(data, mapping=TTIM_MAPPING)
 
     json_data["ttim"] = ttim_json
-    json_data["headgrid"] = headgrid_entry(domain_data, cellsize)
     json_data["start_date"] = start_date
     json_data["observations"] = observations
+    if output_options:
+        json_data["headgrid"] = headgrid_entry(domain_data, output_options.spacing)
     return json_data
 
 
 def data_to_json(
     timml_data: Dict[str, Any],
     ttim_data: Union[Dict[str, Any], None],
-    cellsize: float,
     output_options: Dict[str, bool],
 ) -> Dict[str, Any]:
     if ttim_data is None:
-        return timml_json(timml_data, cellsize, output_options)
+        return timml_json(timml_data, output_options)
     else:
-        return ttim_json(timml_data, ttim_data, cellsize, output_options)
+        return ttim_json(timml_data, ttim_data, output_options)

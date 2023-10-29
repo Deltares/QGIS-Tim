@@ -1,6 +1,6 @@
 import datetime
 from pathlib import Path
-from typing import Tuple, Union
+from typing import NamedTuple, Tuple, Union
 
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import (
@@ -32,6 +32,15 @@ from qgistim.core.processing import mesh_contours, set_temporal_properties
 from qgistim.core.task import BaseServerTask
 
 
+class OutputOptions(NamedTuple):
+    raster: bool
+    mesh: bool
+    contours: bool
+    head_observations: bool
+    discharge: bool
+    spacing: float
+
+
 class ComputeTask(BaseServerTask):
     @property
     def task_description(self):
@@ -55,12 +64,14 @@ class ComputeTask(BaseServerTask):
         if result:
             self.push_success_message()
             self.parent.clear_outdated_output(self.data["path"])
-            if self.data["head_observations"] or self.data["discharge"]:
-                self.parent.load_vector_result(self.data["path"])
-            if self.data["mesh"]:
-                self.parent.load_mesh_result(self.data["path"], self.data["contours"])
-            if self.data["raster"]:
-                self.parent.load_raster_result(self.data["path"])
+            path = self.data["path"]
+            output = self.data["output_options"]
+            if output.head_observations or output.discharge:
+                self.parent.load_vector_result(path)
+            if output.mesh:
+                self.parent.load_mesh_result(path, output.contours)
+            if output.raster:
+                self.parent.load_raster_result(path)
 
         else:
             self.push_failure_message()
@@ -85,10 +96,10 @@ class ComputeWidget(QWidget):
         self.discharge_checkbox = QCheckBox("Discharge")
         self.discharge_observations_checkbox = QCheckBox("Discharge Observations")
 
-        self.cellsize_spin_box = QDoubleSpinBox()
-        self.cellsize_spin_box.setMinimum(0.0)
-        self.cellsize_spin_box.setMaximum(10_000.0)
-        self.cellsize_spin_box.setSingleStep(1.0)
+        self.spacing_spin_box = QDoubleSpinBox()
+        self.spacing_spin_box.setMinimum(0.0)
+        self.spacing_spin_box.setMaximum(10_000.0)
+        self.spacing_spin_box.setSingleStep(1.0)
         self.domain_button.clicked.connect(self.domain)
         # By default: all output
         self.mesh_checkbox.toggled.connect(self.contours_checkbox.setEnabled)
@@ -131,7 +142,7 @@ class ComputeWidget(QWidget):
 
         domain_row = QHBoxLayout()
         domain_row.addWidget(QLabel("Grid spacing"))
-        domain_row.addWidget(self.cellsize_spin_box)
+        domain_row.addWidget(self.spacing_spin_box)
         domain_layout.addWidget(self.domain_button)
         domain_layout.addLayout(domain_row)
 
@@ -174,7 +185,7 @@ class ComputeWidget(QWidget):
         self.setLayout(layout)
 
     def reset(self):
-        self.cellsize_spin_box.setValue(25.0)
+        self.spacing_spin_box.setValue(25.0)
         self.output_line_edit.setText("")
         self.mesh_checkbox.setChecked(True)
         self.raster_checkbox.setChecked(False)
@@ -298,29 +309,29 @@ class ComputeWidget(QWidget):
         Run a TimML computation with the current state of the currently active
         GeoPackage dataset.
         """
-        cellsize = self.cellsize_spin_box.value()
         transient = self.parent.dataset_widget.transient
-        output_options = {
-            "raster": self.raster_checkbox.isChecked(),
-            "mesh": self.mesh_checkbox.isChecked(),
-            "contours": self.contours_checkbox.isChecked(),
-            "head_observations": self.head_observations_checkbox.isChecked(),
-            "discharge": self.discharge_checkbox.isChecked(),
-        }
+        output_options = OutputOptions(
+            raster=self.raster_checkbox.isChecked(),
+            mesh=self.mesh_checkbox.isChecked(),
+            contours=self.contours_checkbox.isChecked(),
+            head_observations=self.head_observations_checkbox.isChecked(),
+            discharge=self.discharge_checkbox.isChecked(),
+            spacing=self.spacing_spin_box.value(),
+        )
 
         path = Path(self.output_path).absolute().with_suffix(".json")
         invalid_input = self.parent.dataset_widget.convert_to_json(
-            path, cellsize=cellsize, transient=transient, output_options=output_options
+            path, transient=transient, output_options=output_options
         )
         # Early return in case some problems are found.
         if invalid_input:
             return
 
-        data = {
+        task_data = {
             "operation": "compute",
             "path": str(path),
             "transient": transient,
-            **output_options,
+            "output_options": output_options,
         }
         # https://gis.stackexchange.com/questions/296175/issues-with-qgstask-and-task-manager
         # It seems the task goes awry when not associated with a Python object!
@@ -336,7 +347,7 @@ class ComputeWidget(QWidget):
             if Path(gpkg_path) == Path(layer.source()):
                 QgsProject.instance().removeMapLayer(layer.id())
 
-        self.compute_task = ComputeTask(self, data, self.parent.message_bar)
+        self.compute_task = ComputeTask(self, task_data, self.parent.message_bar)
         self.start_task = self.parent.start_interpreter_task()
         if self.start_task is not None:
             self.compute_task.addSubTask(
@@ -352,12 +363,12 @@ class ComputeWidget(QWidget):
         """
         item = self.parent.domain_item()
         ymax, ymin = item.element.update_extent(self.parent.iface)
-        self.set_cellsize_from_domain(ymax, ymin)
+        self.set_spacing_from_domain(ymax, ymin)
         self.parent.iface.mapCanvas().refreshAllLayers()
         return
 
-    def set_cellsize_from_domain(self, ymax: float, ymin: float) -> None:
-        # Guess a reasonable value for the cellsize: about 50 rows
+    def set_spacing_from_domain(self, ymax: float, ymin: float) -> None:
+        # Guess a reasonable value for the spacing: about 50 rows
         dy = (ymax - ymin) / 50.0
         if dy > 500.0:
             dy = round(dy / 500.0) * 500.0
@@ -367,7 +378,7 @@ class ComputeWidget(QWidget):
             dy = round(dy / 5.0) * 5.0
         elif dy > 1.0:
             dy = round(dy)
-        self.cellsize_spin_box.setValue(dy)
+        self.spacing_spin_box.setValue(dy)
         return
 
     def load_mesh_result(self, path: Union[Path, str], load_contours: bool) -> None:

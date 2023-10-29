@@ -271,7 +271,8 @@ class QgisTimWidget(QWidget):
         mean time.
         """
         self.compute_widget.compute_button.setEnabled(value)
-        self.dataset_widget.convert_button.setEnabled(value)
+        self.dataset_widget.python_convert_button.setEnabled(value)
+        self.dataset_widget.json_convert_button.setEnabled(value)
         self.extraction_widget.extract_button.setEnabled(value)
         return
 
@@ -292,8 +293,8 @@ class QgisTimWidget(QWidget):
     def transient(self) -> bool:
         return self.compute_widget.transient
 
-    def set_cellsize_from_domain(self, ymax: float, ymin: float) -> None:
-        self.compute_widget.set_cellsize_from_domain(ymax, ymin)
+    def set_spacing_from_domain(self, ymax: float, ymin: float) -> None:
+        self.compute_widget.set_spacing_from_domain(ymax, ymin)
 
     def toggle_element_buttons(self, state: bool) -> None:
         self.elements_widget.toggle_element_buttons(state)

@@ -36,6 +36,7 @@ from PyQt5.QtWidgets import (
 from qgis.core import Qgis, QgsProject, QgsUnitTypes
 from qgistim.core.elements import Aquifer, Domain, load_elements_from_geopackage
 from qgistim.core.formatting import data_to_json, data_to_script
+from qgistim.widgets.compute_widget import OutputOptions
 from qgistim.widgets.error_window import ValidationDialog
 
 SUPPORTED_TTIM_ELEMENTS = set(
@@ -287,8 +288,10 @@ class DatasetWidget(QWidget):
         self.suppress_popup_checkbox.stateChanged.connect(self.suppress_popup_changed)
         self.remove_button.clicked.connect(self.remove_geopackage_layer)
         self.add_button.clicked.connect(self.add_selection_to_qgis)
-        self.convert_button = QPushButton("Export to Python script")
-        self.convert_button.clicked.connect(self.convert_to_python)
+        self.python_convert_button = QPushButton("Save as Python")
+        self.python_convert_button.clicked.connect(self.save_as_python)
+        self.json_convert_button = QPushButton("Save as JSON")
+        self.json_convert_button.clicked.connect(self.save_as_json)
         # Layout
         dataset_layout = QVBoxLayout()
 
@@ -303,6 +306,10 @@ class DatasetWidget(QWidget):
         geopackage_row.addWidget(self.copy_geopackage_button)
         geopackage_row.addWidget(self.restore_geopackage_button)
         geopackage_layout.addLayout(geopackage_row)
+        convert_row = QHBoxLayout()
+        convert_row.addWidget(self.python_convert_button)
+        convert_row.addWidget(self.json_convert_button)
+        geopackage_layout.addLayout(convert_row)
         dataset_layout.addWidget(geopackage_group)
 
         # Transient versus steady-state selector
@@ -317,7 +324,6 @@ class DatasetWidget(QWidget):
         layer_row.addWidget(self.add_button)
         layer_row.addWidget(self.remove_button)
         dataset_layout.addLayout(layer_row)
-        dataset_layout.addWidget(self.convert_button)
         self.setLayout(dataset_layout)
         self.validation_dialog = None
 
@@ -353,7 +359,7 @@ class DatasetWidget(QWidget):
             extent = feature.geometry().boundingBox()
             ymax = extent.yMaximum()
             ymin = extent.yMinimum()
-            self.parent.set_cellsize_from_domain(ymax, ymin)
+            self.parent.set_spacing_from_domain(ymax, ymin)
         return
 
     def add_selection_to_qgis(self) -> None:
@@ -560,13 +566,12 @@ class DatasetWidget(QWidget):
 
         return Extraction(timml=timml_data, ttim=ttim_data)
 
-    def convert_to_python(self) -> None:
-        transient = self.transient
+    def save_as_python(self) -> None:
         outpath, _ = QFileDialog.getSaveFileName(self, "Select file", "", "*.py")
         if outpath == "":  # Empty string in case of cancel button press
             return
 
-        extraction = self._extract_data(transient=transient)
+        extraction = self._extract_data(transient=self.transient)
         if not extraction.success:
             return
 
@@ -584,19 +589,18 @@ class DatasetWidget(QWidget):
     def convert_to_json(
         self,
         path: str,
-        cellsize: float,
         transient: bool,
-        output_options: Dict[str, bool],
+        output_options: OutputOptions,
     ) -> bool:
         """
         Parameters
         ----------
         path: str
             Path to JSON file to write.
-        cellsize: float
-            Cell size to use to compute the head grid.
         transient: bool
             Steady-state (False) or transient (True).
+        output_options: OutputOptions
+            Which outputs to compute and write.
 
         Returns
         -------
@@ -610,7 +614,6 @@ class DatasetWidget(QWidget):
         json_data = data_to_json(
             extraction.timml,
             extraction.ttim,
-            cellsize=cellsize,
             output_options=output_options,
         )
 
@@ -632,3 +635,11 @@ class DatasetWidget(QWidget):
             level=Qgis.Info,
         )
         return False
+
+    def save_as_json(self) -> None:
+        outpath, _ = QFileDialog.getSaveFileName(self, "Select file", "", "*.json")
+        if outpath == "":  # Empty string in case of cancel button press
+            return
+
+        self.convert_to_json(outpath, transient=self.transient, output_options=None)
+        return
