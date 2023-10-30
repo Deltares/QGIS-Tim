@@ -70,7 +70,7 @@ class DatasetTreeWidget(QTreeWidget):
         self.setHeaderHidden(True)
         self.setSortingEnabled(True)
         self.setSizePolicy(QSizePolicy.Minimum, QSizePolicy.Preferred)
-        self.setHeaderLabels(["", "steady", "transient"])
+        self.setHeaderLabels(["", "steady-state", "transient"])
         self.setHeaderHidden(False)
         header = self.header()
         header.setSectionResizeMode(1, QHeaderView.Stretch)
@@ -313,17 +313,21 @@ class DatasetWidget(QWidget):
         dataset_layout.addWidget(geopackage_group)
 
         # Transient versus steady-state selector
+        model_setup_group = QGroupBox("Model Setup")
+        model_setup_layout = QVBoxLayout()
+        model_setup_group.setLayout(model_setup_layout)
         mode_row = QHBoxLayout()
         mode_row.addWidget(self.transient_combo_box)
-        dataset_layout.addLayout(mode_row)
+        model_setup_layout.addLayout(mode_row)
         # Dataset table and suppression checkbox
-        dataset_layout.addWidget(self.dataset_tree)
+        model_setup_layout.addWidget(self.dataset_tree)
         # Assorted widgets
-        dataset_layout.addWidget(self.suppress_popup_checkbox)
+        model_setup_layout.addWidget(self.suppress_popup_checkbox)
         layer_row = QHBoxLayout()
         layer_row.addWidget(self.add_button)
         layer_row.addWidget(self.remove_button)
-        dataset_layout.addLayout(layer_row)
+        model_setup_layout.addLayout(layer_row)
+        dataset_layout.addWidget(model_setup_group)
         self.setLayout(dataset_layout)
         self.validation_dialog = None
 
