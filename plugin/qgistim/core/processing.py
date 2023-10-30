@@ -26,8 +26,10 @@ from qgis.core import (
 from qgistim.core import geopackage
 
 
-def raster_steady_contours(
+def raster_contours(
+    gpkg_path: str,
     layer: QgsRasterLayer,
+    name: str,
     start: float,
     stop: float,
     step: float,
@@ -45,7 +47,6 @@ def raster_steady_contours(
         },
     )
 
-    name = layer.name()
     path = result["OUTPUT"]
     vector_layer = QgsVectorLayer(path)
 
@@ -57,8 +58,17 @@ def raster_steady_contours(
             "OUTPUT": "TEMPORARY_OUTPUT",
         },
     )
-    path = result["OUTPUT"]
-    return QgsVectorLayer(path, name)
+    # path = result["OUTPUT"]
+    # vector_layer = QgsVectorLayer(result, name)
+
+    newfile = not Path(gpkg_path).exists()
+    written_layer = geopackage.write_layer(
+        path=gpkg_path,
+        layer=result["OUTPUT"],
+        layername=name,
+        newfile=newfile,
+    )
+    return written_layer
 
 
 class SteadyContourData(NamedTuple):

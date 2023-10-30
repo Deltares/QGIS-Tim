@@ -28,7 +28,11 @@ from qgis.core import (
 from qgis.gui import QgsMapLayerComboBox
 from qgistim.core import geopackage, layer_styling
 from qgistim.core.elements import ELEMENTS, parse_name
-from qgistim.core.processing import mesh_contours, set_temporal_properties
+from qgistim.core.processing import (
+    mesh_contours,
+    raster_contours,
+    set_temporal_properties,
+)
 from qgistim.core.task import BaseServerTask
 
 
@@ -114,7 +118,9 @@ class ComputeWidget(QWidget):
         self.contour_button = QPushButton("Redraw contours")
         self.contour_button.clicked.connect(self.redraw_contours)
         self.contour_layer = QgsMapLayerComboBox()
-        self.contour_layer.setFilters(QgsMapLayerProxyModel.MeshLayer)
+        self.contour_layer.setFilters(
+            QgsMapLayerProxyModel.MeshLayer | QgsMapLayerProxyModel.RasterLayer
+        )
         self.contour_min_box = QDoubleSpinBox()
         self.contour_max_box = QDoubleSpinBox()
         self.contour_step_box = QDoubleSpinBox()
@@ -243,29 +249,42 @@ class ComputeWidget(QWidget):
     def redraw_contours(self) -> None:
         path = Path(self.output_path)
         layer = self.contour_layer.currentLayer()
-        if layer is None:
+        if layer is None or "head_layer_" not in layer.name():
             return
 
         start, stop, step = self.contour_range()
         if (start == stop) or (step == 0.0):
             return
 
-        renderer = layer.rendererSettings()
-        index = renderer.activeScalarDatasetGroup()
-        qgs_index = QgsMeshDatasetIndex(group=index, dataset=0)
-        name = layer.datasetGroupMetadata(qgs_index).name()
-        contours_name = f"{path.stem}-contours-{name}"
         gpkg_path = str(path.with_suffix(".output.gpkg"))
-
-        layer = mesh_contours(
-            gpkg_path=gpkg_path,
-            layer=layer,
-            index=index,
-            name=contours_name,
-            start=start,
-            stop=stop,
-            step=step,
-        )
+        name = layer.name()
+        pre, mid, after = name.partition("head_layer_")
+        contours_name = f"{pre}contours-{mid}{after}"
+        if isinstance(layer, QgsMeshLayer):
+            renderer = layer.rendererSettings()
+            index = renderer.activeScalarDatasetGroup()
+            layer = mesh_contours(
+                gpkg_path=gpkg_path,
+                layer=layer,
+                index=index,
+                name=contours_name,
+                start=start,
+                stop=stop,
+                step=step,
+            )
+        elif isinstance(layer, QgsRasterLayer):
+            layer = raster_contours(
+                gpkg_path=gpkg_path,
+                layer=layer,
+                name=contours_name,
+                start=start,
+                stop=stop,
+                step=step,
+            )
+        else:
+            raise TypeError(
+                f"Expected QgsMeshLayer or QgsRasterLayer, got: {type(layer).__name__}"
+            )
 
         # Re-use layer if it already exists. Otherwise add a new layer.
         project_layers = {
