@@ -271,18 +271,18 @@ class DatasetWidget(QWidget):
         self.dataset_tree.setSizePolicy(QSizePolicy.Preferred, QSizePolicy.Expanding)
         self.dataset_line_edit = QLineEdit()
         self.dataset_line_edit.setEnabled(False)  # Just used as a viewing port
-        self.new_geopackage_button = QPushButton("New")
         self.open_geopackage_button = QPushButton("Open")
-        self.copy_geopackage_button = QPushButton("Copy")
+        self.new_geopackage_button = QPushButton("New")
+        self.save_geopackage_button = QPushButton("Save as")
         self.restore_geopackage_button = QPushButton("Restore")
         self.transient_combo_box = QComboBox()
         self.transient_combo_box.addItems(["Steady-state", "Transient"])
         self.transient_combo_box.currentTextChanged.connect(self.on_transient_changed)
         self.remove_button = QPushButton("Remove from Model")
         self.add_button = QPushButton("Add to QGIS")
-        self.new_geopackage_button.clicked.connect(self.new_geopackage)
         self.open_geopackage_button.clicked.connect(self.open_geopackage)
-        self.copy_geopackage_button.clicked.connect(self.copy_geopackage)
+        self.new_geopackage_button.clicked.connect(self.new_geopackage)
+        self.save_geopackage_button.clicked.connect(self.save_geopackage)
         self.restore_geopackage_button.clicked.connect(self.restore_geopackage)
         self.suppress_popup_checkbox = QCheckBox("Suppress attribute form pop-up")
         self.suppress_popup_checkbox.stateChanged.connect(self.suppress_popup_changed)
@@ -301,9 +301,9 @@ class DatasetWidget(QWidget):
         geopackage_group.setLayout(geopackage_layout)
         geopackage_layout.addWidget(self.dataset_line_edit)
         geopackage_row = QHBoxLayout()
-        geopackage_row.addWidget(self.open_geopackage_button)
         geopackage_row.addWidget(self.new_geopackage_button)
-        geopackage_row.addWidget(self.copy_geopackage_button)
+        geopackage_row.addWidget(self.open_geopackage_button)
+        geopackage_row.addWidget(self.save_geopackage_button)
         geopackage_row.addWidget(self.restore_geopackage_button)
         geopackage_layout.addLayout(geopackage_row)
         convert_row = QHBoxLayout()
@@ -443,14 +443,13 @@ class DatasetWidget(QWidget):
             self.load_geopackage()
         return
 
-    def copy_geopackage(self) -> None:
+    def save_geopackage(self) -> None:
         """
-        Copy a GeoPackage file, containing qgis-tim, and open it.
+        Copy a GeoPackage file containing qgis-tim.
         """
         # Do nothing if there's nothing to copy.
         if self.path == "":
             return
-        self.dataset_tree.clear()
         target_path, _ = QFileDialog.getSaveFileName(self, "Select file", "", "*.gpkg")
         if target_path != "":  # Empty string in case of cancel button press
             source_path = Path(self.path)
@@ -462,9 +461,6 @@ class DatasetWidget(QWidget):
                 extra_target = target_path.with_suffix(suffix)
                 if extra_source.exists():
                     copy(extra_source, extra_target)
-
-            self.dataset_line_edit.setText(str(target_path))
-            self.load_geopackage()
         return
 
     def restore_geopackage(self) -> None:
