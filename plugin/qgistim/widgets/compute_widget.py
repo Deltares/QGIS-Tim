@@ -67,9 +67,10 @@ class ComputeTask(BaseServerTask):
         self.parent.set_interpreter_interaction(True)
         if result:
             self.push_success_message()
-            self.parent.clear_outdated_output(self.data["path"])
             path = self.data["path"]
             output = self.data["output_options"]
+            name = f"{Path(path).stem}"
+            self.parent.parent.create_output_group(name=f"{name} output")
             if output.head_observations or output.discharge:
                 self.parent.load_vector_result(path)
             if output.mesh:

@@ -372,17 +372,16 @@ class DatasetWidget(QWidget):
             self.add_item_to_qgis(item)
         return
 
-    def load_geopackage(
-        self, input_group: str = None, output_group: str = None
-    ) -> None:
+    def load_geopackage(self, input_group: str = None) -> None:
         """
         Load the layers of a GeoPackage into the Layers Panel
         """
         self.dataset_tree.clear()
 
-        name = str(Path(self.path).stem)
-        self.parent.create_input_group(name, input_group)
-        self.parent.create_output_group(name, output_group)
+        if input_group is None:
+            name = str(Path(self.path).stem)
+            input_group = f"{name} input"
+        self.parent.create_input_group(input_group)
 
         elements = load_elements_from_geopackage(self.path)
         for element in elements:
@@ -469,7 +468,7 @@ class DatasetWidget(QWidget):
         if not success:
             self.parent.message_bar.pushMessage(
                 title="Error",
-                text="Could not find a QGIS-Tim GeoPackage in this QGS Project.",
+                text="Could not find a QGIS-Tim GeoPackage in this QGIS Project.",
                 level=Qgis.Critical,
             )
             return
@@ -482,9 +481,8 @@ class DatasetWidget(QWidget):
             )
 
         input_group_name, _ = qgs_project.readEntry("qgistim", "input_group")
-        output_group_name, _ = qgs_project.readEntry("qgistim", "output_group")
         self.dataset_line_edit.setText(geopackage_path)
-        self.load_geopackage(input_group_name, output_group_name)
+        self.load_geopackage(input_group_name)
         return
 
     def remove_geopackage_layer(self) -> None:
