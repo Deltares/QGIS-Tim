@@ -1,6 +1,48 @@
 [build-system]
-requires = ["setuptools>=42", "wheel"]
+requires = ["setuptools>=64.0.0", "wheel"]
 build-backend = "setuptools.build_meta"
+
+[project]
+name = "gistim"
+description = "Connects TimML and TTim Analytic Element modeling to QGIS"
+readme = "README.md"
+version = "0.4.1"
+maintainers = [{ name = "Huite Bootsma", email = "huite.bootsma@deltares.nl" }]
+requires-python = ">=3.7"
+dependencies = [
+    'pandas',
+    'timml',
+    'ttim',
+    'xarray',
+]
+classifiers = [
+    'Development Status :: 4 - Beta',
+    'Intended Audience :: Science/Research',
+    'License :: OSI Approved :: GNU General Public License v2 (GPLv2)',
+    'Programming Language :: Python',
+    'Operating System :: OS Independent',
+    'Programming Language :: Python :: 3',
+    'Programming Language :: Python :: 3.7',
+    'Programming Language :: Python :: 3.8',
+    'Programming Language :: Python :: 3.9',
+    'Programming Language :: Python :: 3.10',
+    'Programming Language :: Python :: Implementation :: CPython',
+    'Topic :: Scientific/Engineering',
+]
+keywords = ['groundwater modeling', 'analytic element']
+license = { text = "GPL-2.0" }
+
+[project.urls]
+Home = "https://github.com/deltares/QGIS-Tim"
+Code = "https://github.com/deltares/QGIS-Tim"
+Issues = "https://github.com/deltares/QGIS-Tim/issues"
+
+[tool.setuptools]
+packages = [
+    "gistim",
+    "gistim.geomet",
+]
+license-files = ["LICENSE"]
 
 [tool.isort]
 profile = "black"
