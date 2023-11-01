@@ -405,6 +405,7 @@ class DatasetWidget(QWidget):
         self.on_transient_changed()
         self.model_crs = self.domain_item().element.timml_layer.crs()
         self.parent.qgs_project.writeEntry("qgistim", "geopackage_path", self.path)
+        self.parent.qgs_project.writeEntry("qgistim", "input_group", input_group)
         return
 
     def new_geopackage(self) -> None:
@@ -445,7 +446,12 @@ class DatasetWidget(QWidget):
         path, _ = QFileDialog.getOpenFileName(self, "Select file", "", "*.gpkg")
         if path != "":  # Empty string in case of cancel button press
             self.dataset_line_edit.setText(path)
-            self.load_geopackage()
+            try:
+                self.load_geopackage()
+            except:  # noqa: E722
+                msg = f"GeoPackage is not valid QGIS-Tim model input: {path}"
+                self.parent.message_bar.pushMessage("Error", msg, level=Qgis.Critical)
+                self.dataset_line_edit.setText("")
         return
 
     def save_geopackage(self) -> None:

@@ -163,7 +163,6 @@ class LayersPanelGroup:
 
 class InputGroup(LayersPanelGroup):
     def create_group(self) -> None:
-        QgsProject.instance().writeEntry("qgistim", "input_group", self.name)
         self._create_group()
         self.create_subgroup("timml")
         self.create_subgroup("ttim")
