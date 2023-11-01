@@ -125,10 +125,10 @@ class SingleRowSchema(RowWiseSchema, abc.ABC):
     @staticmethod
     def _validate(vd: ValidationData) -> Dict[str, List]:
         nrow = len(vd.data)
-        if nrow > 1:
+        if nrow != 1:
             return {
                 vd.name: [
-                    "Table must contain a single row. " f"Table contains {nrow} rows."
+                    f"Table must contain a single row. Table contains {nrow} rows."
                 ]
             }
         return RowWiseSchema._validate(vd)

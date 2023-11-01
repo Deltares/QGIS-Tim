@@ -39,6 +39,12 @@ class LayersPanelGroup:
         self.create_group()
 
     def _create_group(self):
+        """
+        If a Group with the name already exists in the Layers Panel, remove the
+        subgroups.
+
+        If the name does not exist, create a new group. 
+        """
         self.group = self.root.findGroup(self.name)
         if self.group is not None:
             self.group.removeAllChildren()

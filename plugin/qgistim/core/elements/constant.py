@@ -3,7 +3,7 @@ from qgis.core import QgsField, QgsSingleSymbolRenderer
 from qgistim.core.elements.colors import RED
 from qgistim.core.elements.element import Element
 from qgistim.core.elements.schemata import SingleRowSchema
-from qgistim.core.schemata import Membership, Required
+from qgistim.core.schemata import Membership, Required, RequiresConfinedAquifer
 
 
 class ConstantSchema(SingleRowSchema):
@@ -12,6 +12,7 @@ class ConstantSchema(SingleRowSchema):
         "head": Required(),
         "layer": Required(Membership("aquifer layers")),
     }
+    timml_consistency_schemata = (RequiresConfinedAquifer(),)
 
 
 class Constant(Element):

@@ -2,7 +2,7 @@ from PyQt5.QtCore import QVariant
 from qgis.core import QgsField
 from qgistim.core.elements.element import Element
 from qgistim.core.elements.schemata import SingleRowSchema
-from qgistim.core.schemata import Required
+from qgistim.core.schemata import Required, RequiresConfinedAquifer
 
 
 class UniformFlowSchema(SingleRowSchema):
@@ -10,6 +10,7 @@ class UniformFlowSchema(SingleRowSchema):
         "slope": Required(),
         "angle": Required(),
     }
+    timml_consistency_schemata = (RequiresConfinedAquifer(),)
 
 
 class UniformFlow(Element):

@@ -232,7 +232,11 @@ class DatasetTreeWidget(QTreeWidget):
             data["start_date"] = str(raw_data["start_date"].toPyDateTime())
 
         times = set()
-        other = {"aquifer layers": raw_data["layer"], "global_aquifer": raw_data}
+        other = {
+            "aquifer layers": raw_data["layer"],
+            "global_aquifer": raw_data,
+            "semiconf_head": raw_data["semiconf_head"][0],
+        }
         for name, element in elements.items():
             try:
                 extraction = element.extract_data(transient, other)
