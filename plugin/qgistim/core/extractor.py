@@ -26,7 +26,7 @@ class ExtractorMixin(abc.ABC):
             coordinates.append((vertex.x(), vertex.y()))
         centroid = geometry.centroid().asPoint()
         return (centroid.x(), centroid.y()), coordinates
-        
+
     @classmethod
     def table_to_records(cls, layer: QgsVectorLayer) -> List[Dict[str, Any]]:
         geomtype = layer.geometryType()

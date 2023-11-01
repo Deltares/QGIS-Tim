@@ -449,18 +449,8 @@ class TransientElement(Element, abc.ABC):
         other = other.copy()  # avoid side-effects
         timeseries = self.table_to_dict(self.ttim_layer)
         if timeseries:
-            errors = self.schema.validate_timeseries(
-                name=self.ttim_layer.name(), data=timeseries
-            )
-            if errors:
-                return ElementExtraction(errors=errors)
-
-            grouped = self.groupby(timeseries, "timeseries_id")
-            # Store timeseries in other dict for validation.
             other["ttim timeseries IDs"] = set(timeseries["timeseries_id"])
-
         else:
-            grouped = {}
             other["ttim timeseries IDs"] = {None}
 
         data = self.table_to_records(self.timml_layer)
@@ -469,6 +459,20 @@ class TransientElement(Element, abc.ABC):
         )
         if errors:
             return ElementExtraction(errors=errors)
+
+        if timeseries:
+            grouped = self.groupby(timeseries, "timeseries_id")
+            errors = {}
+            for timeseries_id, group in grouped.items():
+                _errors = self.schema.validate_timeseries(
+                    name=f"Timeseries, timeseries id {timeseries_id}", data=group
+                )
+                errors.update(_errors)
+
+            if errors:
+                return ElementExtraction(errors=errors)
+        else:
+            grouped = {}
 
         elements = []
         times = set()
@@ -526,15 +530,14 @@ class AssociatedElement(Element, abc.ABC):
             return ElementExtraction(errors=missing)
 
         properties = self.table_to_dict(self.assoc_layer)
-        errors = self.assoc_schema.validate_timml(
-            name=self.assoc_layer.name(),
-            data=properties,
-        )
-        if errors:
-            return ElementExtraction(errors=errors)
-
         other = other.copy()  # Avoid side-effects
-        other["properties inhomogeneity_id"] = list(set(properties["inhomogeneity_id"]))
+        if properties:
+            other["properties inhomogeneity_id"] = list(
+                set(properties["inhomogeneity_id"])
+            )
+        else:
+            other["properties inhomogeneity_id"] = [None]
+
         data = self.table_to_records(self.timml_layer)
         errors = self.schema.validate_timml(
             name=self.timml_layer.name(),
@@ -545,6 +548,18 @@ class AssociatedElement(Element, abc.ABC):
             return ElementExtraction(errors=errors)
 
         grouped = self.groupby(properties, "inhomogeneity_id")
+        errors = {}
+        for inhom_id, group in grouped.items():
+            _errors = self.assoc_schema.validate_timml(
+                name=f"Properties, inhomogeneity_id {inhom_id}",
+                data=group,
+                other=other,
+            )
+            errors.update(_errors)
+
+        if errors:
+            return ElementExtraction(errors=errors)
+
         elements = [self.process_timml_row(row=row, grouped=grouped) for row in data]
         return ElementExtraction(data=elements)
 

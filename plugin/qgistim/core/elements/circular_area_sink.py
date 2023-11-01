@@ -14,6 +14,7 @@ from qgistim.core.schemata import (
     Optional,
     Positive,
     Required,
+    StrictlyIncreasing,
 )
 
 
@@ -34,7 +35,7 @@ class CircularAreaSinkSchema(RowWiseSchema):
     )
     timeseries_schemata = {
         "timeseries_id": AllRequired(),
-        "time_start": AllRequired(Positive()),
+        "time_start": AllRequired(Positive(), StrictlyIncreasing()),
         "rate": AllRequired(),
     }
 

@@ -31,7 +31,7 @@ class SchemaBase(abc.ABC):
         for variable, schema in vd.schemata.items():
             _errors = schema.validate(vd.data[variable], vd.other)
             if _errors:
-                errors[variable].extend(_errors)
+                errors[f"{vd.name} {variable}"].extend(_errors)
 
         # The consistency schema rely on the row input being valid.
         # Hence, they are tested second.
@@ -39,7 +39,7 @@ class SchemaBase(abc.ABC):
             for schema in vd.consistency_schemata:
                 _error = schema.validate(vd.data, vd.other)
                 if _error:
-                    errors["Table:"].append(_error)
+                    errors[vd.name].append(_error)
 
         return errors
 

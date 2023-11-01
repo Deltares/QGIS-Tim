@@ -11,6 +11,7 @@ from qgistim.core.schemata import (
     Optional,
     Positive,
     Required,
+    StrictlyIncreasing,
     StrictlyPositive,
 )
 
@@ -35,7 +36,7 @@ class LineSinkDitchSchema(RowWiseSchema):
     }
     timeseries_schemata = {
         "timeseries_id": AllRequired(),
-        "time_start": AllRequired(Positive()),
+        "time_start": AllRequired(Positive(), StrictlyIncreasing()),
         "discharge": AllRequired(),
     }
 

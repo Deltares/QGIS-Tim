@@ -1,6 +1,6 @@
 import abc
 import operator
-from typing import List, Sequence, Union
+from typing import Any, Dict, List, Sequence, Union
 
 OPERATORS = {
     "<": operator.lt,
@@ -255,6 +255,20 @@ class Range(IterableSchema):
         return None
 
 
+class Equals(IterableSchema):
+    def __init__(self, other: str):
+        self.other = other
+
+    def validate(self, data, other: Dict[str, Any]) -> MaybeError:
+        other_data = other[self.other]
+        if data != other_data:
+            return (
+                f"Values are not equal to values of {self.other}: "
+                f"{data} versus {other_data}"
+            )
+        return None
+
+
 class Increasing(IterableSchema):
     def validate(self, data, _=None) -> MaybeError:
         monotonic = all(a <= b for a, b in zip(data, data[1:]))
@@ -309,6 +323,18 @@ class AtleastOneTrue(IterableSchema):
 
 
 # Consistency schemata
+
+
+class ConditionallyRequired(ConsistencySchema):
+    def __init__(self, a: str, b: str):
+        self.a = a
+        self.b = b
+
+    def validate(self, data, _=None) -> MaybeError:
+        print(data)
+        if data[self.a] and data[self.b] is None:
+            return f"If {self.a} is True, {self.b} is required."
+        return None
 
 
 class SemiConfined(ConsistencySchema):

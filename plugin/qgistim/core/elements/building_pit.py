@@ -9,11 +9,11 @@ from qgistim.core.schemata import (
     AllGreaterEqual,
     AllRequired,
     AtleastOneTrue,
+    Equals,
     Membership,
     OffsetAllRequired,
     OptionalFirstOnly,
     Positive,
-    Range,
     Required,
     SemiConfined,
     StrictlyDecreasing,
@@ -33,7 +33,7 @@ class BuildingPitSchema(RowWiseSchema):
 class AssociatedBuildingPitSchema(TableSchema):
     timml_schemata = {
         "inhomogeneity_id": AllRequired(),
-        "layer": AllRequired(Range()),
+        "layer": AllRequired(Equals("aquifer layers")),
         "aquifer_top": AllRequired(StrictlyDecreasing()),
         "aquifer_bottom": AllRequired(StrictlyDecreasing()),
         "aquitard_c": OffsetAllRequired(StrictlyPositive()),

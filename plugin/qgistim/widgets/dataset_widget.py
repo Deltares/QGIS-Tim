@@ -253,7 +253,7 @@ class DatasetTreeWidget(QTreeWidget):
                     raise e
 
         if transient:
-            if times:
+            if times and (times != {0}):
                 data["timml Aquifer:Aquifer"]["tmax"] = max(times)
             else:
                 errors["Model"] = {"TTim input:": ["No transient forcing defined."]}
@@ -521,8 +521,11 @@ class DatasetWidget(QWidget):
         return active_elements
 
     def domain_item(self):
+        items = self.dataset_tree.items()
+        if len(items) == 0:
+            return
         # Find domain entry
-        for item in self.dataset_tree.items():
+        for item in items:
             if isinstance(item.element, Domain):
                 return item
         else:

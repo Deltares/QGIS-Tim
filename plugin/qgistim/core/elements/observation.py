@@ -3,16 +3,23 @@ from qgis.core import QgsDefaultValue, QgsField, QgsSingleSymbolRenderer
 from qgistim.core.elements.colors import LIGHT_BLUE
 from qgistim.core.elements.element import TransientElement
 from qgistim.core.elements.schemata import RowWiseSchema
-from qgistim.core.schemata import AllRequired, Positive, Required
+from qgistim.core.schemata import (
+    AllRequired,
+    Membership,
+    Positive,
+    Required,
+    StrictlyIncreasing,
+)
 
 
 class HeadObservationSchema(RowWiseSchema):
     timml_schemata = {
         "geometry": Required(),
     }
+    ttim_schemata = {"timeseries_id": Required(Membership("ttim timeseries IDs"))}
     timeseries_schemata = {
         "timeseries_id": AllRequired(),
-        "time": AllRequired(Positive()),
+        "time": AllRequired(Positive(), StrictlyIncreasing()),
     }
 
 

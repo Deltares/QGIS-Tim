@@ -8,14 +8,15 @@ from qgistim.core.elements.schemata import RowWiseSchema, TableSchema
 from qgistim.core.schemata import (
     AllGreaterEqual,
     AllRequired,
+    Equals,
     Membership,
     OffsetAllRequired,
     OptionalFirstOnly,
     Positive,
-    Range,
     Required,
     SemiConfined,
     StrictlyDecreasing,
+    StrictlyPositive,
 )
 
 
@@ -31,11 +32,11 @@ class PolygonInhomogeneitySchema(RowWiseSchema):
 class AssociatedPolygonInhomogeneitySchema(TableSchema):
     timml_schemata = {
         "inhomogeneity_id": AllRequired(),
-        "layer": AllRequired(Range()),
+        "layer": AllRequired(Equals("aquifer layers")),
         "aquifer_top": AllRequired(StrictlyDecreasing()),
         "aquifer_bottom": AllRequired(StrictlyDecreasing()),
-        "aquitard_c": OffsetAllRequired(Positive()),
-        "aquifer_k": AllRequired(Positive()),
+        "aquitard_c": OffsetAllRequired(StrictlyPositive()),
+        "aquifer_k": AllRequired(StrictlyPositive()),
         "semiconf_top": OptionalFirstOnly(),
         "semiconf_head": OptionalFirstOnly(),
         "rate": OptionalFirstOnly(),

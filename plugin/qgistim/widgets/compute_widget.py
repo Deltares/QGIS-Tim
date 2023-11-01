@@ -382,6 +382,9 @@ class ComputeWidget(QWidget):
         Write the current viewing extent as rectangle to the GeoPackage.
         """
         item = self.parent.domain_item()
+        # Return in case no dataset has been set yet.
+        if item is None:
+            return
         ymax, ymin = item.element.update_extent(self.parent.iface)
         self.set_spacing_from_domain(ymax, ymin)
         self.parent.iface.mapCanvas().refreshAllLayers()
