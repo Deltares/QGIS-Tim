@@ -442,7 +442,6 @@ class DatasetWidget(QWidget):
         """
         Open a GeoPackage file, containing qgis-tim
         """
-        self.dataset_tree.clear()
         path, _ = QFileDialog.getOpenFileName(self, "Select file", "", "*.gpkg")
         if path != "":  # Empty string in case of cancel button press
             self.dataset_line_edit.setText(path)
@@ -488,6 +487,17 @@ class DatasetWidget(QWidget):
             )
 
         input_group_name, _ = qgs_project.readEntry("qgistim", "input_group")
+
+        reply = QMessageBox.question(
+            self,
+            "Restore Model from Project",
+            f"Re-create Layers Panel group: {input_group_name}?",
+            QMessageBox.Yes | QMessageBox.No,
+            QMessageBox.No,
+        )
+        if reply == QMessageBox.No:
+            return
+
         self.dataset_line_edit.setText(geopackage_path)
         self.load_geopackage(input_group_name)
         return
