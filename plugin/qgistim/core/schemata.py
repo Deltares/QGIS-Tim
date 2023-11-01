@@ -331,7 +331,6 @@ class ConditionallyRequired(ConsistencySchema):
         self.b = b
 
     def validate(self, data, _=None) -> MaybeError:
-        print(data)
         if data[self.a] and data[self.b] is None:
             return f"If {self.a} is True, {self.b} is required."
         return None
@@ -360,6 +359,15 @@ class SemiConfined(ConsistencySchema):
             if data["rate"][0] is not None and semitop:
                 return "A rate cannot be given when a semi-confined is enabled."
         return None
+
+
+class RequiresConfinedAquifer(ConsistencySchema):
+    def validate(self, _, other: Dict[str, Any]) -> MaybeError:
+        if other.get("semiconf_head") is not None:
+            return (
+                "this element requires a confined aquifer without a semi-confined top."
+            )
+        return
 
 
 class SingleRow(ConsistencySchema):
