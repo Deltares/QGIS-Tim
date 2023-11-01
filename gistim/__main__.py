@@ -40,6 +40,7 @@ def write_configjson(path: Path, data: dict[str, Any]) -> None:
     content = {sys.executable: data}
     with open(path, "w") as f:
         f.write(json.dumps(content))
+    print(f"Succesfully written {path}.")
     return
 
 
@@ -77,9 +78,6 @@ def configure(args) -> None:
 
 def handle(line) -> None:
     data = json.loads(line)
-    # print("JSON received:")
-    # print(json.dumps(data, indent=4))
-
     operation = data.pop("operation")
     if operation == "compute":
         gistim.compute.compute(
@@ -87,22 +85,11 @@ def handle(line) -> None:
             transient=data["transient"],
         )
         response = "Computation of {path}".format(**data)
-    elif operation == "extract":
-        inpath = data["inpath"]
-        outpath = data["outpath"]
-        wkt_geometry = data["wkt_geometry"].split(";")
-        gistim.data_extraction.netcdf_to_table(
-            inpath=inpath,
-            outpath=outpath,
-            wkt_geometry=wkt_geometry,
-        )
-        response = "Extraction of {inpath} to {outpath}".format(**data)
     elif operation == "process_ID":
         response = os.getpid()
     else:
         response = (
-            "Invalid operation. Valid options are: "
-            '"compute", "convert", "extract", "process_ID".'
+            'Invalid operation. Valid options are: "compute", "process_ID".'
         )
 
     return response
@@ -140,7 +127,11 @@ def extract(args) -> None:
 
 
 def compute(args) -> None:
-    gistim.compute.compute(path=args.path[0], transient=args.transient[0])
+    if args.transient is None:
+        transient = False
+    else:
+        transient = args.transient[0]
+    gistim.compute.compute(path=args.path[0], transient=transient)
     return
 
 
@@ -150,18 +141,11 @@ if __name__ == "__main__":
     subparsers = parser.add_subparsers(help="sub-command help")
     parser_configure = subparsers.add_parser("configure", help="configure help")
     parser_serve = subparsers.add_parser("serve", help="serve help")
-    parser_extract = subparsers.add_parser("extract", help="extract help")
-    parser_convert = subparsers.add_parser("convert", help="convert help")
     parser_compute = subparsers.add_parser("compute", help="compute help")
 
     parser_configure.set_defaults(func=configure)
 
     parser_serve.set_defaults(func=serve)
-
-    parser_extract.set_defaults(func=extract)
-    parser_extract.add_argument("inpath", type=str, nargs=1, help="inpath")
-    parser_extract.add_argument("outpath", type=str, nargs=1, help="outpath")
-    parser_extract.add_argument("wkt", type=str, nargs=1, help="wkt")
 
     parser_compute.set_defaults(func=compute)
     parser_compute.add_argument("path", type=str, nargs=1, help="path to JSON file")

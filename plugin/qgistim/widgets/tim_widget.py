@@ -21,7 +21,6 @@ from qgistim.core.task import BaseServerTask
 from qgistim.widgets.compute_widget import ComputeWidget
 from qgistim.widgets.dataset_widget import DatasetWidget
 from qgistim.widgets.elements_widget import ElementsWidget
-from qgistim.widgets.extraction_widget import DataExtractionWidget
 from qgistim.widgets.version_dialog import VersionDialog
 
 PYQT_DELETED_ERROR = "wrapped C/C++ object of type QgsLayerTreeGroup has been deleted"
@@ -204,7 +203,6 @@ class QgisTimWidget(QWidget):
         self.message_bar = self.iface.messageBar()
         self.server_handler = ServerHandler()
 
-        self.extraction_widget = DataExtractionWidget(self)
         self.dataset_widget = DatasetWidget(self)
         self.elements_widget = ElementsWidget(self)
         self.compute_widget = ComputeWidget(self)
@@ -221,7 +219,6 @@ class QgisTimWidget(QWidget):
         self.tabwidget.addTab(self.dataset_widget, "Model Manager")
         self.tabwidget.addTab(self.elements_widget, "Elements")
         self.tabwidget.addTab(self.compute_widget, "Results")
-        self.tabwidget.addTab(self.extraction_widget, "Extract")
         self.layout.addWidget(self.config_button, stretch=0, alignment=Qt.AlignRight)
         self.setLayout(self.layout)
 
@@ -253,7 +250,6 @@ class QgisTimWidget(QWidget):
         self.shutdown_server()
         self.dataset_widget.reset()
         self.compute_widget.reset()
-        self.extraction_widget.reset()
         return
 
     def start_interpreter_task(self) -> Union[StartTask, None]:
@@ -291,7 +287,6 @@ class QgisTimWidget(QWidget):
         self.compute_widget.compute_button.setEnabled(value)
         self.dataset_widget.python_convert_button.setEnabled(value)
         self.dataset_widget.json_convert_button.setEnabled(value)
-        self.extraction_widget.extract_button.setEnabled(value)
         return
 
     def shutdown_server(self) -> None:

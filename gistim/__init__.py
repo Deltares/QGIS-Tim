@@ -1,7 +1,6 @@
 import pkg_resources
 
 import gistim.compute
-import gistim.data_extraction
 
 # version
 try:

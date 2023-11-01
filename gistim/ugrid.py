@@ -150,7 +150,7 @@ def ugrid2d_topology(data: Union[xr.DataArray, xr.Dataset]) -> xr.Dataset:
     # Compute all vertices, these are the ugrid nodes
     node_y, node_x = (a.ravel() for a in np.meshgrid(ycoord, xcoord, indexing="ij"))
     face_y, face_x = (a.ravel() for a in np.meshgrid(y, x, indexing="ij"))
-    linear_index = np.arange(node_x.size, dtype=np.int).reshape(
+    linear_index = np.arange(node_x.size, dtype=int).reshape(
         ycoord.size, xcoord.size
     )
     # Allocate face_node_connectivity
