@@ -296,6 +296,7 @@ class DatasetWidget(QWidget):
         self.python_convert_button.clicked.connect(self.save_as_python)
         self.json_convert_button = QPushButton("Save as JSON")
         self.json_convert_button.clicked.connect(self.save_as_json)
+        self.reset()
         # Layout
         dataset_layout = QVBoxLayout()
 
@@ -342,6 +343,9 @@ class DatasetWidget(QWidget):
 
     def reset(self):
         # Set state back to defaults
+        self.save_geopackage_button.setEnabled(False)
+        self.json_convert_button.setEnabled(False)
+        self.python_convert_button.setEnabled(False)
         self.start_task = None
         self.transient_combo_box.setCurrentIndex(0)
         self.dataset_line_edit.setText("")
@@ -397,9 +401,8 @@ class DatasetWidget(QWidget):
             item.element.on_transient_changed(transient)
 
         self.dataset_tree.sortByColumn(0, Qt.SortOrder.AscendingOrder)
-        self.parent.toggle_element_buttons(True)
+        self.parent.enable_geopackage_buttons()
         self.on_transient_changed()
-
         self.model_crs = self.domain_item().element.timml_layer.crs()
         self.parent.qgs_project.writeEntry("qgistim", "geopackage_path", self.path)
         return
@@ -525,11 +528,7 @@ class DatasetWidget(QWidget):
         return active_elements
 
     def domain_item(self):
-        items = self.dataset_tree.items()
-        if len(items) == 0:
-            return
-        # Find domain entry
-        for item in items:
+        for item in self.dataset_tree.items():
             if isinstance(item.element, Domain):
                 return item
         else:

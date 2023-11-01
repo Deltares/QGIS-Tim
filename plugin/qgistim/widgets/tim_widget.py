@@ -43,16 +43,20 @@ class LayersPanelGroup:
         If a Group with the name already exists in the Layers Panel, remove the
         subgroups.
 
-        If the name does not exist, create a new group. 
+        If the name does not exist, create a new group.
         """
         self.group = self.root.findGroup(self.name)
         if self.group is not None:
-            self.group.removeAllChildren()
+            for child in self.group.children():
+                self.subgroups[child.name()] = child
+                child.removeAllChildren()
             return
         self.group = self.root.addGroup(self.name)
         return
 
     def create_subgroup(self, part: str) -> None:
+        if self.subgroups.get(part) is not None:
+            return
         try:
             value = self.group.addGroup(part)
             self.subgroups[part] = value
@@ -268,6 +272,17 @@ class QgisTimWidget(QWidget):
         response = self.server_handler.send(data)
         return response
 
+    def enable_geopackage_buttons(self) -> None:
+        """
+        By default, a number of buttons are disabled until a GeoPackage is loaded.
+        """
+        self.compute_widget.domain_button.setEnabled(True)
+        self.compute_widget.compute_button.setEnabled(True)
+        self.dataset_widget.save_geopackage_button.setEnabled(True)
+        self.dataset_widget.python_convert_button.setEnabled(True)
+        self.dataset_widget.json_convert_button.setEnabled(True)
+        self.elements_widget.enable_element_buttons()
+
     def set_interpreter_interaction(self, value: bool) -> None:
         """
         Disable interaction with the external interpreter. Some task may take a
@@ -299,9 +314,6 @@ class QgisTimWidget(QWidget):
 
     def set_spacing_from_domain(self, ymax: float, ymin: float) -> None:
         self.compute_widget.set_spacing_from_domain(ymax, ymin)
-
-    def toggle_element_buttons(self, state: bool) -> None:
-        self.elements_widget.toggle_element_buttons(state)
 
     def active_elements(self) -> Dict[str, bool]:
         return self.dataset_widget.active_elements()

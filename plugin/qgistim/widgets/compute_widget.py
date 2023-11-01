@@ -202,6 +202,8 @@ class ComputeWidget(QWidget):
         self.contour_min_box.setValue(-5.0)
         self.contour_max_box.setValue(5.0)
         self.contour_step_box.setValue(0.5)
+        self.domain_button.setEnabled(False)
+        self.compute_button.setEnabled(False)
         return
 
     def set_minimum_contour_stop(self) -> None:
@@ -382,9 +384,6 @@ class ComputeWidget(QWidget):
         Write the current viewing extent as rectangle to the GeoPackage.
         """
         item = self.parent.domain_item()
-        # Return in case no dataset has been set yet.
-        if item is None:
-            return
         ymax, ymin = item.element.update_extent(self.parent.iface)
         self.set_spacing_from_domain(ymax, ymin)
         self.parent.iface.mapCanvas().refreshAllLayers()

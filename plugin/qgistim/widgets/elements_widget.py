@@ -16,8 +16,8 @@ class ElementsWidget(QWidget):
                 continue
             button = QPushButton(element)
             button.clicked.connect(partial(self.tim_element, element_type=element))
+            button.setEnabled(False)
             self.element_buttons[element] = button
-        self.toggle_element_buttons(False)  # no dataset loaded yet
 
         elements_layout = QVBoxLayout()
         elements_grid = QGridLayout()
@@ -31,7 +31,7 @@ class ElementsWidget(QWidget):
         elements_layout.addStretch()
         self.setLayout(elements_layout)
 
-    def toggle_element_buttons(self, state: bool) -> None:
+    def enable_element_buttons(self) -> None:
         """
         Enables or disables the element buttons.
 
@@ -41,7 +41,7 @@ class ElementsWidget(QWidget):
             True to enable, False to disable
         """
         for button in self.element_buttons.values():
-            button.setEnabled(state)
+            button.setEnabled(True)
 
     def tim_element(self, element_type: str) -> None:
         """
