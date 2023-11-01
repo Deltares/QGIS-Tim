@@ -20,26 +20,32 @@ class ExtractorMixin(abc.ABC):
         return sorted(range(len(seq)), key=seq.__getitem__)
 
     @staticmethod
-    def extract_coordinates(feature):
-        geometry = feature.geometry()
+    def extract_coordinates(geometry):
         coordinates = []
         for vertex in geometry.vertices():
             coordinates.append((vertex.x(), vertex.y()))
         centroid = geometry.centroid().asPoint()
         return (centroid.x(), centroid.y()), coordinates
-
+        
     @classmethod
     def table_to_records(cls, layer: QgsVectorLayer) -> List[Dict[str, Any]]:
+        geomtype = layer.geometryType()
         features = []
         for feature in layer.getFeatures():
             data = feature.attributeMap()
             for key, value in data.items():
                 if value == NULL:
                     data[key] = None
-            geomtype = layer.geometryType()
-            # Skip if no geometry is present.
+
             if geomtype != geomtype.Null:
-                data["centroid"], data["geometry"] = cls.extract_coordinates(feature)
+                geometry = feature.geometry()
+                if geometry.isNull():
+                    centroid = None
+                    coordinates = None
+                else:
+                    centroid, coordinates = cls.extract_coordinates(geometry)
+                data["centroid"], data["geometry"] = centroid, coordinates
+
             features.append(data)
         return features
 
