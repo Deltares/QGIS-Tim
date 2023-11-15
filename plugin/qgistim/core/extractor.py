@@ -37,7 +37,10 @@ class ExtractorMixin(abc.ABC):
                 if value == NULL:
                     data[key] = None
 
-            if geomtype != geomtype.Null:
+            #if geomtype != geomtype.Null:
+            # This doesn't work on QGIS version 3.28 (LTR).
+            # Apparently the enumerator is >3.28. So check for the integer value instead.
+            if geomtype != 4:
                 geometry = feature.geometry()
                 if geometry.isNull():
                     centroid = None
