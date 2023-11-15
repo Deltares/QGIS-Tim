@@ -288,7 +288,7 @@ class DatasetWidget(QWidget):
         self.new_geopackage_button.clicked.connect(self.new_geopackage)
         self.save_geopackage_button.clicked.connect(self.save_geopackage)
         self.restore_geopackage_button.clicked.connect(self.restore_geopackage)
-        self.suppress_popup_checkbox = QCheckBox("Suppress attribute form pop-up")
+        self.suppress_popup_checkbox = QCheckBox("Suppress attribute form pop-up after feature creation")
         self.suppress_popup_checkbox.stateChanged.connect(self.suppress_popup_changed)
         self.remove_button.clicked.connect(self.remove_geopackage_layer)
         self.add_button.clicked.connect(self.add_selection_to_qgis)
