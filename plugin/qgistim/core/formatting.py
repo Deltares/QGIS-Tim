@@ -10,6 +10,8 @@ from typing import Any, Dict, Tuple, Union
 
 import numpy as np
 
+from qgistim.widgets.compute_widget import OutputOptions
+
 TIMML_MAPPING = {
     "Constant": "Constant",
     "Uniform Flow": "Uflow",
@@ -154,6 +156,11 @@ def elements_and_observations(data, mapping: Dict[str, str], tim: str):
                 observations.append(
                     f"observation_{sanitized(name)}_{i}={tim}_model.head(\n{format_kwargs(kwargs)}\n)"
                 )
+            elif plugin_name == "Discharge Observation":
+                kwargs.pop("label")
+                observations.append(
+                    f"discharge_observation_{sanitized(name)}_{i}={tim}_model.intnormflux(\n{format_kwargs(kwargs)}\n)"
+                )
             else:
                 # Has to be added to the model.
                 # Would result in e.g.:
@@ -240,6 +247,7 @@ def json_elements_and_observations(data, mapping: Dict[str, str]):
     aquifer_data = data.pop("timml Aquifer:Aquifer")
 
     observations = {}
+    discharge_observations = {}
     tim_data = {"ModelMaq": aquifer_data}
     for layername, element_data in data.items():
         prefix, name = layername.split(":")
@@ -251,15 +259,17 @@ def json_elements_and_observations(data, mapping: Dict[str, str]):
         entry = {"type": tim_name, "name": name, "data": element_data}
         if tim_name == "Head Observation":
             observations[layername] = entry
+        elif tim_name == "Discharge Observation":
+            discharge_observations[layername] = entry
         else:
             tim_data[layername] = entry
 
-    return tim_data, observations
+    return tim_data, observations, discharge_observations
 
 
 def timml_json(
     timml_data: Dict[str, Any],
-    output_options: Dict[str, bool],
+    output_options: OutputOptions,
 ) -> Dict[str, Any]:
     """
     Take the data and add:
@@ -270,6 +280,7 @@ def timml_json(
     Parameters
     ----------
     data: Dict[str, Any]
+    output_options: OutputOptions
 
     Returns
     -------
@@ -279,16 +290,17 @@ def timml_json(
     # Process TimML elements
     data = timml_data.copy()  # avoid side-effects
     domain_data = data.pop("timml Domain:Domain")
-    timml_json, observations = json_elements_and_observations(
+    elements, observations, discharge_observations = json_elements_and_observations(
         data, mapping=TIMML_MAPPING
     )
     json_data = {
-        "timml": timml_json,
+        "timml": elements,
         "observations": observations,
+        "discharge_observations": discharge_observations,
         "window": domain_data,
+        "output_options": output_options._asdict(),
     }
-    if output_options:
-        json_data["output_options"] = output_options._asdict()
+    if output_options.mesh or output_options.raster:
         json_data["headgrid"] = headgrid_entry(domain_data, output_options.spacing)
     return json_data
 
@@ -296,19 +308,19 @@ def timml_json(
 def ttim_json(
     timml_data: Dict[str, Any],
     ttim_data: Dict[str, Any],
-    output_options: Dict[str, bool],
+    output_options: OutputOptions,
 ) -> Dict[str, Any]:
     json_data = timml_json(timml_data, output_options)
 
     data = ttim_data.copy()
     domain_data = data.pop("timml Domain:Domain")
     start_date = data.pop("start_date")
-    ttim_json, observations = json_elements_and_observations(data, mapping=TTIM_MAPPING)
+    elements, observations, _ = json_elements_and_observations(data, mapping=TTIM_MAPPING)
 
-    json_data["ttim"] = ttim_json
+    json_data["ttim"] = elements
     json_data["start_date"] = start_date
     json_data["observations"] = observations
-    if output_options:
+    if output_options.mesh or output_options.raster:
         json_data["headgrid"] = headgrid_entry(domain_data, output_options.spacing)
     return json_data
 
@@ -316,7 +328,7 @@ def ttim_json(
 def data_to_json(
     timml_data: Dict[str, Any],
     ttim_data: Union[Dict[str, Any], None],
-    output_options: Dict[str, bool],
+    output_options: OutputOptions,
 ) -> Dict[str, Any]:
     if ttim_data is None:
         return timml_json(timml_data, output_options)
