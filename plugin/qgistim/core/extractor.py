@@ -5,9 +5,16 @@ from typing import Any, Dict, List, Tuple
 from qgis.core import NULL, QgsVectorLayer
 
 
-def remove_zero_length(geometry):
-    # This removes repeated vertices
-    return list(dict.fromkeys(geometry))
+def remove_zero_length(geometry) -> List:
+    # This removes repeated vertices resulting in zero length segments.
+    # These zero length segments will crash TimML.
+    previous_pair = geometry[0]
+    coordinates = [previous_pair]
+    for pair in geometry[1:]:
+        if pair != previous_pair:
+            coordinates.append(pair)
+            previous_pair = pair
+    return coordinates
 
 
 class ExtractorMixin(abc.ABC):
