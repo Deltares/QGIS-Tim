@@ -6,7 +6,7 @@ import sys
 from contextlib import contextmanager, redirect_stderr, redirect_stdout
 from os import devnull
 from pathlib import Path
-from typing import Any
+from typing import Any, Dict
 
 import gistim
 
@@ -33,7 +33,7 @@ def get_configdir() -> Path:
     return configdir
 
 
-def write_configjson(path: Path, data: dict[str, Any]) -> None:
+def write_configjson(path: Path, data: Dict[str, Any]) -> None:
     """
     Create, overwrite if needed.
     """
