@@ -6,13 +6,13 @@ build-backend = "setuptools.build_meta"
 name = "gistim"
 description = "Connects TimML and TTim Analytic Element modeling to QGIS"
 readme = "README.md"
-version = "0.5.0"
+version = "0.5.1"
 maintainers = [{ name = "Huite Bootsma", email = "huite.bootsma@deltares.nl" }]
 requires-python = ">=3.7"
 dependencies = [
     'pandas',
-    'timml',
-    'ttim',
+    'timml>=6.3.0',
+    'ttim>=0.6.5',
     'xarray',
 ]
 classifiers = [
