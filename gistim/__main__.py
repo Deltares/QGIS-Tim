@@ -150,7 +150,7 @@ if __name__ == "__main__":
     parser_compute.set_defaults(func=compute)
     parser_compute.add_argument("path", type=str, nargs=1, help="path to JSON file")
     parser_compute.add_argument("--transient", action=argparse.BooleanOptionalAction)
-    parser.set_defaults(transient=False)
+    parser_compute.set_defaults(transient=False)
 
     # Parse and call the appropriate function
     args = parser.parse_args()
