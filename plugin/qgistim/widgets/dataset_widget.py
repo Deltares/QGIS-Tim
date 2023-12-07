@@ -610,7 +610,6 @@ class DatasetWidget(QWidget):
         self,
         path: str,
         transient: bool,
-        output_options: OutputOptions,
     ) -> bool:
         """
         Parameters
@@ -619,8 +618,6 @@ class DatasetWidget(QWidget):
             Path to JSON file to write.
         transient: bool
             Steady-state (False) or transient (True).
-        output_options: OutputOptions
-            Which outputs to compute and write.
 
         Returns
         -------
@@ -634,7 +631,7 @@ class DatasetWidget(QWidget):
         json_data = data_to_json(
             extraction.timml,
             extraction.ttim,
-            output_options=output_options,
+            output_options=self.parent.compute_widget.output_options,
         )
 
         crs = self.parent.crs
@@ -661,5 +658,5 @@ class DatasetWidget(QWidget):
         if outpath == "":  # Empty string in case of cancel button press
             return
 
-        self.convert_to_json(outpath, transient=self.transient, output_options=None)
+        self.convert_to_json(outpath, transient=self.transient)
         return

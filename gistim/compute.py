@@ -24,8 +24,8 @@ TIMML_MAPPING = {
     "LineSinkDitchString": timml.LineSinkDitchString,
     "LeakyLineDoubletString": timml.LeakyLineDoubletString,
     "ImpLineDoubletString": timml.ImpLineDoubletString,
-    "BuildingPit": timml.BuildingPit,
-    "LeakyBuildingPit": timml.LeakyBuildingPit,
+    "BuildingPit": timml.BuildingPitMaq,
+    "LeakyBuildingPit": timml.LeakyBuildingPitMaq,
 }
 TTIM_MAPPING = {
     "CircAreaSink": ttim.CircAreaSink,
@@ -144,11 +144,11 @@ def _(
 
 
 @singledispatch
-def head_observations(model, observations):
+def compute_head_observations(model, observations):
     raise TypeError("Expected timml or ttim model")
 
 
-@head_observations.register
+@compute_head_observations.register
 def _(
     model: timml.Model,
     observations: Dict,
@@ -167,7 +167,7 @@ def _(
     return pd.DataFrame(d)
 
 
-@head_observations.register
+@compute_head_observations.register
 def _(
     model: ttim.ModelMaq, observations: Dict, start_date: pd.Timestamp
 ) -> Dict[str, pd.DataFrame]:
@@ -219,17 +219,9 @@ def extract_discharges(elements, nlayers, **_):
         elif isinstance(sample, (timml.LineSinkDitchString, timml.HeadLineSinkString)):
             table_rows = []
             for linestring in content:
-                # Workaround for: https://github.com/mbakker7/timml/issues/85
-                discharges = np.zeros((linestring.nls, nlayers))
-                Q = (
-                    (linestring.parameters[:, 0] * linestring.dischargeinf())
-                    .reshape((linestring.nls, linestring.nlayers, linestring.order + 1))
-                    .sum(axis=2)
-                )
-                discharges[:, linestring.layers[0]] = Q
-
+                discharges = linestring.discharge_per_linesink()
                 xy = linestring.xy
-                for q_layered, vertex0, vertex1 in zip(discharges, xy[:-1], xy[1:]):
+                for q_layered, vertex0, vertex1 in zip(discharges.T, xy[:-1], xy[1:]):
                     row = {f"discharge_layer{i}": q for i, q in enumerate(q_layered)}
                     row["geometry"] = {
                         "type": "LineString",
@@ -241,6 +233,39 @@ def extract_discharges(elements, nlayers, **_):
     return tables
 
 
+@singledispatch
+def compute_discharge_observations(model, observations):
+    raise TypeError("Expected timml or ttim model")
+
+
+@compute_discharge_observations.register
+def _(model: timml.Model, observations: Dict):
+    table_rows = []
+    for kwargs in observations:
+        xy = kwargs["xy"]
+        method = kwargs["method"]
+        ndeg = kwargs["ndeg"]
+        discharges = model.intnormflux(xy=xy, method=method, ndeg=ndeg)
+
+        # Store the output per line segment. 
+        for q_layered, vertex0, vertex1 in zip(discharges.T, xy[:-1], xy[1:]):
+            row = {f"discharge_layer{i}": q for i, q in enumerate(q_layered)}
+            row["geometry"] = {
+                "type": "LineString",
+                "coordinates": [vertex0, vertex1],
+                "label": kwargs["label"]
+            }
+            table_rows.append(row)
+
+    return pd.DataFrame(pd.DataFrame.from_records(table_rows))
+
+
+@compute_discharge_observations.register
+def _(model: ttim.ModelMaq, observations: Dict):
+    # intnormflux is not supported by ttim (yet).
+    return None
+
+
 def write_output(
     model: Union[timml.Model, ttim.ModelMaq],
     elements: Dict[str, Any],
@@ -250,6 +275,7 @@ def write_output(
     crs = CoordinateReferenceSystem(**data["crs"])
     output_options = data["output_options"]
     observations = data["observations"]
+    discharge_observations = data["discharge_observations"]
     start_date = pd.to_datetime(data.get("start_date"))
 
     # Compute gridded head data and write to netCDF.
@@ -271,9 +297,15 @@ def write_output(
 
     if output_options["head_observations"] and observations:
         for layername, content in observations.items():
-            tables[layername] = head_observations(
+            tables[layername] = compute_head_observations(
                 model, content["data"], start_date=start_date
             )
+
+    if output_options["discharge_observations"] and discharge_observations:
+        for layername, content in discharge_observations.items():
+            observations = compute_discharge_observations(model, content["data"])
+            if observations is not None:
+                tables[layername] = observations
 
     write_geopackage(tables, crs, path)
     return
