@@ -24,8 +24,8 @@ TIMML_MAPPING = {
     "LineSinkDitchString": timml.LineSinkDitchString,
     "LeakyLineDoubletString": timml.LeakyLineDoubletString,
     "ImpLineDoubletString": timml.ImpLineDoubletString,
-    "BuildingPit": timml.BuildingPit,
-    "LeakyBuildingPit": timml.LeakyBuildingPit,
+    "BuildingPit": timml.BuildingPitMaq,
+    "LeakyBuildingPit": timml.LeakyBuildingPitMaq,
 }
 TTIM_MAPPING = {
     "CircAreaSink": ttim.CircAreaSink,
@@ -240,18 +240,24 @@ def compute_discharge_observations(model, observations):
 
 @compute_discharge_observations.register
 def _(model: timml.Model, observations: Dict):
-    d = {"geometry": [], "label": []}
-    discharges = []
+    table_rows = []
     for kwargs in observations:
         xy = kwargs["xy"]
         method = kwargs["method"]
         ndeg = kwargs["ndeg"]
-        discharges.append(model.intnormflux(xy=xy, method=method, ndeg=ndeg))
-        d["geometry"].append({"type": "LineString", "coordinates": xy})
-        d["label"].append(kwargs["label"])
-    for i, layerhead in enumerate(np.vstack(discharges).T):
-        d[f"discharge_layer{i}"] = layerhead
-    return pd.DataFrame(d)
+        discharges = model.intnormflux(xy=xy, method=method, ndeg=ndeg)
+
+        # Store the output per line segment. 
+        for q_layered, vertex0, vertex1 in zip(discharges.T, xy[:-1], xy[1:]):
+            row = {f"discharge_layer{i}": q for i, q in enumerate(q_layered)}
+            row["geometry"] = {
+                "type": "LineString",
+                "coordinates": [vertex0, vertex1],
+                "label": kwargs["label"]
+            }
+            table_rows.append(row)
+
+    return pd.DataFrame(pd.DataFrame.from_records(table_rows))
 
 
 @compute_discharge_observations.register
