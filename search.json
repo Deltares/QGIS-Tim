@@ -7,11 +7,32 @@
     "text": "Modelling with analytic elements is not very common. The QGIS-Tim plugin makes it more easy to build your model in a graphical user interface starting from simple and making it as complex as you like.\nTherefore, we have compiled a set of tutorials to help you get started and give you an overview of the capabilities of analytical elements.\n\n\n\n\n\n\n\n\n\n\n\n\nBuilding Pit Rijsenhout\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nBuilding Pit The Hague\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nNo matching items"
   },
   {
-    "objectID": "index.html",
-    "href": "index.html",
-    "title": "QGIS-Tim",
+    "objectID": "install.html",
+    "href": "install.html",
+    "title": "Install",
     "section": "",
-    "text": "QGIS-Tim is an open source project for multi-layer groundwater flow simulations. QGIS-Tim provides a link between QGIS and the open source analytic element method software: TimML (steady-state) and TTim (transient).\nThe benefit of the analytic element method (AEM) is that no grid or time-stepping is required. Geohydrological features are represented by points, lines, and polygons. QGIS-Tim stores these features in a GeoPackage.\nQGIS-Tim consists of a “front-end” and a “back-end”. The front-end is a QGIS plugin that provides a limited graphical interface to setup model input, visualize, and analyze model input. The back-end is a Python package. It reads the contents of the GeoPackage and transforms it into a TimML or TTim model, computes a result, and writes it to a file that the QGIS plugin loads.\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n Tutorials\n\n\nLearn how to use QGIS Tim plugin\n\n\n\n\n\n\n\n\n\n\n\n\nNo matching items"
+    "text": "QGIS-Tim consists of two parts: A QGIS plugin and the gistim Python package, which runs in a separate Python environment. The installation of QGIS-Tim therfore consists of three steps:"
+  },
+  {
+    "objectID": "install.html#install-qgis",
+    "href": "install.html#install-qgis",
+    "title": "Install",
+    "section": "1. Install QGIS",
+    "text": "1. Install QGIS\nDownload and install a recent version of QGIS (&gt;3.22): https://www.qgis.org/en/site/forusers/download.html"
+  },
+  {
+    "objectID": "install.html#install-gistim-in-a-seperate-python-environment",
+    "href": "install.html#install-gistim-in-a-seperate-python-environment",
+    "title": "Install",
+    "section": "2. Install gistim in a seperate Python environment",
+    "text": "2. Install gistim in a seperate Python environment\ngistim requires a seperate Python environment, because it depends on packages incompatible with the packages in QGIS’ own Python environment. There are two approaches: either using the fully-fletched Deltaforge distribution (Recommended) or the leaner Miniforge distribution.\n\nMethod 1: with Deltaforge (recommended)\n\nDownload and install Deltaforge. Make sure you use Deltaforge version 0.3.0 or higher!\nOpen the Deltaforge prompt (search in Windows Start for \"Deltaforge Prompt\").\nConfigure the gistim installation, so that the QGIS plugin is able to find it. Run: python -m gistim configure\n\n\n\nMethod 2: with Miniforge\n\nDownload and install a miniforge Python installation\nOpen the miniforge prompt (search in Windows Start for \"Miniforge Prompt\").\nCreate a new conda environment, run: conda create \\--name tim python=3.9\nActivate the environment: conda activate tim\nRun: conda install -c conda-forge gistim\nConfigure the gistim installation, so that the QGIS plugin is able to find it. Run: python -m gistim configure"
+  },
+  {
+    "objectID": "install.html#install-the-qgis-plugin",
+    "href": "install.html#install-the-qgis-plugin",
+    "title": "Install",
+    "section": "3. Install the QGIS plugin",
+    "text": "3. Install the QGIS plugin\n\nMethod 1: From the GQIS plugin database\nNB Due to ongoing developments new features and bug fixes might not be part of this release. Consider installation method 2.\n\nOpen QGIS.\nAt the top, find the Plugins menu (~sixth object in the menubar).\nFind \"Manage and Install plugins\" (~first object in drop-down).\nFind \"All\" (~first in left section).\nSearch for \"Qgis-Tim\".\nClick \"Install Plugin\".\n\n\n\nMethod 2: From Zip (recommended)\n\nDownload the \"QGIS-TIM-plugin.zip\" (do not unzip!) from the iMOD-Suite download portal.\nOpen QGIS.\nAt the top, find the Plugins menu (~sixth object in the menubar).\nFind \"Manage and Install plugins\" (~first object in drop-down).\nFind \"Install from ZIP\" (~fourth in left section).\nEnter the path to the file \"QGIS-TIM-plugin.zip\".\nClick \"Install Plugin\".\n\nThis will add an icon to the toolbar(s).  By clicking the icon, the plugin is started.  The QGIS plugin automatically starts an extra window for the background calculation of a TIM model. This black window is called Python.exe and can be minimized or even closed after the calculation."
   },
   {
     "objectID": "tutorial_TheHague.html",
@@ -119,34 +140,6 @@
     "text": "Creating a transient model\nAt this moment, it is not possible to create a transient (time dependent) model with correct answers to case studies with sheetpile walls. The TTim solution needs to be updated.  Nevertheless in this section we want to guide you on setting up a basic transient model. \n\nReturn to QGIS and in the QGIS-Tim panel go to the tab Compute.\nIn the section Output turn on the option “Transient”.\nIn the panel Layers select timml Aquifer:Aquifer.\n\nAs can be seen in Figure 31, the matrix of properties is extended in the transient mode with cells for transient parameters, like specific storage coefficients (aquitard_s, and aquifer_s) and porosities (aquitard_npor and aquifer_npor). Take care that specific storage coefficient is a storage per meter layer thickness. In older MWell course material a speadsheet is presented for estimation of coefficient values but there we calculated storage coefficients per whole layer. Those values should be divided by layer thickness.\n\n\n\nFigure 31: Attribute Table for Aquifer in transient condition.\n\n\n\nFill in the Table with the corresponding values.\nIn the TTim section in the Layers panel go to the list of elements for transient calculations.\nSelect ttim Temporal Settings:Aquifer and open its Attribute Table (F6). Here the length of the time series is specified.\nSet the starting time to 0.\n\nBut calculations take place for the range of time steps between “time_min” and “time_max”. The time unit is according to central settings in the project, mostly time in days. “Time_min” should not be zero but given a slight offset. Here we also find a “Stehfest_M” number, related to the number of terms in the calculation method performing transformation of formulas in solving differential equations. A reference date can be set to relate the calculation to real time data.\n\nFill in the table according to Figure 32.\n\n\n\n\nFigure 32: Table for ttim Temporal Settings:Aquifer\n\n\nNB!: In QGIS it is an obligation to use a “reference_date” to get the model running and present outcomes!\n\nSelect ttim Computation Times:Domain and set the time values for time steps where we want to get calculations of spatially distributed heads in mesh or raster points and contours.\n\n\n\n\nFigure 33: Table for ttim Computation Times:Domain\n\n\nFor this case we will leave this table blank, because calculating several head distributions at different time steps is rather time consuming during this course.\n\nSelect ttim Observation:observations and here we can set the time steps for a time series at certain points we want to monitor the calculation results. We set points at intervals that follow a (approximately) logarithmic increase in time intervals. Proposed values are shown in the next table.\n\n\n\n\nFigure 34: Table for ttim Observation:observations\n\n\nDon’t choose exactly the same time as when changing the flow. So if 60 is an end value, choose 59.9.\nIn the Attribute Table of layer ttim Well:pumping_wells we can set the discharge amount. The value might change during time when excavation is considered or construction is performed in phases. For each change we have to add a line of input. In case there are a lot of switch on/off moments, this is a lot of work.  We just leave this option without any change because there is an other option in case each well has only a singel start and end time.\n\nTherefor go to the layer timml Well:pumping_wells layer. This layer contains simple elements to make it behave as a simple Timm element.\nIn the Attribute Table make start_time=5, end_time=30 and discharge_transient=15.\nBut fill in a value of 0 m3/d in column “Discharge” because this variable is part of TimML well element. We use the “discharge_transient” variable to define flow in TTim. Remember: Solution of TTim is superposed on solution of TimML."
   },
   {
-    "objectID": "install.html",
-    "href": "install.html",
-    "title": "Install",
-    "section": "",
-    "text": "QGIS-Tim consists of two parts: A QGIS plugin and the gistim Python package, which runs in a separate Python environment. The installation of QGIS-Tim therfore consists of three steps:"
-  },
-  {
-    "objectID": "install.html#install-qgis",
-    "href": "install.html#install-qgis",
-    "title": "Install",
-    "section": "1. Install QGIS",
-    "text": "1. Install QGIS\nDownload and install a recent version of QGIS (&gt;3.22): https://www.qgis.org/en/site/forusers/download.html"
-  },
-  {
-    "objectID": "install.html#install-gistim-in-a-seperate-python-environment",
-    "href": "install.html#install-gistim-in-a-seperate-python-environment",
-    "title": "Install",
-    "section": "2. Install gistim in a seperate Python environment",
-    "text": "2. Install gistim in a seperate Python environment\ngistim requires a seperate Python environment, because it depends on packages incompatible with the packages in QGIS’ own Python environment. There are two approaches: either using the fully-fletched Deltaforge distribution (Recommended) or the leaner Miniforge distribution.\n\nMethod 1: with Deltaforge (recommended)\n\nDownload and install Deltaforge. Make sure you use Deltaforge version 0.3.0 or higher!\nOpen the Deltaforge prompt (search in Windows Start for \"Deltaforge Prompt\").\nConfigure the gistim installation, so that the QGIS plugin is able to find it. Run: python -m gistim configure\n\n\n\nMethod 2: with Miniforge\n\nDownload and install a miniforge Python installation\nOpen the miniforge prompt (search in Windows Start for \"Miniforge Prompt\").\nCreate a new conda environment, run: conda create \\--name tim python=3.9\nActivate the environment: conda activate tim\nRun: conda install -c conda-forge gistim\nConfigure the gistim installation, so that the QGIS plugin is able to find it. Run: python -m gistim configure"
-  },
-  {
-    "objectID": "install.html#install-the-qgis-plugin",
-    "href": "install.html#install-the-qgis-plugin",
-    "title": "Install",
-    "section": "3. Install the QGIS plugin",
-    "text": "3. Install the QGIS plugin\n\nMethod 1: From the GQIS plugin database\nNB Due to ongoing developments new features and bug fixes might not be part of this release. Consider installation method 2.\n\nOpen QGIS.\nAt the top, find the Plugins menu (~sixth object in the menubar).\nFind \"Manage and Install plugins\" (~first object in drop-down).\nFind \"All\" (~first in left section).\nSearch for \"Qgis-Tim\".\nClick \"Install Plugin\".\n\n\n\nMethod 2: From Zip (recommended)\n\nDownload the \"QGIS-TIM-plugin.zip\" (do not unzip!) from the iMOD-Suite download portal.\nOpen QGIS.\nAt the top, find the Plugins menu (~sixth object in the menubar).\nFind \"Manage and Install plugins\" (~first object in drop-down).\nFind \"Install from ZIP\" (~fourth in left section).\nEnter the path to the file \"QGIS-TIM-plugin.zip\".\nClick \"Install Plugin\".\n\nThis will add an icon to the toolbar(s).  By clicking the icon, the plugin is started.  The QGIS plugin automatically starts an extra window for the background calculation of a TIM model. This black window is called Python.exe and can be minimized or even closed after the calculation."
-  },
-  {
     "objectID": "deltaforge_install.html",
     "href": "deltaforge_install.html",
     "title": "Install iMOD Python with Deltaforge",
@@ -173,6 +166,13 @@
     "title": "Install iMOD Python with Deltaforge",
     "section": "Using Deltaforge",
     "text": "Using Deltaforge\nThe easiest way to start your environment is by pressing the Windows Key and start typing deltaforge. This will let you select the Deltaforge Prompt. Select this.\n\n\n\nThe Deltaforge Prompt should be findable in the Windows start menu\n\n\nThis will start a command prompt screen (cmd.exe), where at startup the Deltaforge python environment is activated.\n\n\n\nThe Deltaforge prompt. You can type mamba list to view all the packages installed.\n\n\nTo view all the packages installed in the environment you can type mamba list and press Enter. This will list all packages installed in the environment. If you want to start coding, you can type spyder, which will start Spyder, a Python scientific development environment."
+  },
+  {
+    "objectID": "index.html",
+    "href": "index.html",
+    "title": "QGIS-Tim",
+    "section": "",
+    "text": "QGIS-Tim is an open source project for multi-layer groundwater flow simulations. QGIS-Tim provides a link between QGIS and the open source analytic element method software: TimML (steady-state) and TTim (transient).\nThe benefit of the analytic element method (AEM) is that no grid or time-stepping is required. Geohydrological features are represented by points, lines, and polygons. QGIS-Tim stores these features in a GeoPackage.\nQGIS-Tim consists of a “front-end” and a “back-end”. The front-end is a QGIS plugin that provides a limited graphical interface to setup model input, visualize, and analyze model input. The back-end is a Python package. It reads the contents of the GeoPackage and transforms it into a TimML or TTim model, computes a result, and writes it to a file that the QGIS plugin loads.\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n Tutorials\n\n\nLearn how to use QGIS Tim plugin\n\n\n\n\n\n\n\n\n\n\n\n\nNo matching items"
   },
   {
     "objectID": "tutorial_Rijsenhout.html",
