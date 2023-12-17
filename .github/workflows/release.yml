@@ -1,0 +1,31 @@
+name: release
+
+on:
+  push:
+    branches:
+    - main
+  pull_request:
+    branches:
+    - main
+
+jobs:
+  build:
+    runs-on: ${{ matrix.os }}
+    matrix:
+      os:
+        - ubuntu-latest
+        - macOS-latest
+        - windows-latest
+    steps:
+      - name: Check out repo
+        uses: actions/checkout@v4
+      - name: Setup Pixi
+        uses: prefix-dev/setup-pixi@v0.4.1
+      - name: Build with PyInstaller
+        run: pixi run build-backend
+      - name: Create ZIP Archive
+        run: pixi run create-archive
+      - name: Upload archive
+        uses: softprops/action-gh-release@v1
+        with: 
+          files: *.zip
