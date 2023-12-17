@@ -4,6 +4,8 @@ on:
   push:
     branches:
     - main
+    tags:
+      - '*'
   pull_request:
     branches:
     - main
@@ -11,6 +13,8 @@ on:
 jobs:
   build:
     runs-on: ${{ matrix.os }}
+    permissions:
+      content: write
     matrix:
       os:
         - ubuntu-latest
@@ -25,7 +29,11 @@ jobs:
         run: pixi run build-backend
       - name: Create ZIP Archive
         run: pixi run create-archive
-      - name: Upload archive
-        uses: softprops/action-gh-release@v1
-        with: 
-          files: "*.zip"
+    - name: Upload archive to release
+      uses: svenstaro/upload-release-action@v2
+      with:
+        repo_token: ${{ secrets.GITHUB_TOKEN }}
+        file: dist/gistim-*.zip
+        tag: ${{ github.ref }}
+        overwrite: true
+        file_glob: true
