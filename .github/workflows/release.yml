@@ -28,7 +28,7 @@ jobs:
       - name: Create ZIP Archive
         run: pixi run create-archive
       - name: Release
-        run: gh release upload ${{ github.ref_name }} dist/gistim-${{ RUNNER_OS }}.zip sha256-${{ RUNNER_OS }}.txt
+        run: gh release upload ${{ github.ref_name }} dist/gistim-${{ runner.os }}.zip sha256-${{ runner.os }}.txt
         env:
           GITHUB_TOKEN: ${{ github.TOKEN }}
  
