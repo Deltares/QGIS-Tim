@@ -65,7 +65,7 @@ class ServerHandler:
         """
         env_vars = self.environmental_variables()
         self.process = subprocess.Popen(
-            [interpreter, "-u", "-m", "gistim", "serve"],
+            [interpreter, "serve"],
             stdin=subprocess.PIPE,
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,

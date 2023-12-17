@@ -1,0 +1,33 @@
+[project]
+name = "gistim"
+version = "0.5.3"
+description = "Connects TimML and TTim Analytic Element modeling to QGIS"
+authors = ["Huite Bootsma"]
+channels = ["conda-forge"]
+platforms = ["win-64", "linux-64", "osx-64"]
+license-file = "LICENSE"
+homepage = "https://deltares.github.io/QGIS-Tim"
+documentation = "https://deltares.github.io/QGIS-Tim"
+repository = "https://github.com/Deltares/qgis-tim"
+
+[tasks]
+install = "pip install --no-deps --editable ."
+build-backend = "pyinstaller gistim/__main__.py --name gistim"
+
+[dependencies]
+python = "3.11"
+future = "*"
+
+# Conda-forge will distribute numpy and scipy with Intel MKL, which adds 600 MB
+# to the pyinstaller result. By installing from PyPI instead, we can skip MKL.
+# We do need to declare `future` explicitly, as pixi will complain that on PyPI,
+# no wheels can be found.
+[pypi-dependencies]
+lmfit = "*"
+numpy = "*"
+pandas = "*"
+pyinstaller = "*"
+timml = "==6.3.0"
+ttim = "==0.6.5"
+scipy = "*"
+xarray = "*"

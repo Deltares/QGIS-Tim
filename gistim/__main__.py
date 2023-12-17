@@ -8,6 +8,12 @@ from os import devnull
 from pathlib import Path
 from typing import Any, Dict
 
+import timml
+# Make sure we explicitly import besselaesnumba for pyinstaller.
+# It's a dynamic import inside of timml.
+from timml.besselaesnumba import besselaesnumba  # noqa: F401
+import ttim
+
 import gistim
 
 
@@ -46,8 +52,6 @@ def write_configjson(path: Path, data: Dict[str, Any]) -> None:
 
 def write_versions():
     # Store version numbers
-    import timml
-    import ttim
 
     versions = {
         "timml": timml.__version__,
