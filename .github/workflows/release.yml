@@ -11,8 +11,7 @@ jobs:
   build:
     name: Release ${{ matrix.os }} PyInstaller
     runs-on: ${{ matrix.os }}
-    permissions:
-      content: write
+    permissions: write-all
     strategy:
       matrix:
         os:
