@@ -9,12 +9,14 @@ on:
 
 jobs:
   build:
+    name: Release ${{ matrix.os }} PyInstaller
     runs-on: ${{ matrix.os }}
     permissions:
       content: write
-    matrix:
-      os:
-        - windows-latest
+    strategy:
+      matrix:
+        os:
+          - windows-latest
     steps:
       - name: Check out repo
         uses: actions/checkout@v4
