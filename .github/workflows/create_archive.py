@@ -12,5 +12,6 @@ with open(path, "rb", buffering=0) as f:
     sha256_hash = hashlib.file_digest(f, "sha256").hexdigest()
 
 # Include it in the filename.
-filename = f"dist/gistim-{platform.system()}-{sha256_hash}.zip"
+#filename = f"dist/gistim-{platform.system()}-{sha256_hash}.zip"
+filename = f"dist/gistim-{platform.system()}.zip"
 path.rename(filename)

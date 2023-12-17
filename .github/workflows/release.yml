@@ -6,9 +6,6 @@ on:
     - main
     tags:
       - '*'
-  pull_request:
-    branches:
-    - main
 
 jobs:
   build:
@@ -17,8 +14,6 @@ jobs:
       content: write
     matrix:
       os:
-        - ubuntu-latest
-        - macOS-latest
         - windows-latest
     steps:
       - name: Check out repo
@@ -29,11 +24,8 @@ jobs:
         run: pixi run build-backend
       - name: Create ZIP Archive
         run: pixi run create-archive
-    - name: Upload archive to release
-      uses: svenstaro/upload-release-action@v2
-      with:
-        repo_token: ${{ secrets.GITHUB_TOKEN }}
-        file: dist/gistim-*.zip
-        tag: ${{ github.ref }}
-        overwrite: true
-        file_glob: true
+      - name: Release
+        run: gh release create ${{github.ref_name}} dist/gistim-Windows.zip
+        env:
+          GITHUB_TOKEN: ${{ github.TOKEN }}
+ 
