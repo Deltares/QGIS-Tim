@@ -8,41 +8,13 @@ QGIS-Tim therfore consists of three steps:
 
 ## 1. Install QGIS
 
-Download and install a recent version of QGIS (>3.22):
+Download and install a recent version of QGIS (>=3.28):
 <https://www.qgis.org/en/site/forusers/download.html>{target="_blank"}
 
-## 2. Install ``gistim`` in a seperate Python environment
-
-``gistim`` requires a seperate Python environment, because it depends on
-packages incompatible with the packages in QGIS' own Python environment. There
-are two approaches: either using the fully-fletched Deltaforge distribution
-(Recommended) or the leaner Miniforge distribution.
-
-### Method 1: with Deltaforge (recommended)
-
-1. [Download and install Deltaforge](
-https://download.deltares.nl/imod-suite/){target="_blank"}. **Make sure you use Deltaforge version 0.3.0 or higher!**
-1. Open the Deltaforge prompt (search in Windows Start for \"Deltaforge
-    Prompt\").
-1. Configure the gistim installation, so that the QGIS plugin is able
-    to find it. Run: ``python -m gistim configure``
-
-### Method 2: with Miniforge
-
-1. [Download and install a miniforge Python installation](https://github.com/conda-forge/miniforge){target="_blank"}
-1.  Open the miniforge prompt (search in Windows Start for \"Miniforge
-    Prompt\").
-1.  Create a new conda environment, run: ``conda create \--name tim python=3.9``
-1.  Activate the environment: ``conda activate tim``
-1.  Run: ``conda install -c conda-forge gistim``
-1.  Configure the gistim installation, so that the QGIS plugin is able
-    to find it. Run: ``python -m gistim configure``
-
-## 3. Install the QGIS plugin
+## 2. Install the QGIS plugin
  
 ### Method 1: From the GQIS plugin database 
 **NB** Due to ongoing developments new features and bug fixes might not be part of this release. Consider installation method 2.
-
 
 1.  Open QGIS.
 3.  At the top, find the Plugins menu (\~sixth object in the menubar).
@@ -63,3 +35,18 @@ https://download.deltares.nl/imod-suite/){target="_blank"}. **Make sure you use 
 This will add an icon to the toolbar(s). ![](figures/tutorial/button-Qgis-tim.png){width=6%}
 By clicking the icon, the plugin is started. <br> 
 The QGIS plugin automatically starts an extra window for the background calculation of a TIM model. This black window is called *Python.exe* and can be minimized or even closed after the calculation. 
+
+## 3. Install the TimML and TTim server
+With the plugin installed, we can already define model input and convert it to Python scripts or JSON files.
+To run TimML and TTim computations directly from QGIS, we need to install a server program which contains TimML and TTim.
+
+1.  Start the QGIS-Tim plugin by clicking the icon in the toolbar: ![](figures/tutorial/button-Qgis-tim.png){width=6%}
+2.  Find and click the "Install TimML and TTim server" button at the bottom of the plugin window.
+3.  Click the "Install latest release from GitHub" button to download and install the server program.
+
+Specific releases can also be manually downloaded from the GitHub Releases page: https://github.com/Deltares/QGIS-Tim/releases
+
+1.  Download the gistim ZIP file for your platform: Windows, macOS, or Linux.
+2.  Find and click the "Install TimML and TTim server" button at the bottom of the plugin window.
+3.  Set the path to the downloaded ZIP file in the "Install from ZIP file" section.
+4.  Click the "Install" button to install.
