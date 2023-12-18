@@ -44,9 +44,9 @@ To run TimML and TTim computations directly from QGIS, we need to install a serv
 2.  Find and click the "Install TimML and TTim server" button at the bottom of the plugin window.
 3.  Click the "Install latest release from GitHub" button to download and install the server program.
 
-Specific releases can also be manually downloaded from the GitHub Releases page: https://github.com/Deltares/QGIS-Tim/releases
+Specific releases can also be manually downloaded from the [GitHub Releases page](https://github.com/Deltares/QGIS-Tim/releases):
 
 1.  Download the gistim ZIP file for your platform: Windows, macOS, or Linux.
 2.  Find and click the "Install TimML and TTim server" button at the bottom of the plugin window.
 3.  Set the path to the downloaded ZIP file in the "Install from ZIP file" section.
-4.  Click the "Install" button to install.
+4.  Click the "Install" button.
