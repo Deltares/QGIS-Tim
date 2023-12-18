@@ -64,23 +64,7 @@ def write_versions():
     return
 
 
-def configure(args) -> None:
-    """
-    Write all the environmental variables so the QGIS interpreter
-    can (re)set them properly.
-    """
-    configdir = get_configdir()
-
-    # Store enviromental variables
-    configdir.mkdir(exist_ok=True)
-    env = {key: value for key, value in os.environ.items()}
-    path = configdir / "environmental-variables.json"
-    write_configjson(path, env)
-    write_versions()
-    return
-
-
-def handle(line) -> None:
+def handle(line) -> str:
     data = json.loads(line)
     operation = data.pop("operation")
     if operation == "compute":
@@ -90,11 +74,9 @@ def handle(line) -> None:
         )
         response = "Computation of {path}".format(**data)
     elif operation == "process_ID":
-        response = os.getpid()
+        response = str(os.getpid())
     else:
-        response = (
-            'Invalid operation. Valid options are: "compute", "process_ID".'
-        )
+        response = 'Invalid operation. Valid options are: "compute", "process_ID".'
 
     return response
 
@@ -120,16 +102,6 @@ def serve(_) -> None:
         write_json_stdout({"success": False, "message": str(error)})
 
 
-def extract(args) -> None:
-    """
-    Extract layer input from a netcdf dataset
-    """
-    inpath = args.inpath[0]
-    outpath = args.outpath[0]
-    wkt_geometry = args.wkt[0].split(";")
-    gistim.data_extraction.netcdf_to_table(inpath, outpath, wkt_geometry)
-
-
 def compute(args) -> None:
     if args.transient is None:
         transient = False
@@ -143,11 +115,8 @@ if __name__ == "__main__":
     # Setup argparsers
     parser = argparse.ArgumentParser(prog="gistim")
     subparsers = parser.add_subparsers(help="sub-command help")
-    parser_configure = subparsers.add_parser("configure", help="configure help")
     parser_serve = subparsers.add_parser("serve", help="serve help")
     parser_compute = subparsers.add_parser("compute", help="compute help")
-
-    parser_configure.set_defaults(func=configure)
 
     parser_serve.set_defaults(func=serve)
 

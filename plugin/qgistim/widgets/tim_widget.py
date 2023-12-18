@@ -21,7 +21,7 @@ from qgistim.core.task import BaseServerTask
 from qgistim.widgets.compute_widget import ComputeWidget
 from qgistim.widgets.dataset_widget import DatasetWidget
 from qgistim.widgets.elements_widget import ElementsWidget
-from qgistim.widgets.version_dialog import VersionDialog
+from qgistim.widgets.install_dialog import InstallDialog
 
 PYQT_DELETED_ERROR = "wrapped C/C++ object of type QgsLayerTreeGroup has been deleted"
 
@@ -184,9 +184,7 @@ class StartTask(BaseServerTask):
 
     def run(self):
         try:
-            self.response = self.parent.server_handler.start_server(
-                self.data["interpreter"]
-            )
+            self.response = self.parent.server_handler.start_server()
             if not self.response["success"]:
                 return False
             return True
@@ -206,10 +204,10 @@ class QgisTimWidget(QWidget):
         self.dataset_widget = DatasetWidget(self)
         self.elements_widget = ElementsWidget(self)
         self.compute_widget = ComputeWidget(self)
-        self.version_dialog = VersionDialog(self)
+        self.install_dialog = InstallDialog(self)
 
-        self.config_button = QPushButton("Versions")
-        self.config_button.clicked.connect(self.version_dialog.show)
+        self.config_button = QPushButton("Install TimML and TTim server")
+        self.config_button.clicked.connect(self.install_dialog.show)
         self.config_button.setIcon(QgsApplication.getThemeIcon("/mActionOptions.svg"))
 
         # Layout
@@ -254,8 +252,7 @@ class QgisTimWidget(QWidget):
 
     def start_interpreter_task(self) -> Union[StartTask, None]:
         if not self.server_handler.alive():
-            interpreter = self.version_dialog.interpreter_combo_box.currentText()
-            start_task = StartTask(self, {"interpreter": interpreter}, self.message_bar)
+            start_task = StartTask(self, {}, self.message_bar)
             return start_task
         else:
             return None

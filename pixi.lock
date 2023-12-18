@@ -1743,6 +1743,78 @@ package:
     md5: null
     sha256: 0f7c276c05a9767e877a0b4c5050c8bee6a6d960d7f0c11ebda6b99746068c2a
 - platform: linux-64
+  name: pip
+  version: 23.3.2
+  category: main
+  manager: conda
+  dependencies:
+  - python >=3.7
+  - setuptools
+  - wheel
+  url: https://conda.anaconda.org/conda-forge/noarch/pip-23.3.2-pyhd8ed1ab_0.conda
+  hash:
+    md5: 8591c748f98dcc02253003533bc2e4b1
+    sha256: 29096d1d53c61aeef518729add2f405df86b3629d1d738a35b15095e6a02eeed
+  build: pyhd8ed1ab_0
+  arch: x86_64
+  subdir: linux-64
+  build_number: 0
+  license: MIT
+  license_family: MIT
+  noarch: python
+  size: 1395000
+  timestamp: 1702822023465
+  purls:
+  - pkg:pypi/pip
+- platform: osx-64
+  name: pip
+  version: 23.3.2
+  category: main
+  manager: conda
+  dependencies:
+  - python >=3.7
+  - setuptools
+  - wheel
+  url: https://conda.anaconda.org/conda-forge/noarch/pip-23.3.2-pyhd8ed1ab_0.conda
+  hash:
+    md5: 8591c748f98dcc02253003533bc2e4b1
+    sha256: 29096d1d53c61aeef518729add2f405df86b3629d1d738a35b15095e6a02eeed
+  build: pyhd8ed1ab_0
+  arch: x86_64
+  subdir: osx-64
+  build_number: 0
+  license: MIT
+  license_family: MIT
+  noarch: python
+  size: 1395000
+  timestamp: 1702822023465
+  purls:
+  - pkg:pypi/pip
+- platform: win-64
+  name: pip
+  version: 23.3.2
+  category: main
+  manager: conda
+  dependencies:
+  - python >=3.7
+  - setuptools
+  - wheel
+  url: https://conda.anaconda.org/conda-forge/noarch/pip-23.3.2-pyhd8ed1ab_0.conda
+  hash:
+    md5: 8591c748f98dcc02253003533bc2e4b1
+    sha256: 29096d1d53c61aeef518729add2f405df86b3629d1d738a35b15095e6a02eeed
+  build: pyhd8ed1ab_0
+  arch: x86_64
+  subdir: win-64
+  build_number: 0
+  license: MIT
+  license_family: MIT
+  noarch: python
+  size: 1395000
+  timestamp: 1702822023465
+  purls:
+  - pkg:pypi/pip
+- platform: linux-64
   name: pyinstaller
   version: 6.3.0
   category: main
@@ -2205,172 +2277,70 @@ package:
     sha256: acf8ed278cc03f5aff035e69cb511741e0418681d25fbbb86ca65429c4f4d9cd
 - platform: linux-64
   name: setuptools
-  version: 69.0.2
+  version: 68.2.2
   category: main
-  manager: pypi
-  requires_dist:
-  - sphinx >=3.5 ; extra == 'docs'
-  - sphinx <7.2.5 ; extra == 'docs'
-  - jaraco.packaging >=9.3 ; extra == 'docs'
-  - rst.linker >=1.9 ; extra == 'docs'
-  - furo ; extra == 'docs'
-  - sphinx-lint ; extra == 'docs'
-  - jaraco.tidelift >=1.4 ; extra == 'docs'
-  - pygments-github-lexers ==0.0.5 ; extra == 'docs'
-  - sphinx-favicon ; extra == 'docs'
-  - sphinx-inline-tabs ; extra == 'docs'
-  - sphinx-reredirects ; extra == 'docs'
-  - sphinxcontrib-towncrier ; extra == 'docs'
-  - sphinx-notfound-page <2, >=1 ; extra == 'docs'
-  - pytest >=6 ; extra == 'testing'
-  - pytest-checkdocs >=2.4 ; extra == 'testing'
-  - pytest-enabler >=2.2 ; extra == 'testing'
-  - flake8-2020 ; extra == 'testing'
-  - virtualenv >=13.0.0 ; extra == 'testing'
-  - wheel ; extra == 'testing'
-  - pip >=19.1 ; extra == 'testing'
-  - jaraco.envs >=2.2 ; extra == 'testing'
-  - pytest-xdist ; extra == 'testing'
-  - jaraco.path >=3.2.0 ; extra == 'testing'
-  - build[virtualenv] ; extra == 'testing'
-  - filelock >=3.4.0 ; extra == 'testing'
-  - ini2toml[lite] >=0.9 ; extra == 'testing'
-  - tomli-w >=1.0.0 ; extra == 'testing'
-  - pytest-timeout ; extra == 'testing'
-  - pytest ; extra == 'testing-integration'
-  - pytest-xdist ; extra == 'testing-integration'
-  - pytest-enabler ; extra == 'testing-integration'
-  - virtualenv >=13.0.0 ; extra == 'testing-integration'
-  - tomli ; extra == 'testing-integration'
-  - wheel ; extra == 'testing-integration'
-  - jaraco.path >=3.2.0 ; extra == 'testing-integration'
-  - jaraco.envs >=2.2 ; extra == 'testing-integration'
-  - build[virtualenv] >=1.0.3 ; extra == 'testing-integration'
-  - filelock >=3.4.0 ; extra == 'testing-integration'
-  - packaging >=23.1 ; extra == 'testing-integration'
-  - pytest-black >=0.3.7 ; platform_python_implementation != 'PyPy' and extra == 'testing'
-  - pytest-cov ; platform_python_implementation != 'PyPy' and extra == 'testing'
-  - pytest-mypy >=0.9.1 ; platform_python_implementation != 'PyPy' and extra == 'testing'
-  - jaraco.develop >=7.21 ; (python_version >= '3.9' and sys_platform != 'cygwin') and extra == 'testing'
-  - pytest-ruff ; sys_platform != 'cygwin' and extra == 'testing'
-  - pytest-perf ; sys_platform != 'cygwin' and extra == 'testing'
-  requires_python: '>=3.8'
-  url: https://files.pythonhosted.org/packages/bb/e1/ed2dd0850446b8697ad28d118df885ad04140c64ace06c4bd559f7c8a94f/setuptools-69.0.2-py3-none-any.whl#sha256=1e8fdff6797d3865f37397be788a4e3cba233608e9b509382a2777d25ebde7f2
+  manager: conda
+  dependencies:
+  - python >=3.7
+  url: https://conda.anaconda.org/conda-forge/noarch/setuptools-68.2.2-pyhd8ed1ab_0.conda
   hash:
-    md5: null
-    sha256: 1e8fdff6797d3865f37397be788a4e3cba233608e9b509382a2777d25ebde7f2
+    md5: fc2166155db840c634a1291a5c35a709
+    sha256: 851901b1f8f2049edb36a675f0c3f9a98e1495ef4eb214761b048c6f696a06f7
+  build: pyhd8ed1ab_0
+  arch: x86_64
+  subdir: linux-64
+  build_number: 0
+  license: MIT
+  license_family: MIT
+  noarch: python
+  size: 464399
+  timestamp: 1694548452441
+  purls:
+  - pkg:pypi/setuptools
 - platform: osx-64
   name: setuptools
-  version: 69.0.2
+  version: 68.2.2
   category: main
-  manager: pypi
-  requires_dist:
-  - sphinx >=3.5 ; extra == 'docs'
-  - sphinx <7.2.5 ; extra == 'docs'
-  - jaraco.packaging >=9.3 ; extra == 'docs'
-  - rst.linker >=1.9 ; extra == 'docs'
-  - furo ; extra == 'docs'
-  - sphinx-lint ; extra == 'docs'
-  - jaraco.tidelift >=1.4 ; extra == 'docs'
-  - pygments-github-lexers ==0.0.5 ; extra == 'docs'
-  - sphinx-favicon ; extra == 'docs'
-  - sphinx-inline-tabs ; extra == 'docs'
-  - sphinx-reredirects ; extra == 'docs'
-  - sphinxcontrib-towncrier ; extra == 'docs'
-  - sphinx-notfound-page <2, >=1 ; extra == 'docs'
-  - pytest >=6 ; extra == 'testing'
-  - pytest-checkdocs >=2.4 ; extra == 'testing'
-  - pytest-enabler >=2.2 ; extra == 'testing'
-  - flake8-2020 ; extra == 'testing'
-  - virtualenv >=13.0.0 ; extra == 'testing'
-  - wheel ; extra == 'testing'
-  - pip >=19.1 ; extra == 'testing'
-  - jaraco.envs >=2.2 ; extra == 'testing'
-  - pytest-xdist ; extra == 'testing'
-  - jaraco.path >=3.2.0 ; extra == 'testing'
-  - build[virtualenv] ; extra == 'testing'
-  - filelock >=3.4.0 ; extra == 'testing'
-  - ini2toml[lite] >=0.9 ; extra == 'testing'
-  - tomli-w >=1.0.0 ; extra == 'testing'
-  - pytest-timeout ; extra == 'testing'
-  - pytest ; extra == 'testing-integration'
-  - pytest-xdist ; extra == 'testing-integration'
-  - pytest-enabler ; extra == 'testing-integration'
-  - virtualenv >=13.0.0 ; extra == 'testing-integration'
-  - tomli ; extra == 'testing-integration'
-  - wheel ; extra == 'testing-integration'
-  - jaraco.path >=3.2.0 ; extra == 'testing-integration'
-  - jaraco.envs >=2.2 ; extra == 'testing-integration'
-  - build[virtualenv] >=1.0.3 ; extra == 'testing-integration'
-  - filelock >=3.4.0 ; extra == 'testing-integration'
-  - packaging >=23.1 ; extra == 'testing-integration'
-  - pytest-black >=0.3.7 ; platform_python_implementation != 'PyPy' and extra == 'testing'
-  - pytest-cov ; platform_python_implementation != 'PyPy' and extra == 'testing'
-  - pytest-mypy >=0.9.1 ; platform_python_implementation != 'PyPy' and extra == 'testing'
-  - jaraco.develop >=7.21 ; (python_version >= '3.9' and sys_platform != 'cygwin') and extra == 'testing'
-  - pytest-ruff ; sys_platform != 'cygwin' and extra == 'testing'
-  - pytest-perf ; sys_platform != 'cygwin' and extra == 'testing'
-  requires_python: '>=3.8'
-  url: https://files.pythonhosted.org/packages/bb/e1/ed2dd0850446b8697ad28d118df885ad04140c64ace06c4bd559f7c8a94f/setuptools-69.0.2-py3-none-any.whl#sha256=1e8fdff6797d3865f37397be788a4e3cba233608e9b509382a2777d25ebde7f2
+  manager: conda
+  dependencies:
+  - python >=3.7
+  url: https://conda.anaconda.org/conda-forge/noarch/setuptools-68.2.2-pyhd8ed1ab_0.conda
   hash:
-    md5: null
-    sha256: 1e8fdff6797d3865f37397be788a4e3cba233608e9b509382a2777d25ebde7f2
+    md5: fc2166155db840c634a1291a5c35a709
+    sha256: 851901b1f8f2049edb36a675f0c3f9a98e1495ef4eb214761b048c6f696a06f7
+  build: pyhd8ed1ab_0
+  arch: x86_64
+  subdir: osx-64
+  build_number: 0
+  license: MIT
+  license_family: MIT
+  noarch: python
+  size: 464399
+  timestamp: 1694548452441
+  purls:
+  - pkg:pypi/setuptools
 - platform: win-64
   name: setuptools
-  version: 69.0.2
+  version: 68.2.2
   category: main
-  manager: pypi
-  requires_dist:
-  - sphinx >=3.5 ; extra == 'docs'
-  - sphinx <7.2.5 ; extra == 'docs'
-  - jaraco.packaging >=9.3 ; extra == 'docs'
-  - rst.linker >=1.9 ; extra == 'docs'
-  - furo ; extra == 'docs'
-  - sphinx-lint ; extra == 'docs'
-  - jaraco.tidelift >=1.4 ; extra == 'docs'
-  - pygments-github-lexers ==0.0.5 ; extra == 'docs'
-  - sphinx-favicon ; extra == 'docs'
-  - sphinx-inline-tabs ; extra == 'docs'
-  - sphinx-reredirects ; extra == 'docs'
-  - sphinxcontrib-towncrier ; extra == 'docs'
-  - sphinx-notfound-page <2, >=1 ; extra == 'docs'
-  - pytest >=6 ; extra == 'testing'
-  - pytest-checkdocs >=2.4 ; extra == 'testing'
-  - pytest-enabler >=2.2 ; extra == 'testing'
-  - flake8-2020 ; extra == 'testing'
-  - virtualenv >=13.0.0 ; extra == 'testing'
-  - wheel ; extra == 'testing'
-  - pip >=19.1 ; extra == 'testing'
-  - jaraco.envs >=2.2 ; extra == 'testing'
-  - pytest-xdist ; extra == 'testing'
-  - jaraco.path >=3.2.0 ; extra == 'testing'
-  - build[virtualenv] ; extra == 'testing'
-  - filelock >=3.4.0 ; extra == 'testing'
-  - ini2toml[lite] >=0.9 ; extra == 'testing'
-  - tomli-w >=1.0.0 ; extra == 'testing'
-  - pytest-timeout ; extra == 'testing'
-  - pytest ; extra == 'testing-integration'
-  - pytest-xdist ; extra == 'testing-integration'
-  - pytest-enabler ; extra == 'testing-integration'
-  - virtualenv >=13.0.0 ; extra == 'testing-integration'
-  - tomli ; extra == 'testing-integration'
-  - wheel ; extra == 'testing-integration'
-  - jaraco.path >=3.2.0 ; extra == 'testing-integration'
-  - jaraco.envs >=2.2 ; extra == 'testing-integration'
-  - build[virtualenv] >=1.0.3 ; extra == 'testing-integration'
-  - filelock >=3.4.0 ; extra == 'testing-integration'
-  - packaging >=23.1 ; extra == 'testing-integration'
-  - pytest-black >=0.3.7 ; platform_python_implementation != 'PyPy' and extra == 'testing'
-  - pytest-cov ; platform_python_implementation != 'PyPy' and extra == 'testing'
-  - pytest-mypy >=0.9.1 ; platform_python_implementation != 'PyPy' and extra == 'testing'
-  - jaraco.develop >=7.21 ; (python_version >= '3.9' and sys_platform != 'cygwin') and extra == 'testing'
-  - pytest-ruff ; sys_platform != 'cygwin' and extra == 'testing'
-  - pytest-perf ; sys_platform != 'cygwin' and extra == 'testing'
-  requires_python: '>=3.8'
-  url: https://files.pythonhosted.org/packages/bb/e1/ed2dd0850446b8697ad28d118df885ad04140c64ace06c4bd559f7c8a94f/setuptools-69.0.2-py3-none-any.whl#sha256=1e8fdff6797d3865f37397be788a4e3cba233608e9b509382a2777d25ebde7f2
+  manager: conda
+  dependencies:
+  - python >=3.7
+  url: https://conda.anaconda.org/conda-forge/noarch/setuptools-68.2.2-pyhd8ed1ab_0.conda
   hash:
-    md5: null
-    sha256: 1e8fdff6797d3865f37397be788a4e3cba233608e9b509382a2777d25ebde7f2
+    md5: fc2166155db840c634a1291a5c35a709
+    sha256: 851901b1f8f2049edb36a675f0c3f9a98e1495ef4eb214761b048c6f696a06f7
+  build: pyhd8ed1ab_0
+  arch: x86_64
+  subdir: win-64
+  build_number: 0
+  license: MIT
+  license_family: MIT
+  noarch: python
+  size: 464399
+  timestamp: 1694548452441
+  purls:
+  - pkg:pypi/setuptools
 - platform: linux-64
   name: six
   version: 1.16.0
@@ -2787,6 +2757,72 @@ package:
   license_family: BSD
   size: 16988
   timestamp: 1702511261442
+- platform: linux-64
+  name: wheel
+  version: 0.42.0
+  category: main
+  manager: conda
+  dependencies:
+  - python >=3.7
+  url: https://conda.anaconda.org/conda-forge/noarch/wheel-0.42.0-pyhd8ed1ab_0.conda
+  hash:
+    md5: 1cdea58981c5cbc17b51973bcaddcea7
+    sha256: 80be0ccc815ce22f80c141013302839b0ed938a2edb50b846cf48d8a8c1cfa01
+  build: pyhd8ed1ab_0
+  arch: x86_64
+  subdir: linux-64
+  build_number: 0
+  license: MIT
+  license_family: MIT
+  noarch: python
+  size: 57553
+  timestamp: 1701013309664
+  purls:
+  - pkg:pypi/wheel
+- platform: osx-64
+  name: wheel
+  version: 0.42.0
+  category: main
+  manager: conda
+  dependencies:
+  - python >=3.7
+  url: https://conda.anaconda.org/conda-forge/noarch/wheel-0.42.0-pyhd8ed1ab_0.conda
+  hash:
+    md5: 1cdea58981c5cbc17b51973bcaddcea7
+    sha256: 80be0ccc815ce22f80c141013302839b0ed938a2edb50b846cf48d8a8c1cfa01
+  build: pyhd8ed1ab_0
+  arch: x86_64
+  subdir: osx-64
+  build_number: 0
+  license: MIT
+  license_family: MIT
+  noarch: python
+  size: 57553
+  timestamp: 1701013309664
+  purls:
+  - pkg:pypi/wheel
+- platform: win-64
+  name: wheel
+  version: 0.42.0
+  category: main
+  manager: conda
+  dependencies:
+  - python >=3.7
+  url: https://conda.anaconda.org/conda-forge/noarch/wheel-0.42.0-pyhd8ed1ab_0.conda
+  hash:
+    md5: 1cdea58981c5cbc17b51973bcaddcea7
+    sha256: 80be0ccc815ce22f80c141013302839b0ed938a2edb50b846cf48d8a8c1cfa01
+  build: pyhd8ed1ab_0
+  arch: x86_64
+  subdir: win-64
+  build_number: 0
+  license: MIT
+  license_family: MIT
+  noarch: python
+  size: 57553
+  timestamp: 1701013309664
+  purls:
+  - pkg:pypi/wheel
 - platform: linux-64
   name: xarray
   version: 2023.12.0
