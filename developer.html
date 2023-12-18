@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>QGIS-Tim - Install</title>
+<title>QGIS-Tim - Developer Notes</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -85,7 +85,7 @@ ul.task-list li input[type="checkbox"] {
           <div class="collapse navbar-collapse" id="navbarCollapse">
             <ul class="navbar-nav navbar-nav-scroll me-auto">
   <li class="nav-item">
-    <a class="nav-link active" href="./install.html" rel="" target="" aria-current="page">
+    <a class="nav-link" href="./install.html" rel="" target="">
  <span class="menu-text">Installation</span></a>
   </li>  
   <li class="nav-item">
@@ -93,7 +93,7 @@ ul.task-list li input[type="checkbox"] {
  <span class="menu-text">Tutorials</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link" href="./developer.html" rel="" target="">
+    <a class="nav-link active" href="./developer.html" rel="" target="" aria-current="page">
  <span class="menu-text">Development</span></a>
   </li>  
 </ul>
@@ -119,13 +119,15 @@ ul.task-list li input[type="checkbox"] {
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#install-qgis" id="toc-install-qgis" class="nav-link active" data-scroll-target="#install-qgis">1. Install QGIS</a></li>
-  <li><a href="#install-the-qgis-plugin" id="toc-install-the-qgis-plugin" class="nav-link" data-scroll-target="#install-the-qgis-plugin">2. Install the QGIS plugin</a>
+  <li><a href="#pixi" id="toc-pixi" class="nav-link active" data-scroll-target="#pixi">Pixi</a>
   <ul class="collapse">
-  <li><a href="#method-1-from-the-gqis-plugin-database" id="toc-method-1-from-the-gqis-plugin-database" class="nav-link" data-scroll-target="#method-1-from-the-gqis-plugin-database">Method 1: From the GQIS plugin database</a></li>
-  <li><a href="#method-2-from-zip-recommended" id="toc-method-2-from-zip-recommended" class="nav-link" data-scroll-target="#method-2-from-zip-recommended">Method 2: From Zip (recommended)</a></li>
+  <li><a href="#pyinstaller" id="toc-pyinstaller" class="nav-link" data-scroll-target="#pyinstaller">PyInstaller</a></li>
   </ul></li>
-  <li><a href="#install-the-timml-and-ttim-server" id="toc-install-the-timml-and-ttim-server" class="nav-link" data-scroll-target="#install-the-timml-and-ttim-server">3. Install the TimML and TTim server</a></li>
+  <li><a href="#creating-new-release" id="toc-creating-new-release" class="nav-link" data-scroll-target="#creating-new-release">Creating new release</a>
+  <ul class="collapse">
+  <li><a href="#make-a-github-release" id="toc-make-a-github-release" class="nav-link" data-scroll-target="#make-a-github-release">Make a GitHub release</a></li>
+  <li><a href="#upload-the-plugin-to-the-qgis-respository" id="toc-upload-the-plugin-to-the-qgis-respository" class="nav-link" data-scroll-target="#upload-the-plugin-to-the-qgis-respository">Upload the plugin to the QGIS respository</a></li>
+  </ul></li>
   </ul>
 </nav>
     </div>
@@ -134,7 +136,7 @@ ul.task-list li input[type="checkbox"] {
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title">Install</h1>
+<h1 class="title">Developer Notes</h1>
 </div>
 
 
@@ -149,56 +151,39 @@ ul.task-list li input[type="checkbox"] {
 
 </header>
 
-<p>QGIS-Tim consists of two parts: A QGIS plugin and the <code>gistim</code> Python package, which runs in a separate Python environment. The installation of QGIS-Tim therfore consists of three steps:</p>
-<section id="install-qgis" class="level2">
-<h2 class="anchored" data-anchor-id="install-qgis">1. Install QGIS</h2>
-<p>Download and install a recent version of QGIS (&gt;=3.28): <a href="https://www.qgis.org/en/site/forusers/download.html" target="_blank">https://www.qgis.org/en/site/forusers/download.html</a></p>
-</section>
-<section id="install-the-qgis-plugin" class="level2">
-<h2 class="anchored" data-anchor-id="install-the-qgis-plugin">2. Install the QGIS plugin</h2>
-<section id="method-1-from-the-gqis-plugin-database" class="level3">
-<h3 class="anchored" data-anchor-id="method-1-from-the-gqis-plugin-database">Method 1: From the GQIS plugin database</h3>
-<p><strong>NB</strong> Due to ongoing developments new features and bug fixes might not be part of this release. Consider installation method 2.</p>
-<ol type="1">
-<li>Open QGIS.</li>
-<li>At the top, find the Plugins menu (~sixth object in the menubar).</li>
-<li>Find "Manage and Install plugins" (~first object in drop-down).</li>
-<li>Find "All" (~first in left section).</li>
-<li>Search for "Qgis-Tim".</li>
-<li>Click "Install Plugin".</li>
-</ol>
-</section>
-<section id="method-2-from-zip-recommended" class="level3">
-<h3 class="anchored" data-anchor-id="method-2-from-zip-recommended">Method 2: From Zip (recommended)</h3>
-<ol type="1">
-<li>Download the "QGIS-TIM-plugin.zip" (do not unzip!) from the <a href="https://deltares.thegood.cloud/s/AefTz97ZHbWS4RT" target="_blank">iMOD-Suite download portal.</a></li>
-<li>Open QGIS.</li>
-<li>At the top, find the Plugins menu (~sixth object in the menubar).</li>
-<li>Find "Manage and Install plugins" (~first object in drop-down).</li>
-<li>Find "Install from ZIP" (~fourth in left section).</li>
-<li>Enter the path to the file "QGIS-TIM-plugin.zip".</li>
-<li>Click "Install Plugin".</li>
-</ol>
-<p>This will add an icon to the toolbar(s). <img src="figures/tutorial/button-Qgis-tim.png" class="img-fluid" style="width:6.0%"> By clicking the icon, the plugin is started. <br> The QGIS plugin automatically starts an extra window for the background calculation of a TIM model. This black window is called <em>Python.exe</em> and can be minimized or even closed after the calculation.</p>
+<section id="pixi" class="level2">
+<h2 class="anchored" data-anchor-id="pixi">Pixi</h2>
+<p>QGIS-Tim uses pixi to manage installing dependencies and run common tasks.</p>
+<p>Follow the instructions on the <a href="https://pixi.sh/">Getting Started page</a>.</p>
+<section id="pyinstaller" class="level3">
+<h3 class="anchored" data-anchor-id="pyinstaller">PyInstaller</h3>
+<p>To build the TimML and TTim server application with PyInstaller, run <code>pixi run build-backend</code></p>
+<p>This creates a built PyInstaller application in <code>./dist/gistim</code>.</p>
+<p>Then, run <code>pixi run create-archive</code> to create a ZIP file of the PyInstaller application.</p>
+<p>To test the created ZIP file, start the QGIS plugin and try to install the ZIP file via the “Install TimML and TTim server” button.</p>
 </section>
 </section>
-<section id="install-the-timml-and-ttim-server" class="level2">
-<h2 class="anchored" data-anchor-id="install-the-timml-and-ttim-server">3. Install the TimML and TTim server</h2>
-<p>With the plugin installed, we can already define model input and convert it to Python scripts or JSON files. To run TimML and TTim computations directly from QGIS, we need to install a server program which contains TimML and TTim.</p>
+<section id="creating-new-release" class="level2">
+<h2 class="anchored" data-anchor-id="creating-new-release">Creating new release</h2>
+<section id="make-a-github-release" class="level3">
+<h3 class="anchored" data-anchor-id="make-a-github-release">Make a GitHub release</h3>
+<p>To create a new release:</p>
 <ol type="1">
-<li>Start the QGIS-Tim plugin by clicking the icon in the toolbar: <img src="figures/tutorial/button-Qgis-tim.png" class="img-fluid" style="width:6.0%"></li>
-<li>Find and click the “Install TimML and TTim server” button at the bottom of the plugin window.</li>
-<li>Click the “Install latest release from GitHub” button to download and install the server program.</li>
+<li>Go to the <a href="https://github.com/Deltares/QGIS-Tim/releases">QGIS-Tim releases page</a></li>
+<li>Click on the “Draft a new release” button.</li>
+<li>Create a new tag.</li>
+<li>Write a title and description.</li>
+<li>Publish the release.</li>
+<li>PyInstaller applications will now be automatically built.</li>
 </ol>
-<p>Specific releases can also be manually downloaded from the <a href="https://github.com/Deltares/QGIS-Tim/releases">GitHub Releases page</a>:</p>
-<ol type="1">
-<li>Download the gistim ZIP file for your platform: Windows, macOS, or Linux.</li>
-<li>Find and click the “Install TimML and TTim server” button at the bottom of the plugin window.</li>
-<li>Set the path to the downloaded ZIP file in the “Install from ZIP file” section.</li>
-<li>Click the “Install” button.</li>
-</ol>
+<p>GitHub actions have been defined to automatically build PyInstaller applications on Windows, macOS, and Linux. These run automatically when a new tag is defined. The defined workflows will upload their files to an existing release. This means tags should only be created via the GitHub “Draft a new release” functionality, or no release will be available to upload to.</p>
+</section>
+<section id="upload-the-plugin-to-the-qgis-respository" class="level3">
+<h3 class="anchored" data-anchor-id="upload-the-plugin-to-the-qgis-respository">Upload the plugin to the QGIS respository</h3>
+<p>Login to the <a href="https://plugins.qgis.org/plugins/qgistim/">QGIS plugin repository</a> and upload the ZIP file of the QGIS plugin.</p>
 
 
+</section>
 </section>
 
 </main> <!-- /main -->
