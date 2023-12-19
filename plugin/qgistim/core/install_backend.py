@@ -11,23 +11,16 @@ import shutil
 import os
 
 
-GITHUB_URL = "https://api.github.com/repos/deltares/qgis-tim/releases"
-PLATFORMS = {
-    "Windows": "Windows",
-    "Darwin": "macOS",
-    "Linux": "Linux",
-}
-
-
-def get_configdir() -> Path:
+def get_gistim_dir() -> Path:
     if platform.system() == "Windows":
-        configdir = Path(os.environ["APPDATA"]) / "qgis-tim"
+        gistim_dir = Path(os.environ["APPDATA"]) / "qgis-tim"
     else:
-        configdir = Path(os.environ["HOME"]) / ".qgis-tim"
-    return configdir
+        gistim_dir = Path(os.environ["HOME"]) / ".qgis-tim"
+    return gistim_dir
 
 
 def get_release_assets() -> Dict[str, str]:
+    GITHUB_URL = "https://api.github.com/repos/deltares/qgis-tim/releases"
     response = requests.get(GITHUB_URL)
     json_content = json.loads(response.content)
     last_release = json_content[0]
@@ -37,18 +30,23 @@ def get_release_assets() -> Dict[str, str]:
 
 
 def download_assets(assets: Dict[str, str]) -> ZipFile:
-    platform = platform.system()
-    github_platform = PLATFORMS.get(platform)
-    if github_platform is None:
+    SYSTEMS = {
+        "Windows": "Windows",
+        "Darwin": "macOS",
+        "Linux": "Linux",
+    }
+    user_system = platform.system()
+    github_system = SYSTEMS.get(user_system)
+    if github_system is None:
         raise ValueError(
-            f"Unsupported platform: {platform}. "
-            f"Only {', '.join(PLATFORMS.keys())} are supported."
+            f"Unsupported OS: {user_system}. "
+            f"Only {', '.join(SYSTEMS.keys())} are supported."
         )
     # Get checksum
-    checksum_url = assets[f"sha256-checksum-{github_platform}.txt"]
+    checksum_url = assets[f"sha256-checksum-{github_system}.txt"]
     checksum_github = requests.get(checksum_url).content.decode("utf-8")
     # Get zipfile content
-    zip_url = assets[f"gistim-{github_platform}.zip"]
+    zip_url = assets[f"gistim-{github_system}.zip"]
     zipfile_content = requests.get(zip_url).content
     # Compare checksums
     sha = hashlib.sha256()
@@ -60,7 +58,7 @@ def download_assets(assets: Dict[str, str]) -> ZipFile:
 
 
 def create_destination() -> Path:
-    gistim_dir = get_configdir()
+    gistim_dir = get_gistim_dir()
     if gistim_dir.exists():
         shutil.rmtree(gistim_dir)
     gistim_dir.mkdir()

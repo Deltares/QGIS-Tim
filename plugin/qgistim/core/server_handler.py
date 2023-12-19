@@ -20,7 +20,7 @@ class ServerHandler:
         return self.process is not None and self.process.poll() is None
 
     @staticmethod
-    def get_configdir() -> Path:
+    def get_gistim_dir() -> Path:
         """
         Get the location of the qgis-tim PyInstaller executable.
 
@@ -28,24 +28,24 @@ class ServerHandler:
 
         Returns
         -------
-        configdir: pathlib.Path
+        gistim_dir: pathlib.Path
         """
         if platform.system() == "Windows":
-            configdir = Path(os.environ["APPDATA"]) / "qgis-tim"
+            gistim_dir = Path(os.environ["APPDATA"]) / "qgis-tim"
         else:
-            configdir = Path(os.environ["HOME"]) / ".qgis-tim"
-        return configdir
+            gistim_dir = Path(os.environ["HOME"]) / ".qgis-tim"
+        return gistim_dir
     
     @staticmethod
     def get_interpreter() -> Path:
         if platform.system() == "Windows":
-            return ServerHandler.get_configdir() / "gistim.exe"
+            return ServerHandler.get_gistim_dir() / "gistim.exe"
         else:
-            return ServerHandler.get_configdir() / "gistim"
+            return ServerHandler.get_gistim_dir() / "gistim"
         
     @staticmethod
     def versions():
-        path = ServerHandler.get_configdir() / "versions.json"
+        path = ServerHandler.get_gistim_dir() / "versions.json"
         if path.exists():
             with open(path, "r") as f:
                 versions = json.loads(f.read())
