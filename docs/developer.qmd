@@ -13,7 +13,7 @@ To build the TimML and TTim server application with PyInstaller, run `pixi run b
 This creates a built PyInstaller application in `./dist/gistim`.
 
 Run `pixi run zip-backend` to create a ZIP file of the PyInstaller application.
-RUn `pixi run zip-plugin` to create a ZIP file of the QGIS plugin that can be installed in QGIS.
+Run `pixi run zip-plugin` to create a ZIP file of the QGIS plugin that can be installed in QGIS.
 
 To test the created ZIP files: Install the QGIS from the ZIP file, start the QGIS plugin and try to install the ZIP file via the "Install TimML and TTim server" button.
 
