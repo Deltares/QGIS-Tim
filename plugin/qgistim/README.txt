@@ -9,8 +9,8 @@ This plugin represent a single model with a single GeoPackage. The different
 elements are represented as layers in the GeoPackage, and also as ordinary
 vector layers in QGIS.
 
-To run the model with TimML, this plugin relies on a second package called
-`gistim`: https://pypi.org/project/gistim/
+To run the model with TimML and TTim, this plugin relies on a server program called
+`gistim`.
 
 Find the repository and issue tracker here:
 https://github.com/Deltares/QGIS-Tim
