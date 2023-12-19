@@ -1,18 +1,13 @@
 import argparse
 import json
 import os
-import platform
 import sys
 from contextlib import contextmanager, redirect_stderr, redirect_stdout
 from os import devnull
-from pathlib import Path
-from typing import Any, Dict
 
-import timml
 # Make sure we explicitly import besselaesnumba for pyinstaller.
 # It's a dynamic import inside of timml.
 from timml.besselaesnumba import besselaesnumba  # noqa: F401
-import ttim
 
 import gistim
 
@@ -29,39 +24,6 @@ def write_json_stdout(data):
     sys.stdout.write(json.dumps(data))
     sys.stdout.write("\n")
     sys.stdout.flush()
-
-
-def get_configdir() -> Path:
-    if platform.system() == "Windows":
-        configdir = Path(os.environ["APPDATA"]) / "qgis-tim"
-    else:
-        configdir = Path(os.environ["HOME"]) / ".qgis-tim"
-    return configdir
-
-
-def write_configjson(path: Path, data: Dict[str, Any]) -> None:
-    """
-    Create, overwrite if needed.
-    """
-    content = {sys.executable: data}
-    with open(path, "w") as f:
-        f.write(json.dumps(content))
-    print(f"Succesfully written {path}.")
-    return
-
-
-def write_versions():
-    # Store version numbers
-
-    versions = {
-        "timml": timml.__version__,
-        "ttim": ttim.__version__,
-        "gistim": gistim.__version__,
-    }
-    configdir = get_configdir()
-    path = configdir / "tim-versions.json"
-    write_configjson(path, versions)
-    return
 
 
 def handle(line) -> str:

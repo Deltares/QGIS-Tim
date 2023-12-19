@@ -12,9 +12,10 @@ To build the TimML and TTim server application with PyInstaller, run `pixi run b
 
 This creates a built PyInstaller application in `./dist/gistim`.
 
-Then, run `pixi run create-archive` to create a ZIP file of the PyInstaller application.
+Run `pixi run zip-backend` to create a ZIP file of the PyInstaller application.
+RUn `pixi run zip-plugin` to create a ZIP file of the QGIS plugin that can be installed in QGIS.
 
-To test the created ZIP file, start the QGIS plugin and try to install the ZIP file via the "Install TimML and TTim server" button.
+To test the created ZIP files: Install the QGIS from the ZIP file, start the QGIS plugin and try to install the ZIP file via the "Install TimML and TTim server" button.
 
 ## Creating new release
 
@@ -29,7 +30,7 @@ To create a new release:
 5. Publish the release.
 6. PyInstaller applications will now be automatically built.
 
-GitHub actions have been defined to automatically build PyInstaller applications on Windows, macOS, and Linux. These run automatically when a new tag is defined. The defined workflows will upload their files to an existing release. This means tags should only be created via the GitHub "Draft a new release" functionality, or no release will be available to upload to.
+GitHub actions have been defined to automatically build PyInstaller applications on Windows, macOS, and Linux; and to create a ZIP file of the QGIS plugin. These run automatically when a new tag is defined. The defined workflows will upload their files to an existing release. This means tags should only be created via the GitHub "Draft a new release" functionality, or no release will be available to upload to.
 
 ### Upload the plugin to the QGIS respository
 

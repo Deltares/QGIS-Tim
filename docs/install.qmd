@@ -13,7 +13,7 @@ Download and install a recent version of QGIS (>=3.28):
 
 ## 2. Install the QGIS plugin
  
-### Method 1: From the GQIS plugin database 
+### Method 1: From the QGIS plugin database 
 **NB** Due to ongoing developments new features and bug fixes might not be part of this release. Consider installation method 2.
 
 1.  Open QGIS.
@@ -23,8 +23,8 @@ Download and install a recent version of QGIS (>=3.28):
 6.  Search for \"Qgis-Tim\".
 7.  Click \"Install Plugin\".
 
-### Method 2: From Zip (recommended) 
-1.  Download the \"QGIS-TIM-plugin.zip\" (do not unzip!) from the [iMOD-Suite download portal.](https://deltares.thegood.cloud/s/AefTz97ZHbWS4RT){target="_blank"}
+### Method 2: From ZIP file (recommended for now) 
+1.  Download the \"QGIS-Tim-plugin.zip\" from the [GitHub Releases page](https://github.com/Deltares/QGIS-Tim/releases) (do not unzip!).
 2.  Open QGIS.
 3.  At the top, find the Plugins menu (\~sixth object in the menubar).
 4.  Find \"Manage and Install plugins\" (\~first object in drop-down).
@@ -32,15 +32,13 @@ Download and install a recent version of QGIS (>=3.28):
 6.  Enter the path to the file \"QGIS-TIM-plugin.zip\".
 7.  Click \"Install Plugin\".
 
-This will add an icon to the toolbar(s). ![](figures/tutorial/button-Qgis-tim.png){width=6%}
-By clicking the icon, the plugin is started. <br> 
-The QGIS plugin automatically starts an extra window for the background calculation of a TIM model. This black window is called *Python.exe* and can be minimized or even closed after the calculation. 
+This will add an icon to the toolbar(s). By clicking the icon, the plugin is started.
 
-## 3. Install the TimML and TTim server
+### 3. Install the TimML and TTim server
 With the plugin installed, we can already define model input and convert it to Python scripts or JSON files.
 To run TimML and TTim computations directly from QGIS, we need to install a server program which contains TimML and TTim.
 
-1.  Start the QGIS-Tim plugin by clicking the icon in the toolbar: ![](figures/tutorial/button-Qgis-tim.png){width=6%}
+1.  Start the QGIS-Tim plugin by clicking the QGIS-Tim icon in the toolbar.
 2.  Find and click the "Install TimML and TTim server" button at the bottom of the plugin window.
 3.  Click the "Install latest release from GitHub" button to download and install the server program.
 
