@@ -159,8 +159,8 @@ ul.task-list li input[type="checkbox"] {
 <h3 class="anchored" data-anchor-id="pyinstaller">PyInstaller</h3>
 <p>To build the TimML and TTim server application with PyInstaller, run <code>pixi run build-backend</code></p>
 <p>This creates a built PyInstaller application in <code>./dist/gistim</code>.</p>
-<p>Then, run <code>pixi run create-archive</code> to create a ZIP file of the PyInstaller application.</p>
-<p>To test the created ZIP file, start the QGIS plugin and try to install the ZIP file via the “Install TimML and TTim server” button.</p>
+<p>Run <code>pixi run zip-backend</code> to create a ZIP file of the PyInstaller application. Run <code>pixi run zip-plugin</code> to create a ZIP file of the QGIS plugin that can be installed in QGIS.</p>
+<p>To test the created ZIP files: Install the QGIS from the ZIP file, start the QGIS plugin and try to install the ZIP file via the “Install TimML and TTim server” button.</p>
 </section>
 </section>
 <section id="creating-new-release" class="level2">
@@ -176,7 +176,7 @@ ul.task-list li input[type="checkbox"] {
 <li>Publish the release.</li>
 <li>PyInstaller applications will now be automatically built.</li>
 </ol>
-<p>GitHub actions have been defined to automatically build PyInstaller applications on Windows, macOS, and Linux. These run automatically when a new tag is defined. The defined workflows will upload their files to an existing release. This means tags should only be created via the GitHub “Draft a new release” functionality, or no release will be available to upload to.</p>
+<p>GitHub actions have been defined to automatically build PyInstaller applications on Windows, macOS, and Linux; and to create a ZIP file of the QGIS plugin. These run automatically when a new tag is defined. The defined workflows will upload their files to an existing release. This means tags should only be created via the GitHub “Draft a new release” functionality, or no release will be available to upload to.</p>
 </section>
 <section id="upload-the-plugin-to-the-qgis-respository" class="level3">
 <h3 class="anchored" data-anchor-id="upload-the-plugin-to-the-qgis-respository">Upload the plugin to the QGIS respository</h3>

@@ -122,8 +122,8 @@ ul.task-list li input[type="checkbox"] {
   <li><a href="#install-qgis" id="toc-install-qgis" class="nav-link active" data-scroll-target="#install-qgis">1. Install QGIS</a></li>
   <li><a href="#install-the-qgis-plugin" id="toc-install-the-qgis-plugin" class="nav-link" data-scroll-target="#install-the-qgis-plugin">2. Install the QGIS plugin</a>
   <ul class="collapse">
-  <li><a href="#method-1-from-the-gqis-plugin-database" id="toc-method-1-from-the-gqis-plugin-database" class="nav-link" data-scroll-target="#method-1-from-the-gqis-plugin-database">Method 1: From the GQIS plugin database</a></li>
-  <li><a href="#method-2-from-zip-recommended" id="toc-method-2-from-zip-recommended" class="nav-link" data-scroll-target="#method-2-from-zip-recommended">Method 2: From Zip (recommended)</a></li>
+  <li><a href="#method-a-from-the-qgis-plugin-database" id="toc-method-a-from-the-qgis-plugin-database" class="nav-link" data-scroll-target="#method-a-from-the-qgis-plugin-database">Method A: From the QGIS plugin database</a></li>
+  <li><a href="#method-b-from-zip-file-recommended-for-now" id="toc-method-b-from-zip-file-recommended-for-now" class="nav-link" data-scroll-target="#method-b-from-zip-file-recommended-for-now">Method B: From ZIP file (recommended for now)</a></li>
   </ul></li>
   <li><a href="#install-the-timml-and-ttim-server" id="toc-install-the-timml-and-ttim-server" class="nav-link" data-scroll-target="#install-the-timml-and-ttim-server">3. Install the TimML and TTim server</a></li>
   </ul>
@@ -156,9 +156,9 @@ ul.task-list li input[type="checkbox"] {
 </section>
 <section id="install-the-qgis-plugin" class="level2">
 <h2 class="anchored" data-anchor-id="install-the-qgis-plugin">2. Install the QGIS plugin</h2>
-<section id="method-1-from-the-gqis-plugin-database" class="level3">
-<h3 class="anchored" data-anchor-id="method-1-from-the-gqis-plugin-database">Method 1: From the GQIS plugin database</h3>
-<p><strong>NB</strong> Due to ongoing developments new features and bug fixes might not be part of this release. Consider installation method 2.</p>
+<section id="method-a-from-the-qgis-plugin-database" class="level3">
+<h3 class="anchored" data-anchor-id="method-a-from-the-qgis-plugin-database">Method A: From the QGIS plugin database</h3>
+<p><strong>NB</strong> Due to ongoing developments new features and bug fixes might not be part of this release. Consider installation method B.</p>
 <ol type="1">
 <li>Open QGIS.</li>
 <li>At the top, find the Plugins menu (~sixth object in the menubar).</li>
@@ -168,10 +168,10 @@ ul.task-list li input[type="checkbox"] {
 <li>Click "Install Plugin".</li>
 </ol>
 </section>
-<section id="method-2-from-zip-recommended" class="level3">
-<h3 class="anchored" data-anchor-id="method-2-from-zip-recommended">Method 2: From Zip (recommended)</h3>
+<section id="method-b-from-zip-file-recommended-for-now" class="level3">
+<h3 class="anchored" data-anchor-id="method-b-from-zip-file-recommended-for-now">Method B: From ZIP file (recommended for now)</h3>
 <ol type="1">
-<li>Download the "QGIS-TIM-plugin.zip" (do not unzip!) from the <a href="https://deltares.thegood.cloud/s/AefTz97ZHbWS4RT" target="_blank">iMOD-Suite download portal.</a></li>
+<li>Download the "QGIS-Tim-plugin.zip" from the <a href="https://github.com/Deltares/QGIS-Tim/releases">GitHub Releases page</a> (do not unzip!).</li>
 <li>Open QGIS.</li>
 <li>At the top, find the Plugins menu (~sixth object in the menubar).</li>
 <li>Find "Manage and Install plugins" (~first object in drop-down).</li>
@@ -179,14 +179,15 @@ ul.task-list li input[type="checkbox"] {
 <li>Enter the path to the file "QGIS-TIM-plugin.zip".</li>
 <li>Click "Install Plugin".</li>
 </ol>
-<p>This will add an icon to the toolbar(s). <img src="figures/tutorial/button-Qgis-tim.png" class="img-fluid" style="width:6.0%"> By clicking the icon, the plugin is started. <br> The QGIS plugin automatically starts an extra window for the background calculation of a TIM model. This black window is called <em>Python.exe</em> and can be minimized or even closed after the calculation.</p>
+<p>This will add an icon to the toolbar(s). <img src="figures/tutorial/button-Qgis-tim.png" class="img-fluid" style="width:6.0%"></p>
+<p>By clicking the icon, the plugin is started.</p>
 </section>
 </section>
 <section id="install-the-timml-and-ttim-server" class="level2">
 <h2 class="anchored" data-anchor-id="install-the-timml-and-ttim-server">3. Install the TimML and TTim server</h2>
 <p>With the plugin installed, we can already define model input and convert it to Python scripts or JSON files. To run TimML and TTim computations directly from QGIS, we need to install a server program which contains TimML and TTim.</p>
 <ol type="1">
-<li>Start the QGIS-Tim plugin by clicking the icon in the toolbar: <img src="figures/tutorial/button-Qgis-tim.png" class="img-fluid" style="width:6.0%"></li>
+<li>Start the QGIS-Tim plugin by clicking the QGIS-Tim icon in the toolbar.</li>
 <li>Find and click the “Install TimML and TTim server” button at the bottom of the plugin window.</li>
 <li>Click the “Install latest release from GitHub” button to download and install the server program.</li>
 </ol>
