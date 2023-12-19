@@ -18,6 +18,7 @@ from qgistim.core.install_backend import install_from_github, install_from_zip
 class InstallTask(QgsTask):
     def finished(self, result) -> None:
         self.parent.enable_install_buttons(True)
+        self.parent.install_zip_line_edit.setText("")
         self.parent.update_versions()
         if result:
             self.message_bar.pushMessage(
