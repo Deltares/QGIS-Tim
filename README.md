@@ -24,8 +24,8 @@ necessary computations and writes result files that are loaded back into QGIS by
 Download and install a recent version of QGIS (>=3.28):
 <https://www.qgis.org/en/site/forusers/download.html>
 
-### Method 1: From the QGIS plugin database 
-**NB** Due to ongoing developments new features and bug fixes might not be part of this release. Consider installation method 2.
+### Method A: From the QGIS plugin database 
+**NB** Due to ongoing developments new features and bug fixes might not be part of this release. Consider installation method B.
 
 1.  Open QGIS.
 3.  At the top, find the Plugins menu (\~sixth object in the menubar).
@@ -34,7 +34,7 @@ Download and install a recent version of QGIS (>=3.28):
 6.  Search for \"Qgis-Tim\".
 7.  Click \"Install Plugin\".
 
-### Method 2: From ZIP file (recommended for now) 
+### Method B: From ZIP file (recommended for now) 
 1.  Download the \"QGIS-Tim-plugin.zip\" from the [GitHub Releases page](https://github.com/Deltares/QGIS-Tim/releases) (do not unzip!).
 2.  Open QGIS.
 3.  At the top, find the Plugins menu (\~sixth object in the menubar).
@@ -45,7 +45,7 @@ Download and install a recent version of QGIS (>=3.28):
 
 This will add an icon to the toolbar(s). By clicking the icon, the plugin is started.
 
-### 3. Install the TimML and TTim server
+### Install the TimML and TTim server
 With the plugin installed, we can already define model input and convert it to Python scripts or JSON files.
 To run TimML and TTim computations directly from QGIS, we need to install a server program which contains TimML and TTim.
 
