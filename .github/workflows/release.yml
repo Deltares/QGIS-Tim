@@ -9,7 +9,7 @@ on:
 
 jobs:
   build:
-    name: Release ${{ matrix.os }} PyInstaller
+    name: Release ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
     permissions: write-all
     strategy:
@@ -36,7 +36,7 @@ jobs:
         run: pixi run zip-plugin
       - name: Release plugin ZIP
         if: matrix.os == 'ubuntu-latest'
-        run: gh release upload ${{ github.ref_name }} plugin/QGIS-Tim-plugin.zip
+        run: gh release upload ${{ github.ref_name }} dist/QGIS-Tim-plugin.zip
         env:
           GITHUB_TOKEN: ${{ github.TOKEN }}
  
