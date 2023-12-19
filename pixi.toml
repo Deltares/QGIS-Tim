@@ -1,6 +1,6 @@
 [project]
 name = "gistim"
-version = "0.6.0"
+version = "0.6.1"
 description = "Connects TimML and TTim Analytic Element modeling to QGIS"
 authors = ["Huite Bootsma"]
 channels = ["conda-forge"]
