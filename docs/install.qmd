@@ -40,9 +40,13 @@ By clicking the icon, the plugin is started.
 With the plugin installed, we can already define model input and convert it to Python scripts or JSON files.
 To run TimML and TTim computations directly from QGIS, we need to install a server program which contains TimML and TTim.
 
+### Method A: Install from GitHub (requires internet connection)
+
 1.  Start the QGIS-Tim plugin by clicking the QGIS-Tim icon in the toolbar.
 2.  Find and click the "Install TimML and TTim server" button at the bottom of the plugin window.
 3.  Click the "Install latest release from GitHub" button to download and install the server program.
+
+### Method B: Install from ZIP file
 
 Specific releases can also be manually downloaded from the [GitHub Releases page](https://github.com/Deltares/QGIS-Tim/releases):
 
