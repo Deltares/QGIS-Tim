@@ -125,7 +125,11 @@ ul.task-list li input[type="checkbox"] {
   <li><a href="#method-a-from-the-qgis-plugin-database" id="toc-method-a-from-the-qgis-plugin-database" class="nav-link" data-scroll-target="#method-a-from-the-qgis-plugin-database">Method A: From the QGIS plugin database</a></li>
   <li><a href="#method-b-from-zip-file-recommended-for-now" id="toc-method-b-from-zip-file-recommended-for-now" class="nav-link" data-scroll-target="#method-b-from-zip-file-recommended-for-now">Method B: From ZIP file (recommended for now)</a></li>
   </ul></li>
-  <li><a href="#install-the-timml-and-ttim-server" id="toc-install-the-timml-and-ttim-server" class="nav-link" data-scroll-target="#install-the-timml-and-ttim-server">3. Install the TimML and TTim server</a></li>
+  <li><a href="#install-the-timml-and-ttim-server" id="toc-install-the-timml-and-ttim-server" class="nav-link" data-scroll-target="#install-the-timml-and-ttim-server">3. Install the TimML and TTim server</a>
+  <ul class="collapse">
+  <li><a href="#method-a-install-from-github-requires-internet-connection" id="toc-method-a-install-from-github-requires-internet-connection" class="nav-link" data-scroll-target="#method-a-install-from-github-requires-internet-connection">Method A: Install from GitHub (requires internet connection)</a></li>
+  <li><a href="#method-b-install-from-zip-file" id="toc-method-b-install-from-zip-file" class="nav-link" data-scroll-target="#method-b-install-from-zip-file">Method B: Install from ZIP file</a></li>
+  </ul></li>
   </ul>
 </nav>
     </div>
@@ -186,11 +190,16 @@ ul.task-list li input[type="checkbox"] {
 <section id="install-the-timml-and-ttim-server" class="level2">
 <h2 class="anchored" data-anchor-id="install-the-timml-and-ttim-server">3. Install the TimML and TTim server</h2>
 <p>With the plugin installed, we can already define model input and convert it to Python scripts or JSON files. To run TimML and TTim computations directly from QGIS, we need to install a server program which contains TimML and TTim.</p>
+<section id="method-a-install-from-github-requires-internet-connection" class="level3">
+<h3 class="anchored" data-anchor-id="method-a-install-from-github-requires-internet-connection">Method A: Install from GitHub (requires internet connection)</h3>
 <ol type="1">
 <li>Start the QGIS-Tim plugin by clicking the QGIS-Tim icon in the toolbar.</li>
 <li>Find and click the “Install TimML and TTim server” button at the bottom of the plugin window.</li>
 <li>Click the “Install latest release from GitHub” button to download and install the server program.</li>
 </ol>
+</section>
+<section id="method-b-install-from-zip-file" class="level3">
+<h3 class="anchored" data-anchor-id="method-b-install-from-zip-file">Method B: Install from ZIP file</h3>
 <p>Specific releases can also be manually downloaded from the <a href="https://github.com/Deltares/QGIS-Tim/releases">GitHub Releases page</a>:</p>
 <ol type="1">
 <li>Download the gistim ZIP file for your platform: Windows, macOS, or Linux.</li>
@@ -200,6 +209,7 @@ ul.task-list li input[type="checkbox"] {
 </ol>
 
 
+</section>
 </section>
 
 </main> <!-- /main -->
