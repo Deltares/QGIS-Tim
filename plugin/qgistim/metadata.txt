@@ -4,9 +4,9 @@
 
 [general]
 name=Qgis-Tim
-qgisMinimumVersion=3.22
+qgisMinimumVersion=3.28
 description=QGIS plugin to setup TimML multi-layer analytic elements
-version=0.4.1
+version=0.6.0
 author=Deltares
 email=huitebootsma@gmail.com
 
