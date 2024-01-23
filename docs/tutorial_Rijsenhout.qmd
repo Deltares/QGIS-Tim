@@ -390,7 +390,7 @@ We have the Value Tool and the Cross section tool to check for calculated values
 
 Are you tired of the pop-up window every time you add a point? There is an option to add points C to E in one serie and fill in the labels afterwards.
 
-(@) On the tab *Model Manager*, in the lowest section, check the option "Suppress attribute from pop-up". 
+(@) On the tab *Model Manager*, in the lowest section, check the option "Suppress attribute form pop-up after feature creation". 
 (@) Place points C to E.
 (@) Open the Attribute Table from layer "timml Head Observation:Piezometers" and fill in the Labels C to E. 
 (@) Save your changes and stop the editing mode. 
