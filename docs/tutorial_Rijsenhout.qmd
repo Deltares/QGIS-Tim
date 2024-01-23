@@ -3,10 +3,9 @@ title: "Building Pit Rijsenhout"
 ---
 
 ## Requirements
-- Be sure QGIS version 3.22.00 or higher is installed.
+- Be sure QGIS version 3.28.00 or higher is installed.
 - Be sure the ``gistim`` Python package is installed (see [installation](install.qmd) for instructions).
 - Download the tutorial material. [Follow this link.](https://deltares.thegood.cloud/s/zryWnfjT43Ryoea)
-- Installation of the QGIS-Tim plugin and the MOD plugin is part of this Tutorial. The necessary ZIP files are included in the tutorial material.
 - Internet connections is optional during this Tutorial. It is only required for installation of additional plugins and the use of an online topographic background map.
 
 ## Description
@@ -29,11 +28,7 @@ At the project location, the top layer is 12 m thick and consists of a low perme
 ![Geological cross section near Rijssenhout \[source: BRO GeoTOP v1.4.1\]](figures/tutorial/GeoTOP-Verticaledoorsnede.png){width=100% #fig-GeoTOP-Verticaledoorsnede}
 
 ## Getting Started
-Let's first configure the gistim python installation again, to be sure that QGIS can find the gistim software.
 
-(@) Open the Deltaforge prompt (search in Windows Start for "Deltaforge Prompt"). A black window pops up.
-(@) In this window type ``python -m gistim configure`` and press ENTER.
-(@) You can close this window now.
 (@) Launch QGIS from your START menu, from your desktop or click on …\\QGIS3.28.0\\bin\\qgis-bin.exe.
 
 > **Intermezzo:** *QGIS language settings*
@@ -64,22 +59,31 @@ The case in this tutorial is located in The Netherlands, so next we select the a
 > - Close this window.
 
 ### Install plugins
-This is the moment to download/import four plugins needed for this tutorial:
+This is the moment to import four plugins needed for this tutorial: 
 
-- the QGIS-Tim plugin. The development version imported from ZIP file.
-- the iMOD plugin. The development version imported from ZIP file.
-- the Value Tool. The official version installed via QGIS (internet connection required).
-- the PDOK plugin. The official version installed via QGIS (internet connection required). <br> This plugin gives access to a large database from which we will load the topographic maps and use the navigation option.
+- the QGIS-Tim plugin (developed by Deltares). 
+- the iMOD plugin (developed by Deltares).
+- the Value Tool. 
+- the PDOK plugin. This plugin gives access to a large database from which we will load the topographic maps and use the navigation option.
 
-(@) Go to *Plugins* from the main menu and select *Manage and Install Plugins…* to open the plugin window.
-(@) On the left section select *Install from ZIP*.
-(@) Click the Browse button (![](figures/tutorial/button-Qgis-browse.png){width=4%}) and from the tutorial dataset select the ZIP file "QGIS-Tim_Tutorial\\QGIS-iMOD-plugin.zip".
-(@) Click *Install Plugin*.
-(@) In the same way, install the QGIS-Tim plugin using the ZIP file "QGIS-Tim_Tutorial\\QGIS-Tim-plugin.zip".
+To install the plugins from QGIS you need an internet connection! 
 
-If you have an internet connection continue with the installation of the next two plugins from the QGIS plugin library.
+> No internet connection? Follow the next steps to import the two Deltares' plugins from a ZIP file provided in the Tutorial Dataset.
+>
+> - Go to *Plugins* from the main menu and select *Manage and Install Plugins…* to open the plugin window.
+> - On the left section select *Install from ZIP*.
+> - Click the Browse button (![](figures/tutorial/button-Qgis-browse.png){width=4%}) and select the ZIP file "QGIS-Tim_Tutorial\\QGIS-iMOD-plugin.zip".
+> - Click *Install Plugin*.
+> - In the same way, install the QGIS-Tim plugin using the ZIP file "QGIS-Tim_Tutorial\\QGIS-Tim-plugin.zip".
 
-(@) From the left section, select the group *All* to see all available plugins.
+If you have an internet connection, all four plugins can be downloaded within QGIS. 
+
+(@) At the top, find the Plugins menu (\~sixth object in the menubar).
+(@) Find \"Manage and Install plugins\" (\~first object in drop-down).
+(@) Find \"All\" (\~first in left section).
+(@) Search for \"Qgis-Tim\".
+(@) Click \"Install Plugin\".
+(@) Search for “iMOD" and install it.
 (@) Search for “Value Tool” and install it.
 (@) Search for “PDOK services plugin” and install it.
 (@) Make sure that under *Plugins > Manage and Install Plugins > Installed* now the 4 added plugins are checked.

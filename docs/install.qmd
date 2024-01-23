@@ -13,8 +13,7 @@ Download and install a recent version of QGIS (>=3.28):
 
 ## 2. Install the QGIS plugin
  
-### Method A: From the QGIS plugin database 
-**NB** Due to ongoing developments new features and bug fixes might not be part of this release. Consider installation method B.
+### Method A: From the QGIS plugin database (recommended) 
 
 1.  Open QGIS.
 3.  At the top, find the Plugins menu (\~sixth object in the menubar).
@@ -23,7 +22,7 @@ Download and install a recent version of QGIS (>=3.28):
 6.  Search for \"Qgis-Tim\".
 7.  Click \"Install Plugin\".
 
-### Method B: From ZIP file (recommended for now) 
+### Method B: From ZIP file 
 1.  Download the \"QGIS-Tim-plugin.zip\" from the [GitHub Releases page](https://github.com/Deltares/QGIS-Tim/releases) (do not unzip!).
 2.  Open QGIS.
 3.  At the top, find the Plugins menu (\~sixth object in the menubar).
@@ -43,14 +42,15 @@ To run TimML and TTim computations directly from QGIS, we need to install a serv
 ### Method A: Install from GitHub (requires internet connection)
 
 1.  Start the QGIS-Tim plugin by clicking the QGIS-Tim icon in the toolbar.
-2.  Find and click the "Install TimML and TTim server" button at the bottom of the plugin window.
-3.  Click the "Install latest release from GitHub" button to download and install the server program.
+1.  Find and click the "Install TimML and TTim server" button at the bottom of the plugin window.
+1.  Click the "Install latest release from GitHub" button to download and install the server program.
 
 ### Method B: Install from ZIP file
 
 Specific releases can also be manually downloaded from the [GitHub Releases page](https://github.com/Deltares/QGIS-Tim/releases):
 
 1.  Download the gistim ZIP file for your platform: Windows, macOS, or Linux.
-2.  Find and click the "Install TimML and TTim server" button at the bottom of the plugin window.
-3.  Set the path to the downloaded ZIP file in the "Install from ZIP file" section.
-4.  Click the "Install" button.
+1.  Start the QGIS-Tim plugin by clicking the QGIS-Tim icon in the toolbar.
+1.  Find and click the "Install TimML and TTim server" button at the bottom of the plugin window.
+1.  Set the path to the downloaded ZIP file in the "Install from ZIP file" section.
+1.  Click the "Install" button.
