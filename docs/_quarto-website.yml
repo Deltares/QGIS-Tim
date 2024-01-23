@@ -12,6 +12,8 @@ website:
         href: install.qmd
       - text: Tutorials
         href: tutorial.qmd
+      - text: Development
+        href: developer.qmd
     right:
       - icon: github
         href: https://github.com/Deltares/QGIS-Tim

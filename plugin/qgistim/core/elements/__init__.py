@@ -9,6 +9,7 @@ from qgistim.core.elements.building_pit import BuildingPit
 from qgistim.core.elements.circular_area_sink import CircularAreaSink
 from qgistim.core.elements.constant import Constant
 from qgistim.core.elements.domain import Domain
+from qgistim.core.elements.discharge_observation import DischargeObservation
 from qgistim.core.elements.element import Element
 from qgistim.core.elements.head_line_sink import HeadLineSink
 from qgistim.core.elements.headwell import HeadWell, RemoteHeadWell
@@ -44,6 +45,7 @@ ELEMENTS = {
         BuildingPit,
         LeakyBuildingPit,
         HeadObservation,
+        DischargeObservation,
     )
 }
 

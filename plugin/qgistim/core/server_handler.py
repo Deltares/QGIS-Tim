@@ -9,7 +9,7 @@ import os
 import platform
 import subprocess
 from pathlib import Path
-from typing import Any, Dict, List
+from typing import Any, Dict
 
 
 class ServerHandler:
@@ -20,56 +20,49 @@ class ServerHandler:
         return self.process is not None and self.process.poll() is None
 
     @staticmethod
-    def get_configdir() -> Path:
+    def get_gistim_dir() -> Path:
         """
-        Get the location of the qgis-tim plugin settings.
+        Get the location of the qgis-tim PyInstaller executable.
 
         The location differs per OS.
 
         Returns
         -------
-        configdir: pathlib.Path
+        gistim_dir: pathlib.Path
         """
         if platform.system() == "Windows":
-            configdir = Path(os.environ["APPDATA"]) / "qgis-tim"
+            gistim_dir = Path(os.environ["APPDATA"]) / "qgis-tim"
         else:
-            configdir = Path(os.environ["HOME"]) / ".qgis-tim"
-        return configdir
-
+            gistim_dir = Path(os.environ["HOME"]) / ".qgis-tim"
+        return gistim_dir
+    
     @staticmethod
-    def interpreters() -> List[str]:
-        with open(
-            ServerHandler.get_configdir() / "environmental-variables.json", "r"
-        ) as f:
-            env_vars = json.loads(f.read())
-        return list(env_vars.keys())
-
-    @staticmethod
-    def environmental_variables():
-        with open(
-            ServerHandler.get_configdir() / "environmental-variables.json", "r"
-        ) as f:
-            env_vars = json.loads(f.read())
-        return env_vars
-
+    def get_interpreter() -> Path:
+        if platform.system() == "Windows":
+            return ServerHandler.get_gistim_dir() / "gistim.exe"
+        else:
+            return ServerHandler.get_gistim_dir() / "gistim"
+        
     @staticmethod
     def versions():
-        with open(ServerHandler.get_configdir() / "tim-versions.json", "r") as f:
-            versions = json.loads(f.read())
+        path = ServerHandler.get_gistim_dir() / "versions.json"
+        if path.exists():
+            with open(path, "r") as f:
+                versions = json.loads(f.read())
+        else:
+            versions = {}
         return versions
 
-    def start_server(self, interpreter: str) -> Dict[str, Any]:
+    def start_server(self) -> Dict[str, Any]:
         """
-        Starts a new (conda) interpreter, based on the settings in the
-        configuration directory.
+        Starts a new PyInstaller interpreter.
         """
-        env_vars = self.environmental_variables()
+        interpreter = self.get_interpreter()
         self.process = subprocess.Popen(
-            [interpreter, "-u", "-m", "gistim", "serve"],
+            [interpreter, "serve"],
             stdin=subprocess.PIPE,
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
-            env=env_vars[interpreter],
             text=True,
         )
         response = json.loads(self.process.stdout.readline())

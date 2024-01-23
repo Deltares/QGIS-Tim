@@ -42,6 +42,7 @@ class OutputOptions(NamedTuple):
     contours: bool
     head_observations: bool
     discharge: bool
+    discharge_observations: bool
     spacing: float
 
 
@@ -71,7 +72,13 @@ class ComputeTask(BaseServerTask):
             output = self.data["output_options"]
             name = f"{Path(path).stem}"
             self.parent.parent.create_output_group(name=f"{name} output")
-            if output.head_observations or output.discharge:
+            if any(
+                (
+                    output.head_observations,
+                    output.discharge,
+                    output.discharge_observations,
+                )
+            ):
                 self.parent.load_vector_result(path)
             if output.mesh:
                 self.parent.load_mesh_result(path, output.contours)
@@ -166,6 +173,7 @@ class ComputeWidget(QWidget):
         result_layout.addWidget(self.contours_checkbox)
         result_layout.addWidget(self.head_observations_checkbox)
         result_layout.addWidget(self.discharge_checkbox)
+        result_layout.addWidget(self.discharge_observations_checkbox)
 
         result_layout.addLayout(button_row)
 
@@ -199,6 +207,7 @@ class ComputeWidget(QWidget):
         self.contours_checkbox.setChecked(True)
         self.head_observations_checkbox.setChecked(True)
         self.discharge_checkbox.setChecked(False)
+        self.discharge_observations_checkbox.setChecked(False)
         self.contour_min_box.setValue(-5.0)
         self.contour_max_box.setValue(5.0)
         self.contour_step_box.setValue(0.5)
@@ -235,6 +244,18 @@ class ComputeWidget(QWidget):
     @property
     def output_path(self) -> str:
         return self.output_line_edit.text()
+
+    @property
+    def output_options(self) -> OutputOptions:
+        return OutputOptions(
+            raster=self.raster_checkbox.isChecked(),
+            mesh=self.mesh_checkbox.isChecked(),
+            contours=self.contours_checkbox.isChecked(),
+            head_observations=self.head_observations_checkbox.isChecked(),
+            discharge=self.discharge_checkbox.isChecked(),
+            discharge_observations=self.discharge_observations_checkbox.isChecked(),
+            spacing=self.spacing_spin_box.value(),
+        )
 
     def clear_outdated_output(self, path: str) -> None:
         path = Path(path)
@@ -332,18 +353,10 @@ class ComputeWidget(QWidget):
         GeoPackage dataset.
         """
         transient = self.parent.dataset_widget.transient
-        output_options = OutputOptions(
-            raster=self.raster_checkbox.isChecked(),
-            mesh=self.mesh_checkbox.isChecked(),
-            contours=self.contours_checkbox.isChecked(),
-            head_observations=self.head_observations_checkbox.isChecked(),
-            discharge=self.discharge_checkbox.isChecked(),
-            spacing=self.spacing_spin_box.value(),
-        )
 
         path = Path(self.output_path).absolute().with_suffix(".json")
         invalid_input = self.parent.dataset_widget.convert_to_json(
-            path, transient=transient, output_options=output_options
+            path, transient=transient
         )
         # Early return in case some problems are found.
         if invalid_input:
@@ -353,7 +366,7 @@ class ComputeWidget(QWidget):
             "operation": "compute",
             "path": str(path),
             "transient": transient,
-            "output_options": output_options,
+            "output_options": self.output_options,
         }
         # https://gis.stackexchange.com/questions/296175/issues-with-qgstask-and-task-manager
         # It seems the task goes awry when not associated with a Python object!
@@ -502,6 +515,8 @@ class ComputeWidget(QWidget):
                 or "ttim Head Observation" in layername
             ):
                 labels = layer_styling.number_labels("head_layer0")
+            elif "timml Discharge Observation:" in layername:
+                labels = layer_styling.number_labels("discharge_layer0")
             elif "discharge-" in layername:
                 labels = layer_styling.number_labels("discharge_layer0")
             else:

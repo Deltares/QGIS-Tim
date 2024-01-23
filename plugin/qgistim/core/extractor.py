@@ -5,9 +5,16 @@ from typing import Any, Dict, List, Tuple
 from qgis.core import NULL, QgsVectorLayer
 
 
-def remove_zero_length(geometry):
-    # This removes repeated vertices
-    return list(dict.fromkeys(geometry))
+def remove_zero_length(geometry) -> List:
+    # This removes repeated vertices resulting in zero length segments.
+    # These zero length segments will crash TimML.
+    previous_pair = geometry[0]
+    coordinates = [previous_pair]
+    for pair in geometry[1:]:
+        if pair != previous_pair:
+            coordinates.append(pair)
+            previous_pair = pair
+    return coordinates
 
 
 class ExtractorMixin(abc.ABC):
@@ -29,6 +36,10 @@ class ExtractorMixin(abc.ABC):
 
     @classmethod
     def table_to_records(cls, layer: QgsVectorLayer) -> List[Dict[str, Any]]:
+        # layer.geometryType().Null is an enumerator, which isn't available in QGIS 3.28 LTR.
+        # So just use the integer representation instead for now.
+        # FUTURE: GEOM_TYPE_NULL = geomtype.Null
+        GEOM_TYPE_NULL = 4
         geomtype = layer.geometryType()
         features = []
         for feature in layer.getFeatures():
@@ -37,7 +48,7 @@ class ExtractorMixin(abc.ABC):
                 if value == NULL:
                     data[key] = None
 
-            if geomtype != geomtype.Null:
+            if geomtype != GEOM_TYPE_NULL:
                 geometry = feature.geometry()
                 if geometry.isNull():
                     centroid = None

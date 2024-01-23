@@ -1,0 +1,42 @@
+name: release
+
+on:
+  push:
+    branches:
+    - main
+    tags:
+      - '*'
+
+jobs:
+  build:
+    name: Release ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    permissions: write-all
+    strategy:
+      matrix:
+        os:
+          - ubuntu-latest
+          - macOS-latest
+          - windows-latest
+    steps:
+      - name: Check out repo
+        uses: actions/checkout@v4
+      - name: Setup Pixi
+        uses: prefix-dev/setup-pixi@v0.4.3
+      - name: Build with PyInstaller
+        run: pixi run build-backend
+      - name: Create backend ZIP
+        run: pixi run zip-backend
+      - name: Release backend ZIP
+        run: gh release upload ${{ github.ref_name }} dist/gistim-${{ runner.os }}.zip dist/sha256-checksum-${{ runner.os }}.txt
+        env:
+          GITHUB_TOKEN: ${{ github.TOKEN }}
+      - name: Create plugin ZIP
+        if: matrix.os == 'ubuntu-latest'
+        run: pixi run zip-plugin
+      - name: Release plugin ZIP
+        if: matrix.os == 'ubuntu-latest'
+        run: gh release upload ${{ github.ref_name }} dist/QGIS-Tim-plugin.zip
+        env:
+          GITHUB_TOKEN: ${{ github.TOKEN }}
+ 

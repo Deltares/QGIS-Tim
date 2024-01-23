@@ -1,0 +1,37 @@
+---
+title: "Developer Notes"
+---
+
+## Pixi
+QGIS-Tim uses pixi to manage installing dependencies and run common tasks.
+
+Follow the instructions on the [Getting Started page](https://pixi.sh/). 
+
+### PyInstaller
+To build the TimML and TTim server application with PyInstaller, run `pixi run build-backend`
+
+This creates a built PyInstaller application in `./dist/gistim`.
+
+Run `pixi run zip-backend` to create a ZIP file of the PyInstaller application.
+Run `pixi run zip-plugin` to create a ZIP file of the QGIS plugin that can be installed in QGIS.
+
+To test the created ZIP files: Install the QGIS from the ZIP file, start the QGIS plugin and try to install the ZIP file via the "Install TimML and TTim server" button.
+
+## Creating new release
+
+### Make a GitHub release
+
+To create a new release:
+
+1. Go to the [QGIS-Tim releases page](https://github.com/Deltares/QGIS-Tim/releases)
+2. Click on the "Draft a new release" button.
+3. Create a new tag.
+4. Write a title and description.
+5. Publish the release.
+6. PyInstaller applications will now be automatically built.
+
+GitHub actions have been defined to automatically build PyInstaller applications on Windows, macOS, and Linux; and to create a ZIP file of the QGIS plugin. These run automatically when a new tag is defined. The defined workflows will upload their files to an existing release. This means tags should only be created via the GitHub "Draft a new release" functionality, or no release will be available to upload to.
+
+### Upload the plugin to the QGIS respository
+
+Login to the [QGIS plugin repository](https://plugins.qgis.org/plugins/qgistim/) and upload the ZIP file of the QGIS plugin.

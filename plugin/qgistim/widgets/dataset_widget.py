@@ -288,7 +288,7 @@ class DatasetWidget(QWidget):
         self.new_geopackage_button.clicked.connect(self.new_geopackage)
         self.save_geopackage_button.clicked.connect(self.save_geopackage)
         self.restore_geopackage_button.clicked.connect(self.restore_geopackage)
-        self.suppress_popup_checkbox = QCheckBox("Suppress attribute form pop-up")
+        self.suppress_popup_checkbox = QCheckBox("Suppress attribute form pop-up after feature creation")
         self.suppress_popup_checkbox.stateChanged.connect(self.suppress_popup_changed)
         self.remove_button.clicked.connect(self.remove_geopackage_layer)
         self.add_button.clicked.connect(self.add_selection_to_qgis)
@@ -610,7 +610,6 @@ class DatasetWidget(QWidget):
         self,
         path: str,
         transient: bool,
-        output_options: OutputOptions,
     ) -> bool:
         """
         Parameters
@@ -619,8 +618,6 @@ class DatasetWidget(QWidget):
             Path to JSON file to write.
         transient: bool
             Steady-state (False) or transient (True).
-        output_options: OutputOptions
-            Which outputs to compute and write.
 
         Returns
         -------
@@ -634,7 +631,7 @@ class DatasetWidget(QWidget):
         json_data = data_to_json(
             extraction.timml,
             extraction.ttim,
-            output_options=output_options,
+            output_options=self.parent.compute_widget.output_options,
         )
 
         crs = self.parent.crs
@@ -661,5 +658,5 @@ class DatasetWidget(QWidget):
         if outpath == "":  # Empty string in case of cancel button press
             return
 
-        self.convert_to_json(outpath, transient=self.transient, output_options=None)
+        self.convert_to_json(outpath, transient=self.transient)
         return
