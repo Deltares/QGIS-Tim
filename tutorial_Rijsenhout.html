@@ -171,10 +171,15 @@ ul.task-list li input[type="checkbox"] {
   <li><a href="#model-1-single-aquifer" id="toc-model-1-single-aquifer" class="nav-link" data-scroll-target="#model-1-single-aquifer">Model 1: single aquifer</a></li>
   <li><a href="#model-2-single-well" id="toc-model-2-single-well" class="nav-link" data-scroll-target="#model-2-single-well">Model 2: single well</a></li>
   <li><a href="#model-3-multiple-layers" id="toc-model-3-multiple-layers" class="nav-link" data-scroll-target="#model-3-multiple-layers">Model 3: multiple layers</a></li>
-  <li><a href="#model-4-add-a-set-of-sheet-piles" id="toc-model-4-add-a-set-of-sheet-piles" class="nav-link" data-scroll-target="#model-4-add-a-set-of-sheet-piles">Model 4: add a set of sheet piles</a></li>
-  <li><a href="#how-to-reopen-tim-after-closing-qgis." id="toc-how-to-reopen-tim-after-closing-qgis." class="nav-link" data-scroll-target="#how-to-reopen-tim-after-closing-qgis."><img src="figures/tutorial/emoji-exclamation.png" class="img-fluid" style="width:4.0%"> How to reopen Tim after closing QGIS.</a></li>
+  <li><a href="#model-4-add-a-set-of-sheet-piles" id="toc-model-4-add-a-set-of-sheet-piles" class="nav-link" data-scroll-target="#model-4-add-a-set-of-sheet-piles">Model 4: add a set of sheet piles</a>
+  <ul class="collapse">
+  <li><a href="#how-to-reopen-tim-after-closing-qgis" id="toc-how-to-reopen-tim-after-closing-qgis" class="nav-link" data-scroll-target="#how-to-reopen-tim-after-closing-qgis">How to reopen Tim after closing QGIS</a></li>
+  </ul></li>
   <li><a href="#model-5-add-infiltration-of-drainwater" id="toc-model-5-add-infiltration-of-drainwater" class="nav-link" data-scroll-target="#model-5-add-infiltration-of-drainwater">Model 5: add infiltration of drainwater</a></li>
-  <li><a href="#model-6-add-observation-points" id="toc-model-6-add-observation-points" class="nav-link" data-scroll-target="#model-6-add-observation-points">Model 6: add observation points</a></li>
+  <li><a href="#model-6-add-observation-points" id="toc-model-6-add-observation-points" class="nav-link" data-scroll-target="#model-6-add-observation-points">Model 6: add observation points</a>
+  <ul class="collapse">
+  <li><a href="#draw-contour-lines" id="toc-draw-contour-lines" class="nav-link" data-scroll-target="#draw-contour-lines">Draw Contour Lines</a></li>
+  </ul></li>
   <li><a href="#model-7-determine-the-influence-of-the-nearby-lake" id="toc-model-7-determine-the-influence-of-the-nearby-lake" class="nav-link" data-scroll-target="#model-7-determine-the-influence-of-the-nearby-lake">Model 7: determine the influence of the nearby lake</a></li>
   <li><a href="#model-8-abstraction-effect-over-time" id="toc-model-8-abstraction-effect-over-time" class="nav-link" data-scroll-target="#model-8-abstraction-effect-over-time">Model 8: abstraction effect over time</a></li>
   <li><a href="#export-your-tim-model-to-python" id="toc-export-your-tim-model-to-python" class="nav-link" data-scroll-target="#export-your-tim-model-to-python">Export your Tim model to Python</a></li>
@@ -204,10 +209,9 @@ ul.task-list li input[type="checkbox"] {
 <section id="requirements" class="level2">
 <h2 class="anchored" data-anchor-id="requirements">Requirements</h2>
 <ul>
-<li>Be sure QGIS version 3.22.00 or higher is installed.</li>
+<li>Be sure QGIS version 3.28.00 or higher is installed.</li>
 <li>Be sure the <code>gistim</code> Python package is installed (see <a href="./install.html">installation</a> for instructions).</li>
 <li>Download the tutorial material. <a href="https://deltares.thegood.cloud/s/zryWnfjT43Ryoea">Follow this link.</a></li>
-<li>Installation of the QGIS-Tim plugin and the MOD plugin is part of this Tutorial. The necessary ZIP files are included in the tutorial material.</li>
 <li>Internet connections is optional during this Tutorial. It is only required for installation of additional plugins and the use of an online topographic background map.</li>
 </ul>
 </section>
@@ -238,11 +242,7 @@ ul.task-list li input[type="checkbox"] {
 </section>
 <section id="getting-started" class="level2">
 <h2 class="anchored" data-anchor-id="getting-started">Getting Started</h2>
-<p>Let’s first configure the gistim python installation again, to be sure that QGIS can find the gistim software.</p>
 <ol class="example" type="1">
-<li>Open the Deltaforge prompt (search in Windows Start for “Deltaforge Prompt”). A black window pops up.</li>
-<li>In this window type <code>python -m gistim configure</code> and press ENTER.</li>
-<li>You can close this window now.</li>
 <li>Launch QGIS from your START menu, from your desktop or click on …\QGIS3.28.0\bin\qgis-bin.exe.</li>
 </ol>
 <blockquote class="blockquote">
@@ -257,11 +257,11 @@ ul.task-list li input[type="checkbox"] {
 </ol>
 </blockquote>
 <p>We start with the creation of a new QGIS project.</p>
-<ol start="5" class="example" type="1">
+<ol start="2" class="example" type="1">
 <li>From the main menu click on <em>Project</em> and select <em>New</em>.</li>
 </ol>
 <p>The case in this tutorial is located in The Netherlands, so next we select the appropriate projection.</p>
-<ol start="6" class="example" type="1">
+<ol start="3" class="example" type="1">
 <li>From the main menu click on <em>Project</em> and select <em>Properties</em>.</li>
 <li>In the <em>Properties</em> window select the category <em>CRS</em>, search for “EPSG:28992” and you find “Amersfoort / RD New”. Select this option and click the <em>Apply</em> button, followed by the <em>OK</em> button to close the window.</li>
 </ol>
@@ -276,23 +276,32 @@ ul.task-list li input[type="checkbox"] {
 </blockquote>
 <section id="install-plugins" class="level3">
 <h3 class="anchored" data-anchor-id="install-plugins">Install plugins</h3>
-<p>This is the moment to download/import four plugins needed for this tutorial:</p>
+<p>This is the moment to import four plugins needed for this tutorial:</p>
 <ul>
-<li>the QGIS-Tim plugin. The development version imported from ZIP file.</li>
-<li>the iMOD plugin. The development version imported from ZIP file.</li>
-<li>the Value Tool. The official version installed via QGIS (internet connection required).</li>
-<li>the PDOK plugin. The official version installed via QGIS (internet connection required). <br> This plugin gives access to a large database from which we will load the topographic maps and use the navigation option.</li>
+<li>the QGIS-Tim plugin (developed by Deltares).</li>
+<li>the iMOD plugin (developed by Deltares).</li>
+<li>the Value Tool.</li>
+<li>the PDOK plugin. This plugin gives access to a large database from which we will load the topographic maps and use the navigation option.</li>
 </ul>
-<ol start="8" class="example" type="1">
+<p>To install the plugins from QGIS you need an internet connection!</p>
+<blockquote class="blockquote">
+<p>No internet connection? Follow the next steps to import the two Deltares’ plugins from a ZIP file provided in the Tutorial Dataset.</p>
+<ul>
 <li>Go to <em>Plugins</em> from the main menu and select <em>Manage and Install Plugins…</em> to open the plugin window.</li>
 <li>On the left section select <em>Install from ZIP</em>.</li>
-<li>Click the Browse button (<img src="figures/tutorial/button-Qgis-browse.png" class="img-fluid" style="width:4.0%">) and from the tutorial dataset select the ZIP file “QGIS-Tim_Tutorial\QGIS-iMOD-plugin.zip”.</li>
+<li>Click the Browse button (<img src="figures/tutorial/button-Qgis-browse.png" class="img-fluid" style="width:4.0%">) and select the ZIP file “QGIS-Tim_Tutorial\QGIS-iMOD-plugin.zip”.</li>
 <li>Click <em>Install Plugin</em>.</li>
 <li>In the same way, install the QGIS-Tim plugin using the ZIP file “QGIS-Tim_Tutorial\QGIS-Tim-plugin.zip”.</li>
-</ol>
-<p>If you have an internet connection continue with the installation of the next two plugins from the QGIS plugin library.</p>
-<ol start="13" class="example" type="1">
-<li>From the left section, select the group <em>All</em> to see all available plugins.</li>
+</ul>
+</blockquote>
+<p>If you have an internet connection, all four plugins can be downloaded within QGIS.</p>
+<ol start="5" class="example" type="1">
+<li>At the top, find the Plugins menu (~sixth object in the menubar).</li>
+<li>Find "Manage and Install plugins" (~first object in drop-down).</li>
+<li>Find "All" (~first in left section).</li>
+<li>Search for "Qgis-Tim".</li>
+<li>Click "Install Plugin".</li>
+<li>Search for “iMOD” and install it.</li>
 <li>Search for “Value Tool” and install it.</li>
 <li>Search for “PDOK services plugin” and install it.</li>
 <li>Make sure that under <em>Plugins &gt; Manage and Install Plugins &gt; Installed</em> now the 4 added plugins are checked.</li>
@@ -306,7 +315,7 @@ ul.task-list li input[type="checkbox"] {
 <li>PDOK Services Plugin <img src="figures/tutorial/button-PDOK.png" class="img-fluid" style="width:4.0%"></li>
 </ul>
 <p>Further in this Tutorial we will use some default toolbars that might be hidden at the moment. Let’s check that and unhide if necessary.</p>
-<ol start="18" class="example" type="1">
+<ol start="15" class="example" type="1">
 <li>Select <em>View</em> from the main menu and choose <em>Toolbars</em>.</li>
 <li>Be sure the “Advanced Digitizing Toolbar”, the “Snapping Toolbar” and the “Attributes Toolbar” are checked.</li>
 </ol>
@@ -321,10 +330,10 @@ ul.task-list li input[type="checkbox"] {
 <li>Use the browse button (<img src="figures/tutorial/button-Qgis-browse.png" class="img-fluid" style="width:4.0%">) and from the tutorial material select “…\QGIS-Tim_Tutorial\dbase\TopographicMapRijssenhout.png”.</li>
 <li>Click on <em>Add</em> and <em>Close</em> the window.</li>
 <li>If you do not see the map, select the layer “TopographicMapRijssenhout”, click your right mouse button and select “Zoom to Layer(s)”.</li>
-<li>Continue after step 26.</li>
+<li>Continue after step 23.</li>
 </ul>
 </blockquote>
-<ol start="20" class="example" type="1">
+<ol start="17" class="example" type="1">
 <li>If you do have an internet connection click on the PDOK plugin button (<img src="figures/tutorial/button-PDOK.png" class="img-fluid" style="width:4.0%">) to open the “PDOK Services Plugin” window.</li>
 <li>From the tab <em>PDOK Services</em> search for “pastel” and you will find a WMTS type layer called “BTRM Achtergrondkaart WMTS”.</li>
 <li>Select the layer.</li>
@@ -332,25 +341,25 @@ ul.task-list li input[type="checkbox"] {
 <li>Close the PDOK window.</li>
 </ol>
 <p>Our project area is near the town of Rijsenhout so let’s navigate to that town using the PDOK plugin.</p>
-<ol start="25" class="example" type="1">
+<ol start="22" class="example" type="1">
 <li>Type “Rijsenhout” in the PDOK search field, near the PDOK button (<img src="figures/tutorial/button-PDOK-search.png" class="img-fluid" style="width:20.0%">)</li>
 <li>PDOK will find “Rijsenhout, Haarlemmermeer, Noord-Holland”. Click on it and QGIS will fly you to the project location.</li>
 </ol>
 <p>Let’s now open a shape file containing the locations and depths of the bombs.</p>
-<ol start="27" class="example" type="1">
+<ol start="24" class="example" type="1">
 <li>Go to <em>Layer</em> in the main menu, go to <em>Add layer</em> and select <em>Add Vector layer</em>.</li>
 <li>Use the browse button (<img src="figures/tutorial/button-Qgis-browse.png" class="img-fluid" style="width:4.0%">) and from the tutorial material select “…\QGIS-Tim_Tutorial\dbase\bombs.shp”.</li>
 <li>Click on <em>Add</em> and <em>Close</em> the window.</li>
 </ol>
 <p><img src="figures/tutorial/emoji-tip.png" class="img-fluid" style="width:3.0%"> <strong>Tip:</strong> a fast alternative for adding layers: from the menu <em>View &gt; Toolbar</em> add the <em>Manage Layers Toolbar</em> and use the button <img src="figures/tutorial/button-Qgis-VectorLayer.png" class="img-fluid" style="width:4.0%">.</p>
-<ol start="30" class="example" type="1">
+<ol start="27" class="example" type="1">
 <li>In the <em>Layers</em> panel on the left, select the layer “bombs”.</li>
 <li>Click your right mouse button and from the menu select <em>Show Labels</em>.</li>
 <li>You can zoom in and out with the scroll button on your mouse or navigate with the buttons in the main menu: <img src="figures/tutorial/button_zoom-menu.png" class="img-fluid" style="width:40.0%"></li>
 <li>Use <img src="figures/tutorial/button_zoomPan.png" class="img-fluid" style="width:4.0%"> to pan the map with your left mouse button and use <img src="figures/tutorial/button_zoomtolayer.png" class="img-fluid" style="width:4.0%"> to zoom to the extend of the layers/groups selected in the <em>Layers</em> panel.</li>
 </ol>
 <p>Let’s save this project to be able to return to it later or in case of a crash of QGIS.</p>
-<ol start="34" class="example" type="1">
+<ol start="31" class="example" type="1">
 <li>Go to <em>Project</em> in the main menu, select <em>Save As</em> and select a folder and a file name for your project, e.g.&nbsp;“…\QGIS-Tim_Tutorial\Rijsenhout.qgz”</li>
 </ol>
 </section>
@@ -358,29 +367,28 @@ ul.task-list li input[type="checkbox"] {
 <section id="start-your-tim-model" class="level2">
 <h2 class="anchored" data-anchor-id="start-your-tim-model">Start your Tim model<br></h2>
 <p>Now we are ready to activate the QGIS-Tim plugin.</p>
-<ol start="35" class="example" type="1">
+<ol start="32" class="example" type="1">
 <li>Click on the QGIS-Tim plugin button (<img src="figures/tutorial/button-Qgis-tim.png" class="img-fluid" style="width:4.0%">) and the QGIS-Tim panel appears.</li>
-<li>Go to the tab <em>GeoPackage</em>. <br> Here we will create an empty database (geopackage) to store all elements and parameters for the model.</li>
+<li>Go to the tab <em>Model Manager</em>. <br> Here we will create an empty database (GeoPackage) to store all elements and parameters for the model.</li>
 <li>Click the <em>New</em> button to create the GeoPackage and save it for instance in the folder with your tutorial data, e.g.&nbsp;“..\QGIS-Tim_Tutorial\dbase\case-Rijsenhout.gpkg”.</li>
 </ol>
 <p>Your window looks like in <a href="#fig-Panel-QGIS-Tim">Figure&nbsp;2</a>.</p>
 <div id="fig-Panel-QGIS-Tim" class="quarto-figure quarto-figure-center anchored">
 <figure class="figure">
-<p><img src="figures/tutorial/Panel-QGIS-Tim.png" class="img-fluid figure-img" style="width:60.0%"></p>
+<p><img src="figures/tutorial/Panel-QGIS-Tim.png" class="img-fluid figure-img" style="width:50.0%"></p>
 <figcaption class="figure-caption">Figure&nbsp;2: QGIS-Tim panel</figcaption>
 </figure>
 </div>
-<ol start="38" class="example" type="1">
-<li>Check in the <em>Layers</em> panel on the left that your new geopackage is added as a group. <br> A sub group <strong>timml</strong> for the steady state model input, the sub group <strong>ttim</strong> for the transient model input and a series of output formats (vector/mesh/raster).</li>
+<ol start="35" class="example" type="1">
+<li>Check in the <em>Layers</em> panel on the left that your new geopackage is added as a group. <br> A sub group <strong>timml</strong> for the steady state model input and the sub group <strong>ttim</strong> for the transient model input.</li>
 </ol>
 <p>If you had no introduction to the Tim plugin, read the Intermezzo below for a general explanation of the components.</p>
 <blockquote class="blockquote">
 <p><strong>Intermezzo:</strong> <em>introduction Tabs on the Tim panel</em></p>
 <ol type="a">
-<li>GeoPackage: an overview of the elements in your geopackage. In case you switch to transient modelling, an extra column with <em>ttim</em> elements is added.</li>
-<li>Elements: a list of 14 Tim elements from which you can build your model.</li>
-<li>Compute: here you can define your domain and cell size, decide if your model is transient or not and change the output name.</li>
-<li>Extract: open an existing 3d geohydrological model (NC file) and extract the data for your project area.</li>
+<li>Model Manager: an overview of the elements in your geopackage. In case you switch to transient modelling, an extra column with <em>ttim</em> elements is added.</li>
+<li>Elements: a list of at least 16 Tim elements from which you can build your model.</li>
+<li>Results: here you can define your domain and cell size, decide if your model is transient or not and manage the output files.</li>
 </ol>
 </blockquote>
 <p>Now we are ready to define our first steady state model by parameterizing our Aquifer. <br></p>
@@ -388,7 +396,7 @@ ul.task-list li input[type="checkbox"] {
 <section id="model-1-single-aquifer" class="level2">
 <h2 class="anchored" data-anchor-id="model-1-single-aquifer">Model 1: single aquifer</h2>
 <p>We start with a very simple ‘model’, only the parameters of a single aquifer. <br> Important message: all editing of model parameters and model elements you do in the <em>Layers</em> panel on the left!</p>
-<ol start="39" class="example" type="1">
+<ol start="36" class="example" type="1">
 <li>So select the layer “timml Aquifer:Aquifer” on the left.</li>
 <li>Click your right mouse button and from the menu select <em>Attribute Table</em> to open the table in a new window. <br> <strong>NB</strong> Alternative is to press F6 or use the button <em>Open Attribute Table</em> (<img src="figures/tutorial/button-Qgis-OpenAttributeTable.png" class="img-fluid" style="width:3.0%">).</li>
 <li>Start the editing mode with a click on the <em>Toggle Editing Mode</em> button (<img src="figures/tutorial/button-Qgis-AttributeTable-StartEditingMode.png" class="img-fluid" style="width:4.0%">).</li>
@@ -458,20 +466,22 @@ ul.task-list li input[type="checkbox"] {
 </tbody>
 </table>
 <p><strong>NB!</strong> In the real world counting starts with 1. However, Tim is programmed in Python and in Python counting starts with 0. You will get used to it.<br><br> Also be aware that the <em>Aquifer</em> element you just edited is just a table. This is indicated with the icon (<img src="figures/tutorial/button-Qgis-AttributeTable.png" class="img-fluid" style="width:3.0%">) just before the layer name in the left panel. For Tim this means that the properties in this table apply for the full model domain. We will introduce some inhomogeneities later as polygons within that domain.</p>
-<ol start="45" class="example" type="1">
+<ol start="42" class="example" type="1">
 <li>Save all changes with the <em>Save Edits</em> button (<img src="figures/tutorial/button-Qgis-AttributeTable-SaveEdits.png" class="img-fluid" style="width:4.0%">).</li>
 <li>Stop the <em>Editing Mode</em> with a click on the button (<img src="figures/tutorial/button-Qgis-AttributeTable-StartEditingMode.png" class="img-fluid" style="width:4.0%">).</li>
 <li>Close the <em>Attribute Table</em> window with a click on the X in the upper right corner.</li>
-<li>Go to the tab <em>Compute</em> in QGIS-Tim.</li>
+<li>Go to the tab <em>Results</em> in QGIS-Tim.</li>
 <li>Click the button <em>Set to current extent</em>.</li>
+<li>See that the output folder is by default the same as the folder of your geopackage.</li>
+<li>See that from the output type ‘Raster’ is not selected.</li>
 <li>Start the calculation with a click on <em>Compute</em>.</li>
 </ol>
 <p>A black Python.exe window pops up indicating that the TIM calculation started on the background. You can ignore this window but keep it open. Of course you van minimize it. If the calculation was completed successful, you will see this echo in QGIS. <img src="figures/tutorial/Panel-QGIS-Tim-completion.png" class="img-fluid" style="width:80.0%">.</p>
-<p>After the calculation you see that the result is automatically added to a new geopackage, probably called “case-Rijsenhout output”. Results are saved both as mesh and raster. For each format a separate sub group is created. Although these layers / groups are checked, the data is not visible. That is because the geopackage was added last, and QGIS adds layers at the end of the list. Let’s move the layer “pastel” to the background.</p>
-<ol start="51" class="example" type="1">
+<p>After the calculation you see that the result is automatically added to a new geopackage, probably called “case-Rijsenhout output”. Results are saved as vector and/or mesh and raster. For each output format a separate sub group is created. The sub group <em>Raster</em> is empty while the output option <em>Raster</em> was not checked. <br> Although these layers / groups are checked, the data is not visible. That is because the geopackage was added last, and QGIS adds layers at the end of the list. Let’s move the layer “pastel” to the background.</p>
+<ol start="50" class="example" type="1">
 <li>Select the layer “pastel” and drag it with your left mouse button to the bottom of the list of layers.</li>
 </ol>
-<p>The calculation result is now visible and we see a raster with just the value 0, not a very exciting result because no other elements are present yet. Let’s now add a well element.</p>
+<p>The calculation result is now visible and we see a mesh with just the value 0, not a very exciting result because no other elements are present yet. Let’s now add a well element.</p>
 <blockquote class="blockquote">
 <p><strong>Intermezzo:</strong> <em>Mesh and Raster format explained</em></p>
 <ul>
@@ -482,14 +492,14 @@ ul.task-list li input[type="checkbox"] {
 </section>
 <section id="model-2-single-well" class="level2">
 <h2 class="anchored" data-anchor-id="model-2-single-well">Model 2: single well</h2>
-<ol start="52" class="example" type="1">
-<li>First hide the output layers by deselecting both the rasters (case-Rijsenhout-output:raster) and meshes (case-Rijsenhout-output:mesh).</li>
+<ol start="51" class="example" type="1">
+<li>First hide the output layers by deselecting the sub group <em>mesh</em> or even the main group <em>case-Rijsenhout output</em>.</li>
 <li>Go to the tab <em>Elements</em> in QGIS-Tim.</li>
 <li>Click on the element “Well” and a window opens to create a new (vector) layer in QGIS.</li>
 <li>Give the layer a name, e.g.&nbsp;“DewateringWell”.</li>
 </ol>
 <p>See that layer “timml Well:DewateringWell” is added to the timml sub group in your geopackage with ‘point’ as geometry. Also in the ttim sub group an element with the same name is added. This is a table that can store transient well data while referring to the x/y locations in the timml layer. Next step is to add the actual well, both the location and its parameters.</p>
-<ol start="56" class="example" type="1">
+<ol start="55" class="example" type="1">
 <li>Select the layer “timml Well:DewateringWell”.</li>
 <li>Click your right mouse button and select the <em>Toggle Editing Mode</em> (<img src="figures/tutorial/button-Qgis-AttributeTable-StartEditingMode.png" class="img-fluid" style="width:4.0%">).</li>
 <li>To add a new well (feature) to the layer click the <em>Add Point Feature</em> button (<img src="figures/tutorial/button_AddPointFeature.png" class="img-fluid" style="width:4.0%">).</li>
@@ -497,24 +507,23 @@ ul.task-list li input[type="checkbox"] {
 <li>Fill the feature with the values from the example below.</li>
 </ol>
 <p><img src="figures/tutorial/figure_WellFeatureAttributes.png" class="img-fluid" style="width:40.0%"></p>
-<ol start="61" class="example" type="1">
+<ol start="60" class="example" type="1">
 <li>Click <em>OK</em>.</li>
 <li>Click the <em>Toggle Editing</em> button (<img src="figures/tutorial/button-Qgis-AttributeTable-StartEditingMode.png" class="img-fluid" style="width:4.0%">) and if you are asked to save changes and select <em>Save</em>. <br> An alternative way to save your edits is to click the <em>Save Layer Edits</em> button (<img src="figures/tutorial/button_SavelayerEdits.png" class="img-fluid" style="width:4.0%">) and then stop editing with the <em>Toggle Editing</em> button (<img src="figures/tutorial/button-Qgis-AttributeTable-StartEditingMode.png" class="img-fluid" style="width:4.0%">).</li>
 </ol>
 <p>Next step is to rerun the model including the new well.</p>
-<ol start="63" class="example" type="1">
-<li>In QGIS-Tim go to the tab <em>GeoPackage</em> and see that the Well is added.</li>
-<li>Go to the tab <em>Compute</em> and click on <em>Compute</em>.</li>
+<ol start="62" class="example" type="1">
+<li>In QGIS-Tim go to the tab <em>Model Manager</em> and see that the Well is added.</li>
+<li>Go to the tab <em>Results</em> and select also the output format <em>Raster</em>.</li>
+<li>Click on <em>Compute</em> to rerun your model.</li>
 </ol>
-<p>The output in your ouput group “case-Rijsenhout output” is directly overwritten with the new results.</p>
-<ol start="65" class="example" type="1">
-<li>Open the sub group <em>raster</em> and see the created raster “case-Rijsenhout-head_layer_0”.</li>
-</ol>
+<p>The output in your ouput group “case-Rijsenhout output” is directly overwritten with the new results. In the sub group <em>mesh</em> you see the created raster “case-Rijsenhout-head_layer_0”.</p>
 <p>Do you like to see the values of the calculated Head under you mouse?</p>
-<ol start="66" class="example" type="1">
-<li>Deselect the output sub group <em>mesh</em>.</li>
+<ol start="65" class="example" type="1">
+<li>Make the results visible again by, see if the group <em>case-Rijsenhout output</em> and <em>mesh</em> are checked.</li>
+<li>Select the output sub group <em>mesh</em>.</li>
 <li>Select the <em>Value Tool</em> button (<img src="figures/tutorial/button_valuetool.png" class="img-fluid" style="width:4.0%">).</li>
-<li>Hover over the area and in the “Value Tool” panel you see the value within the raster file at your mouse location.</li>
+<li>Hover over the area and in the “Value Tool” panel you see the value within the mesh file at your mouse location.</li>
 </ol>
 <div id="fig-figure_ValueTool-in-QGIS" class="quarto-figure quarto-figure-left anchored">
 <figure class="figure">
@@ -553,10 +562,11 @@ ul.task-list li input[type="checkbox"] {
 <li>From the menu select <em>Open Attribute Table</em> and the table opens in a new window. Once again, press F6 for a quick open of the Attribute Table.</li>
 <li>Start the editing mode with a click on the <em>Toggle Editing Mode</em> button (<img src="figures/tutorial/button-Qgis-AttributeTable-StartEditingMode.png" class="img-fluid" style="width:4.0%">).</li>
 <li>Add three extra aquifers / features; click three times on the <em>Add Feature</em> button (<img src="figures/tutorial/button-AttributeTable-AddFeature.png" class="img-fluid" style="width:15.0%">).</li>
+<li>See that for the new elemenst the <strong>fid</strong> is set to <em>Autogenerate</em>. Be aware that your QGIS probably resorts the layers and brings the existing layer (layer=0) to the botom of your table.</li>
 </ol>
 <p>The Holocene top layer is not a distinguished layer but a resistance on top of layer 0.</p>
-<ol start="78" class="example" type="1">
-<li>Fill the features with the values from the table below:</li>
+<ol start="79" class="example" type="1">
+<li>Fill the features with the values from the table below. <br> <strong>NB</strong> Never change the <strong>fid=1</strong> of the first layer, even if it is not on top of your table.</li>
 </ol>
 <table class="table">
 <colgroup>
@@ -624,24 +634,24 @@ ul.task-list li input[type="checkbox"] {
 </tr>
 </tbody>
 </table>
-<ol start="79" class="example" type="1">
+<ol start="80" class="example" type="1">
 <li>Save your changes and close the window.</li>
-<li>Go to the tab <em>Compute</em> and run the new model with a click on the button <em>Compute</em>.</li>
+<li>Go to the tab <em>Results</em> and run the new model with a click on the button <em>Compute</em>.</li>
 </ol>
 <p>Let’s now check the calculated heads for the 4 layers, first with the <em>Value Tool</em> and then with the <em>Cross section</em> tool.</p>
-<ol start="81" class="example" type="1">
+<ol start="82" class="example" type="1">
 <li>From the layers select the layer “case-Rijsenhout-output:raster” and deselect the “case-Rijsenhout-output:mesh”.</li>
 <li>Activate the <em>Value Tool</em> (<img src="figures/tutorial/button_valuetool.png" class="img-fluid" style="width:4.0%">).</li>
 <li>In the <em>Value Tool</em> panel go to the tab <em>Options</em>.</li>
 <li>For <em>Show Layers</em> choose “Visible layers” and for <em>Show bands</em> choose “Active bands”.</li>
 <li>Return to the tab <em>Table</em> and hoover over the calculated values, especially near your well.</li>
-<li>Activate the <em>iMOD Cross section</em> widget (<img src="figures/tutorial/button_iMOD-Cross-section.png" class="img-fluid" style="width:3.0%">) to create your cross section with the four layers (Need instructions? Go back to step 69 for support). <br> <strong>NB</strong> You don’t need to ‘add’ all four layers separately. Just use the raster file “case-Rijsenhout-head_layer_0” and from the dropdown menu <em>Variable:</em> select the four bands/layers.</li>
+<li>Activate the <em>iMOD Cross section</em> widget (<img src="figures/tutorial/button_iMOD-Cross-section.png" class="img-fluid" style="width:3.0%">) to create your cross section with the four layers (Need instructions? Go back to step 69 for support). <br> <strong>NB</strong> You don’t need to ‘add’ all four layers separately. Just use the raster file (<img src="figures/tutorial/button_Raster.png" class="img-fluid" style="width:3.0%">) “case-Rijsenhout-head_layer_0” and from the dropdown menu <em>Variable:</em> select the four bands/layers.</li>
 </ol>
 </section>
 <section id="model-4-add-a-set-of-sheet-piles" class="level2">
 <h2 class="anchored" data-anchor-id="model-4-add-a-set-of-sheet-piles">Model 4: add a set of sheet piles</h2>
 <p>Now we introduce a new but frequently used element: the sheet pile.</p>
-<ol start="87" class="example" type="1">
+<ol start="88" class="example" type="1">
 <li>Return to the QGIS-Tim panel and go to the tab <em>Elements</em>.</li>
 <li>Click on the element “Leaky Line Doublet”.</li>
 <li>Give the layer a name, e.g.&nbsp;“sheetpile”.</li>
@@ -651,22 +661,23 @@ ul.task-list li input[type="checkbox"] {
 <li>Click <em>OK</em>.</li>
 </ol>
 <p>You probably tried to close the building pit but either your lines cross or do not close actually when zooming in. To close the pit, let’s snap both start and end point together.</p>
-<ol start="94" class="example" type="1">
-<li>First enable the snapping mode with a click on the button (<img src="figures/tutorial/button_EnableSnapping.png" class="img-fluid" style="width:4.0%">).</li>
+<ol start="95" class="example" type="1">
+<li>First enable the snapping mode with a click on the button (<img src="figures/tutorial/button_EnableSnapping.png" class="img-fluid" style="width:4.0%">), available on the Snapping Toolbar.</li>
+<li>Make sure the Tolerance is set to 0.00 (<img src="figures/tutorial/button_ToolbarSnappingTollerance.png" class="img-fluid" style="width:25.0%">) in the Snapping Toolbar.</li>
 <li>Then activate the <em>Vertex Tool</em> with a click on the button <img src="figures/tutorial/button_VertexTool.png" class="img-fluid" style="width:4.0%">.</li>
 <li>Move your mouse to the start point location and when it shows a small circle, click your left mouse button.</li>
 <li>Next, move your mouse towards the end point and you see the snapping active: the end point gets a small fuchsia box.</li>
 <li>Click your left mouse and you see that both vertices now connect.</li>
 </ol>
 <p>Perhaps you are not satisfied with your created building pit.</p>
-<ol start="99" class="example" type="1">
+<ol start="101" class="example" type="1">
 <li>You can play around with other nice options in QGIS to move (<img src="figures/tutorial/button_MoveFeature.png" class="img-fluid" style="width:4.0%">), rotate (<img src="figures/tutorial/button_RotateFeature.png" class="img-fluid" style="width:4.0%">) or scale (<img src="figures/tutorial/button_ScaleFeature.png" class="img-fluid" style="width:4.0%">) your pit.</li>
 <li>End the <em>Toggle Editing Mode</em> with <img src="figures/tutorial/button-Qgis-AttributeTable-StartEditingMode.png" class="img-fluid" style="width:4.0%"> and save your changes.</li>
-<li>In the QGIS-Tim panel go to <em>Compute</em>.</li>
+<li>In the QGIS-Tim panel go to the tab <em>Results</em>.</li>
 <li>Rerun your model and check the calculated heads.</li>
 </ol>
 <p>Disappointed in the effect of the sheet piles on the calculated head? You are right if you expected no major effect because of the shallow penetration in this high permeable thick aquifer. If we would increase the aquitard_c between layers 0 and 1, perhaps we would see more effect of the sheet piles. <br></p>
-<ol start="103" class="example" type="1">
+<ol start="105" class="example" type="1">
 <li>If you dare… try to rerun the model yourself with aquitard_c = 800 (layer 1) and see that the drawdown is limited to the building pit (<a href="#fig-figure_DrawdownConstructionPit">Figure&nbsp;6</a>.)</li>
 <li>Don’t forget to undo this side path and make aquitard_c = 0.5 again for layer 1.</li>
 </ol>
@@ -676,47 +687,43 @@ ul.task-list li input[type="checkbox"] {
 <figcaption class="figure-caption">Figure&nbsp;6: Drawdown within the building pit</figcaption>
 </figure>
 </div>
-<hr>
-</section>
-<section id="how-to-reopen-tim-after-closing-qgis." class="level2">
-<h2 class="anchored" data-anchor-id="how-to-reopen-tim-after-closing-qgis."><img src="figures/tutorial/emoji-exclamation.png" class="img-fluid" style="width:4.0%"> How to reopen Tim after closing QGIS.</h2>
-<p>Before we introduce you another new Tim element we must explain you how to reopen your Tim project after a closure of QGIS. A crash might close QGIS or just a long day of work is a reason to shut down your laptop. Always remember two things:</p>
+<section id="how-to-reopen-tim-after-closing-qgis" class="level3">
+<h3 class="anchored" data-anchor-id="how-to-reopen-tim-after-closing-qgis">How to reopen Tim after closing QGIS</h3>
+<p>Before we introduce you another new Tim element we must explain you how to reopen your Tim project after a closure of QGIS. A crash might close QGIS or just a long day of work is a reason to shut down your laptop Always remember two things:</p>
 <ul>
-<li>your geopackage (*.gpkg) contains the complete set of model features and parameter values. Every time you change a model element, you will remember, you had to save the changes. So the GPKG file is always up to date.</li>
+<li>your geopackage is saved as a *.gpkg file and contains the complete set of model features and parameter values. Every time you change a model element, you will remember, you had to save the changes. So the GPKG file is always up to date.</li>
 <li>your QGIS project is saved in the *.qgz file and contains all the added layers and their format (legend, line color, labels etc.).</li>
 </ul>
 <p>Now let’s experience what it is to close and open QGIS including your QGIS-Tim project.</p>
-<ol start="105" class="example" type="1">
+<ol start="107" class="example" type="1">
 <li>Save your QGIS session (Ctrl+S).</li>
 <li>Select <em>Project</em> from the main menu and choose <em>New</em>.</li>
 <li>Again select <em>Project</em> but now choose <em>Open Recent</em> and find your own project in the list.</li>
-<li>Open the QGIS-Tim plugin with a click on <img src="figures/tutorial/button-Qgis-tim.png" class="img-fluid" style="width:4.0%">.</li>
 </ol>
-<p><em>The Tim panel is empty but why?</em> <br> It is not possible for the plugin to read your geopackage as it is loaded in the layer list. To load your Tim project you <em>must</em> open the geopackage from the Tim panel. This will add the geopackage to the Layers panel next to the existing one with the same name, which makes it at least confusing. We better remove the original Geopackage first before opening it with Tim. Disadvantage is that we also remove the calculated results including all your formatting efforts. The developers try to fix that in the next version. <br> The following steps are the right way to go for now:</p>
-<ol start="109" class="example" type="1">
-<li>Select layer <em>case-Rijsenhout input</em> in the panel on the left in order to remove it.</li>
-<li>Click your right mouse button and select <em>Remove Group…</em> and click <em>OK</em>.</li>
-<li>In the same way remove layer <em>case-Rijsenhout output</em>.</li>
-<li>In the QGIS-Tim panel on the tab <em>GeoPackage</em> click <em>Open</em> and open the GPKG file containing your model.</li>
-<li>Your geopackage is now added to the Tim panel and the Layers list. Don’t forget to move down the background layer “pastel”.</li>
+<p><em>The Tim panel is empty but why?</em> <br> It is not possible for the plugin to automaticcaly read your geopackage as it is loaded in the <em>Layers</em> panel. But there is good news. QGIS-Tim added a hidden line to your QGIS project file *.qgz. This line contains the full path to your last active geopackage file *.gpkg. Based on this information QGIS-Tim can restore your last active Tim project.</p>
+<ol start="110" class="example" type="1">
+<li>In the tab <em>Model Manager</em> click the button <em>Restore</em>.</li>
+<li>A window pops up asking you if you agree to restore the last active project.</li>
+<li>Click <em>Yes</em> and you see the <em>Model Manager</em> is filled with all project information.</li>
 </ol>
-<hr>
+<p>In the backgorund the plugin first removes all layers and than opens the geopackage again. You did not see it, did you? It happend in a blink of an eye.</p>
+</section>
 </section>
 <section id="model-5-add-infiltration-of-drainwater" class="level2">
 <h2 class="anchored" data-anchor-id="model-5-add-infiltration-of-drainwater">Model 5: add infiltration of drainwater</h2>
-<p>To prevent damage on the private properties caused by the dewatering, the authorities demand 50% of the drained flux to be infiltrated. For the infiltration a horizontal well of 400 m is used. In Tim this element is called “Line Sink Ditch”. Let’s add this element just along the Aalsmeerderweg southeast of the project area.</p>
-<ol start="114" class="example" type="1">
+<p>To prevent damage on the private properties caused by the dewatering, the authorities demand 50% of the drained flux to be infiltrated. For the infiltration a horizontal well of 400 m is used. In Tim this element is called “Line Sink Ditch”. Let’s add this element just along the road (Aalsmeerderweg) southeast of the project area.</p>
+<ol start="113" class="example" type="1">
 <li>On the tab <em>Elements</em> in QGIS-Tim click on the element “Line Sink Ditch”.</li>
 <li>Give the layer a name, e.g.&nbsp;“InfiltrationWell”.</li>
 </ol>
-<p>See that layer “timml Line Sink Ditch:InfiltrationWell” is added to the timml sub group in your geopackage with ‘line’ as geometry. For the transient sum a table with the same name is added to the ttim sub group. Next step is to add the location of the well and its capacity.</p>
-<ol start="116" class="example" type="1">
+<p>See that layer “timml Line Sink Ditch:InfiltrationWell” is added to the timml sub group in your geopackage with ‘line’ as geometry. For the transient version of the model a table with the same name is added to the ttim sub group. Next step is to add the location of the horizontal well and its capacity.</p>
+<ol start="115" class="example" type="1">
 <li>Click the *Measure Line” button (<img src="figures/tutorial/button_MeasureLine.png" class="img-fluid" style="width:4.0%">) from the “Attributes Toolbar”.</li>
-<li>With your left mouse button try to get an idea what a distance of 400 m. looks like. Close the window.</li>
+<li>With your left mouse button try to get an idea what a distance of 400 m along the road looks like. Close the window.</li>
 <li>Select the layer “timml Line Sink Ditch:InfiltrationWell”.</li>
 <li>Start editing with the <em>Toggle Editing Mode</em>.</li>
 <li>Use the <em>Add Line Feature</em> button (<img src="figures/tutorial/button_AddLineFeature.png" class="img-fluid" style="width:4.0%">) to draw a 400 m line (click left to start, click right to close).</li>
-<li>Fill these feature within the table: discharge = -1000 (negative abstraction is into the model), resistance = 1, width = 1, layer = 0! not <em>NULL</em> ;-). By default order = 4.</li>
+<li>Fill these feature within the table: discharge = -1000 (negative abstraction is flux into the model), resistance = 1, width = 1, layer = 0! not <em>NULL</em> ;-). By default order = 4.</li>
 <li>Click <em>OK</em>.</li>
 <li>Stop editing the layer, save your changes.</li>
 <li>Rerun the model.</li>
@@ -732,11 +739,16 @@ ul.task-list li input[type="checkbox"] {
 <section id="model-6-add-observation-points" class="level2">
 <h2 class="anchored" data-anchor-id="model-6-add-observation-points">Model 6: add observation points</h2>
 <p>We have the Value Tool and the Cross section tool to check for calculated values in the rasters. Besides that, Tim has the opportunity to add observation points automatically providing you with the calculated heads.</p>
-<ol start="126" class="example" type="1">
-<li>On the tab <em>Elements</em> in QGIS-Tim click on the element “Observation”.</li>
+<ol start="125" class="example" type="1">
+<li>On the tab <em>Elements</em> in QGIS-Tim click on the element “Head Observation”.</li>
 <li>Give the layer a name, e.g.&nbsp;“Piezometers”.</li>
-<li>Start editing with the <em>Toggle Editing Mode</em> and use <em>Add Point Feature</em> button (<img src="figures/tutorial/button_AddPointFeature.png" class="img-fluid" style="width:4.0%">) to add 5 points in line with 1 really close to the dewatering well (see <a href="#fig-figure_ObservationsLocations">Figure&nbsp;8</a>).</li>
-<li>Save your changes and rerun the model.</li>
+<li>Select the new layer “timml Head Observation:Piezometers”.</li>
+<li>Start editing with the <em>Toggle Editing Mode</em> and use <em>Add Point Feature</em> button (<img src="figures/tutorial/button_AddPointFeature.png" class="img-fluid" style="width:4.0%">).</li>
+<li>Click with your left mouse button to place a point near point A.<br>
+</li>
+<li>In the poped up window fill in Label = A and click <em>OK</em>.</li>
+<li>Go to the layer “timml Head Observation:Piezometers”, click your right mouse button and activate “<img src="figures/tutorial/icon-showlabels.png" class="img-fluid" style="width:4.0%"> show labels”</li>
+<li>Add point B close to the dwatering well (<a href="#fig-figure_ObservationsLocations">Figure&nbsp;8</a>).</li>
 </ol>
 <div id="fig-figure_ObservationsLocations" class="quarto-figure quarto-figure-center anchored">
 <figure class="figure">
@@ -744,18 +756,28 @@ ul.task-list li input[type="checkbox"] {
 <figcaption class="figure-caption">Figure&nbsp;8: Observation locations (<em>A</em>-<em>E</em>) together with other Tim elements</figcaption>
 </figure>
 </div>
+<p>Are you tired of the pop-up window every time you add a point? There is an option to add points C to E in one serie and fill in the labels afterwards.</p>
+<ol start="133" class="example" type="1">
+<li>On the tab <em>Model Manager</em>, in the lowest section, check the option “Suppress attribute form pop-up after feature creation”.</li>
+<li>Place points C to E.</li>
+<li>Open the Attribute Table from layer “timml Head Observation:Piezometers” and fill in the Labels C to E.</li>
+<li>Save your changes and stop the editing mode.</li>
+<li>Compute the model again.</li>
+</ol>
 <p>The observed values are saved in a new layer under the existing group “case-Rijsenhout output” and sub group “vector”.</p>
-<ol start="130" class="example" type="1">
-<li>In this sub group select the layer “case-Rijsenhout-timml Observation:Piezometers” and check the calculated values within this layer by opening the Attribute Table (F6).</li>
+<ol start="138" class="example" type="1">
+<li>In this sub group select the layer “case-Rijsenhout-timml Head Observation:Piezometers” and check the calculated values within this layer by opening the Attribute Table (F6).</li>
 <li>Close the Attribute Table.</li>
 </ol>
+<section id="draw-contour-lines" class="level3">
+<h3 class="anchored" data-anchor-id="draw-contour-lines">Draw Contour Lines</h3>
 <p>One way of displaying the calculated results is still missing: contour lines.</p>
-<ol start="132" class="example" type="1">
-<li>In QGIS-Tim go to the tab <em>Compute</em>.</li>
+<ol start="140" class="example" type="1">
+<li>In QGIS-Tim go to the tab <em>Results</em>.</li>
 <li>In the section <em>Contour</em> select layer “case-Rijsenhout-head_layer_0”.</li>
-<li>Define the contours from -9 to -5 with an increment of 0.10 and click <em>Export contours</em>.</li>
+<li>Define the contours from -9 to -5 with an increment of 0.10 and click <em>Redraw contours</em>.</li>
 </ol>
-<p>A layer with your contours is saved in the group “case-Rijsenhout-output:vector”. Your map hopefully looks like <a href="#fig-figure_Contourlines">Figure&nbsp;9</a>. If not, try to change the contour settings and create a better contour map.</p>
+<p>A layer with your contours is saved in the group “case-Rijsenhout-output:vector”. Your map hopefully looks like <a href="#fig-figure_Contourlines">Figure&nbsp;9</a>. If not, try to change the contour settings and create a better contour map or check the layer so it will be displayed.</p>
 <div id="fig-figure_Contourlines" class="quarto-figure quarto-figure-center anchored">
 <figure class="figure">
 <p><img src="figures/tutorial/figure_Contourlines.png" class="img-fluid figure-img" style="width:90.0%"></p>
@@ -763,16 +785,17 @@ ul.task-list li input[type="checkbox"] {
 </figure>
 </div>
 </section>
+</section>
 <section id="model-7-determine-the-influence-of-the-nearby-lake" class="level2">
 <h2 class="anchored" data-anchor-id="model-7-determine-the-influence-of-the-nearby-lake">Model 7: determine the influence of the nearby lake</h2>
 <p>East of the project area there is a large lake. What will be the influence of this lake? Let’s find out. <br> In Tim a lake is added as an inhomogeneity within the total model domain. This domain is described in table “timml Aquifer:Aquifer” we filled in with the first model.</p>
-<ol start="135" class="example" type="1">
+<ol start="143" class="example" type="1">
 <li>On the tab <em>Elements</em> in QGIS-Tim click on the element “Polygon Semi-Confined Top”.</li>
 <li>Give the layer a name, e.g.&nbsp;“Lake” and find out that layer “timml Polygon Semi-Confined Top:Lake” is added to the geopackage.</li>
 <li>Start editing with the <em>Toggle Editing Mode</em> and use <em>Add Polygon Feature</em> button (<img src="figures/tutorial/button_AddPolygonFeature.png" class="img-fluid" style="width:4.0%">) to add the Lake contour. <br> <strong>NB</strong> Try to minimize the number of segments because each segment slows down the calculations. With QGIS it is tempting to use detail but the influence of detail on the outcome is small.</li>
 <li>Fill the Lake feature with the following parameters: aquitard_c = 500, semiconf_top = -7 (bottom of the Lake) and semiconf_head = -2 (water level).</li>
 <li>Save your changes and rerun the model.</li>
-<li>Analyse the results and perhaps create contour lines from the tab “Compute”.</li>
+<li>Analyse the results and perhaps create contour lines from the tab “Results”.</li>
 </ol>
 <div id="fig-figure_Contourlines02" class="quarto-figure quarto-figure-center anchored">
 <figure class="figure">
@@ -781,39 +804,39 @@ ul.task-list li input[type="checkbox"] {
 </figure>
 </div>
 <p>You can not miss the effect of the Lake in this calculation. In many cases you like to analyse or even save this difference. Let’s see how we can use Tim and QGIS to isolate the effect. Therefor we rerun the model without the Lake and rename the output.</p>
-<ol start="141" class="example" type="1">
-<li>In QGIS-Tim go to the tab <em>Geopackage</em>.</li>
+<ol start="149" class="example" type="1">
+<li>In QGIS-Tim go to the tab <em>Model Manager</em>.</li>
 <li>In the list of Steady State elements switch off “timml Polygon Semi-Confined Top:Lake”.</li>
-<li>Go to the tab <em>Compute</em>.</li>
+<li>Go to the tab <em>Results</em>.</li>
 <li>Click the button <em>Set path as …</em> and change the name of the output, e.g.&nbsp;“case-Rijsenhout-NoLake”.</li>
 <li>Click <em>Compute</em> to run the model without the Lake.</li>
 </ol>
 <p>The new results are added as new layer to the project. Check for instance sub group “raster” under the group “case-Rijsenhout output”. Now we use QGIS to calculate the head difference for layer 0. For raster calculations we prefer <em>Raster Calculator</em> over the <em>Mesh Calculator</em> in QGIS.</p>
-<ol start="146" class="example" type="1">
+<ol start="154" class="example" type="1">
 <li>From the QGIS main menu <em>Raster</em> select the tool <em>Raster Calculator</em> and the tool window opens.</li>
 <li>In the section <em>Raster Calculator Expression</em> you can create an expression using the elements from <em>Raster Bands</em> and <em>Operators</em>. Create this expression: “case-Rijsenhout-head_layer_001 - case-Rijsenhout-NoLake-head_layer_001”.</li>
 <li>In <em>Output layer</em> give a new name for this new GeoTIFF file, e.g.&nbsp;“head-effect-lake”.</li>
 <li>Click <em>OK</em> to start the calculation and see that the GeoTIFF file is added as a layer.</li>
 <li>In the properties of layer “head-effect-lake” go to the section <em>Symbology</em> and set the <em>Render type</em> to “Singelband pseudocolor”.</li>
 <li>See that the difference in head is maximum 3 meter.</li>
-<li>In <em>Geopackage</em> check again the Lake element.</li>
-<li>In <em>Compute</em> reset the path to the old name.</li>
+<li>In <em>Model Manager</em> check again the Lake element.</li>
+<li>In <em>Results</em> reset the path to the old name.</li>
 </ol>
 </section>
 <section id="model-8-abstraction-effect-over-time" class="level2">
 <h2 class="anchored" data-anchor-id="model-8-abstraction-effect-over-time">Model 8: abstraction effect over time</h2>
 <p>Now you are ready for the last step: make your model transient. We keep it simple: we run the model for 30 days and see the increasing effect of the well.</p>
-<ol start="154" class="example" type="1">
-<li>In <em>Compute</em> within the <em>output</em> section change “steady state” into “transient”.</li>
-<li>Go to <em>Geopackage</em> and see that only 5 elements have a transient component.</li>
+<ol start="162" class="example" type="1">
+<li>In <em>Results</em> within the <em>output</em> section change “steady state” into “transient”.</li>
+<li>Go to <em>Model Manager</em> and see that only 5 elements have a transient component.</li>
 </ol>
 <p>By selecting the “transient” option, columns containing extra parameters necessary for a transient model have been unhidden now. First of all we see it in the layer “timml Aquifer:Aquifer” where columns “storage” and “porosity are visible now.</p>
-<ol start="156" class="example" type="1">
+<ol start="164" class="example" type="1">
 <li>In your geopackage select the layer “timml Aquifer:Aquifer”.</li>
 <li>Open its table, start the editing mode and for every layer set both acquifer_s and acquitard_s to 0.001. Acquitard_s (layer 0) = 0.25. You can use copy and paste to do it quickly.</li>
 </ol>
 <p><strong>NB!</strong> In transient mode, Tim can not handle aquitard with zero thickness so let’s set the aquitard thickness to 0.1 m</p>
-<ol start="158" class="example" type="1">
+<ol start="166" class="example" type="1">
 <li>Change the values in the column “aquifer_top” to -17.0, -22.1, -27.1 and -47.1 m.</li>
 <li>In your geopackage select the layer “ttim Temporal Settings:Aquifer” to define the temporal properties of the model.</li>
 <li>Open its table, start the editing mode and add a new feature.</li>
@@ -824,8 +847,8 @@ ul.task-list li input[type="checkbox"] {
 <li>Save and Close the table.</li>
 </ol>
 <p>For the observations we can define a different set of output moments.</p>
-<ol start="166" class="example" type="1">
-<li>In your geopackage select the layer “ttim Observation:Piezometers”.</li>
+<ol start="174" class="example" type="1">
+<li>In your geopackage select the layer “ttim Head Observation:Piezometers”.</li>
 <li>Open its table, start the editing mode and add 10 features / periods (click 10 times “Add feature”).</li>
 <li>In the column “time” add the moments 1,2,3,4,5,10,15,20,25 and 30.</li>
 <li>Save and Close the table.</li>
@@ -836,24 +859,24 @@ ul.task-list li input[type="checkbox"] {
 <li>Detailed: a well can be switched on and off multiple times within the modelled period. Parameters are set in the transient part of the model, so in “ttim Well:DewateringWell”.</li>
 </ul>
 <p>In this tutorial we show you the simple version.</p>
-<ol start="170" class="example" type="1">
+<ol start="178" class="example" type="1">
 <li>In your geopackage select the layer “timml Well:DewateringWell”.</li>
 <li>Open its table, start the editing mode and see that columns with time dependent parameters are visible now.</li>
 <li>Switch off the Steady State abstraction, make discharge = 0.</li>
 <li>Switch on the Transient abstraction: time_start = 2, time_end = 30, discharge_transient = 2000, caisson_radius = 1.</li>
 <li>Save your changes.</li>
-<li>Compute your transient model in the tab <em>Compute</em>.</li>
+<li>Compute your transient model in the tab <em>Results</em>.</li>
 </ol>
-<p>In case of a successful calculation a new layer is added to your Vector output: case-Rijsenhout-ttim Observation:Piezometers. This layer contains transient data which is indicated with the clock icon right from the layer name. There are 2 ways to visualize these calculated heads in the observations point a) animation over time and b) timeseries at location.</p>
-<ol start="176" class="example" type="1">
+<p>In case of a successful calculation a new layer is added to your Vector output: case-Rijsenhout-ttim Head Observation:Piezometers. This layer contains transient data which is indicated with the clock icon right from the layer name. There are 2 ways to visualize these calculated heads in the observations point a) animation over time and b) timeseries at location.</p>
+<ol start="184" class="example" type="1">
 <li>For the animation over time, activate the <em>Temporal Control Panel</em> with the button <img src="figures/tutorial/button_TemporalControllerPanel.png" class="img-fluid" style="width:4.0%"> on the Map Navigation Toolbar.</li>
 <li>For timeseries at location activate the Timeseries panel with the <em>Timeseries</em> button (<img src="figures/tutorial/button_iMOD-TimeSeries.png" class="img-fluid" style="width:4.0%">) on the iMOD Toolbar.</li>
-<li>Be sure that “case-Rijsenhout-ttim Observation:Piezometers” is checked and “case-Rijsenhout-timml Observation:Piezometers” is unchecked.</li>
+<li>Be sure that “case-Rijsenhout-ttim Head Observation:Piezometers” is checked and “case-Rijsenhout-timml Head Observation:Piezometers” is unchecked.</li>
 <li>In the Temporal Controller panel click the green play button (<img src="figures/tutorial/button_TemporalControllerPanel-menu.png" class="img-fluid" style="width:14.0%">). Navigation buttons appear.</li>
 <li>Increase the <em>Step</em> to 16 hours and start the animation with a click on the <em>Play</em> button (<img src="figures/tutorial/button_TemporalControler-play.png" class="img-fluid" style="width:4.0%">).</li>
 </ol>
 <p>Only the first few days you see most prominent drawdown. Let’s now display the timeseries at the point of your mouse with data from the mesh.</p>
-<ol start="181" class="example" type="1">
+<ol start="189" class="example" type="1">
 <li>Go to the iMOD Time Series panel.</li>
 <li>Be sure the layer “case-Rijsenhout-head_layer_0” is selected.</li>
 <li>For “variable:” select <em>head</em> and for “layers:” select <em>0</em>.</li>
@@ -863,8 +886,8 @@ ul.task-list li input[type="checkbox"] {
 <li>Finally click the <em>Plot</em> button and the 3 timeseries are added to the chart.</li>
 </ol>
 <p>In the same way you can display the time series from the Observations.</p>
-<ol start="188" class="example" type="1">
-<li>In the iMOD time series panel select the layer “case-Rijsenhout-ttim Observation:Piezometers”.</li>
+<ol start="196" class="example" type="1">
+<li>In the iMOD time series panel select the layer “case-Rijsenhout-ttim Head Observation:Piezometers”.</li>
 <li>For “ID column:” select <em>label</em> and for “Variable:” select <em>head_layer0</em>. Don’t forget to <strong>deselect <em>fid</em></strong>.</li>
 <li>Click the button <em>Select Points</em> and draw a box with your mouse to select one or more observation points.</li>
 <li>Click the <em>Plot</em> button and the selected timeseries are added to the chart.</li>
@@ -876,7 +899,7 @@ ul.task-list li input[type="checkbox"] {
 </figure>
 </div>
 <p>Before closing the display we change the line properties and save the graph as a PNG file.</p>
-<ol start="192" class="example" type="1">
+<ol start="200" class="example" type="1">
 <li>Select the single time series for the observation point closest to your dewatering well. The color of the line is now visible in the field next to the button <em>Line Color</em>.</li>
 <li>Change the color to red.</li>
 <li>Select the timeseries with the most shallow timeseries and change the color to green.</li>
@@ -889,8 +912,8 @@ ul.task-list li input[type="checkbox"] {
 <section id="export-your-tim-model-to-python" class="level2">
 <h2 class="anchored" data-anchor-id="export-your-tim-model-to-python">Export your Tim model to Python</h2>
 <p>For scenario calculation or sensitivity analysis you probably want to switch from QGIS to Python for efficiency reasons. In this tutorial we only show you the first step: export your model to a Python file (*.py). Your Tim model is just a set of elements (points, lines, polygons) and its parameters so the Python file is not very large.</p>
-<ol start="199" class="example" type="1">
-<li>In QGIS-Tim go to the tab <em>GeoPackage</em>.</li>
+<ol start="207" class="example" type="1">
+<li>In QGIS-Tim go to the tab <em>Model Manager</em>.</li>
 <li>Click the button <em>Convert GeoPackage to Python script</em> and you can save the *.py file wherever you like.</li>
 <li>Check the content of the file with you text editor (e.g.&nbsp;Notepad).</li>
 </ol>
