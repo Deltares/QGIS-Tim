@@ -522,7 +522,7 @@ table {
 <p>Now we are ready to activate the QGIS-Tim plugin.</p>
 <ol start="32" class="example" type="1">
 <li>Click on the QGIS-Tim plugin button (<img src="figures/tutorial/button-Qgis-tim.png" class="img-fluid" style="width:4.0%">) and the QGIS-Tim panel appears.</li>
-<li>Go to the tab <em>GeoPackage</em>. <br> Here we will create an empty database (geopackage) to store all elements and parameters for the model.</li>
+<li>Go to the tab <em>Model Manager</em>. <br> Here we will create an empty database (geopackage) to store all elements and parameters for the model.</li>
 <li>Click the <em>New</em> button to create the GeoPackage and save it for instance in the folder with your tutorial data, e.g.&nbsp;“..\QGIS-Tim_Tutorial-TheHague\case-TheHague.gpkg”.</li>
 </ol>
 <p>Your window looks like in <a href="#fig-Panel-QGIS-Tim_TheHague">Figure&nbsp;4</a>.</p>
@@ -538,12 +538,11 @@ table {
 <p>If you had no introduction to the Tim plugin, read the Intermezzo below for a general explanation of the components.</p>
 <blockquote class="blockquote">
 <p><strong>Intermezzo:</strong> <em>introduction Tabs on the Tim panel</em></p>
-<ol type="a">
-<li>GeoPackage: an overview of the elements in your geopackage. In case you switch to transient modelling, an extra column with <em>ttim</em> elements is added.</li>
-<li>Elements: a list of 14 Tim elements from which you can build your model.</li>
-<li>Compute: here you can define your domain and cell size, decide if your model is transient or not and change the output name.</li>
-<li>Extract: open an existing 3d geohydrological model (NC file) and extract the data for your project area.</li>
-</ol>
+<ul>
+<li>Model Manager: an overview of the elements in your geopackage. In case you switch to transient modelling, an extra column with <em>ttim</em> elements is added.</li>
+<li>Elements: a list of at least 16 Tim elements from which you can build your model.</li>
+<li>Results: here you can define your domain and cell size, decide if your model is transient or not and manage the output files.</li>
+</ul>
 </blockquote>
 <p>Let’s save this project to be able to return to it later or in case of a crash of QGIS.</p>
 <ol start="36" class="example" type="1">
@@ -821,7 +820,7 @@ table {
 <h2 class="anchored" data-anchor-id="computing-the-groundwater-head-drawdown">Computing the groundwater head drawdown</h2>
 <ol start="68" class="example" type="1">
 <li>Zoom in or out to desired domain for which you want to see the model results.</li>
-<li>In the QGIS-Tim panel select the tab <em>Compute</em>.</li>
+<li>In the QGIS-Tim panel select the tab <em>Results</em>.</li>
 <li>Select the button <em>Set to current extent</em> to define the Domain.</li>
 <li>Grid spacing will follow automatically but for now make the results mesh more dense by changing “Grid spacing” to 3.00 m.</li>
 <li>In the “Output” section give the name of the file where you want to store the results.</li>
@@ -893,7 +892,7 @@ table {
 <ol start="94" class="example" type="1">
 <li>In the input group select layer <em>timml Aquifer:…</em></li>
 <li>Open the <em>Attrribute Table</em> (F6) and change the value for “aquitard_c” in layer 1 into 200 d.</li>
-<li>In the QGIS-Tim panel go to the tab <em>Compute</em> and change the name of the output, e.g.&nbsp;case-TheHague_v1.</li>
+<li>In the QGIS-Tim panel go to the tab <em>Results</em> and change the name of the output, e.g.&nbsp;case-TheHague_v1.</li>
 <li>Click <em>Compute</em> to run variant 1.</li>
 </ol>
 <p>Check in the <em>Layers</em> panel and see that the results are not overwritten but added to the groups, e.g.&nbsp;layer <em>case-TheHague_v1-timml Observation:observations</em> is added to the group <em>Vector</em>.</p>
@@ -977,7 +976,7 @@ table {
 <ol start="99" class="example" type="1">
 <li>In layer <em>timml Aquifer:…</em> reset the value for “aquitard_c” in layer 1 to the default of 40 d.</li>
 <li>In layer <em>timml Leaky Line Doublet:…</em> change the value for “resistance” into 5000 d (500x10).</li>
-<li>In the QGIS-Tim panel go to the tab <em>Compute</em> and change the name of the output, e.g.&nbsp;case-TheHague_v2.</li>
+<li>In the QGIS-Tim panel go to the tab <em>Results</em> and change the name of the output, e.g.&nbsp;case-TheHague_v2.</li>
 <li>Click <em>Compute</em> to run variant 2.</li>
 <li>Fill in your calculated heads at the observation locations in the table above.</li>
 </ol>
@@ -994,7 +993,7 @@ table {
 <p>How to copy the sheet pile wall to an extra <em>Leaky Line Doublet</em> element?</p>
 <ol start="104" class="example" type="1">
 <li>In the QGIS-Tim panel go to the tab <em>Elements</em> and add a second <em>Leaky Line Doublet</em> and give it a name, e.g.&nbsp;“sheet_pile_L1”</li>
-<li>Go to the tab <em>GeoPackage</em> and see that the element separately is added to the list. Here is can switch this element on / off for a calculation.</li>
+<li>Go to the tab <em>Model Manager</em> and see that the element separately is added to the list. Here is can switch this element on / off for a calculation.</li>
 <li>In the <em>Layers</em> panel select the new layer <em>timml Leaky Line Doublet:sheet_pile_l1</em>.</li>
 <li>Open its <em>Attribute Table</em> (F6) and start the editing mode. The table is empty.</li>
 <li>Also open the <em>Attribute Table</em> of the first <em>Leaky Line Doublet</em> and select the existing element.</li>
@@ -1020,7 +1019,7 @@ table {
 <p>We conclude that the drawdown of groundwater level around the building pit with deep sheet piles decreased significantly.</p>
 <p>Next also alternatives with a shallow concrete cut-off wall will be calculated for a shallow and a deep wall. In that case we have R=1000 d, but note that the input in the attribute than becomes k*R=10000 due to the error in Tim.</p>
 <ol start="115" class="example" type="1">
-<li>After changing the value in attribute tables of wall elements, we can compute again, switching off and on the element for the deep wall section (tab Geopackage on the QGIS-Tim panel).</li>
+<li>After changing the value in attribute tables of wall elements, we can compute again, switching off and on the element for the deep wall section (tab “Model Manager” on the QGIS-Tim panel).</li>
 </ol>
 <p>Again extra calculation is needed to adjust well extractions for drawdown in the building pit.<br> Results of calculations are gathered in the following table, showing extractions and head outside the wall at South East monitoring position.</p>
 <div id="tbl-CalculatedHeads2Variants" class="anchored">
@@ -1092,7 +1091,7 @@ table {
 <h2 class="anchored" data-anchor-id="using-python-for-sensitivity-analyses-with-a-qgis-tim-model">Using Python for sensitivity analyses with a QGIS-Tim model</h2>
 <p>QGIS-Tim offers the opportunity to export the geopackage of the created model to a Python script. This makes it possible to use the script for other ways of calculation, e.g.: - Calculation of model results in other Python environments, like Anaconda or Spyder or in a notebook. - Use in other Python oriented programs, like the Probabilistic Toolkit.</p>
 <ol start="119" class="example" type="1">
-<li>If input of all elements is ready and the model has proved to run properly, go to the QGIS-Tim panel and the tab <em>Geopackage</em>.</li>
+<li>If input of all elements is ready and the model has proved to run properly, go to the QGIS-Tim panel and the tab <em>Model Manager</em>.</li>
 <li>At the bottom press the button <em>Convert GeoPackage to Python script</em>.</li>
 <li>After a short period for translation in Python the explorer panel appears where you can enter the name you want to give for the python file, e.g.&nbsp;“case-TheHague.py” and store it in a directory you choose to save your work. The file looks like:</li>
 </ol>
@@ -1299,8 +1298,8 @@ table {
 <h2 class="anchored" data-anchor-id="creating-a-transient-model">Creating a transient model</h2>
 <p>At this moment, it is not possible to create a transient (time dependent) model with correct answers to case studies with sheetpile walls. The TTim solution needs to be updated. <br> Nevertheless in this section we want to guide you on setting up a basic transient model. <br></p>
 <ol start="155" class="example" type="1">
-<li>Return to QGIS and in the QGIS-Tim panel go to the tab <em>Compute</em>.</li>
-<li>In the section <em>Output</em> turn on the option “Transient”.</li>
+<li>Return to QGIS and in the QGIS-Tim panel go to the tab <em>Model Manager</em>.</li>
+<li>In the section <em>Model Setup</em> turn on the option “Transient”.</li>
 <li>In the panel <em>Layers</em> select <em>timml Aquifer:Aquifer</em>.</li>
 </ol>
 <p>As can be seen in <a href="#fig-Panel-TimmlAquiferAttrTable_v02">Figure&nbsp;31</a>, the matrix of properties is extended in the transient mode with cells for transient parameters, like specific storage coefficients (aquitard_s, and aquifer_s) and porosities (aquitard_npor and aquifer_npor). Take care that specific storage coefficient is a storage per meter layer thickness. In older MWell course material a speadsheet is presented for estimation of coefficient values but there we calculated storage coefficients per whole layer. Those values should be divided by layer thickness.</p>

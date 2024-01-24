@@ -830,16 +830,17 @@ ul.task-list li input[type="checkbox"] {
 <h2 class="anchored" data-anchor-id="model-8-abstraction-effect-over-time">Model 8: abstraction effect over time</h2>
 <p>Now you are ready for the last step: make your model transient. We keep it simple: we run the model for 30 days and see the increasing effect of the well.</p>
 <ol start="162" class="example" type="1">
-<li>In <em>Results</em> within the <em>output</em> section change “steady state” into “transient”.</li>
-<li>Go to <em>Model Manager</em> and see that only 5 elements have a transient component.</li>
+<li>In the QGIS-Tim panel go to the tab <em>Model Manager</em>.</li>
+<li>In the section <em>Model Setup</em> turn on the option “Transient”.</li>
+<li>See below that only 5 elements have a transient component.</li>
 </ol>
 <p>By selecting the “transient” option, columns containing extra parameters necessary for a transient model have been unhidden now. First of all we see it in the layer “timml Aquifer:Aquifer” where columns “storage” and “porosity are visible now.</p>
-<ol start="164" class="example" type="1">
+<ol start="165" class="example" type="1">
 <li>In your geopackage select the layer “timml Aquifer:Aquifer”.</li>
 <li>Open its table, start the editing mode and for every layer set both acquifer_s and acquitard_s to 0.001. Acquitard_s (layer 0) = 0.25. You can use copy and paste to do it quickly.</li>
 </ol>
 <p><strong>NB!</strong> In transient mode, Tim can not handle aquitard with zero thickness so let’s set the aquitard thickness to 0.1 m</p>
-<ol start="166" class="example" type="1">
+<ol start="167" class="example" type="1">
 <li>Change the values in the column “aquifer_top” to -17.0, -22.1, -27.1 and -47.1 m.</li>
 <li>In your geopackage select the layer “ttim Temporal Settings:Aquifer” to define the temporal properties of the model.</li>
 <li>Open its table, start the editing mode and add a new feature.</li>
@@ -850,7 +851,7 @@ ul.task-list li input[type="checkbox"] {
 <li>Save and Close the table.</li>
 </ol>
 <p>For the observations we can define a different set of output moments.</p>
-<ol start="174" class="example" type="1">
+<ol start="175" class="example" type="1">
 <li>In your geopackage select the layer “ttim Head Observation:Piezometers”.</li>
 <li>Open its table, start the editing mode and add 10 features / periods (click 10 times “Add feature”).</li>
 <li>In the column “time” add the moments 1,2,3,4,5,10,15,20,25 and 30.</li>
@@ -862,7 +863,7 @@ ul.task-list li input[type="checkbox"] {
 <li>Detailed: a well can be switched on and off multiple times within the modelled period. Parameters are set in the transient part of the model, so in “ttim Well:DewateringWell”.</li>
 </ul>
 <p>In this tutorial we show you the simple version.</p>
-<ol start="178" class="example" type="1">
+<ol start="179" class="example" type="1">
 <li>In your geopackage select the layer “timml Well:DewateringWell”.</li>
 <li>Open its table, start the editing mode and see that columns with time dependent parameters are visible now.</li>
 <li>Switch off the Steady State abstraction, make discharge = 0.</li>
@@ -871,7 +872,7 @@ ul.task-list li input[type="checkbox"] {
 <li>Compute your transient model in the tab <em>Results</em>.</li>
 </ol>
 <p>In case of a successful calculation a new layer is added to your Vector output: case-Rijsenhout-ttim Head Observation:Piezometers. This layer contains transient data which is indicated with the clock icon right from the layer name. There are 2 ways to visualize these calculated heads in the observations point a) animation over time and b) timeseries at location.</p>
-<ol start="184" class="example" type="1">
+<ol start="185" class="example" type="1">
 <li>For the animation over time, activate the <em>Temporal Control Panel</em> with the button <img src="figures/tutorial/button_TemporalControllerPanel.png" class="img-fluid" style="width:4.0%"> on the Map Navigation Toolbar.</li>
 <li>For timeseries at location activate the Timeseries panel with the <em>Timeseries</em> button (<img src="figures/tutorial/button_iMOD-TimeSeries.png" class="img-fluid" style="width:4.0%">) on the iMOD Toolbar.</li>
 <li>Be sure that “case-Rijsenhout-ttim Head Observation:Piezometers” is checked and “case-Rijsenhout-timml Head Observation:Piezometers” is unchecked.</li>
@@ -879,7 +880,7 @@ ul.task-list li input[type="checkbox"] {
 <li>Increase the <em>Step</em> to 16 hours and start the animation with a click on the <em>Play</em> button (<img src="figures/tutorial/button_TemporalControler-play.png" class="img-fluid" style="width:4.0%">).</li>
 </ol>
 <p>Only the first few days you see most prominent drawdown. Let’s now display the timeseries at the point of your mouse with data from the mesh.</p>
-<ol start="189" class="example" type="1">
+<ol start="190" class="example" type="1">
 <li>Go to the iMOD Time Series panel.</li>
 <li>Be sure the layer “case-Rijsenhout-head_layer_0” is selected.</li>
 <li>For “variable:” select <em>head</em> and for “layers:” select <em>0</em>.</li>
@@ -889,7 +890,7 @@ ul.task-list li input[type="checkbox"] {
 <li>Finally click the <em>Plot</em> button and the 3 timeseries are added to the chart.</li>
 </ol>
 <p>In the same way you can display the time series from the Observations.</p>
-<ol start="196" class="example" type="1">
+<ol start="197" class="example" type="1">
 <li>In the iMOD time series panel select the layer “case-Rijsenhout-ttim Head Observation:Piezometers”.</li>
 <li>For “ID column:” select <em>label</em> and for “Variable:” select <em>head_layer0</em>. Don’t forget to <strong>deselect <em>fid</em></strong>.</li>
 <li>Click the button <em>Select Points</em> and draw a box with your mouse to select one or more observation points.</li>
@@ -902,7 +903,7 @@ ul.task-list li input[type="checkbox"] {
 </figure>
 </div>
 <p>Before closing the display we change the line properties and save the graph as a PNG file.</p>
-<ol start="200" class="example" type="1">
+<ol start="201" class="example" type="1">
 <li>Select the single time series for the observation point closest to your dewatering well. The color of the line is now visible in the field next to the button <em>Line Color</em>.</li>
 <li>Change the color to red.</li>
 <li>Select the timeseries with the most shallow timeseries and change the color to green.</li>
@@ -915,7 +916,7 @@ ul.task-list li input[type="checkbox"] {
 <section id="export-your-tim-model-to-python" class="level2">
 <h2 class="anchored" data-anchor-id="export-your-tim-model-to-python">Export your Tim model to Python</h2>
 <p>For scenario calculation or sensitivity analysis you probably want to switch from QGIS to Python for efficiency reasons. In this tutorial we only show you the first step: export your model to a Python file (*.py). Your Tim model is just a set of elements (points, lines, polygons) and its parameters so the Python file is not very large.</p>
-<ol start="207" class="example" type="1">
+<ol start="208" class="example" type="1">
 <li>In QGIS-Tim go to the tab <em>Model Manager</em>.</li>
 <li>Click the button <em>Convert GeoPackage to Python script</em> and you can save the *.py file wherever you like.</li>
 <li>Check the content of the file with you text editor (e.g.&nbsp;Notepad).</li>
