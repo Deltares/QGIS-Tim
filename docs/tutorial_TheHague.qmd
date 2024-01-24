@@ -46,7 +46,7 @@ title: "Building Pit The Hague "
 ---
 
 ## Requirements
-- Be sure QGIS version 3.22.00 or higher is installed.
+- Be sure QGIS version 3.28.00 or higher is installed.
 - Be sure the ``gistim`` Python package is installed (see [installation](install.qmd) for instructions).
 - Download the tutorial material. <a href="https://deltares.thegood.cloud/s/JWsmtC82zZjSRx3" target="_blank">Follow this link.</a>
 - Installation of the QGIS-Tim plugin and the MOD plugin is part of this Tutorial. The necessary ZIP files are included in the tutorial material.
@@ -121,11 +121,7 @@ Tasks:
 - Also check for point leaks. Model these leaks with a hole in the sheet pile in the southwest corner of the area.
 
 ## Getting Started
-Let's first configure the gistim python installation again, to be sure that QGIS can find the gistim software.
 
-(@) Open the Deltaforge prompt (search in Windows Start for "Deltaforge Prompt"). A black window pops up.
-(@) In this window type ``python -m gistim configure`` and press ENTER.
-(@) You can close this window now.
 (@) Launch QGIS from your START menu, from your desktop or click on …\\QGIS3.28.0\\bin\\qgis-bin.exe.
 
 > **Intermezzo:** *QGIS language settings*
@@ -138,6 +134,7 @@ Let's first configure the gistim python installation again, to be sure that QGIS
 > a. From the drop-down menu *“User interface translation”* (Dutch: *Vertaling gebruikers-interface*) select *American English* and click *OK*.
 > a. Close QGIS and open it again to activate your language change.
 
+
 We start with the creation of a new QGIS project.
 
 (@) From the main menu click on *Project* and select *New*.
@@ -149,28 +146,37 @@ The case in this tutorial is located in The Netherlands, so next we select the a
 
 > In case your work is mostly in The Netherlands and in the “Amersfoort / RD New” projection, consider making this your default projection.
 >
-> - From the main menu click on *Settings* and select *Options...*.
-> - In the section *CRS and Transforms* select *CRS (handling)*, pick the radio button *Use a default CRS* and select “EPSG:28992 -Amersfoort / RD New”.
-> - Click OK.
-> - Close this window.
+> a. From the main menu click on *Settings* and select *Options...*.
+> a. In the section *CRS and Transforms* select *CRS (handling)*, pick the radio button *Use a default CRS* and select “EPSG:28992 -Amersfoort / RD New”.
+> a. Click OK.
+> a. Close this window.
 
 ### Install plugins
-This is the moment to download/import four plugins needed for this tutorial. This is the list:
+This is the moment to import four plugins needed for this tutorial: 
 
-- the QGIS-Tim plugin. The development version, imported from a ZIP file.
-- the iMOD plugin. The development version, imported from a ZIP file.
-- the Value Tool. The official version, installed via the Plugin Manager of QGIS (internet connection required).
-- the PDOK plugin. The official version, installed via the Plugin Manager of QGIS (internet connection required). This plugin gives access to a large database from which we will load the topographic maps and use the navigation option.
+- the QGIS-Tim plugin (developed by Deltares). 
+- the iMOD plugin (developed by Deltares).
+- the Value Tool. A plugin to display in table or plot values from raster layers (or mesh layers) at the current mouse position.
+- the PDOK plugin. This plugin gives access to a large database from which we will load the topographic maps and use the navigation option.
 
-(@) Go to *Plugins* from the main menu and select *Manage and Install Plugins…* to open the plugin window.
-(@) On the left section select *Install from ZIP*.
-(@) Click the *Browse* button (![](figures/tutorial/button-Qgis-browse.png){width=4%}) and from the tutorial dataset select the ZIP file "QGIS-Tim_Tutorial-TheHague\\QGIS-iMOD-plugin.zip".
-(@) Click *Install Plugin*.
-(@) In the same way, install the QGIS-Tim plugin using the ZIP file "QGIS-Tim_Tutorial-TheHague\\QGIS-Tim-plugin.zip".
+To install the plugins from QGIS you need an internet connection! 
 
-If you have an internet connection continue with the installation of the next two plugins from the QGIS plugin library.
+> No internet connection? Follow the next steps to import the two Deltares' plugins from a ZIP file provided in the Tutorial Dataset.
+>
+> a. Go to *Plugins* from the main menu and select *Manage and Install Plugins…* to open the plugin window.
+> a. On the left section select *Install from ZIP*.
+> a. Click the Browse button (![](figures/tutorial/button-Qgis-browse.png){width=4%}) and select the ZIP file "QGIS-Tim_Tutorial\\QGIS-iMOD-plugin.zip".
+> a. Click *Install Plugin*.
+> a. In the same way, install the QGIS-Tim plugin using the ZIP file "QGIS-Tim_Tutorial\\QGIS-Tim-plugin.zip".
 
-(@) From the left section, select the group *All* to see all available plugins.
+If you have an internet connection, all four plugins can be downloaded within QGIS. 
+
+(@) At the top, find the Plugins menu (\~sixth object in the menubar).
+(@) Find \"Manage and Install plugins\" (\~first object in drop-down).
+(@) Find \"All\" (\~first in left section).
+(@) Search for \"Qgis-Tim\".
+(@) Click \"Install Plugin\".
+(@) Search for “iMOD" and install it.
 (@) Search for “Value Tool” and install it.
 (@) Search for “PDOK services plugin” and install it.
 (@) Make sure that under *Plugins > Manage and Install Plugins > Installed* now the 4 added plugins are checked.
@@ -185,8 +191,8 @@ See in the toolbar section of QGIS that the plugins are installed:
 
 Further in this Tutorial we will use some default toolbars that might be hidden at the moment. Let's check that and unhide if necessary.
 
-(@) Select *View* from the main menu and choose *Panels* and be sure these two toolbars are checked: <br> - Layers <br> - Browser.
-(@) Select *View* from the main menu and choose *Toolbars* and be sure these three toolbars are checked: <br> - Advanced Digitizing Toolbar <br> - Snapping Toolbar <br> - Attributes Toolbar.
+(@) Select *View* from the main menu and choose *Panels* and be sure these two toolbars are checked: <br> - Layers; <br> - Browser.
+(@) Select *View* from the main menu and choose *Toolbars* and be sure these three toolbars are checked: <br> - Advanced Digitizing Toolbar; <br> - Snapping Toolbar; <br> - Attributes Toolbar.
 
 ### Prepare your project
 For navigation purposes, let's load a topographic map for The Netherlands from the online PDOK database.
@@ -234,9 +240,9 @@ Now we are ready to activate the QGIS-Tim plugin.
 (@) Go to the tab *GeoPackage*. <br> Here we will create an empty database (geopackage) to store all elements and parameters for the model.
 (@) Click the *New* button to create the GeoPackage and save it for instance in the folder with your tutorial data, e.g. "..\\QGIS-Tim_Tutorial-TheHague\\case-TheHague.gpkg".
 
-Your window looks like in @fig-Panel-QGIS-Tim_v02.
+Your window looks like in @fig-Panel-QGIS-Tim_TheHague.
 
-![QGIS-Tim panel](figures/tutorial/Panel-QGIS-Tim_v02.png){width=50% #fig-Panel-QGIS-Tim_v02 fig-align="left"}
+![QGIS-Tim panel](figures/tutorial/Panel-QGIS-Tim_TheHague.png){width=50% #fig-Panel-QGIS-Tim_TheHague fig-align="left"}
 
 (@) Check in the *Layers* panel on the left that your new geopackage is added as a group. <br> A sub group **timml** for the steady state model input, the sub group **ttim** for the transient model input and a series of output formats (vector/mesh/raster).
 

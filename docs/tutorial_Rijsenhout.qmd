@@ -98,8 +98,8 @@ See in the toolbar section of QGIS that the plugins are installed:
 
 Further in this Tutorial we will use some default toolbars that might be hidden at the moment. Let's check that and unhide if necessary.
 
-(@) Select *View* from the main menu and choose *Toolbars*.
-(@) Be sure the "Advanced Digitizing Toolbar", the "Snapping Toolbar" and the "Attributes Toolbar" are checked.
+(@) Select *View* from the main menu and choose *Panels* and be sure these two toolbars are checked: <br> - Layers; <br> - Browser.
+(@) Select *View* from the main menu and choose *Toolbars* and be sure these three toolbars are checked: <br> - Advanced Digitizing Toolbar; <br> - Snapping Toolbar; <br> - Attributes Toolbar.
 
 ### Prepare your project
 For navigation purposes, let's load a topographic map for The Netherlands from the online PDOK database.
