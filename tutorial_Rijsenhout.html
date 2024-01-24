@@ -267,12 +267,12 @@ ul.task-list li input[type="checkbox"] {
 </ol>
 <blockquote class="blockquote">
 <p>In case your work is mostly in The Netherlands and in the “Amersfoort / RD New” projection, consider making this your default projection.</p>
-<ul>
+<ol type="a">
 <li>From the main menu click on <em>Settings</em> and select <em>Options…</em>.</li>
 <li>In the section <em>CRS and Transforms</em> select <em>CRS (handling)</em>, pick the radio button <em>Use a default CRS</em> and select “EPSG:28992 -Amersfoort / RD New”.</li>
 <li>Click OK.</li>
 <li>Close this window.</li>
-</ul>
+</ol>
 </blockquote>
 <section id="install-plugins" class="level3">
 <h3 class="anchored" data-anchor-id="install-plugins">Install plugins</h3>
@@ -280,19 +280,19 @@ ul.task-list li input[type="checkbox"] {
 <ul>
 <li>the QGIS-Tim plugin (developed by Deltares).</li>
 <li>the iMOD plugin (developed by Deltares).</li>
-<li>the Value Tool.</li>
+<li>the Value Tool. A plugin to display in table or plot values from raster layers (or mesh layers) at the current mouse position.</li>
 <li>the PDOK plugin. This plugin gives access to a large database from which we will load the topographic maps and use the navigation option.</li>
 </ul>
 <p>To install the plugins from QGIS you need an internet connection!</p>
 <blockquote class="blockquote">
 <p>No internet connection? Follow the next steps to import the two Deltares’ plugins from a ZIP file provided in the Tutorial Dataset.</p>
-<ul>
+<ol type="a">
 <li>Go to <em>Plugins</em> from the main menu and select <em>Manage and Install Plugins…</em> to open the plugin window.</li>
 <li>On the left section select <em>Install from ZIP</em>.</li>
 <li>Click the Browse button (<img src="figures/tutorial/button-Qgis-browse.png" class="img-fluid" style="width:4.0%">) and select the ZIP file “QGIS-Tim_Tutorial\QGIS-iMOD-plugin.zip”.</li>
 <li>Click <em>Install Plugin</em>.</li>
 <li>In the same way, install the QGIS-Tim plugin using the ZIP file “QGIS-Tim_Tutorial\QGIS-Tim-plugin.zip”.</li>
-</ul>
+</ol>
 </blockquote>
 <p>If you have an internet connection, all four plugins can be downloaded within QGIS.</p>
 <ol start="5" class="example" type="1">
@@ -325,13 +325,13 @@ ul.task-list li input[type="checkbox"] {
 <p>For navigation purposes, let’s load a topographic map for The Netherlands from the online PDOK database.</p>
 <blockquote class="blockquote">
 <p>No internet connection? Follow the next steps to import a simple PNG file as a background.</p>
-<ul>
+<ol type="a">
 <li>Go to <em>Layer</em> in the main menu, go to <em>Add layer</em> and select <em>Add Raster layer</em>.</li>
 <li>Use the browse button (<img src="figures/tutorial/button-Qgis-browse.png" class="img-fluid" style="width:4.0%">) and from the tutorial material select “…\QGIS-Tim_Tutorial\dbase\TopographicMapRijssenhout.png”.</li>
 <li>Click on <em>Add</em> and <em>Close</em> the window.</li>
 <li>If you do not see the map, select the layer “TopographicMapRijssenhout”, click your right mouse button and select “Zoom to Layer(s)”.</li>
 <li>Continue after step 23.</li>
-</ul>
+</ol>
 </blockquote>
 <ol start="17" class="example" type="1">
 <li>If you do have an internet connection click on the PDOK plugin button (<img src="figures/tutorial/button-PDOK.png" class="img-fluid" style="width:4.0%">) to open the “PDOK Services Plugin” window.</li>
@@ -385,11 +385,11 @@ ul.task-list li input[type="checkbox"] {
 <p>If you had no introduction to the Tim plugin, read the Intermezzo below for a general explanation of the components.</p>
 <blockquote class="blockquote">
 <p><strong>Intermezzo:</strong> <em>introduction Tabs on the Tim panel</em></p>
-<ol type="a">
+<ul>
 <li>Model Manager: an overview of the elements in your geopackage. In case you switch to transient modelling, an extra column with <em>ttim</em> elements is added.</li>
 <li>Elements: a list of at least 16 Tim elements from which you can build your model.</li>
 <li>Results: here you can define your domain and cell size, decide if your model is transient or not and manage the output files.</li>
-</ol>
+</ul>
 </blockquote>
 <p>Now we are ready to define our first steady state model by parameterizing our Aquifer. <br></p>
 </section>
@@ -400,7 +400,7 @@ ul.task-list li input[type="checkbox"] {
 <li>So select the layer “timml Aquifer:Aquifer” on the left.</li>
 <li>Click your right mouse button and from the menu select <em>Attribute Table</em> to open the table in a new window. <br> <strong>NB</strong> Alternative is to press F6 or use the button <em>Open Attribute Table</em> (<img src="figures/tutorial/button-Qgis-OpenAttributeTable.png" class="img-fluid" style="width:3.0%">).</li>
 <li>Start the editing mode with a click on the <em>Toggle Editing Mode</em> button (<img src="figures/tutorial/button-Qgis-AttributeTable-StartEditingMode.png" class="img-fluid" style="width:4.0%">).</li>
-<li>Hover with your mouse over the buttons and find the <em>Add Feature</em> button (<img src="figures/tutorial/button-AttributeTable-AddFeature.png" class="img-fluid" style="width:20.0%">). Perhaps number 5 from left.</li>
+<li>Hover with your mouse over the buttons and find the <em>Add Feature</em> button (<img src="figures/tutorial/button-AttributeTable-AddFeature.png" class="img-fluid" style="width:20.0%">). Perhaps button 5 from left.</li>
 <li>Add a new feature with this <em>Add Feature</em> button. In this case a feature is a hydrological layer.</li>
 <li>Fill the feature with the values from the table below:</li>
 </ol>
@@ -465,15 +465,18 @@ ul.task-list li input[type="checkbox"] {
 </tr>
 </tbody>
 </table>
-<p><strong>NB!</strong> In the real world counting starts with 1. However, Tim is programmed in Python and in Python counting starts with 0. You will get used to it.<br><br> Also be aware that the <em>Aquifer</em> element you just edited is just a table. This is indicated with the icon (<img src="figures/tutorial/button-Qgis-AttributeTable.png" class="img-fluid" style="width:3.0%">) just before the layer name in the left panel. For Tim this means that the properties in this table apply for the full model domain. We will introduce some inhomogeneities later as polygons within that domain.</p>
+<p><strong>NB!</strong> About Layer = 0. In the real world counting starts with 1. However, Tim is programmed in Python and in Python counting starts with 0. You will get used to it.</p>
 <ol start="42" class="example" type="1">
 <li>Save all changes with the <em>Save Edits</em> button (<img src="figures/tutorial/button-Qgis-AttributeTable-SaveEdits.png" class="img-fluid" style="width:4.0%">).</li>
 <li>Stop the <em>Editing Mode</em> with a click on the button (<img src="figures/tutorial/button-Qgis-AttributeTable-StartEditingMode.png" class="img-fluid" style="width:4.0%">).</li>
 <li>Close the <em>Attribute Table</em> window with a click on the X in the upper right corner.</li>
+</ol>
+<p>Also be aware that the <em>Aquifer</em> element you just edited is just a table. This is indicated with the icon (<img src="figures/tutorial/button-Qgis-AttributeTable.png" class="img-fluid" style="width:3.0%">) just before the layer name in the left panel. For Tim this means that the properties in this table apply for the full model domain. We will introduce some inhomogeneities later as polygons within that domain.</p>
+<ol start="45" class="example" type="1">
 <li>Go to the tab <em>Results</em> in QGIS-Tim.</li>
 <li>Click the button <em>Set to current extent</em>.</li>
-<li>See that the output folder is by default the same as the folder of your geopackage.</li>
-<li>See that from the output type ‘Raster’ is not selected.</li>
+<li>On the tab sear for the section <em>Output</em>. Here you see that the output folder is by default the same as the folder of your geopackage.</li>
+<li>See that from the output type ‘Raster’ is not selected so only Meshes are created.</li>
 <li>Start the calculation with a click on <em>Compute</em>.</li>
 </ol>
 <p>A black Python.exe window pops up indicating that the TIM calculation started on the background. You can ignore this window but keep it open. Of course you van minimize it. If the calculation was completed successful, you will see this echo in QGIS. <img src="figures/tutorial/Panel-QGIS-Tim-completion.png" class="img-fluid" style="width:80.0%">.</p>
@@ -496,7 +499,7 @@ ul.task-list li input[type="checkbox"] {
 <li>First hide the output layers by deselecting the sub group <em>mesh</em> or even the main group <em>case-Rijsenhout output</em>.</li>
 <li>Go to the tab <em>Elements</em> in QGIS-Tim.</li>
 <li>Click on the element “Well” and a window opens to create a new (vector) layer in QGIS.</li>
-<li>Give the layer a name, e.g.&nbsp;“DewateringWell”.</li>
+<li>Give the layer a name, e.g.&nbsp;“DewateringWell” and click <em>OK</em>.</li>
 </ol>
 <p>See that layer “timml Well:DewateringWell” is added to the timml sub group in your geopackage with ‘point’ as geometry. Also in the ttim sub group an element with the same name is added. This is a table that can store transient well data while referring to the x/y locations in the timml layer. Next step is to add the actual well, both the location and its parameters.</p>
 <ol start="55" class="example" type="1">
@@ -520,8 +523,8 @@ ul.task-list li input[type="checkbox"] {
 <p>The output in your ouput group “case-Rijsenhout output” is directly overwritten with the new results. In the sub group <em>mesh</em> you see the created raster “case-Rijsenhout-head_layer_0”.</p>
 <p>Do you like to see the values of the calculated Head under you mouse?</p>
 <ol start="65" class="example" type="1">
-<li>Make the results visible again by, see if the group <em>case-Rijsenhout output</em> and <em>mesh</em> are checked.</li>
-<li>Select the output sub group <em>mesh</em>.</li>
+<li>Make the results visible again. So see if the group <em>case-Rijsenhout output</em> and <em>mesh</em> are checked.</li>
+<li>Select the output sub group <em>mesh</em> and deselect the group <em>raster</em>.</li>
 <li>Select the <em>Value Tool</em> button (<img src="figures/tutorial/button_valuetool.png" class="img-fluid" style="width:4.0%">).</li>
 <li>Hover over the area and in the “Value Tool” panel you see the value within the mesh file at your mouse location.</li>
 </ol>
