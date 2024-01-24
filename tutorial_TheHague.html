@@ -167,7 +167,6 @@ ul.task-list li input[type="checkbox"] {
   <li><a href="#prepare-your-project" id="toc-prepare-your-project" class="nav-link" data-scroll-target="#prepare-your-project">Prepare your project</a></li>
   <li><a href="#open-the-qgis-tim-panel" id="toc-open-the-qgis-tim-panel" class="nav-link" data-scroll-target="#open-the-qgis-tim-panel">Open the QGIS-Tim panel</a></li>
   </ul></li>
-  <li><a href="#checking-available-data-from-lhm" id="toc-checking-available-data-from-lhm" class="nav-link" data-scroll-target="#checking-available-data-from-lhm">Checking available data from LHM</a></li>
   <li><a href="#start-your-tim-model" id="toc-start-your-tim-model" class="nav-link" data-scroll-target="#start-your-tim-model">Start your Tim model</a>
   <ul class="collapse">
   <li><a href="#adding-a-leaky-line-doublet" id="toc-adding-a-leaky-line-doublet" class="nav-link" data-scroll-target="#adding-a-leaky-line-doublet">Adding a Leaky Line Doublet</a></li>
@@ -250,7 +249,7 @@ ol.w {list-style-type: inherit;}
 <section id="requirements" class="level2">
 <h2 class="anchored" data-anchor-id="requirements">Requirements</h2>
 <ul>
-<li>Be sure QGIS version 3.22.00 or higher is installed.</li>
+<li>Be sure QGIS version 3.28.00 or higher is installed.</li>
 <li>Be sure the <code>gistim</code> Python package is installed (see <a href="./install.html">installation</a> for instructions).</li>
 <li>Download the tutorial material. <a href="https://deltares.thegood.cloud/s/JWsmtC82zZjSRx3" target="_blank">Follow this link.</a></li>
 <li>Installation of the QGIS-Tim plugin and the MOD plugin is part of this Tutorial. The necessary ZIP files are included in the tutorial material.</li>
@@ -397,11 +396,7 @@ table {
 </section>
 <section id="getting-started" class="level2">
 <h2 class="anchored" data-anchor-id="getting-started">Getting Started</h2>
-<p>Let’s first configure the gistim python installation again, to be sure that QGIS can find the gistim software.</p>
 <ol class="example" type="1">
-<li>Open the Deltaforge prompt (search in Windows Start for “Deltaforge Prompt”). A black window pops up.</li>
-<li>In this window type <code>python -m gistim configure</code> and press ENTER.</li>
-<li>You can close this window now.</li>
 <li>Launch QGIS from your START menu, from your desktop or click on …\QGIS3.28.0\bin\qgis-bin.exe.</li>
 </ol>
 <blockquote class="blockquote">
@@ -416,42 +411,51 @@ table {
 </ol>
 </blockquote>
 <p>We start with the creation of a new QGIS project.</p>
-<ol start="5" class="example" type="1">
+<ol start="2" class="example" type="1">
 <li>From the main menu click on <em>Project</em> and select <em>New</em>.</li>
 </ol>
 <p>The case in this tutorial is located in The Netherlands, so next we select the appropriate projection.</p>
-<ol start="6" class="example" type="1">
+<ol start="3" class="example" type="1">
 <li>From the main menu click on <em>Project</em> and select <em>Properties</em>.</li>
 <li>In the <em>Properties</em> window select the category <em>CRS</em>, search for “EPSG:28992” and you find “Amersfoort / RD New”. Select this option and click the <em>Apply</em> button, followed by the <em>OK</em> button to close the window.</li>
 </ol>
 <blockquote class="blockquote">
 <p>In case your work is mostly in The Netherlands and in the “Amersfoort / RD New” projection, consider making this your default projection.</p>
-<ul>
+<ol type="a">
 <li>From the main menu click on <em>Settings</em> and select <em>Options…</em>.</li>
 <li>In the section <em>CRS and Transforms</em> select <em>CRS (handling)</em>, pick the radio button <em>Use a default CRS</em> and select “EPSG:28992 -Amersfoort / RD New”.</li>
 <li>Click OK.</li>
 <li>Close this window.</li>
-</ul>
+</ol>
 </blockquote>
 <section id="install-plugins" class="level3">
 <h3 class="anchored" data-anchor-id="install-plugins">Install plugins</h3>
-<p>This is the moment to download/import four plugins needed for this tutorial. This is the list:</p>
+<p>This is the moment to import four plugins needed for this tutorial:</p>
 <ul>
-<li>the QGIS-Tim plugin. The development version, imported from a ZIP file.</li>
-<li>the iMOD plugin. The development version, imported from a ZIP file.</li>
-<li>the Value Tool. The official version, installed via the Plugin Manager of QGIS (internet connection required).</li>
-<li>the PDOK plugin. The official version, installed via the Plugin Manager of QGIS (internet connection required). This plugin gives access to a large database from which we will load the topographic maps and use the navigation option.</li>
+<li>the QGIS-Tim plugin (developed by Deltares).</li>
+<li>the iMOD plugin (developed by Deltares).</li>
+<li>the Value Tool. A plugin to display in table or plot values from raster layers (or mesh layers) at the current mouse position.</li>
+<li>the PDOK plugin. This plugin gives access to a large database from which we will load the topographic maps and use the navigation option.</li>
 </ul>
-<ol start="8" class="example" type="1">
+<p>To install the plugins from QGIS you need an internet connection!</p>
+<blockquote class="blockquote">
+<p>No internet connection? Follow the next steps to import the two Deltares’ plugins from a ZIP file provided in the Tutorial Dataset.</p>
+<ol type="a">
 <li>Go to <em>Plugins</em> from the main menu and select <em>Manage and Install Plugins…</em> to open the plugin window.</li>
 <li>On the left section select <em>Install from ZIP</em>.</li>
-<li>Click the <em>Browse</em> button (<img src="figures/tutorial/button-Qgis-browse.png" class="img-fluid" style="width:4.0%">) and from the tutorial dataset select the ZIP file “QGIS-Tim_Tutorial-TheHague\QGIS-iMOD-plugin.zip”.</li>
+<li>Click the Browse button (<img src="figures/tutorial/button-Qgis-browse.png" class="img-fluid" style="width:4.0%">) and select the ZIP file “QGIS-Tim_Tutorial\QGIS-iMOD-plugin.zip”.</li>
 <li>Click <em>Install Plugin</em>.</li>
-<li>In the same way, install the QGIS-Tim plugin using the ZIP file “QGIS-Tim_Tutorial-TheHague\QGIS-Tim-plugin.zip”.</li>
+<li>In the same way, install the QGIS-Tim plugin using the ZIP file “QGIS-Tim_Tutorial\QGIS-Tim-plugin.zip”.</li>
 </ol>
-<p>If you have an internet connection continue with the installation of the next two plugins from the QGIS plugin library.</p>
-<ol start="13" class="example" type="1">
-<li>From the left section, select the group <em>All</em> to see all available plugins.</li>
+</blockquote>
+<p>If you have an internet connection, all four plugins can be downloaded within QGIS.</p>
+<ol start="5" class="example" type="1">
+<li>At the top, find the Plugins menu (~sixth object in the menubar).</li>
+<li>Find "Manage and Install plugins" (~first object in drop-down).</li>
+<li>Find "All" (~first in left section).</li>
+<li>Search for "Qgis-Tim".</li>
+<li>Click "Install Plugin".</li>
+<li>Search for “iMOD” and install it.</li>
 <li>Search for “Value Tool” and install it.</li>
 <li>Search for “PDOK services plugin” and install it.</li>
 <li>Make sure that under <em>Plugins &gt; Manage and Install Plugins &gt; Installed</em> now the 4 added plugins are checked.</li>
@@ -465,9 +469,9 @@ table {
 <li>PDOK Services Plugin <img src="figures/tutorial/button-PDOK.png" class="img-fluid" style="width:4.0%"></li>
 </ul>
 <p>Further in this Tutorial we will use some default toolbars that might be hidden at the moment. Let’s check that and unhide if necessary.</p>
-<ol start="18" class="example" type="1">
-<li>Select <em>View</em> from the main menu and choose <em>Panels</em> and be sure these two toolbars are checked: <br> - Layers <br> - Browser.</li>
-<li>Select <em>View</em> from the main menu and choose <em>Toolbars</em> and be sure these three toolbars are checked: <br> - Advanced Digitizing Toolbar <br> - Snapping Toolbar <br> - Attributes Toolbar.</li>
+<ol start="15" class="example" type="1">
+<li>Select <em>View</em> from the main menu and choose <em>Panels</em> and be sure these two toolbars are checked: <br> - Layers; <br> - Browser.</li>
+<li>Select <em>View</em> from the main menu and choose <em>Toolbars</em> and be sure these three toolbars are checked: <br> - Advanced Digitizing Toolbar; <br> - Snapping Toolbar; <br> - Attributes Toolbar.</li>
 </ol>
 </section>
 <section id="prepare-your-project" class="level3">
@@ -480,10 +484,10 @@ table {
 <li>Use the <em>Browse</em> button (<img src="figures/tutorial/button-Qgis-browse.png" class="img-fluid" style="width:4.0%">) and from the tutorial material select “…\QGIS-Tim_Tutorial-TheHague\TopographicMapTheHague.png”.</li>
 <li>Click on <em>Add</em> and <em>Close</em> the window.</li>
 <li>If you do not see the map, select the layer “TopographicMapTheHague”, click your right mouse button and select “Zoom to Layer(s)”.</li>
-<li>Continue after step 26.</li>
+<li>Continue after step 23.</li>
 </ul>
 </blockquote>
-<ol start="20" class="example" type="1">
+<ol start="17" class="example" type="1">
 <li>If you do have an internet connection click on the PDOK plugin button (<img src="figures/tutorial/button-PDOK.png" class="img-fluid" style="width:4.0%">) to open the “PDOK Services Plugin” window.</li>
 <li>From the tab <em>PDOK Services</em> search for “pastel” and you will find a WMTS type layer called “BRT Achtergrondkaart WMTS”.</li>
 <li>Select the layer.</li>
@@ -491,44 +495,44 @@ table {
 <li>Close the PDOK window.</li>
 </ol>
 <p>Our project area is in the centre of the city of The Hague so let’s navigate to that city using the PDOK plugin.</p>
-<ol start="25" class="example" type="1">
+<ol start="22" class="example" type="1">
 <li>Type “Parkstraat” in the PDOK search field, near the PDOK button (<img src="figures/tutorial/button-PDOK-search.png" class="img-fluid" style="width:20.0%">)</li>
 <li>One of the locations PDOK will find is “Parkstraat, ’s-Gravenhage”. Click on it and QGIS will fly you to the project location.</li>
 </ol>
 <p>Let’s now open a shape file containing the circumference of the building location.</p>
-<ol start="27" class="example" type="1">
+<ol start="24" class="example" type="1">
 <li>Go to <em>Layer</em> in the main menu, go to <em>Add layer</em> and select <em>Add Vector layer</em>.</li>
 <li>Use the <em>Browse</em> button (<img src="figures/tutorial/button-Qgis-browse.png" class="img-fluid" style="width:4.0%">) and from the tutorial material select “…\QGIS-Tim_Tutorial-TheHague\building_pit.shp”.</li>
 <li>Click on <em>Add</em> and <em>Close</em> the window.</li>
 </ol>
 <p><img src="figures/tutorial/emoji-tip.png" class="img-fluid" style="width:3.0%"> <strong>Tip:</strong> a fast alternative for adding layers: from the menu <em>View &gt; Toolbar</em> add the <em>Manage Layers Toolbar</em> and use the button <img src="figures/tutorial/button-Qgis-VectorLayer.png" class="img-fluid" style="width:4.0%">.</p>
-<ol start="30" class="example" type="1">
+<ol start="27" class="example" type="1">
 <li>In the <em>Layers</em> panel on the left, select the layer “building_pit”.</li>
 <li>Click your right mouse button and from the menu select <em>Properties</em>.</li>
 <li>In the new window go to the section <em>Symbology</em> on the left and try to pick a polygon style with only a contour color.</li>
 <li>Click on <em>OK</em> a to save and close the window.</li>
 </ol>
 <p>Let’s save this project to be able to return to it later or in case of a crash of QGIS.</p>
-<ol start="34" class="example" type="1">
+<ol start="31" class="example" type="1">
 <li>Go to <em>Project</em> in the main menu, select <em>Save As</em> and select a folder and a file name for your project, e.g.&nbsp;“…\QGIS-Tim_Tutorial-TheHague\TheHague.qgz”</li>
 </ol>
 </section>
 <section id="open-the-qgis-tim-panel" class="level3">
 <h3 class="anchored" data-anchor-id="open-the-qgis-tim-panel">Open the QGIS-Tim panel</h3>
 <p>Now we are ready to activate the QGIS-Tim plugin.</p>
-<ol start="35" class="example" type="1">
+<ol start="32" class="example" type="1">
 <li>Click on the QGIS-Tim plugin button (<img src="figures/tutorial/button-Qgis-tim.png" class="img-fluid" style="width:4.0%">) and the QGIS-Tim panel appears.</li>
 <li>Go to the tab <em>GeoPackage</em>. <br> Here we will create an empty database (geopackage) to store all elements and parameters for the model.</li>
 <li>Click the <em>New</em> button to create the GeoPackage and save it for instance in the folder with your tutorial data, e.g.&nbsp;“..\QGIS-Tim_Tutorial-TheHague\case-TheHague.gpkg”.</li>
 </ol>
-<p>Your window looks like in <a href="#fig-Panel-QGIS-Tim_v02">Figure&nbsp;4</a>.</p>
-<div id="fig-Panel-QGIS-Tim_v02" class="quarto-figure quarto-figure-left anchored">
+<p>Your window looks like in <a href="#fig-Panel-QGIS-Tim_TheHague">Figure&nbsp;4</a>.</p>
+<div id="fig-Panel-QGIS-Tim_TheHague" class="quarto-figure quarto-figure-left anchored">
 <figure class="figure">
-<p><img src="figures/tutorial/Panel-QGIS-Tim_v02.png" class="img-fluid figure-img" style="width:50.0%"></p>
+<p><img src="figures/tutorial/Panel-QGIS-Tim_TheHague.png" class="img-fluid figure-img" style="width:50.0%"></p>
 <figcaption class="figure-caption">Figure&nbsp;4: QGIS-Tim panel</figcaption>
 </figure>
 </div>
-<ol start="38" class="example" type="1">
+<ol start="35" class="example" type="1">
 <li>Check in the <em>Layers</em> panel on the left that your new geopackage is added as a group. <br> A sub group <strong>timml</strong> for the steady state model input, the sub group <strong>ttim</strong> for the transient model input and a series of output formats (vector/mesh/raster).</li>
 </ol>
 <p>If you had no introduction to the Tim plugin, read the Intermezzo below for a general explanation of the components.</p>
@@ -542,29 +546,15 @@ table {
 </ol>
 </blockquote>
 <p>Let’s save this project to be able to return to it later or in case of a crash of QGIS.</p>
-<ol start="39" class="example" type="1">
+<ol start="36" class="example" type="1">
 <li>Go to <em>Project</em> in the main menu, select <em>Save As</em> and select a folder and a file name for your project, e.g.&nbsp;“…\QGIS-Tim_Tutorial-TheHague\TheHague.qgz”</li>
 </ol>
 </section>
 </section>
-<section id="checking-available-data-from-lhm" class="level2">
-<h2 class="anchored" data-anchor-id="checking-available-data-from-lhm">Checking available data from LHM</h2>
-<p>We will now research what possible layer info is available from the LHM database (Landelijk hydrologisch model). Information from LHM is made available in the provided file “…\QGIS-Tim_Tutorial-TheHague\LHM4.1-ondergrondmodel.nc”. The file contains rasterdata of both the 3D geological layering within The Netherlands and the corresponding geological parameterization (permeability, resistance, thickness).</p>
-<ol start="40" class="example" type="1">
-<li>In the QGIS-Tim panel go to the <em>Extract</em> tab.</li>
-<li>Open the file “..\QGIS-Tim_Tutorial-TheHague\LHM4.1-ondergrondmodel.nc” (this may take a minute because the file is 350 MB).</li>
-<li>Click the button <em>Select by Polygon</em> and draw a large polygon (&gt; 250x250m) to select the area around the building location between <em>Parkstraat</em> and <em>Oranjestraat</em> (see <a href="#fig-TheHagueCityCentre">Figure&nbsp;1</a>). Left-click several times and close the polygon with a right click.</li>
-<li>Then click the <em>Extract</em> button and save the extracted subsoil data to a CSV file, e.g.&nbsp;“Ex2DH.csv”.</li>
-<li>A separate python window is opened and the selection is performed. You can follow the progress in your tool bar. There is no message indicating the process has ended. Just ignore the black screen and continue with the next step.</li>
-</ol>
-<blockquote class="blockquote">
-<p><img src="figures/tutorial/figure_ExtractionError.png" id="fig-figure_ExtractionError" class="img-fluid" style="width:90.0%"> <br> QGIS displays this error message in case your polygon is too small. In that case redraw your polygon for a larger area.</p>
-</blockquote>
-<p>Automatically 2 CSV files will be created. One with average values for bottom and top of layers and aquifer permeabilities and aquitard resistances. The other contains statistics on the data.</p>
-<ol start="45" class="example" type="1">
-<li>From a file manager on your laptop (e.g.&nbsp;Explorer) open the CSV files.</li>
-</ol>
-<p>An example of values from the first CSV are presented in <a href="#tbl-SubsoilCharacteristicsLHM">Table&nbsp;2</a>. In each LHM layer the Aquitard information is positioned on top of Aquifer.</p>
+<section id="start-your-tim-model" class="level2">
+<h2 class="anchored" data-anchor-id="start-your-tim-model">Start your Tim model</h2>
+<p>To get an idea of the parameterization of our Aquifer we can use the layer information available from the LHM database (Landelijk hydrologisch model). That model provides 3D geological layering within The Netherlands and the corresponding geological parameterization (permeability, resistance, thickness).</p>
+<p>An example of parameter values near our building pit area is presented in <a href="#tbl-SubsoilCharacteristicsLHM">Table&nbsp;2</a>. In each LHM layer the Aquitard information is positioned on top of Aquifer.</p>
 <div id="tbl-SubsoilCharacteristicsLHM" class="anchored">
 <table class="table">
 <caption>Table&nbsp;2: The characteristics of the subsoil based on LHM data (example, your values may differ)</caption>
@@ -715,11 +705,8 @@ table {
 </table>
 </div>
 <p>A choice should be made at which depth the hydrogeological base is chosen for this project. Where high aquifer k is followed by a large aquifer c the base is chosen. For this case the base is chosen at -60.5 m (all depth data in <a href="#tbl-SubsoilCharacteristicsLHM">Table&nbsp;2</a> are m NAP). As you can see, values for Holocene layers are not available here and thus not displayed in LHM results. <br><br> Aquitard resistance in the city is quite high, so a value of 3000 days is best guess from experience. <br><br> For marine deposits at -12 a value of 50 to 100 days per meter layer thickness is a proper choice. The permeability of fine Holocene sand is chosen at 10 m/d.</p>
-</section>
-<section id="start-your-tim-model" class="level2">
-<h2 class="anchored" data-anchor-id="start-your-tim-model">Start your Tim model</h2>
 <p>We are now ready to define our first steady state model by parameterizing our Aquifer.</p>
-<ol start="46" class="example" type="1">
+<ol start="37" class="example" type="1">
 <li>From the <em>Layers</em> panel, select the layer <em>timml Aquifer:Aquifer</em>.</li>
 <li>Click your right mouse button and from the menu select <em>Open Attribute table</em> (<img src="figures/tutorial/button-Qgis-OpenAttributeTable.png" class="img-fluid" style="width:3.0%">). Search for the same icon somewhere on the <em>Attributes Toolbar</em>.</li>
 <li>Switch to the editing mode in the table with a click on (<img src="figures/tutorial/button-Qgis-AttributeTable-StartEditingMode.png" class="img-fluid" style="width:4.0%">) <em>Toggle Editing</em>.</li>
@@ -733,7 +720,7 @@ table {
 </figure>
 </div>
 <p><strong>NB!</strong> Closing this table window with the <img src="figures/tutorial/Button_CloseWindow.png" class="img-fluid" style="width:2.5%"> will not save the filled in data or stop the editing mode!</p>
-<ol start="51" class="example" type="1">
+<ol start="42" class="example" type="1">
 <li>Click on the <em>Save-Edits</em> button (<img src="figures/tutorial/button_SavelayerEdits.png" class="img-fluid" style="width:3.0%">) to save you data during the process or click on the <em>Toggle Editing Mode</em> button (<img src="figures/tutorial/button-Qgis-AttributeTable-StartEditingMode.png" class="img-fluid" style="width:4.0%">) to stop edditing and QGIS askes you if your changes should be saved.</li>
 <li>Now you can close the Attribute Table window.</li>
 </ol>
@@ -744,12 +731,12 @@ table {
 </ul>
 <section id="adding-a-leaky-line-doublet" class="level3">
 <h3 class="anchored" data-anchor-id="adding-a-leaky-line-doublet">Adding a Leaky Line Doublet</h3>
-<ol start="53" class="example" type="1">
+<ol start="44" class="example" type="1">
 <li>In the QGIS-Tim window go to tab <em>Elements</em> and select the button <em>Leaky Line Doublet</em>.</li>
 <li>Fill in the name of the layer in the pop-up panel, e.g.&nbsp;‘sheet_pile’, and click <em>OK</em> and this new Layer is added to the <em>Layers</em> panel.</li>
 </ol>
 <p>First, we will <em>draw</em> the location of the sheet pile before <em>adding</em> the parameter values.</p>
-<ol start="55" class="example" type="1">
+<ol start="46" class="example" type="1">
 <li>In the <em>Layers</em> panel right click on the layer <img src="figures/tutorial/figure_Leakylinedoublet_icon.png" class="img-fluid" style="width:4.0%"> <em>timml Leaky Line Doublet:sheet_pile</em> and start the editing mode by clicking the <em>Toggle Editing</em> button (<img src="figures/tutorial/button-Qgis-AttributeTable-StartEditingMode.png" class="img-fluid" style="width:4.0%">).</li>
 </ol>
 <p>Two important remarks before drawing the sheet pile:</p>
@@ -757,7 +744,7 @@ table {
 <li>Start drawing at the most southern corner of the building pit to make a variation for an extra purpose later on in this tutorial.</li>
 <li>In order to make a closed area surrounded with the sheet piles, the first and last point must have the same coordinate and intersect. For this we must activate the Snapping option in QGIS.</li>
 </ul>
-<ol start="56" class="example" type="1">
+<ol start="47" class="example" type="1">
 <li>In the main menu go to <em>Project</em> and select <em>Snapping Options..</em>.</li>
 <li>From the new toolbar (see <a href="#fig-button_ToolbarSnappingSettings">Figure&nbsp;6</a>), click on the <em>Enable Snapping</em> button (<img src="figures/tutorial/button_EnableSnapping.png" class="img-fluid" style="width:3.0%">).</li>
 </ol>
@@ -767,7 +754,7 @@ table {
 <figcaption class="figure-caption">Figure&nbsp;6: Switching on snapping options</figcaption>
 </figure>
 </div>
-<ol start="58" class="example" type="1">
+<ol start="49" class="example" type="1">
 <li>Then select the <em>Add line feature</em> icon (<img src="figures/tutorial/button_AddLineFeature.png" class="img-fluid" style="width:3.0%">) to start the drawing of the sheet pile.</li>
 <li>Draw the sheet pile around the building pit (start south corner) with your left mouse button and close the feature on the first point.</li>
 <li>In the pop-up window fill in the resistance (1000 d, see * below) and layer number (layer=0, see ** below) as in <a href="#fig-LeakylinedoubletFeatureAttributes">Figure&nbsp;7</a> and click OK to close the window.</li>
@@ -781,14 +768,14 @@ table {
 <blockquote class="blockquote">
 <p>Remarks to the provided values: <br> * Because of a known issue in the TimML software, until this issue is resolved, the value of the resistance must be multiplied by the permeability. For normal sheet pile walls a resistance value of 100-250 d for interlock leakage is a good choice. In this case the chosen value needs to be increased by multiplying with the applicable aquifer permeability in the effected layer (R=100 d becomes R=10*100 d). <br> ** In the real-world counting starts with 1. However, Tim is programmed in Python and in Python counting starts with 0. You will get used to it.</p>
 </blockquote>
-<ol start="61" class="example" type="1">
+<ol start="52" class="example" type="1">
 <li>Close the editing mode with a click on (<img src="figures/tutorial/button-Qgis-AttributeTable-StartEditingMode.png" class="img-fluid" style="width:4.0%">) and you are asked to save your changes.</li>
 <li>Open the attribute table for <em>Leaky Line Doublet</em> (click <img src="figures/tutorial/button-Qgis-OpenAttributeTable.png" class="img-fluid" style="width:3.0%"> or press F6) to check hydraulic resistance values for the sheet pile walls.</li>
 </ol>
 </section>
 <section id="adding-a-well" class="level3">
 <h3 class="anchored" data-anchor-id="adding-a-well">Adding a Well</h3>
-<ol start="63" class="example" type="1">
+<ol start="54" class="example" type="1">
 <li>In GIS-Tim go to the tab <em>Elements</em> and select the <em>Well</em> element.</li>
 <li>A name for the element can be given in the pop-up panel, e.g.&nbsp;<em>pumping_wells</em>.</li>
 <li>In the <em>Layers</em> panel right click on the layer <img src="figures/tutorial/figure_well_icon.png" class="img-fluid" style="width:3.0%"> <em>timml Well:pumping_wells</em> and start the editing mode by clicking the <em>Toggle Editing</em> button (<img src="figures/tutorial/button-Qgis-AttributeTable-StartEditingMode.png" class="img-fluid" style="width:4.0%">).</li>
@@ -803,7 +790,7 @@ table {
 <figcaption class="figure-caption">Figure&nbsp;8: Schematization of the pumping wells, sheet piles and observation locations</figcaption>
 </figure>
 </div>
-<ol start="70" class="example" type="1">
+<ol start="61" class="example" type="1">
 <li>In the <em>Layers</em> panel right select layer <em>timml Well:pumping_wells</em> and open the <em>Attribute Table (F6)</em>.</li>
 <li>Start the editing mode and fill in the values shown in <a href="#fig-WellAttributeTable">Figure&nbsp;9</a>. Don’t forget the column ‘Label’. <br> The discharge value in the table is a first guess to be adjusted later to desired level of -3.5 m groundwater lowering in the building pit.</li>
 <li>Stop the editing mode, save your work and close the window.</li>
@@ -816,7 +803,7 @@ table {
 </figure>
 </div>
 <p>When you finished the input of the wells and their parameters, you have to look back to the combination of wells and sheet pile wall. The reason is that near a well the flow is strong and therefore the flow through the wall is increased. This may lead to extremities in the calculation if wall segments are chosen too large. Tim uses control points but they are set at regular distances on the doublet (the number of control points is 1+order). It is necessary to divide the wall in smaller sections near well locations. The length of each section should be chosen equal to approximately the distance of the wall to the nearest well.</p>
-<ol start="74" class="example" type="1">
+<ol start="65" class="example" type="1">
 <li>Select the Leaky Line Doublet in the <em>Layers</em> panel and start the editing mode.</li>
 <li>Activate the Vertex Tool (<img src="figures/tutorial/button_VertexTool.png" class="img-fluid" style="width:4.0%">) and then hoover along the sheet pile line in your drawing. The line element near your pointer lights up.</li>
 <li>With the combination of <strong>Shift + double left click</strong>, you can add a new vertex to the line. Repeat that for the number of points you want to add.</li>
@@ -832,7 +819,7 @@ table {
 </section>
 <section id="computing-the-groundwater-head-drawdown" class="level2">
 <h2 class="anchored" data-anchor-id="computing-the-groundwater-head-drawdown">Computing the groundwater head drawdown</h2>
-<ol start="77" class="example" type="1">
+<ol start="68" class="example" type="1">
 <li>Zoom in or out to desired domain for which you want to see the model results.</li>
 <li>In the QGIS-Tim panel select the tab <em>Compute</em>.</li>
 <li>Select the button <em>Set to current extent</em> to define the Domain.</li>
@@ -847,7 +834,7 @@ table {
 <section id="studying-output-results" class="level2">
 <h2 class="anchored" data-anchor-id="studying-output-results">Studying output results</h2>
 <p>After the calculation you see that the result is automatically added to the <em>Layers</em> panel, probably called “case-TheHague output”. Results are presented as Mesh, Raster and Vector data. Contours are saved as vector. <br> Although these layers / groups are checked, the data is not visible. That is because the geopackage was added last, and QGIS adds layers at the end of the list. <br> Let’s move the layer “pastel” to the background.</p>
-<ol start="85" class="example" type="1">
+<ol start="76" class="example" type="1">
 <li>Select the layer “pastel” and drag it with your left mouse button to the bottom of the list of layers.</li>
 <li>Uncheck mesh and raster to only visualize contours on the base map.</li>
 <li>Uncheck contour lines of layer 1 and 2 to get only the result for layer 0 on screen as in <a href="#fig-DrawdownConstructionPit_v01">Figure&nbsp;11</a>.</li>
@@ -859,13 +846,13 @@ table {
 </figure>
 </div>
 <p>The lowering in the building pit is shown to be around -6.20 m. To get it around -3.50 m as demanded, the well discharge should be decreased accordingly. An extra calculation with half the flow per well will be sufficient.</p>
-<ol start="88" class="example" type="1">
+<ol start="79" class="example" type="1">
 <li>Go to the well attribute table, adjust the flow to 60% (30 m3/d per well) and compute the model again.</li>
 </ol>
 <section id="adding-observations-wells" class="level3">
 <h3 class="anchored" data-anchor-id="adding-observations-wells">Adding observations wells</h3>
 <p>The city authorities that perform quality checks on the effect of construction projects insisted on the installation of some piezometers to assure reduction of risks for surrounding old monumental structures.</p>
-<ol start="89" class="example" type="1">
+<ol start="80" class="example" type="1">
 <li>In the QGIS-Tim panel go to the <em>Elements</em> tab and select the element <em>Observation</em>.</li>
 <li>Give a name in the pop-up panel, e.g.&nbsp;“observations”.</li>
 <li>Then go to the <em>Layers</em> panel and select the layer <img src="figures/tutorial/figure_Observation_icon.png" class="img-fluid" style="width:3.0%"><em>timml Observation:observations</em>.</li>
@@ -874,7 +861,7 @@ table {
 <li>Compute the model again.</li>
 </ol>
 <p>Results of calculations at the observation locations are presented as <em>Vector</em> data in the <em>Layers</em> panel.</p>
-<ol start="95" class="example" type="1">
+<ol start="86" class="example" type="1">
 <li>Uncheck/check layers in order to display observation results only.</li>
 </ol>
 <p>By default, the label at each observation location is the calculated head for layer 0. Perhaps you see a second number near the location. For your information: this is the “location number” label belonging to the model input in layer <em>timml Observation:observations</em>.</p>
@@ -882,7 +869,7 @@ table {
 </section>
 <section id="creating-a-cross-section" class="level3">
 <h3 class="anchored" data-anchor-id="creating-a-cross-section">Creating a cross section</h3>
-<ol start="96" class="example" type="1">
+<ol start="87" class="example" type="1">
 <li>To make a cross section, use the iMOD plugin toolbar and click on the Cross Section widget (<img src="figures/tutorial/button_iMOD-Cross-section.png" class="img-fluid" style="width:3.0%">)</li>
 <li>From the dropdown menu on the left of this panel, select the mesh (<img src="figures/tutorial/button_Mesh.png" class="img-fluid" style="width:3.0%">) with *_layer_0.</li>
 <li>Press <em>Add</em>.</li>
@@ -903,14 +890,14 @@ table {
 <h2 class="anchored" data-anchor-id="making-calculations-with-parameter-variations-or-checking-bandwidth">Making calculations with parameter variations or checking bandwidth</h2>
 <p>The authorities demand a drawdown effect of dewatering at a maximum of 0.10 m at surrounding buildings. This means that improvements for leakage control are needed but first we need to discover what parameter to focus on.</p>
 <p>To check whether the wall resistance or the bottom resistance of the layer 1 (below the building pit) is more important we can make 2 variations; one with C-clay=200 d and one with R-wall=500 d.&nbsp;<br> Of course you can change your model input, rerun the model and overwrite your model results. The next steps show you how to change the model input and save the results in separate <em>.gpkg and </em>.nc files.</p>
-<ol start="103" class="example" type="1">
+<ol start="94" class="example" type="1">
 <li>In the input group select layer <em>timml Aquifer:…</em></li>
 <li>Open the <em>Attrribute Table</em> (F6) and change the value for “aquitard_c” in layer 1 into 200 d.</li>
 <li>In the QGIS-Tim panel go to the tab <em>Compute</em> and change the name of the output, e.g.&nbsp;case-TheHague_v1.</li>
 <li>Click <em>Compute</em> to run variant 1.</li>
 </ol>
 <p>Check in the <em>Layers</em> panel and see that the results are not overwritten but added to the groups, e.g.&nbsp;layer <em>case-TheHague_v1-timml Observation:observations</em> is added to the group <em>Vector</em>.</p>
-<ol start="107" class="example" type="1">
+<ol start="98" class="example" type="1">
 <li>Fill in your calculated heads at the observation locations in <a href="#tbl-CalculatedHeads2Variants">Table&nbsp;4</a> or use Excel.</li>
 </ol>
 <div id="tbl-CalculatedHeads2Variants" class="anchored">
@@ -987,7 +974,7 @@ table {
 </div>
 <p>* Known issue in TimML: you have to multiply Rw by layer permeability (Rw*10).</p>
 <p>Let’s now run Variant 2.</p>
-<ol start="108" class="example" type="1">
+<ol start="99" class="example" type="1">
 <li>In layer <em>timml Aquifer:…</em> reset the value for “aquitard_c” in layer 1 to the default of 40 d.</li>
 <li>In layer <em>timml Leaky Line Doublet:…</em> change the value for “resistance” into 5000 d (500x10).</li>
 <li>In the QGIS-Tim panel go to the tab <em>Compute</em> and change the name of the output, e.g.&nbsp;case-TheHague_v2.</li>
@@ -1005,7 +992,7 @@ table {
 <li>We recommend to create an extra <em>Leaky Line Doublet</em> element. In this case it is more easy to switch on/off this additional element in your sensitivity analysis.</li>
 </ul>
 <p>How to copy the sheet pile wall to an extra <em>Leaky Line Doublet</em> element?</p>
-<ol start="113" class="example" type="1">
+<ol start="104" class="example" type="1">
 <li>In the QGIS-Tim panel go to the tab <em>Elements</em> and add a second <em>Leaky Line Doublet</em> and give it a name, e.g.&nbsp;“sheet_pile_L1”</li>
 <li>Go to the tab <em>GeoPackage</em> and see that the element separately is added to the list. Here is can switch this element on / off for a calculation.</li>
 <li>In the <em>Layers</em> panel select the new layer <em>timml Leaky Line Doublet:sheet_pile_l1</em>.</li>
@@ -1014,14 +1001,14 @@ table {
 <li>Click on the <em>Copy</em> button (<img src="figures/tutorial/button_Copy_Selected_Row.png" class="img-fluid" style="width:3.0%">) in the source table to copy the selected row to the clipboard.</li>
 </ol>
 <p><img src="figures/tutorial/figure_Leakylinedoublet_copy.png" class="img-fluid" style="width:70.0%"></p>
-<ol start="119" class="example" type="1">
+<ol start="110" class="example" type="1">
 <li>In the target table, paste it with the <em>Paste</em> button (<img src="figures/tutorial/button_Paste_Feature.png" class="img-fluid" style="width:3.0%">) as a new layer.</li>
 <li>Assign this new sheet pile to layer=1.</li>
 <li>Stop editing and save the new element.</li>
 <li>Click <em>Compute</em> to start the computation again.</li>
 </ol>
 <p>The results are directly visible in the contours and cross-section again. <br> We can conclude that the drawdown in the building pit increases with a factor of almost 2 (-7.48 m at the centre of the building pit). Therefore, we adjust the well flow to 3.95/7.48*30=15.54 m3/d per well.</p>
-<ol start="123" class="example" type="1">
+<ol start="114" class="example" type="1">
 <li>Implement this change in the <em>timm Well</em> element and recalculate the model.</li>
 </ol>
 <div id="fig-figure_HeadsInCrosssection04" class="quarto-figure quarto-figure-center anchored">
@@ -1032,7 +1019,7 @@ table {
 </div>
 <p>We conclude that the drawdown of groundwater level around the building pit with deep sheet piles decreased significantly.</p>
 <p>Next also alternatives with a shallow concrete cut-off wall will be calculated for a shallow and a deep wall. In that case we have R=1000 d, but note that the input in the attribute than becomes k*R=10000 due to the error in Tim.</p>
-<ol start="124" class="example" type="1">
+<ol start="115" class="example" type="1">
 <li>After changing the value in attribute tables of wall elements, we can compute again, switching off and on the element for the deep wall section (tab Geopackage on the QGIS-Tim panel).</li>
 </ol>
 <p>Again extra calculation is needed to adjust well extractions for drawdown in the building pit.<br> Results of calculations are gathered in the following table, showing extractions and head outside the wall at South East monitoring position.</p>
@@ -1086,7 +1073,7 @@ table {
 <section id="effect-of-a-not-closed-wall-about-20-cm" class="level2">
 <h2 class="anchored" data-anchor-id="effect-of-a-not-closed-wall-about-20-cm">Effect of a not closed wall (about 20 cm)</h2>
 <p>Authorities are afraid that leakage incidents could be harmful for surrounding monuments. The effect of leakage can be studied by creating a fictitious little opening in the wall. This can be done e.g.&nbsp;by changing the values of first and last coordinate of the leaky line doublet.</p>
-<ol start="125" class="example" type="1">
+<ol start="116" class="example" type="1">
 <li>Select the <em>Leaky Line Doublet</em> in the <em>Layers</em> panel</li>
 <li>In the editing toolbar go to the toggle editing option (<img src="figures/tutorial/button-Qgis-AttributeTable-StartEditingMode.png" class="img-fluid" style="width:4.0%">) and check the vertex option (<img src="figures/tutorial/button_VertexTool.png" class="img-fluid" style="width:4.0%">).</li>
 <li>On the drawing panel select a point in the line element of the wall and right click.</li>
@@ -1104,7 +1091,7 @@ table {
 <section id="using-python-for-sensitivity-analyses-with-a-qgis-tim-model" class="level2">
 <h2 class="anchored" data-anchor-id="using-python-for-sensitivity-analyses-with-a-qgis-tim-model">Using Python for sensitivity analyses with a QGIS-Tim model</h2>
 <p>QGIS-Tim offers the opportunity to export the geopackage of the created model to a Python script. This makes it possible to use the script for other ways of calculation, e.g.: - Calculation of model results in other Python environments, like Anaconda or Spyder or in a notebook. - Use in other Python oriented programs, like the Probabilistic Toolkit.</p>
-<ol start="128" class="example" type="1">
+<ol start="119" class="example" type="1">
 <li>If input of all elements is ready and the model has proved to run properly, go to the QGIS-Tim panel and the tab <em>Geopackage</em>.</li>
 <li>At the bottom press the button <em>Convert GeoPackage to Python script</em>.</li>
 <li>After a short period for translation in Python the explorer panel appears where you can enter the name you want to give for the python file, e.g.&nbsp;“case-TheHague.py” and store it in a directory you choose to save your work. The file looks like:</li>
@@ -1120,11 +1107,11 @@ table {
 <p>To get the Python file running in a platform like Anaconda or Spyder, extra lines should be added at wish, to get the output that the user needs.</p>
 <p>Next this file can be used for geostatistical and scenario-analysis. There are several ways of handling this kind of study, like writing an additional Python program to perform repeated calculations and statistical analysis on results. But an easy way is to use the Probabilistic Toolkit (PTK), a platform for statistical analysis to be used together with geotechnical design programs, developed by Deltares. The PTK can be used for study of model sensitivity for variation of parameter values or reliability analysis.</p>
 <p>The PTK can be downloaded free of charge at <a href="https://download.deltares.nl/ptk" target="_blank">Probabilistic Toolkit - download.</a></p>
-<ol start="131" class="example" type="1">
+<ol start="122" class="example" type="1">
 <li>Open the <strong>Probabilistic Toolkit</strong> from your desktop (<img src="figures/tutorial/icon-probabiliticToolKit.png" class="img-fluid" style="width:4.0%">) or Windows menu (Deltares folder).</li>
 </ol>
 <p>The Toolkit opens at the first of 5 tabs: <em>Model</em>.</p>
-<ol start="132" class="example" type="1">
+<ol start="123" class="example" type="1">
 <li>In the section <em>Model Type</em> check if the dropdown menu <em>Type</em> is set to <em>Internal</em>.</li>
 <li>In the section <em>Model Type</em> check if the dropdown menu <em>Language</em> is set to <em>Python</em> and a the field <em>Version</em> appears.</li>
 <li>Select the tree points (‘…’) in the field <em>Version</em> and give the path where PTK can find the Python interpreter, e.g.&nbsp;Spyder at “C:\roelofs_fs\_software\deltaforge\pythonw.exe”.</li>
@@ -1145,7 +1132,7 @@ table {
 </figure>
 </div>
 <p>In PTK we have to set these parameters:</p>
-<ol start="136" class="example" type="1">
+<ol start="127" class="example" type="1">
 <li>In the PTK panel <em>Input</em> click 4 times on the <em>Add</em> button (<img src="figures/tutorial/button-PTK-add.png" class="img-fluid" style="width:3.0%">), to add 4 variables and name them Rshp, czba, khol and cbasis (see <a href="#fig-figure-PTK-VariableNameValue">Figure&nbsp;16</a>)</li>
 <li>In the tab <em>Variables</em> give these 4 variables the values 10000, 40, 10 and 100.</li>
 <li>Return to the tab <em>Model</em> and assign these variable values to the parameters in the source code by copying this code block to the top of the Python source code (see <a href="#fig-figure-PTK02">Figure&nbsp;17</a>). <br> <code>Rwall = Rshp</code> <br> <code>c0    = czba</code> <br> <code>k0    = khol</code> <br> <code>c2    = cbasis</code></li>
@@ -1157,25 +1144,25 @@ table {
 <figcaption class="figure-caption">Figure&nbsp;17: Replace parameters in the Python code.</figcaption>
 </figure>
 </div>
-<ol start="140" class="example" type="1">
+<ol start="131" class="example" type="1">
 <li>At the end of the source code, eliminate the following lines from the converted file:</li>
 </ol>
 <p><code>head = model.headgrid(xg=np.arange(80940.0, 81166.0, 4), yg=np.arange(455554.0, 455360.0, -4) )</code></p>
-<ol start="141" class="example" type="1">
+<ol start="132" class="example" type="1">
 <li>Also eliminate the lines:</li>
 </ol>
 <p><code>observation_peilbuis_2 = model.head(x=80970.16497991727, y=455495.54316352855)</code> <code>observation_peilbuis_3 = model.head(x=81004.86605597858, y=455389.68291883526)</code> <code>observation_peilbuis_4 = model.head(x=81049.06450220713, y=455485.0645022071)</code></p>
-<ol start="142" class="example" type="1">
+<ol start="133" class="example" type="1">
 <li>Because we only are interested in 2 points, use the first two observation points and add these lines at the end of the Python script:</li>
 </ol>
 <p><code>pb0 = observation_observations_0[0]</code><br> <code>pb1 = observation_observations_1[0]</code></p>
-<ol start="143" class="example" type="1">
+<ol start="134" class="example" type="1">
 <li>In the panel <em>Output</em> of the PTK use the <em>Add</em> button (<img src="figures/tutorial/button-PTK-add.png" class="img-fluid" style="width:3.0%">) the new defined variables “pb0” and “pb1”.</li>
 <li>Check if the program works properly. Field <em>Analysis</em> must contain “Run model”, field <em>Results</em> must contain “Single run”</li>
 <li>Press the RUN button (<img src="figures/tutorial/button-PTK-START.png" class="img-fluid" style="width:3.0%">) to calculate the model.</li>
 </ol>
 <p>In the tab <em>Run model</em> we find the results of our calculation.</p>
-<ol start="146" class="example" type="1">
+<ol start="137" class="example" type="1">
 <li>Check if it complies with your earlier calculations in QGIS-Tim.</li>
 </ol>
 <div id="fig-figure-PTK03" class="quarto-figure quarto-figure-left anchored">
@@ -1185,12 +1172,12 @@ table {
 </figure>
 </div>
 <p>If results are as expected, we can step to a sensitivity analyses.</p>
-<ol start="147" class="example" type="1">
+<ol start="138" class="example" type="1">
 <li>In the tab <em>Field</em>, set the Analysis option to “Sensitivity*.</li>
 <li>Go to the tab <em>Variables</em>.</li>
 </ol>
 <p>For each selected parameter a distribution is defined with certain limits or characteristic values. Distribution formulas can be chosen based on knowhow of the user. Best guess of the parameter value distributions is given in the next example window.</p>
-<ol start="149" class="example" type="1">
+<ol start="140" class="example" type="1">
 <li>Change the distributon types for each Variable in the column “Distrubution” and fill in the other values.</li>
 </ol>
 <div id="fig-figure-PTK04" class="quarto-figure quarto-figure-center anchored">
@@ -1199,7 +1186,7 @@ table {
 <figcaption class="figure-caption">Figure&nbsp;19: Best guess of the parameter value distributions</figcaption>
 </figure>
 </div>
-<ol start="150" class="example" type="1">
+<ol start="141" class="example" type="1">
 <li>Select the row with sheetpile resistance (Rshp) and in the panel below the distribution is shown (see <a href="#fig-figure-PTK-graph01">Figure&nbsp;20</a>).</li>
 </ol>
 <p>Parameter value distributions of silt layer resistance (czba), basic peat layer resistance (cbasis) and permeability of Holocene sand (khol) are shown in graphs below.</p>
@@ -1228,7 +1215,7 @@ table {
 </figure>
 </div>
 <p>Low and high value of resistivity are set in the tab <em>Calculation</em> to 10% and 90%.</p>
-<ol start="151" class="example" type="1">
+<ol start="142" class="example" type="1">
 <li>Press RUN (<img src="figures/tutorial/button-PTK-START.png" class="img-fluid" style="width:3.0%">) to recalculate the model in the Sensitivity mode.</li>
 <li>After the run is finished, a new tab <em>Sensitivity</em> is visible. Go to the tab.</li>
 </ol>
@@ -1241,7 +1228,7 @@ table {
 </div>
 <p>However, with this model we get a varying outcome for the level in the building pit and this is not realistic for a practical situation. In real projects, the dewatering contractor would like to know what the effect on dewatering demand and interaction with environment would be if the aim is to reach the designed groundwater head in the building pit while adjusting the rate of extraction in the wells. <br></p>
 <p>We can do this quite simply with the aid of the Python file. To perform this analysis we follow the assumption that the relation between drawdown and well extraction is linear.<br></p>
-<ol start="153" class="example" type="1">
+<ol start="144" class="example" type="1">
 <li>Go to the tab <em>Model</em> and in the panel <em>Model code</em> remove from the end of the script the lines for <code>pb0</code> and the line for <code>pb1</code>.</li>
 <li>On the top of the script, below the line <code>k01 = khol</code> add a value for the fixed total extraction flux and the fixed head within the building pit: <br> <code>Qws = 100</code> <br> <code>pb0d = -3.5</code></li>
 <li>Now add the following lines to the code. <strong>NB!</strong> <em>Use the same observation variable name as is used in your script!</em><br> <code>pb0  = observation_observations_0[0]</code> <br> <code>fact = pb0d/pb0</code><br> <code>Qtot = 8*Qws*fact</code><br> <code>pb1  = observation_observations_1[0]*fact</code><br></li>
@@ -1277,13 +1264,13 @@ table {
 </div>
 <p>The probabilistic model gives a 50% probability on a flow of 297 m3/d, even with a 10% chance of an overrun to 659 m3/d.&nbsp;The groundwater drawdown at the standpipe outside the building pit amounts -0.44 m with 50% probability but with 10% value of -1.10 m. <br></p>
 <p>Moreover, it is possible to perform a calculation of reliability with the PTK.</p>
-<ol start="159" class="example" type="1">
+<ol start="150" class="example" type="1">
 <li>Go to the tab <em>Analysis</em> and select the option <em>Reliability</em>.</li>
 <li>Then we check the variable distributions again.</li>
 <li>Next, we open the tab <em>Calculation</em>.</li>
 </ol>
 <p>This gives the possibility to introduce a failure criterium for certain variable, like in our case pb1. We choose a less strict criterium because with a shallow sheetpile wall it is not possible to meet the requirements anyhow.</p>
-<ol start="162" class="example" type="1">
+<ol start="153" class="example" type="1">
 <li>Choose a comparison with undershooting a critical value of REF -0.5 m for the groundwater head in pb1 (see <a href="#fig-figure-PTK-Calculation01">Figure&nbsp;29</a>).</li>
 </ol>
 <p>At the right hand side in the settings window a calculation method needs to be selected. Many statistical methods are available, like Monte Carlo method etc. They are described in the help of the PTK in the main menu. We chose FORM (First Order Reliability Method) as a fast method because it is an automated intelligent iteration process to find a design point for reliability by using first calculated realisations (p.97 in the Help manual, see PTK menu).</p>
@@ -1293,7 +1280,7 @@ table {
 <figcaption class="figure-caption">Figure&nbsp;29: Setting up a reliability calculation by choosing a failure criterium and selecting a calculation method.</figcaption>
 </figure>
 </div>
-<ol start="163" class="example" type="1">
+<ol start="154" class="example" type="1">
 <li>Recalculate the model and go to the tab <em>Reliability</em>.</li>
 </ol>
 <p>From the result (see <a href="#fig-figure-PTK-Reliability01">Figure&nbsp;30</a>) we conclude that the FORM method is able to find a solution in just a few iterations.</p>
@@ -1311,7 +1298,7 @@ table {
 <section id="creating-a-transient-model" class="level2">
 <h2 class="anchored" data-anchor-id="creating-a-transient-model">Creating a transient model</h2>
 <p>At this moment, it is not possible to create a transient (time dependent) model with correct answers to case studies with sheetpile walls. The TTim solution needs to be updated. <br> Nevertheless in this section we want to guide you on setting up a basic transient model. <br></p>
-<ol start="164" class="example" type="1">
+<ol start="155" class="example" type="1">
 <li>Return to QGIS and in the QGIS-Tim panel go to the tab <em>Compute</em>.</li>
 <li>In the section <em>Output</em> turn on the option “Transient”.</li>
 <li>In the panel <em>Layers</em> select <em>timml Aquifer:Aquifer</em>.</li>
@@ -1323,14 +1310,14 @@ table {
 <figcaption class="figure-caption">Figure&nbsp;31: Attribute Table for Aquifer in transient condition.</figcaption>
 </figure>
 </div>
-<ol start="167" class="example" type="1">
+<ol start="158" class="example" type="1">
 <li>Fill in the Table with the corresponding values.</li>
 <li>In the TTim section in the <em>Layers panel</em> go to the list of elements for transient calculations.</li>
 <li>Select <em>ttim Temporal Settings:Aquifer</em> and open its <em>Attribute Table</em> (F6). Here the length of the time series is specified.</li>
 <li>Set the starting time to 0.</li>
 </ol>
 <p>But calculations take place for the range of time steps between “time_min” and “time_max”. The time unit is according to central settings in the project, mostly time in days. “Time_min” should not be zero but given a slight offset. Here we also find a “Stehfest_M” number, related to the number of terms in the calculation method performing transformation of formulas in solving differential equations. A reference date can be set to relate the calculation to real time data.</p>
-<ol start="171" class="example" type="1">
+<ol start="162" class="example" type="1">
 <li>Fill in the table according to <a href="#fig-Panel-TTimAquiferAttrTable_v01">Figure&nbsp;32</a>.</li>
 </ol>
 <div id="fig-Panel-TTimAquiferAttrTable_v01" class="quarto-figure quarto-figure-center anchored">
@@ -1340,7 +1327,7 @@ table {
 </figure>
 </div>
 <p><strong>NB!</strong>: In QGIS it is an obligation to use a “reference_date” to get the model running and present outcomes!</p>
-<ol start="172" class="example" type="1">
+<ol start="163" class="example" type="1">
 <li>Select <em>ttim Computation Times:Domain</em> and set the time values for time steps where we want to get calculations of spatially distributed heads in mesh or raster points and contours.</li>
 </ol>
 <div id="fig-Panel-TTim_DomainAttrTable_v01" class="quarto-figure quarto-figure-center anchored">
@@ -1350,7 +1337,7 @@ table {
 </figure>
 </div>
 <p>For this case we will leave this table blank, because calculating several head distributions at different time steps is rather time consuming during this course.</p>
-<ol start="173" class="example" type="1">
+<ol start="164" class="example" type="1">
 <li>Select <em>ttim Observation:observations</em> and here we can set the time steps for a time series at certain points we want to monitor the calculation results. We set points at intervals that follow a (approximately) logarithmic increase in time intervals. Proposed values are shown in the next table.</li>
 </ol>
 <div id="fig-Panel-TTim_ObservationsAttrTable_v01" class="quarto-figure quarto-figure-center anchored">
@@ -1361,7 +1348,7 @@ table {
 </div>
 <p>Don’t choose exactly the same time as when changing the flow. So if 60 is an end value, choose 59.9.</p>
 <p>In the <em>Attribute Table</em> of layer <em>ttim Well:pumping_wells</em> we can set the discharge amount. The value might change during time when excavation is considered or construction is performed in phases. For each change we have to add a line of input. In case there are a lot of switch on/off moments, this is a lot of work. <br> We just leave this option without any change because there is an other option in case each well has only a singel start and end time.</p>
-<ol start="174" class="example" type="1">
+<ol start="165" class="example" type="1">
 <li>Therefor go to the layer <em>timml Well:pumping_wells</em> layer. This layer contains simple elements to make it behave as a simple Timm element.</li>
 <li>In the <em>Attribute Table</em> make start_time=5, end_time=30 and discharge_transient=15.</li>
 <li>But fill in a value of 0 m3/d in column “Discharge” because this variable is part of TimML well element. We use the “discharge_transient” variable to define flow in TTim. Remember: Solution of TTim is superposed on solution of TimML.</li>
