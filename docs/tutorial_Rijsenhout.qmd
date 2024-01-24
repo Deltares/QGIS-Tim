@@ -53,28 +53,28 @@ The case in this tutorial is located in The Netherlands, so next we select the a
 
 > In case your work is mostly in The Netherlands and in the “Amersfoort / RD New” projection, consider making this your default projection.
 >
-> - From the main menu click on *Settings* and select *Options...*.
-> - In the section *CRS and Transforms* select *CRS (handling)*, pick the radio button *Use a default CRS* and select “EPSG:28992 -Amersfoort / RD New”.
-> - Click OK.
-> - Close this window.
+> a. From the main menu click on *Settings* and select *Options...*.
+> a. In the section *CRS and Transforms* select *CRS (handling)*, pick the radio button *Use a default CRS* and select “EPSG:28992 -Amersfoort / RD New”.
+> a. Click OK.
+> a. Close this window.
 
 ### Install plugins
 This is the moment to import four plugins needed for this tutorial: 
 
 - the QGIS-Tim plugin (developed by Deltares). 
 - the iMOD plugin (developed by Deltares).
-- the Value Tool. 
+- the Value Tool. A plugin to display in table or plot values from raster layers (or mesh layers) at the current mouse position.
 - the PDOK plugin. This plugin gives access to a large database from which we will load the topographic maps and use the navigation option.
 
 To install the plugins from QGIS you need an internet connection! 
 
 > No internet connection? Follow the next steps to import the two Deltares' plugins from a ZIP file provided in the Tutorial Dataset.
 >
-> - Go to *Plugins* from the main menu and select *Manage and Install Plugins…* to open the plugin window.
-> - On the left section select *Install from ZIP*.
-> - Click the Browse button (![](figures/tutorial/button-Qgis-browse.png){width=4%}) and select the ZIP file "QGIS-Tim_Tutorial\\QGIS-iMOD-plugin.zip".
-> - Click *Install Plugin*.
-> - In the same way, install the QGIS-Tim plugin using the ZIP file "QGIS-Tim_Tutorial\\QGIS-Tim-plugin.zip".
+> a. Go to *Plugins* from the main menu and select *Manage and Install Plugins…* to open the plugin window.
+> a. On the left section select *Install from ZIP*.
+> a. Click the Browse button (![](figures/tutorial/button-Qgis-browse.png){width=4%}) and select the ZIP file "QGIS-Tim_Tutorial\\QGIS-iMOD-plugin.zip".
+> a. Click *Install Plugin*.
+> a. In the same way, install the QGIS-Tim plugin using the ZIP file "QGIS-Tim_Tutorial\\QGIS-Tim-plugin.zip".
 
 If you have an internet connection, all four plugins can be downloaded within QGIS. 
 
@@ -106,11 +106,11 @@ For navigation purposes, let's load a topographic map for The Netherlands from t
 
 > No internet connection? Follow the next steps to import a simple PNG file as a background.
 >
-> - Go to *Layer* in the main menu, go to *Add layer* and select *Add Raster layer*.
-> - Use the browse button (![](figures/tutorial/button-Qgis-browse.png){width=4%}) and from the tutorial material select “…\\QGIS-Tim_Tutorial\\dbase\\TopographicMapRijssenhout.png”.
-> - Click on *Add* and *Close* the window.
-> - If you do not see the map, select the layer "TopographicMapRijssenhout", click your right mouse button and select "Zoom to Layer(s)".
-> - Continue after step @continuewithoutinternet.
+> a. Go to *Layer* in the main menu, go to *Add layer* and select *Add Raster layer*.
+> a. Use the browse button (![](figures/tutorial/button-Qgis-browse.png){width=4%}) and from the tutorial material select “…\\QGIS-Tim_Tutorial\\dbase\\TopographicMapRijssenhout.png”.
+> a. Click on *Add* and *Close* the window.
+> a. If you do not see the map, select the layer "TopographicMapRijssenhout", click your right mouse button and select "Zoom to Layer(s)".
+> a. Continue after step @continuewithoutinternet.
 
 
 (@) If you do have an internet connection click on the PDOK plugin button (![](figures/tutorial/button-PDOK.png){width=4%}) to open the "PDOK Services Plugin" window.
@@ -158,9 +158,9 @@ If you had no introduction to the Tim plugin, read the Intermezzo below for a ge
 
 > **Intermezzo:** *introduction Tabs on the Tim panel*
 >
-> a. Model Manager: an overview of the elements in your geopackage. In case you switch to transient modelling, an extra column with *ttim* elements is added.
-> a. Elements: a list of at least 16 Tim elements from which you can build your model.
-> a. Results: here you can define your domain and cell size, decide if your model is transient or not and manage the output files.
+> - Model Manager: an overview of the elements in your geopackage. In case you switch to transient modelling, an extra column with *ttim* elements is added.
+> - Elements: a list of at least 16 Tim elements from which you can build your model.
+> - Results: here you can define your domain and cell size, decide if your model is transient or not and manage the output files.
 
 Now we are ready to define our first steady state model by parameterizing our Aquifer. <br>
 
@@ -171,7 +171,7 @@ Important message: all editing of model parameters and model elements you do in 
 (@) So select the layer "timml Aquifer:Aquifer" on the left.
 (@) Click your right mouse button and from the menu select *Attribute Table* to open the table in a new window. <br> **NB** Alternative is to press F6 or use the button *Open Attribute Table* (![](figures/tutorial/button-Qgis-OpenAttributeTable.png){width=3%}).
 (@) Start the editing mode with a click on the *Toggle Editing Mode* button (![](figures/tutorial/button-Qgis-AttributeTable-StartEditingMode.png ){width=4%}).
-(@) Hover with your mouse over the buttons and find the *Add Feature* button (![](figures/tutorial/button-AttributeTable-AddFeature.png){width=20%}). Perhaps number 5 from left.
+(@) Hover with your mouse over the buttons and find the *Add Feature* button (![](figures/tutorial/button-AttributeTable-AddFeature.png){width=20%}). Perhaps button 5 from left.
 (@) Add a new feature with this *Add Feature* button. In this case a feature is a hydrological layer.
 (@) Fill the feature with the values from the table below:
 
@@ -188,16 +188,18 @@ Important message: all editing of model parameters and model elements you do in 
 | semiconfined_top   | *NULL*     | [m MSL]  | |
 | semiconfined_head   | *NULL*     | [m MSL] | |
 
-**NB!** In the real world counting starts with 1. However, Tim is programmed in Python and in Python counting starts with 0. You will get used to it.<br><br>
-Also be aware that the *Aquifer* element you just edited is just a table. This is indicated with the icon (![](figures/tutorial/button-Qgis-AttributeTable.png){width=3%}) just before the layer name in the left panel. For Tim this means that the properties in this table apply for the full model domain. We will introduce some inhomogeneities later as polygons within that domain.
+**NB!** About Layer = 0. In the real world counting starts with 1. However, Tim is programmed in Python and in Python counting starts with 0. You will get used to it.
 
 (@) Save all changes with the *Save Edits* button (![](figures/tutorial/button-Qgis-AttributeTable-SaveEdits.png){width=4%}).
 (@) Stop the *Editing Mode* with a click on the button (![](figures/tutorial/button-Qgis-AttributeTable-StartEditingMode.png ){width=4%}).
 (@) Close the *Attribute Table* window with a click on the X in the upper right corner.
+
+Also be aware that the *Aquifer* element you just edited is just a table. This is indicated with the icon (![](figures/tutorial/button-Qgis-AttributeTable.png){width=3%}) just before the layer name in the left panel. For Tim this means that the properties in this table apply for the full model domain. We will introduce some inhomogeneities later as polygons within that domain.
+
 (@) Go to the tab *Results* in QGIS-Tim.
 (@) Click the button *Set to current extent*.
-(@) See that the output folder is by default the same as the folder of your geopackage.
-(@) See that from the output type 'Raster' is not selected.
+(@) On the tab sear for the section *Output*. Here you see that the output folder is by default the same as the folder of your geopackage.
+(@) See that from the output type 'Raster' is not selected so only Meshes are created.
 (@) Start the calculation with a click on *Compute*.
 
 A black Python.exe window pops up indicating that the TIM calculation started on the background. You can ignore this window but keep it open. Of course you van minimize it. If the calculation was completed successful, you will see this echo in QGIS.
@@ -219,7 +221,7 @@ The calculation result is now visible and we see a mesh with just the value 0, n
 (@) First hide the output layers by deselecting the sub group *mesh* or even the main group *case-Rijsenhout output*.
 (@) Go to the tab *Elements* in QGIS-Tim.
 (@) Click on the element "Well" and a window opens to create a new (vector) layer in QGIS.
-(@) Give the layer a name, e.g. "DewateringWell".
+(@) Give the layer a name, e.g. "DewateringWell" and click *OK*.
 
 See that layer "timml Well:DewateringWell" is added to the timml sub group in your geopackage with 'point' as geometry. Also in the ttim sub group an element with the same name is added. This is a table that can store transient well data while referring to the x/y locations in the timml layer. Next step is to add the actual well, both the location and its parameters.
 
@@ -244,8 +246,8 @@ The output in your ouput group "case-Rijsenhout output" is directly overwritten 
 
 Do you like to see the values of the calculated Head under you mouse?
 
-(@) Make the results visible again by, see if the group *case-Rijsenhout output* and *mesh* are checked.
-(@) Select the output sub group *mesh*.
+(@) Make the results visible again. So see if the group *case-Rijsenhout output* and *mesh* are checked.
+(@) Select the output sub group *mesh* and deselect the group *raster*.
 (@) Select the *Value Tool* button (![](figures/tutorial/button_valuetool.png){width=4%}).
 (@) Hover over the area and in the “Value Tool” panel you see the value within the mesh file at your mouse location.
 
