@@ -453,8 +453,9 @@ The new results are added as new layer to the project. Check for instance sub gr
 ## Model 8: abstraction effect over time
 Now you are ready for the last step: make your model transient. We keep it simple: we run the model for 30 days and see the increasing effect of the well.
 
-(@) In *Results* within the *output* section change "steady state" into "transient".
-(@) Go to *Model Manager* and see that only 5 elements have a transient component.
+(@) In the QGIS-Tim panel go to the tab *Model Manager*.
+(@) In the section *Model Setup* turn on the option "Transient".
+(@) See below that only 5 elements have a transient component.
 
 By selecting the "transient" option, columns containing extra parameters necessary for a transient model have been unhidden now. First of all we see it in the layer "timml Aquifer:Aquifer" where columns "storage" and "porosity are visible now.
 
