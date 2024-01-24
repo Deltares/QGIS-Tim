@@ -253,22 +253,10 @@ Let's save this project to be able to return to it later or in case of a crash o
 
 (@) Go to *Project* in the main menu, select *Save As* and select a folder and a file name for your project, e.g. “…\\QGIS-Tim_Tutorial-TheHague\\TheHague.qgz”
 
-## Checking available data from LHM
-We will now research what possible layer info is available from the LHM database (Landelijk hydrologisch model). Information from LHM is made available in the provided file “…\\QGIS-Tim_Tutorial-TheHague\\LHM4.1-ondergrondmodel.nc". The file contains rasterdata of both the 3D geological layering within The Netherlands and the corresponding geological parameterization (permeability, resistance, thickness).
+## Start your Tim model
+To get an idea of the parameterization of our Aquifer we can use the layer information available from the LHM database (Landelijk hydrologisch model). That model provides 3D geological layering within The Netherlands and the corresponding geological parameterization (permeability, resistance, thickness).
 
-(@) In the QGIS-Tim panel go to the *Extract* tab.
-(@) Open the file "..\\QGIS-Tim_Tutorial-TheHague\\LHM4.1-ondergrondmodel.nc" (this may take a minute because the file is 350 MB).
-(@) Click the button *Select by Polygon* and draw a large polygon (> 250x250m) to select the area around the building location between *Parkstraat* and *Oranjestraat* (see @fig-TheHagueCityCentre). Left-click several times and close the polygon with a right click.
-(@) Then click the *Extract* button and save the extracted subsoil data to a CSV file, e.g. "Ex2DH.csv".
-(@) A separate python window is opened and the selection is performed. You can follow the progress in your tool bar. There is no message indicating the process has ended. Just ignore the black screen and continue with the next step.
-
-> ![](figures/tutorial/figure_ExtractionError.png){width=90% #fig-figure_ExtractionError} <br> QGIS displays this error message in case your polygon is too small. In that case redraw your polygon for a larger area.
-
-Automatically 2 CSV files will be created. One with average values for bottom and top of layers and aquifer permeabilities and aquitard resistances. The other contains statistics on the data.
-
-(@) From a file manager on your laptop (e.g. Explorer) open the CSV files.
-
-An example of values from the first CSV are presented in @tbl-SubsoilCharacteristicsLHM. In each LHM layer the Aquitard information is positioned on top of Aquifer.
+An example of parameter values near our building pit area is presented in @tbl-SubsoilCharacteristicsLHM. In each LHM layer the Aquitard information is positioned on top of Aquifer.
 
 | fid <br> -| layer <br> -| aquitard <br> c| aquitard <br> npor| aquitard <br> s| aquifer <br> k| aquifer <br> npor| aquifer <br> s| aquifer <br> top| aquifer <br> bottom| semiconf <br> top| semiconf <br> head|
 |---|---|:--:|:--:|:--:|:--:|:--:|:--:|:-:|:--:|:--:|:--:|
@@ -286,7 +274,6 @@ A choice should be made at which depth the hydrogeological base is chosen for th
 Aquitard resistance in the city is quite high, so a value of 3000 days is best guess from experience. <br><br>
 For marine deposits at -12 a value of 50 to 100 days per meter layer thickness is a proper choice. The permeability of fine Holocene sand is chosen at 10 m/d.
 
-## Start your Tim model
 We are now ready to define our first steady state model by parameterizing our Aquifer.
 
 (@) From the *Layers* panel, select the layer *timml Aquifer:Aquifer*.
