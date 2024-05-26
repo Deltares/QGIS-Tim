@@ -1,10 +1,31 @@
 [
   {
-    "objectID": "index.html",
-    "href": "index.html",
-    "title": "QGIS-Tim",
+    "objectID": "deltaforge_install.html",
+    "href": "deltaforge_install.html",
+    "title": "Install iMOD Python with Deltaforge",
     "section": "",
-    "text": "QGIS-Tim is an open source project for multi-layer groundwater flow simulations. QGIS-Tim provides a link between QGIS and the open source analytic element method software: TimML (steady-state) and TTim (transient).\nThe benefit of the analytic element method (AEM) is that no grid or time-stepping is required. Geohydrological features are represented by points, lines, and polygons. QGIS-Tim stores these features in a GeoPackage.\nQGIS-Tim consists of a “front-end” and a “back-end”. The front-end is a QGIS plugin that provides a limited graphical interface to setup model input, visualize, and analyze model input. The back-end is a Python package. It reads the contents of the GeoPackage and transforms it into a TimML or TTim model, computes a result, and writes it to a file that the QGIS plugin loads.\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n Tutorials\n\n\nLearn how to use QGIS Tim plugin\n\n\n\n\n\n\n\n\n\n\n\n\nNo matching items"
+    "text": "Deltaforge is a python distribution which includes iMOD Python and all its dependencies. It is provided as an installer and makes installing iMOD Python easy. You can download the Deltaforge installer on the Deltares download portal."
+  },
+  {
+    "objectID": "deltaforge_install.html#what-is-deltaforge",
+    "href": "deltaforge_install.html#what-is-deltaforge",
+    "title": "Install iMOD Python with Deltaforge",
+    "section": "",
+    "text": "Deltaforge is a python distribution which includes iMOD Python and all its dependencies. It is provided as an installer and makes installing iMOD Python easy. You can download the Deltaforge installer on the Deltares download portal."
+  },
+  {
+    "objectID": "deltaforge_install.html#installation",
+    "href": "deltaforge_install.html#installation",
+    "title": "Install iMOD Python with Deltaforge",
+    "section": "Installation",
+    "text": "Installation\nTo install Deltaforge, double-click the executable, this will open the installation Wizard. You will be greeted with the welcome screen.\n\n\n\nThe welcome screen\n\n\nClick \"Next\", and then \"I agree\" in the license agreement.\n\n\n\nLicense agreement screen\n\n\nNext, you get to decide what type of installation you want. On your local machine it suffices to select Just me. If you are an admin of a server and you want to let others enjoy the Deltaforge installation as well, click All Users.\n\n\n\nThe installation type screen\n\n\nNext you get to decide where the python environment is installed. The default location is usually fine.\n\n\n\nThe location of the python installation\n\n\nFinally, some further configuration is possible. The screenshots contains the options we recommend.\n\n\n\nInstallation options with the recommended options selected."
+  },
+  {
+    "objectID": "deltaforge_install.html#using-deltaforge",
+    "href": "deltaforge_install.html#using-deltaforge",
+    "title": "Install iMOD Python with Deltaforge",
+    "section": "Using Deltaforge",
+    "text": "Using Deltaforge\nThe easiest way to start your environment is by pressing the Windows Key and start typing deltaforge. This will let you select the Deltaforge Prompt. Select this.\n\n\n\nThe Deltaforge Prompt should be findable in the Windows start menu\n\n\nThis will start a command prompt screen (cmd.exe), where at startup the Deltaforge python environment is activated.\n\n\n\nThe Deltaforge prompt. You can type mamba list to view all the packages installed.\n\n\nTo view all the packages installed in the environment you can type mamba list and press Enter. This will list all packages installed in the environment. If you want to start coding, you can type spyder, which will start Spyder, a Python scientific development environment."
   },
   {
     "objectID": "tutorial_Rijsenhout.html",
@@ -194,81 +215,11 @@
     ]
   },
   {
-    "objectID": "deltaforge_install.html",
-    "href": "deltaforge_install.html",
-    "title": "Install iMOD Python with Deltaforge",
+    "objectID": "index.html",
+    "href": "index.html",
+    "title": "QGIS-Tim",
     "section": "",
-    "text": "Deltaforge is a python distribution which includes iMOD Python and all its dependencies. It is provided as an installer and makes installing iMOD Python easy. You can download the Deltaforge installer on the Deltares download portal."
-  },
-  {
-    "objectID": "deltaforge_install.html#what-is-deltaforge",
-    "href": "deltaforge_install.html#what-is-deltaforge",
-    "title": "Install iMOD Python with Deltaforge",
-    "section": "",
-    "text": "Deltaforge is a python distribution which includes iMOD Python and all its dependencies. It is provided as an installer and makes installing iMOD Python easy. You can download the Deltaforge installer on the Deltares download portal."
-  },
-  {
-    "objectID": "deltaforge_install.html#installation",
-    "href": "deltaforge_install.html#installation",
-    "title": "Install iMOD Python with Deltaforge",
-    "section": "Installation",
-    "text": "Installation\nTo install Deltaforge, double-click the executable, this will open the installation Wizard. You will be greeted with the welcome screen.\n\n\n\nThe welcome screen\n\n\nClick \"Next\", and then \"I agree\" in the license agreement.\n\n\n\nLicense agreement screen\n\n\nNext, you get to decide what type of installation you want. On your local machine it suffices to select Just me. If you are an admin of a server and you want to let others enjoy the Deltaforge installation as well, click All Users.\n\n\n\nThe installation type screen\n\n\nNext you get to decide where the python environment is installed. The default location is usually fine.\n\n\n\nThe location of the python installation\n\n\nFinally, some further configuration is possible. The screenshots contains the options we recommend.\n\n\n\nInstallation options with the recommended options selected."
-  },
-  {
-    "objectID": "deltaforge_install.html#using-deltaforge",
-    "href": "deltaforge_install.html#using-deltaforge",
-    "title": "Install iMOD Python with Deltaforge",
-    "section": "Using Deltaforge",
-    "text": "Using Deltaforge\nThe easiest way to start your environment is by pressing the Windows Key and start typing deltaforge. This will let you select the Deltaforge Prompt. Select this.\n\n\n\nThe Deltaforge Prompt should be findable in the Windows start menu\n\n\nThis will start a command prompt screen (cmd.exe), where at startup the Deltaforge python environment is activated.\n\n\n\nThe Deltaforge prompt. You can type mamba list to view all the packages installed.\n\n\nTo view all the packages installed in the environment you can type mamba list and press Enter. This will list all packages installed in the environment. If you want to start coding, you can type spyder, which will start Spyder, a Python scientific development environment."
-  },
-  {
-    "objectID": "install.html",
-    "href": "install.html",
-    "title": "Install",
-    "section": "",
-    "text": "QGIS-Tim consists of two parts: A QGIS plugin and the gistim Python package, which runs in a separate Python environment. The installation of QGIS-Tim therfore consists of three steps:"
-  },
-  {
-    "objectID": "install.html#install-qgis",
-    "href": "install.html#install-qgis",
-    "title": "Install",
-    "section": "1. Install QGIS",
-    "text": "1. Install QGIS\nDownload and install a recent version of QGIS (&gt;=3.28): https://www.qgis.org/en/site/forusers/download.html"
-  },
-  {
-    "objectID": "install.html#install-the-qgis-plugin",
-    "href": "install.html#install-the-qgis-plugin",
-    "title": "Install",
-    "section": "2. Install the QGIS plugin",
-    "text": "2. Install the QGIS plugin\n\nMethod A: From the QGIS plugin database (recommended)\n\nOpen QGIS.\nAt the top, find the Plugins menu (~sixth object in the menubar).\nFind \"Manage and Install plugins\" (~first object in drop-down).\nFind \"All\" (~first in left section).\nSearch for \"Qgis-Tim\".\nClick \"Install Plugin\".\n\n\n\nMethod B: From ZIP file\n\nDownload the \"QGIS-Tim-plugin.zip\" from the GitHub Releases page (do not unzip!).\nOpen QGIS.\nAt the top, find the Plugins menu (~sixth object in the menubar).\nFind \"Manage and Install plugins\" (~first object in drop-down).\nFind \"Install from ZIP\" (~fourth in left section).\nEnter the path to the file \"QGIS-TIM-plugin.zip\".\nClick \"Install Plugin\".\n\nThis will add an icon to the toolbar(s). \nBy clicking the icon, the plugin is started."
-  },
-  {
-    "objectID": "install.html#install-the-timml-and-ttim-server",
-    "href": "install.html#install-the-timml-and-ttim-server",
-    "title": "Install",
-    "section": "3. Install the TimML and TTim server",
-    "text": "3. Install the TimML and TTim server\nWith the plugin installed, we can already define model input and convert it to Python scripts or JSON files. To run TimML and TTim computations directly from QGIS, we need to install a server program which contains TimML and TTim.\n\nMethod A: Install from GitHub (requires internet connection)\n\nStart the QGIS-Tim plugin by clicking the QGIS-Tim icon in the toolbar.\nFind and click the “Install TimML and TTim server” button at the bottom of the plugin window.\nClick the “Install latest release from GitHub” button to download and install the server program.\n\n\n\nMethod B: Install from ZIP file\nSpecific releases can also be manually downloaded from the GitHub Releases page:\n\nDownload the gistim ZIP file for your platform: Windows, macOS, or Linux.\nStart the QGIS-Tim plugin by clicking the QGIS-Tim icon in the toolbar.\nFind and click the “Install TimML and TTim server” button at the bottom of the plugin window.\nSet the path to the downloaded ZIP file in the “Install from ZIP file” section.\nClick the “Install” button."
-  },
-  {
-    "objectID": "developer.html",
-    "href": "developer.html",
-    "title": "Developer Notes",
-    "section": "",
-    "text": "QGIS-Tim uses pixi to manage installing dependencies and run common tasks.\nFollow the instructions on the Getting Started page.\n\n\nTo build the TimML and TTim server application with PyInstaller, run pixi run build-backend\nThis creates a built PyInstaller application in ./dist/gistim.\nRun pixi run zip-backend to create a ZIP file of the PyInstaller application. Run pixi run zip-plugin to create a ZIP file of the QGIS plugin that can be installed in QGIS.\nTo test the created ZIP files: Install the QGIS from the ZIP file, start the QGIS plugin and try to install the ZIP file via the “Install TimML and TTim server” button."
-  },
-  {
-    "objectID": "developer.html#pixi",
-    "href": "developer.html#pixi",
-    "title": "Developer Notes",
-    "section": "",
-    "text": "QGIS-Tim uses pixi to manage installing dependencies and run common tasks.\nFollow the instructions on the Getting Started page.\n\n\nTo build the TimML and TTim server application with PyInstaller, run pixi run build-backend\nThis creates a built PyInstaller application in ./dist/gistim.\nRun pixi run zip-backend to create a ZIP file of the PyInstaller application. Run pixi run zip-plugin to create a ZIP file of the QGIS plugin that can be installed in QGIS.\nTo test the created ZIP files: Install the QGIS from the ZIP file, start the QGIS plugin and try to install the ZIP file via the “Install TimML and TTim server” button."
-  },
-  {
-    "objectID": "developer.html#creating-new-release",
-    "href": "developer.html#creating-new-release",
-    "title": "Developer Notes",
-    "section": "Creating new release",
-    "text": "Creating new release\n\nMake a GitHub release\nTo create a new release:\n\nGo to the QGIS-Tim releases page\nClick on the “Draft a new release” button.\nCreate a new tag.\nWrite a title and description.\nPublish the release.\nPyInstaller applications will now be automatically built.\n\nGitHub actions have been defined to automatically build PyInstaller applications on Windows, macOS, and Linux; and to create a ZIP file of the QGIS plugin. These run automatically when a new tag is defined. The defined workflows will upload their files to an existing release. This means tags should only be created via the GitHub “Draft a new release” functionality, or no release will be available to upload to.\n\n\nUpload the plugin to the QGIS respository\nLogin to the QGIS plugin repository and upload the ZIP file of the QGIS plugin."
+    "text": "QGIS-Tim is an open source project for multi-layer groundwater flow simulations. QGIS-Tim provides a link between QGIS and the open source analytic element method software: TimML (steady-state) and TTim (transient).\nThe benefit of the analytic element method (AEM) is that no grid or time-stepping is required. Geohydrological features are represented by points, lines, and polygons. QGIS-Tim stores these features in a GeoPackage.\nQGIS-Tim consists of a “front-end” and a “back-end”. The front-end is a QGIS plugin that provides a limited graphical interface to setup model input, visualize, and analyze model input. The back-end is a Python package. It reads the contents of the GeoPackage and transforms it into a TimML or TTim model, computes a result, and writes it to a file that the QGIS plugin loads.\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n Tutorials\n\n\nLearn how to use QGIS Tim plugin\n\n\n\n\n\n\n\n\n\n\n\n\nNo matching items"
   },
   {
     "objectID": "tutorial_TheHague.html",
@@ -423,5 +374,54 @@
       "Tutorials",
       "Building Pit The Hague"
     ]
+  },
+  {
+    "objectID": "install.html",
+    "href": "install.html",
+    "title": "Install",
+    "section": "",
+    "text": "QGIS-Tim consists of two parts: A QGIS plugin and the gistim Python package, which runs in a separate Python environment. The installation of QGIS-Tim therfore consists of three steps:"
+  },
+  {
+    "objectID": "install.html#install-qgis",
+    "href": "install.html#install-qgis",
+    "title": "Install",
+    "section": "1. Install QGIS",
+    "text": "1. Install QGIS\nDownload and install a recent version of QGIS (&gt;=3.28): https://www.qgis.org/en/site/forusers/download.html"
+  },
+  {
+    "objectID": "install.html#install-the-qgis-plugin",
+    "href": "install.html#install-the-qgis-plugin",
+    "title": "Install",
+    "section": "2. Install the QGIS plugin",
+    "text": "2. Install the QGIS plugin\n\nMethod A: From the QGIS plugin database (recommended)\n\nOpen QGIS.\nAt the top, find the Plugins menu (~sixth object in the menubar).\nFind \"Manage and Install plugins\" (~first object in drop-down).\nFind \"All\" (~first in left section).\nSearch for \"Qgis-Tim\".\nClick \"Install Plugin\".\n\n\n\nMethod B: From ZIP file\n\nDownload the \"QGIS-Tim-plugin.zip\" from the GitHub Releases page (do not unzip!).\nOpen QGIS.\nAt the top, find the Plugins menu (~sixth object in the menubar).\nFind \"Manage and Install plugins\" (~first object in drop-down).\nFind \"Install from ZIP\" (~fourth in left section).\nEnter the path to the file \"QGIS-TIM-plugin.zip\".\nClick \"Install Plugin\".\n\nThis will add an icon to the toolbar(s). \nBy clicking the icon, the plugin is started."
+  },
+  {
+    "objectID": "install.html#install-the-timml-and-ttim-server",
+    "href": "install.html#install-the-timml-and-ttim-server",
+    "title": "Install",
+    "section": "3. Install the TimML and TTim server",
+    "text": "3. Install the TimML and TTim server\nWith the plugin installed, we can already define model input and convert it to Python scripts or JSON files. To run TimML and TTim computations directly from QGIS, we need to install a server program which contains TimML and TTim.\n\nMethod A: Install from GitHub (requires internet connection)\n\nStart the QGIS-Tim plugin by clicking the QGIS-Tim icon in the toolbar.\nFind and click the “Install TimML and TTim server” button at the bottom of the plugin window.\nClick the “Install latest release from GitHub” button to download and install the server program.\n\n\n\nMethod B: Install from ZIP file\nSpecific releases can also be manually downloaded from the GitHub Releases page:\n\nDownload the gistim ZIP file for your platform: Windows, macOS, or Linux.\nStart the QGIS-Tim plugin by clicking the QGIS-Tim icon in the toolbar.\nFind and click the “Install TimML and TTim server” button at the bottom of the plugin window.\nSet the path to the downloaded ZIP file in the “Install from ZIP file” section.\nClick the “Install” button."
+  },
+  {
+    "objectID": "developer.html",
+    "href": "developer.html",
+    "title": "Developer Notes",
+    "section": "",
+    "text": "QGIS-Tim uses pixi to manage installing dependencies and run common tasks.\nFollow the instructions on the Getting Started page.\n\n\nTo build the TimML and TTim server application with PyInstaller, run pixi run build-backend\nThis creates a built PyInstaller application in ./dist/gistim.\nRun pixi run zip-backend to create a ZIP file of the PyInstaller application. Run pixi run zip-plugin to create a ZIP file of the QGIS plugin that can be installed in QGIS.\nTo test the created ZIP files: Install the QGIS from the ZIP file, start the QGIS plugin and try to install the ZIP file via the “Install TimML and TTim server” button."
+  },
+  {
+    "objectID": "developer.html#pixi",
+    "href": "developer.html#pixi",
+    "title": "Developer Notes",
+    "section": "",
+    "text": "QGIS-Tim uses pixi to manage installing dependencies and run common tasks.\nFollow the instructions on the Getting Started page.\n\n\nTo build the TimML and TTim server application with PyInstaller, run pixi run build-backend\nThis creates a built PyInstaller application in ./dist/gistim.\nRun pixi run zip-backend to create a ZIP file of the PyInstaller application. Run pixi run zip-plugin to create a ZIP file of the QGIS plugin that can be installed in QGIS.\nTo test the created ZIP files: Install the QGIS from the ZIP file, start the QGIS plugin and try to install the ZIP file via the “Install TimML and TTim server” button."
+  },
+  {
+    "objectID": "developer.html#creating-new-release",
+    "href": "developer.html#creating-new-release",
+    "title": "Developer Notes",
+    "section": "Creating new release",
+    "text": "Creating new release\n\nMake a GitHub release\nTo create a new release:\n\nGo to the QGIS-Tim releases page\nClick on the “Draft a new release” button.\nCreate a new tag.\nWrite a title and description.\nPublish the release.\nPyInstaller applications will now be automatically built.\n\nGitHub actions have been defined to automatically build PyInstaller applications on Windows, macOS, and Linux; and to create a ZIP file of the QGIS plugin. These run automatically when a new tag is defined. The defined workflows will upload their files to an existing release. This means tags should only be created via the GitHub “Draft a new release” functionality, or no release will be available to upload to.\n\n\nUpload the plugin to the QGIS respository\nLogin to the QGIS plugin repository and upload the ZIP file of the QGIS plugin."
   }
 ]
