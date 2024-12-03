@@ -488,8 +488,8 @@ Special attention for the Well package while it has 2 options to make it transie
 In this tutorial we show you the simple version.
 
 (@) In your geopackage select the layer "timml Well:DewateringWell".
-(@) Open its table, start the editing mode and see that columns with time dependent parameters are visible now.
-(@) Switch off the Steady State abstraction, make discharge = 0.
+(@) Open its table, start the editing mode and see that 6 extra columns with time dependent parameters are visible now ("time_start", "time_end", "discharge_transient", "caisson_radius", "slug" and "timeseries_id").
+(@) Switch off the Steady State abstraction, make discharge = 0 (was 2000).
 (@) Switch on the Transient abstraction: time_start = 2, time_end = 30, discharge_transient = 2000, caisson_radius = 1.
 (@) Save your changes.
 (@) Compute your transient model in the tab *Results*.

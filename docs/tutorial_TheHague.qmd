@@ -410,6 +410,7 @@ We can observe that the lowering of groundwater around the building pit is quite
 
 (@) To make a cross section, use the iMOD plugin toolbar and click on the Cross Section widget (![](figures/tutorial/button_iMOD-Cross-section.png){width=3%})
 (@) From the dropdown menu on the left of this panel, select the mesh (![](figures/tutorial/button_Mesh.png){width=3%}) with \*_layer_0.
+(@) Check the box *As line(s)*.
 (@) Press *Add*.
 (@) Start to define your cross section with a click on the button *Select location*.
 (@) Draw your cross section by left clicking on the map. Stop drawing with a right click. You can redraw this line anytime you like.
