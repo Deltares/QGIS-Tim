@@ -2,12 +2,12 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.4.555">
+<meta name="generator" content="quarto-1.6.39">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>QGIS-Tim - Building Pit The Hague</title>
+<title>Building Pit The Hague – QGIS-Tim</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -36,10 +36,10 @@ ul.task-list li input[type="checkbox"] {
 <script src="site_libs/quarto-html/tippy.umd.min.js"></script>
 <script src="site_libs/quarto-html/anchor.min.js"></script>
 <link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-e26003cea8cd680ca0c55a263523d882.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<link href="site_libs/bootstrap/bootstrap-84ede947b78ad032198a25618006d6bf.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <link href="site_libs/quarto-contrib/fontawesome6-0.1.0/all.css" rel="stylesheet">
 <link href="site_libs/quarto-contrib/fontawesome6-0.1.0/latex-fontsize.css" rel="stylesheet">
 <script id="quarto-search-options" type="application/json">{
@@ -89,7 +89,7 @@ ul.task-list li input[type="checkbox"] {
     </a>
   </div>
             <div id="quarto-search" class="" title="Search"></div>
-          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
   <span class="navbar-toggler-icon"></span>
 </button>
           <div class="collapse navbar-collapse" id="navbarCollapse">
@@ -115,17 +115,17 @@ ul.task-list li input[type="checkbox"] {
   </li>  
 </ul>
           </div> <!-- /navcollapse -->
-          <div class="quarto-navbar-tools">
+            <div class="quarto-navbar-tools">
 </div>
       </div> <!-- /container-fluid -->
     </nav>
   <nav class="quarto-secondary-nav">
     <div class="container-fluid d-flex">
-      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
         <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./tutorial_TheHague.html">Building Pit The Hague</a></li></ol></nav>
-        <a class="flex-grow-1" role="button" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
         </a>
     </div>
   </nav>
@@ -283,7 +283,7 @@ ol.w {list-style-type: inherit;}
 <section id="introduction-case-the-hague" class="level2">
 <h2 class="anchored" data-anchor-id="introduction-case-the-hague">Introduction case <em>The Hague</em></h2>
 <p>In the old city centre of The Hague a building plan with a parking basement is constructed. The dimensions of the building pit are <strong>34.2 m * 83.2 m.</strong> The area is shown in <a href="#fig-TheHagueCityCentre" class="quarto-xref">Figure&nbsp;1</a>.</p>
-<div id="fig-TheHagueCityCentre" class="quarto-figure quarto-figure-left quarto-float anchored" data-fig-align="left">
+<div id="fig-TheHagueCityCentre" class="quarto-float quarto-figure quarto-figure-left anchored" data-fig-align="left">
 <figure class="quarto-float quarto-float-fig figure">
 <div aria-describedby="fig-TheHagueCityCentre-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <img src="figures/tutorial/photo-TheHagueCityCentre.png" class="img-fluid quarto-figure quarto-figure-left figure-img" style="width:50.0%">
@@ -294,7 +294,7 @@ Figure&nbsp;1: Schematization of the building area in The Hague city centre (ora
 </figure>
 </div>
 <p>To carry out the construction in dry conditions, the groundwater level needs to be lowered by <strong>3.5 m.</strong> The required drainage time is 4 months. <br> The environment is vulnerable with valuable buildings and monuments (see <a href="#fig-TheMonumentalEnvironment" class="quarto-xref">Figure&nbsp;2</a>) that have a shallow foundation. The subsoil consists of sandy layers which locally contain shallow peat/clay/silt layers and deeper layers of clay/silt. The builder contractor must use a sheet pile wall that needs to be installed in a water-retarding layer (aquitard).</p>
-<div id="fig-TheMonumentalEnvironment" class="quarto-figure quarto-figure-left quarto-float anchored" data-fig-align="left">
+<div id="fig-TheMonumentalEnvironment" class="quarto-float quarto-figure quarto-figure-left anchored" data-fig-align="left">
 <figure class="quarto-float quarto-float-fig figure">
 <div aria-describedby="fig-TheMonumentalEnvironment-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <img src="figures/tutorial/photo-TheMonumentalEnvironment.png" class="img-fluid quarto-figure quarto-figure-left figure-img" style="width:50.0%">
@@ -307,7 +307,7 @@ Figure&nbsp;2: The monumental environment
 <p><strong>The questions to be elaborated in the hydrogeological advice is:</strong> <br> <em>“How deep should a sheet pile wall be placed to prevent damage? Can risks arise from a leak?”</em></p>
 <p>Applications of a sheet pile wall (with a hydraulic resistance of 100 days) and a concrete cut off wall (with a hydraulic resistance of 1000 days) need to be studied.</p>
 <p>The soil profile has been investigated with borings and CPTs. An example of a CPT is shown in <a href="#fig-CPT01" class="quarto-xref">Figure&nbsp;3</a>.</p>
-<div id="fig-CPT01" class="quarto-figure quarto-figure-left quarto-float anchored" data-fig-align="left">
+<div id="fig-CPT01" class="quarto-float quarto-figure quarto-figure-left anchored" data-fig-align="left">
 <figure class="quarto-float quarto-float-fig figure">
 <div aria-describedby="fig-CPT01-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <img src="figures/tutorial/figure-CPT01.png" class="img-fluid quarto-figure quarto-figure-left figure-img" style="width:70.0%">
@@ -330,7 +330,7 @@ table {
   font-size: 13px;
 }
 </style>
-<div id="tbl-GeohydrologicalModelSubsoil" class="quarto-float anchored">
+<div id="tbl-GeohydrologicalModelSubsoil" class="quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-tbl figure">
 <figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-GeohydrologicalModelSubsoil-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 Table&nbsp;1: Geohydrological model of the subsoil
@@ -552,7 +552,7 @@ Table&nbsp;1: Geohydrological model of the subsoil
 <li>Click the <em>New</em> button to create the GeoPackage and save it for instance in the folder with your tutorial data, e.g.&nbsp;“..\QGIS-Tim_Tutorial-TheHague\case-TheHague.gpkg”.</li>
 </ol>
 <p>Your window looks like in <a href="#fig-Panel-QGIS-Tim_TheHague" class="quarto-xref">Figure&nbsp;4</a>.</p>
-<div id="fig-Panel-QGIS-Tim_TheHague" class="quarto-figure quarto-figure-left quarto-float anchored" data-fig-align="left">
+<div id="fig-Panel-QGIS-Tim_TheHague" class="quarto-float quarto-figure quarto-figure-left anchored" data-fig-align="left">
 <figure class="quarto-float quarto-float-fig figure">
 <div aria-describedby="fig-Panel-QGIS-Tim_TheHague-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <img src="figures/tutorial/Panel-QGIS-Tim_TheHague.png" class="img-fluid quarto-figure quarto-figure-left figure-img" style="width:50.0%">
@@ -584,7 +584,7 @@ Figure&nbsp;4: QGIS-Tim panel
 <h2 class="anchored" data-anchor-id="start-your-tim-model">Start your Tim model</h2>
 <p>To get an idea of the parameterization of our Aquifer we can use the layer information available from the LHM database (Landelijk hydrologisch model). That model provides 3D geological layering within The Netherlands and the corresponding geological parameterization (permeability, resistance, thickness).</p>
 <p>An example of parameter values near our building pit area is presented in <a href="#tbl-SubsoilCharacteristicsLHM" class="quarto-xref">Table&nbsp;2</a>. In each LHM layer the Aquitard information is positioned on top of Aquifer.</p>
-<div id="tbl-SubsoilCharacteristicsLHM" class="quarto-float anchored">
+<div id="tbl-SubsoilCharacteristicsLHM" class="quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-tbl figure">
 <figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-SubsoilCharacteristicsLHM-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 Table&nbsp;2: The characteristics of the subsoil based on LHM data (example, your values may differ)
@@ -748,7 +748,7 @@ Table&nbsp;2: The characteristics of the subsoil based on LHM data (example, you
 <li>Then by clicking 3 times on (<img src="figures/tutorial/button-Qgis-AttributeTable-AddFeature.png" class="img-fluid" style="width:4.0%">) <em>Add feature</em> you will see new rows are added.</li>
 <li>Now you are able to fill in the desired values shown in <a href="#fig-AquiferAttrTable_v01" class="quarto-xref">Figure&nbsp;5</a>. <br> <strong>NB! Do not fill in column FID. ‘Autogenerate’ will take care.</strong></li>
 </ol>
-<div id="fig-AquiferAttrTable_v01" class="quarto-figure quarto-figure-center quarto-float anchored">
+<div id="fig-AquiferAttrTable_v01" class="quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-fig figure">
 <div aria-describedby="fig-AquiferAttrTable_v01-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <img src="figures/tutorial/Panel-Timml AquiferAttrTable_v01.png" class="img-fluid figure-img" style="width:70.0%">
@@ -787,7 +787,7 @@ Figure&nbsp;5: The characteristics of the aquifer
 <li>In the main menu go to <em>Project</em> and select <em>Snapping Options..</em>.</li>
 <li>From the new toolbar (see <a href="#fig-button_ToolbarSnappingSettings" class="quarto-xref">Figure&nbsp;6</a>), click on the <em>Enable Snapping</em> button (<img src="figures/tutorial/button_EnableSnapping.png" class="img-fluid" style="width:3.0%">).</li>
 </ol>
-<div id="fig-button_ToolbarSnappingSettings" class="quarto-figure quarto-figure-center quarto-float anchored">
+<div id="fig-button_ToolbarSnappingSettings" class="quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-fig figure">
 <div aria-describedby="fig-button_ToolbarSnappingSettings-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <img src="figures/tutorial/button_ToolbarSnappingSettings.png" class="img-fluid figure-img" style="width:90.0%">
@@ -802,7 +802,7 @@ Figure&nbsp;6: Switching on snapping options
 <li>Draw the sheet pile around the building pit (start south corner) with your left mouse button and close the feature on the first point.</li>
 <li>In the pop-up window fill in the resistance (1000 d, see * below) and layer number (layer=0, see ** below) as in <a href="#fig-LeakylinedoubletFeatureAttributes" class="quarto-xref">Figure&nbsp;7</a> and click OK to close the window.</li>
 </ol>
-<div id="fig-LeakylinedoubletFeatureAttributes" class="quarto-figure quarto-figure-left quarto-float anchored" data-fig-align="left">
+<div id="fig-LeakylinedoubletFeatureAttributes" class="quarto-float quarto-figure quarto-figure-left anchored" data-fig-align="left">
 <figure class="quarto-float quarto-float-fig figure">
 <div aria-describedby="fig-LeakylinedoubletFeatureAttributes-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <img src="figures/tutorial/figure_LeakylinedoubletFeatureAttributes.png" class="img-fluid quarto-figure quarto-figure-left figure-img" style="width:60.0%">
@@ -831,7 +831,7 @@ Figure&nbsp;7: The characteristics of the Leaky line doublet
 <li>In the pop-up window, fill in the well parameters discharge (50 m3/d), radius (0.1 m), resistance (1 d) and layer (0).</li>
 <li>Now add the other 7 wells locations in a fast way: do not import parameters with every single point. We will do that later. Just click <em>OK</em> on each <em>Feature Attribute</em> window.</li>
 </ol>
-<div id="fig-SchematizationTheHague" class="quarto-figure quarto-figure-left quarto-float anchored" data-fig-align="left">
+<div id="fig-SchematizationTheHague" class="quarto-float quarto-figure quarto-figure-left anchored" data-fig-align="left">
 <figure class="quarto-float quarto-float-fig figure">
 <div aria-describedby="fig-SchematizationTheHague-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <img src="figures/tutorial/figure_SchematizationTheHague.png" class="img-fluid quarto-figure quarto-figure-left figure-img" style="width:60.0%">
@@ -847,7 +847,7 @@ Figure&nbsp;8: Schematization of the pumping wells, sheet piles and observation 
 <li>Stop the editing mode, save your work and close the window.</li>
 <li>Select layer <em>timml Well:pumping_wells</em> again, click right and from the menu select <em>Show labels</em>.</li>
 </ol>
-<div id="fig-WellAttributeTable" class="quarto-figure quarto-figure-center quarto-float anchored">
+<div id="fig-WellAttributeTable" class="quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-fig figure">
 <div aria-describedby="fig-WellAttributeTable-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <img src="figures/tutorial/figure_WellAttributeTable.png" class="img-fluid figure-img" style="width:100.0%">
@@ -864,7 +864,7 @@ Figure&nbsp;9: Well properties
 <li>With the combination of <strong>Shift + double left click</strong>, you can add a new vertex to the line. Repeat that for the number of points you want to add.</li>
 </ol>
 <p><a href="#fig-figure_SheetPileExtraPoints" class="quarto-xref">Figure&nbsp;10</a> shows the result of positioned extra points in the line.</p>
-<div id="fig-figure_SheetPileExtraPoints" class="quarto-figure quarto-figure-left quarto-float anchored" data-fig-align="left">
+<div id="fig-figure_SheetPileExtraPoints" class="quarto-float quarto-figure quarto-figure-left anchored" data-fig-align="left">
 <figure class="quarto-float quarto-float-fig figure">
 <div aria-describedby="fig-figure_SheetPileExtraPoints-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <img src="figures/tutorial/figure_SheetPileExtraPoints.png" class="img-fluid quarto-figure quarto-figure-left figure-img" style="width:60.0%">
@@ -898,7 +898,7 @@ Figure&nbsp;10: Extra points for segmentation of the sheet pile element
 <li>Uncheck mesh and raster to only visualize contours on the base map.</li>
 <li>Uncheck contour lines of layer 1 and 2 to get only the result for layer 0 on screen as in <a href="#fig-DrawdownConstructionPit_v01" class="quarto-xref">Figure&nbsp;11</a>.</li>
 </ol>
-<div id="fig-DrawdownConstructionPit_v01" class="quarto-figure quarto-figure-left quarto-float anchored" data-fig-align="left">
+<div id="fig-DrawdownConstructionPit_v01" class="quarto-float quarto-figure quarto-figure-left anchored" data-fig-align="left">
 <figure class="quarto-float quarto-float-fig figure">
 <div aria-describedby="fig-DrawdownConstructionPit_v01-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <img src="figures/tutorial/figure_DrawdownConstructionPit_v01.png" class="img-fluid quarto-figure quarto-figure-left figure-img" style="width:70.0%">
@@ -935,13 +935,14 @@ Figure&nbsp;11: Updated results of groundwater head lowering contours due to 8 w
 <ol start="87" class="example" type="1">
 <li>To make a cross section, use the iMOD plugin toolbar and click on the Cross Section widget (<img src="figures/tutorial/button_iMOD-Cross-section.png" class="img-fluid" style="width:3.0%">)</li>
 <li>From the dropdown menu on the left of this panel, select the mesh (<img src="figures/tutorial/button_Mesh.png" class="img-fluid" style="width:3.0%">) with *_layer_0.</li>
+<li>Check the box <em>As line(s)</em>.</li>
 <li>Press <em>Add</em>.</li>
 <li>Start to define your cross section with a click on the button <em>Select location</em>.</li>
 <li>Draw your cross section by left clicking on the map. Stop drawing with a right click. You can redraw this line anytime you like.</li>
 <li>Satisfied with your line? Click the button <em>Plot</em> to draw this layer in the cross section. Your screen might look like <a href="#fig-HeadsInCrosssection03" class="quarto-xref">Figure&nbsp;12</a>.</li>
 <li>By using the <em>Export</em> button you can store results from the cross section in a CSV file.</li>
 </ol>
-<div id="fig-HeadsInCrosssection03" class="quarto-figure quarto-figure-center quarto-float anchored">
+<div id="fig-HeadsInCrosssection03" class="quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-fig figure">
 <div aria-describedby="fig-HeadsInCrosssection03-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <img src="figures/tutorial/figure_HeadsInCrosssection03.png" class="img-fluid figure-img" style="width:100.0%">
@@ -957,17 +958,17 @@ Figure&nbsp;12: Cross section of groundwater heads per layer, sheet pile wall R=
 <h2 class="anchored" data-anchor-id="making-calculations-with-parameter-variations-or-checking-bandwidth">Making calculations with parameter variations or checking bandwidth</h2>
 <p>The authorities demand a drawdown effect of dewatering at a maximum of 0.10 m at surrounding buildings. This means that improvements for leakage control are needed but first we need to discover what parameter to focus on.</p>
 <p>To check whether the wall resistance or the bottom resistance of the layer 1 (below the building pit) is more important we can make 2 variations; one with C-clay=200 d and one with R-wall=500 d.&nbsp;<br> Of course you can change your model input, rerun the model and overwrite your model results. The next steps show you how to change the model input and save the results in separate <em>.gpkg and </em>.nc files.</p>
-<ol start="94" class="example" type="1">
+<ol start="95" class="example" type="1">
 <li>In the input group select layer <em>timml Aquifer:…</em></li>
 <li>Open the <em>Attrribute Table</em> (F6) and change the value for “aquitard_c” in layer 1 into 200 d.</li>
 <li>In the QGIS-Tim panel go to the tab <em>Results</em> and change the name of the output, e.g.&nbsp;case-TheHague_v1.</li>
 <li>Click <em>Compute</em> to run variant 1.</li>
 </ol>
 <p>Check in the <em>Layers</em> panel and see that the results are not overwritten but added to the groups, e.g.&nbsp;layer <em>case-TheHague_v1-timml Observation:observations</em> is added to the group <em>Vector</em>.</p>
-<ol start="98" class="example" type="1">
+<ol start="99" class="example" type="1">
 <li>Fill in your calculated heads at the observation locations in <a href="#tbl-CalculatedHeads2Variants" class="quarto-xref">Table&nbsp;4</a> or use Excel.</li>
 </ol>
-<div id="tbl-CalculatedHeads2Variants" class="quarto-float anchored">
+<div id="tbl-CalculatedHeads2Variants" class="quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-tbl figure">
 <figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-CalculatedHeads2Variants-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 Table&nbsp;3: Table: calculated heads [m] in observation points for 2 variants compared to the initial situations. Your values will differ.
@@ -1047,7 +1048,7 @@ Table&nbsp;3: Table: calculated heads [m] in observation points for 2 variants c
 </div>
 <p>* Known issue in TimML: you have to multiply Rw by layer permeability (Rw*10).</p>
 <p>Let’s now run Variant 2.</p>
-<ol start="99" class="example" type="1">
+<ol start="100" class="example" type="1">
 <li>In layer <em>timml Aquifer:…</em> reset the value for “aquitard_c” in layer 1 to the default of 40 d.</li>
 <li>In layer <em>timml Leaky Line Doublet:…</em> change the value for “resistance” into 5000 d (500x10).</li>
 <li>In the QGIS-Tim panel go to the tab <em>Results</em> and change the name of the output, e.g.&nbsp;case-TheHague_v2.</li>
@@ -1065,7 +1066,7 @@ Table&nbsp;3: Table: calculated heads [m] in observation points for 2 variants c
 <li>We recommend to create an extra <em>Leaky Line Doublet</em> element. In this case it is more easy to switch on/off this additional element in your sensitivity analysis.</li>
 </ul>
 <p>How to copy the sheet pile wall to an extra <em>Leaky Line Doublet</em> element?</p>
-<ol start="104" class="example" type="1">
+<ol start="105" class="example" type="1">
 <li>In the QGIS-Tim panel go to the tab <em>Elements</em> and add a second <em>Leaky Line Doublet</em> and give it a name, e.g.&nbsp;“sheet_pile_L1”</li>
 <li>Go to the tab <em>Model Manager</em> and see that the element separately is added to the list. Here is can switch this element on / off for a calculation.</li>
 <li>In the <em>Layers</em> panel select the new layer <em>timml Leaky Line Doublet:sheet_pile_l1</em>.</li>
@@ -1074,17 +1075,17 @@ Table&nbsp;3: Table: calculated heads [m] in observation points for 2 variants c
 <li>Click on the <em>Copy</em> button (<img src="figures/tutorial/button_Copy_Selected_Row.png" class="img-fluid" style="width:3.0%">) in the source table to copy the selected row to the clipboard.</li>
 </ol>
 <p><img src="figures/tutorial/figure_Leakylinedoublet_copy.png" class="img-fluid" style="width:70.0%"></p>
-<ol start="110" class="example" type="1">
+<ol start="111" class="example" type="1">
 <li>In the target table, paste it with the <em>Paste</em> button (<img src="figures/tutorial/button_Paste_Feature.png" class="img-fluid" style="width:3.0%">) as a new layer.</li>
 <li>Assign this new sheet pile to layer=1.</li>
 <li>Stop editing and save the new element.</li>
 <li>Click <em>Compute</em> to start the computation again.</li>
 </ol>
 <p>The results are directly visible in the contours and cross-section again. <br> We can conclude that the drawdown in the building pit increases with a factor of almost 2 (-7.48 m at the centre of the building pit). Therefore, we adjust the well flow to 3.95/7.48*30=15.54 m3/d per well.</p>
-<ol start="114" class="example" type="1">
+<ol start="115" class="example" type="1">
 <li>Implement this change in the <em>timm Well</em> element and recalculate the model.</li>
 </ol>
-<div id="fig-figure_HeadsInCrosssection04" class="quarto-figure quarto-figure-center quarto-float anchored">
+<div id="fig-figure_HeadsInCrosssection04" class="quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-fig figure">
 <div aria-describedby="fig-figure_HeadsInCrosssection04-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <img src="figures/tutorial/figure_HeadsInCrosssection04.png" class="img-fluid figure-img" style="width:100.0%">
@@ -1096,11 +1097,11 @@ Figure&nbsp;13: Cross section of groundwater heads per layer, sheet pile wall R=
 </div>
 <p>We conclude that the drawdown of groundwater level around the building pit with deep sheet piles decreased significantly.</p>
 <p>Next also alternatives with a shallow concrete cut-off wall will be calculated for a shallow and a deep wall. In that case we have R=1000 d, but note that the input in the attribute than becomes k*R=10000 due to the error in Tim.</p>
-<ol start="115" class="example" type="1">
+<ol start="116" class="example" type="1">
 <li>After changing the value in attribute tables of wall elements, we can compute again, switching off and on the element for the deep wall section (tab “Model Manager” on the QGIS-Tim panel).</li>
 </ol>
 <p>Again extra calculation is needed to adjust well extractions for drawdown in the building pit.<br> Results of calculations are gathered in the following table, showing extractions and head outside the wall at South East monitoring position.</p>
-<div id="tbl-CalculatedHeads2Variants" class="quarto-float anchored">
+<div id="tbl-CalculatedHeads2Variants" class="quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-tbl figure">
 <figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-CalculatedHeads2Variants-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 Table&nbsp;4: Effect of 4 Wall alternatives on extraction rate and drawdown South East.
@@ -1156,14 +1157,14 @@ Table&nbsp;4: Effect of 4 Wall alternatives on extraction rate and drawdown Sout
 <section id="effect-of-a-not-closed-wall-about-20-cm" class="level2">
 <h2 class="anchored" data-anchor-id="effect-of-a-not-closed-wall-about-20-cm">Effect of a not closed wall (about 20 cm)</h2>
 <p>Authorities are afraid that leakage incidents could be harmful for surrounding monuments. The effect of leakage can be studied by creating a fictitious little opening in the wall. This can be done e.g.&nbsp;by changing the values of first and last coordinate of the leaky line doublet.</p>
-<ol start="116" class="example" type="1">
+<ol start="117" class="example" type="1">
 <li>Select the <em>Leaky Line Doublet</em> in the <em>Layers</em> panel</li>
 <li>In the editing toolbar go to the toggle editing option (<img src="figures/tutorial/button-Qgis-AttributeTable-StartEditingMode.png" class="img-fluid" style="width:4.0%">) and check the vertex option (<img src="figures/tutorial/button_VertexTool.png" class="img-fluid" style="width:4.0%">).</li>
 <li>On the drawing panel select a point in the line element of the wall and right click.</li>
 </ol>
 <p>The list with coordinates appears in the vertex editor at the lower left corner of the screen. There you can edit the coordinates of all points in the line. Another option is to zoom in and select a point in the line element and drag it to a new position.</p>
 <p>When the coordinates differ a gap results, in the studied case we created a 0.2 m wide gap. It might be elaborate to perform but the result is shown in the next figure. The result is calculated by using a small grid spacing. At this created gap a large flow results in the corner of the building pit, leading to an insufficient drawdown in the building pit and a 0.1 – 0.2 m larger lowering outside the building pit at that location.</p>
-<div id="fig-figure_LeakageEffectCorner" class="quarto-figure quarto-figure-center quarto-float anchored">
+<div id="fig-figure_LeakageEffectCorner" class="quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-fig figure">
 <div aria-describedby="fig-figure_LeakageEffectCorner-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <img src="figures/tutorial/figure_LeakageEffectCorner.png" class="img-fluid figure-img" style="width:80.0%">
@@ -1178,12 +1179,12 @@ Figure&nbsp;14: Calculated effect of leakage at one corner in the building pit
 <section id="using-python-for-sensitivity-analyses-with-a-qgis-tim-model" class="level2">
 <h2 class="anchored" data-anchor-id="using-python-for-sensitivity-analyses-with-a-qgis-tim-model">Using Python for sensitivity analyses with a QGIS-Tim model</h2>
 <p>QGIS-Tim offers the opportunity to export the geopackage of the created model to a Python script. This makes it possible to use the script for other ways of calculation, e.g.: - Calculation of model results in other Python environments, like Anaconda or Spyder or in a notebook. - Use in other Python oriented programs, like the Probabilistic Toolkit.</p>
-<ol start="119" class="example" type="1">
+<ol start="120" class="example" type="1">
 <li>If input of all elements is ready and the model has proved to run properly, go to the QGIS-Tim panel and the tab <em>Model Manager</em>.</li>
 <li>At the bottom press the button <em>Convert GeoPackage to Python script</em>.</li>
 <li>After a short period for translation in Python the explorer panel appears where you can enter the name you want to give for the python file, e.g.&nbsp;“case-TheHague.py” and store it in a directory you choose to save your work. The file looks like:</li>
 </ol>
-<div id="fig-figure_PythonExport01" class="quarto-figure quarto-figure-center quarto-float anchored">
+<div id="fig-figure_PythonExport01" class="quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-fig figure">
 <div aria-describedby="fig-figure_PythonExport01-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <img src="figures/tutorial/figure_PythonExport01.png" class="img-fluid figure-img" style="width:90.0%">
@@ -1198,11 +1199,11 @@ Figure&nbsp;15: Python script
 <p>To get the Python file running in a platform like Anaconda or Spyder, extra lines should be added at wish, to get the output that the user needs.</p>
 <p>Next this file can be used for geostatistical and scenario-analysis. There are several ways of handling this kind of study, like writing an additional Python program to perform repeated calculations and statistical analysis on results. But an easy way is to use the Probabilistic Toolkit (PTK), a platform for statistical analysis to be used together with geotechnical design programs, developed by Deltares. The PTK can be used for study of model sensitivity for variation of parameter values or reliability analysis.</p>
 <p>The PTK can be downloaded free of charge at <a href="https://download.deltares.nl/ptk" target="_blank">Probabilistic Toolkit - download.</a></p>
-<ol start="122" class="example" type="1">
+<ol start="123" class="example" type="1">
 <li>Open the <strong>Probabilistic Toolkit</strong> from your desktop (<img src="figures/tutorial/icon-probabiliticToolKit.png" class="img-fluid" style="width:4.0%">) or Windows menu (Deltares folder).</li>
 </ol>
 <p>The Toolkit opens at the first of 5 tabs: <em>Model</em>.</p>
-<ol start="123" class="example" type="1">
+<ol start="124" class="example" type="1">
 <li>In the section <em>Model Type</em> check if the dropdown menu <em>Type</em> is set to <em>Internal</em>.</li>
 <li>In the section <em>Model Type</em> check if the dropdown menu <em>Language</em> is set to <em>Python</em> and a the field <em>Version</em> appears.</li>
 <li>Select the tree points (‘…’) in the field <em>Version</em> and give the path where PTK can find the Python interpreter, e.g.&nbsp;Spyder at “C:\roelofs_fs\_software\deltaforge\pythonw.exe”.</li>
@@ -1216,7 +1217,7 @@ Figure&nbsp;15: Python script
 <li>The permeability of the sand layer k01.</li>
 <li>The resistance c2 of the second clay layer at -14 m NAP.</li>
 </ul>
-<div id="fig-figure-PTK-VariableNameValue" class="quarto-figure quarto-figure-center quarto-float anchored">
+<div id="fig-figure-PTK-VariableNameValue" class="quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-fig figure">
 <div aria-describedby="fig-figure-PTK-VariableNameValue-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <img src="figures/tutorial/figure-PTK-VariableNameValue.png" class="img-fluid figure-img" style="width:80.0%">
@@ -1227,13 +1228,13 @@ Figure&nbsp;16: Declaration of Variables to control the analysis and first guess
 </figure>
 </div>
 <p>In PTK we have to set these parameters:</p>
-<ol start="127" class="example" type="1">
+<ol start="128" class="example" type="1">
 <li>In the PTK panel <em>Input</em> click 4 times on the <em>Add</em> button (<img src="figures/tutorial/button-PTK-add.png" class="img-fluid" style="width:3.0%">), to add 4 variables and name them Rshp, czba, khol and cbasis (see <a href="#fig-figure-PTK-VariableNameValue" class="quarto-xref">Figure&nbsp;16</a>)</li>
 <li>In the tab <em>Variables</em> give these 4 variables the values 10000, 40, 10 and 100.</li>
 <li>Return to the tab <em>Model</em> and assign these variable values to the parameters in the source code by copying this code block to the top of the Python source code (see <a href="#fig-figure-PTK02" class="quarto-xref">Figure&nbsp;17</a>). <br> <code>Rwall = Rshp</code> <br> <code>c0    = czba</code> <br> <code>k0    = khol</code> <br> <code>c2    = cbasis</code></li>
 <li>Finaly, replace the fixed value (<strong>NB!</strong> 2 times “Rwall”, for each sheet pile definition) in the Python code for the parameter name (see red elements in <a href="#fig-figure-PTK02" class="quarto-xref">Figure&nbsp;17</a>).</li>
 </ol>
-<div id="fig-figure-PTK02" class="quarto-figure quarto-figure-center quarto-float anchored">
+<div id="fig-figure-PTK02" class="quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-fig figure">
 <div aria-describedby="fig-figure-PTK02-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <img src="figures/tutorial/figure-PTK02.png" class="img-fluid figure-img" style="width:80.0%">
@@ -1243,28 +1244,28 @@ Figure&nbsp;17: Replace parameters in the Python code.
 </figcaption>
 </figure>
 </div>
-<ol start="131" class="example" type="1">
+<ol start="132" class="example" type="1">
 <li>At the end of the source code, eliminate the following lines from the converted file:</li>
 </ol>
 <p><code>head = model.headgrid(xg=np.arange(80940.0, 81166.0, 4), yg=np.arange(455554.0, 455360.0, -4) )</code></p>
-<ol start="132" class="example" type="1">
+<ol start="133" class="example" type="1">
 <li>Also eliminate the lines:</li>
 </ol>
 <p><code>observation_peilbuis_2 = model.head(x=80970.16497991727, y=455495.54316352855)</code> <code>observation_peilbuis_3 = model.head(x=81004.86605597858, y=455389.68291883526)</code> <code>observation_peilbuis_4 = model.head(x=81049.06450220713, y=455485.0645022071)</code></p>
-<ol start="133" class="example" type="1">
+<ol start="134" class="example" type="1">
 <li>Because we only are interested in 2 points, use the first two observation points and add these lines at the end of the Python script:</li>
 </ol>
 <p><code>pb0 = observation_observations_0[0]</code><br> <code>pb1 = observation_observations_1[0]</code></p>
-<ol start="134" class="example" type="1">
+<ol start="135" class="example" type="1">
 <li>In the panel <em>Output</em> of the PTK use the <em>Add</em> button (<img src="figures/tutorial/button-PTK-add.png" class="img-fluid" style="width:3.0%">) the new defined variables “pb0” and “pb1”.</li>
 <li>Check if the program works properly. Field <em>Analysis</em> must contain “Run model”, field <em>Results</em> must contain “Single run”</li>
 <li>Press the RUN button (<img src="figures/tutorial/button-PTK-START.png" class="img-fluid" style="width:3.0%">) to calculate the model.</li>
 </ol>
 <p>In the tab <em>Run model</em> we find the results of our calculation.</p>
-<ol start="137" class="example" type="1">
+<ol start="138" class="example" type="1">
 <li>Check if it complies with your earlier calculations in QGIS-Tim.</li>
 </ol>
-<div id="fig-figure-PTK03" class="quarto-figure quarto-figure-left quarto-float anchored" data-fig-align="left">
+<div id="fig-figure-PTK03" class="quarto-float quarto-figure quarto-figure-left anchored" data-fig-align="left">
 <figure class="quarto-float quarto-float-fig figure">
 <div aria-describedby="fig-figure-PTK03-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <img src="figures/tutorial/figure-PTK03.png" class="img-fluid quarto-figure quarto-figure-left figure-img" style="width:40.0%">
@@ -1275,15 +1276,15 @@ Figure&nbsp;18: Result of test run in PTK to check model outcome.
 </figure>
 </div>
 <p>If results are as expected, we can step to a sensitivity analyses.</p>
-<ol start="138" class="example" type="1">
+<ol start="139" class="example" type="1">
 <li>In the tab <em>Field</em>, set the Analysis option to “Sensitivity*.</li>
 <li>Go to the tab <em>Variables</em>.</li>
 </ol>
 <p>For each selected parameter a distribution is defined with certain limits or characteristic values. Distribution formulas can be chosen based on knowhow of the user. Best guess of the parameter value distributions is given in the next example window.</p>
-<ol start="140" class="example" type="1">
+<ol start="141" class="example" type="1">
 <li>Change the distributon types for each Variable in the column “Distrubution” and fill in the other values.</li>
 </ol>
-<div id="fig-figure-PTK04" class="quarto-figure quarto-figure-center quarto-float anchored">
+<div id="fig-figure-PTK04" class="quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-fig figure">
 <div aria-describedby="fig-figure-PTK04-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <img src="figures/tutorial/figure-PTK04.png" class="img-fluid figure-img" style="width:100.0%">
@@ -1293,11 +1294,11 @@ Figure&nbsp;19: Best guess of the parameter value distributions
 </figcaption>
 </figure>
 </div>
-<ol start="141" class="example" type="1">
+<ol start="142" class="example" type="1">
 <li>Select the row with sheetpile resistance (Rshp) and in the panel below the distribution is shown (see <a href="#fig-figure-PTK-graph01" class="quarto-xref">Figure&nbsp;20</a>).</li>
 </ol>
 <p>Parameter value distributions of silt layer resistance (czba), basic peat layer resistance (cbasis) and permeability of Holocene sand (khol) are shown in graphs below.</p>
-<div id="fig-figure-PTK-graph01" class="quarto-figure quarto-figure-center quarto-float anchored">
+<div id="fig-figure-PTK-graph01" class="quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-fig figure">
 <div aria-describedby="fig-figure-PTK-graph01-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <img src="figures/tutorial/figure-PTK-graph01.png" class="img-fluid figure-img" style="width:100.0%">
@@ -1307,7 +1308,7 @@ Figure&nbsp;20: Parameter value distributions of sheetpile resistance Rshp
 </figcaption>
 </figure>
 </div>
-<div id="fig-figure-PTK-graph02" class="quarto-figure quarto-figure-center quarto-float anchored">
+<div id="fig-figure-PTK-graph02" class="quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-fig figure">
 <div aria-describedby="fig-figure-PTK-graph02-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <img src="figures/tutorial/figure-PTK-graph02.png" class="img-fluid figure-img" style="width:100.0%">
@@ -1317,7 +1318,7 @@ Figure&nbsp;21: Parameter value distributions of silt layer resistance czba
 </figcaption>
 </figure>
 </div>
-<div id="fig-figure-PTK-graph03" class="quarto-figure quarto-figure-center quarto-float anchored">
+<div id="fig-figure-PTK-graph03" class="quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-fig figure">
 <div aria-describedby="fig-figure-PTK-graph03-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <img src="figures/tutorial/figure-PTK-graph03.png" class="img-fluid figure-img" style="width:100.0%">
@@ -1327,7 +1328,7 @@ Figure&nbsp;22: Parameter value distributions of basic peat layer resistance cba
 </figcaption>
 </figure>
 </div>
-<div id="fig-figure-PTK-graph04" class="quarto-figure quarto-figure-center quarto-float anchored">
+<div id="fig-figure-PTK-graph04" class="quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-fig figure">
 <div aria-describedby="fig-figure-PTK-graph04-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <img src="figures/tutorial/figure-PTK-graph04.png" class="img-fluid figure-img" style="width:100.0%">
@@ -1338,12 +1339,12 @@ Figure&nbsp;23: Parameter value distributions of permeability of Holocene sand k
 </figure>
 </div>
 <p>Low and high value of resistivity are set in the tab <em>Calculation</em> to 10% and 90%.</p>
-<ol start="142" class="example" type="1">
+<ol start="143" class="example" type="1">
 <li>Press RUN (<img src="figures/tutorial/button-PTK-START.png" class="img-fluid" style="width:3.0%">) to recalculate the model in the Sensitivity mode.</li>
 <li>After the run is finished, a new tab <em>Sensitivity</em> is visible. Go to the tab.</li>
 </ol>
 <p>Here we can find what extent parameter variations contribute to model results. In <a href="#fig-figure-PTK-Sensitivity01" class="quarto-xref">Figure&nbsp;24</a> it is shown what parameter variation means for drawdown in the building pit. We conclude that for a situation with a sheet pile wall in only the first sand layer the variation of the resistance of the loamy layer (czba) determines the drawdown, and with that this factor determines the amount of extraction in that situation for the largest part. Translated to practical considerations, it is worthwhile to spend extra budget on determining the homogeneity of that layer and the vertical permeability of the loamy layer in more detail.</p>
-<div id="fig-figure-PTK-Sensitivity01" class="quarto-figure quarto-figure-center quarto-float anchored">
+<div id="fig-figure-PTK-Sensitivity01" class="quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-fig figure">
 <div aria-describedby="fig-figure-PTK-Sensitivity01-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <img src="figures/tutorial/figure-PTK-Sensitivity01.png" class="img-fluid figure-img" style="width:100.0%">
@@ -1355,7 +1356,7 @@ Figure&nbsp;24: Sensitivity of drawdown in building pit to parameter value distr
 </div>
 <p>However, with this model we get a varying outcome for the level in the building pit and this is not realistic for a practical situation. In real projects, the dewatering contractor would like to know what the effect on dewatering demand and interaction with environment would be if the aim is to reach the designed groundwater head in the building pit while adjusting the rate of extraction in the wells. <br></p>
 <p>We can do this quite simply with the aid of the Python file. To perform this analysis we follow the assumption that the relation between drawdown and well extraction is linear.<br></p>
-<ol start="144" class="example" type="1">
+<ol start="145" class="example" type="1">
 <li>Go to the tab <em>Model</em> and in the panel <em>Model code</em> remove from the end of the script the lines for <code>pb0</code> and the line for <code>pb1</code>.</li>
 <li>On the top of the script, below the line <code>k01 = khol</code> add a value for the fixed total extraction flux and the fixed head within the building pit: <br> <code>Qws = 100</code> <br> <code>pb0d = -3.5</code></li>
 <li>Now add the following lines to the code. <strong>NB!</strong> <em>Use the same observation variable name as is used in your script!</em><br> <code>pb0  = observation_observations_0[0]</code> <br> <code>fact = pb0d/pb0</code><br> <code>Qtot = 8*Qws*fact</code><br> <code>pb1  = observation_observations_1[0]*fact</code><br></li>
@@ -1364,7 +1365,7 @@ Figure&nbsp;24: Sensitivity of drawdown in building pit to parameter value distr
 <li>After the calculation is finisched, go to the tab <em>Sensitivity</em> and in the top left field select “Qtot” and or “pb1”.</li>
 </ol>
 <p>Again, we see that the parameter value for the hydraulic resistance of the loamy clay layer (czba) is most relevant to the variation of the outcome, not only for the drawdown effect in the area surrounding the building pit (pb1, see <a href="#fig-figure-PTK-Sensitivity02" class="quarto-xref">Figure&nbsp;25</a>) but also for the total flow to the extraction wells (Qtot, see <a href="#fig-figure-PTK-Sensitivity03" class="quarto-xref">Figure&nbsp;26</a>).</p>
-<div id="fig-figure-PTK-Sensitivity02" class="quarto-figure quarto-figure-center quarto-float anchored">
+<div id="fig-figure-PTK-Sensitivity02" class="quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-fig figure">
 <div aria-describedby="fig-figure-PTK-Sensitivity02-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <img src="figures/tutorial/figure-PTK-Sensitivity02.png" class="img-fluid figure-img" style="width:100.0%">
@@ -1374,7 +1375,7 @@ Figure&nbsp;25: Sensitivity of Pb1 (drawdown outside building pit) due to parame
 </figcaption>
 </figure>
 </div>
-<div id="fig-figure-PTK-Sensitivity03" class="quarto-figure quarto-figure-center quarto-float anchored">
+<div id="fig-figure-PTK-Sensitivity03" class="quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-fig figure">
 <div aria-describedby="fig-figure-PTK-Sensitivity03-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <img src="figures/tutorial/figure-PTK-Sensitivity03.png" class="img-fluid figure-img" style="width:100.0%">
@@ -1385,7 +1386,7 @@ Figure&nbsp;26: Sensitivity of Qtot (groundwater extraction from the building pi
 </figure>
 </div>
 <p>Based on the same statistic distributions for the parameter values we now are also able to calculate the uncertainty in output for this case, using a sheet pile wall in the first aquifer. <br> The distribution of the results for drawdown just outside the building pit is given in <a href="#fig-figure-PTK-Uncertainty01" class="quarto-xref">Figure&nbsp;27</a>, which in the lower part shows the distribution for total flow rate from the dewatering in the building pit.</p>
-<div id="fig-figure-PTK-Uncertainty01" class="quarto-figure quarto-figure-center quarto-float anchored">
+<div id="fig-figure-PTK-Uncertainty01" class="quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-fig figure">
 <div aria-describedby="fig-figure-PTK-Uncertainty01-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <img src="figures/tutorial/figure-PTK-Uncertainty01.png" class="img-fluid figure-img" style="width:100.0%">
@@ -1395,7 +1396,7 @@ Figure&nbsp;27: Uncertainty in drawdown outside building pit due to parameter va
 </figcaption>
 </figure>
 </div>
-<div id="fig-figure-PTK-Uncertainty02" class="quarto-figure quarto-figure-center quarto-float anchored">
+<div id="fig-figure-PTK-Uncertainty02" class="quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-fig figure">
 <div aria-describedby="fig-figure-PTK-Uncertainty02-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <img src="figures/tutorial/figure-PTK-Uncertainty02.png" class="img-fluid figure-img" style="width:100.0%">
@@ -1407,17 +1408,17 @@ Figure&nbsp;28: Uncertainty in groundwater extraction from the building pit due 
 </div>
 <p>The probabilistic model gives a 50% probability on a flow of 297 m3/d, even with a 10% chance of an overrun to 659 m3/d.&nbsp;The groundwater drawdown at the standpipe outside the building pit amounts -0.44 m with 50% probability but with 10% value of -1.10 m. <br></p>
 <p>Moreover, it is possible to perform a calculation of reliability with the PTK.</p>
-<ol start="150" class="example" type="1">
+<ol start="151" class="example" type="1">
 <li>Go to the tab <em>Analysis</em> and select the option <em>Reliability</em>.</li>
 <li>Then we check the variable distributions again.</li>
 <li>Next, we open the tab <em>Calculation</em>.</li>
 </ol>
 <p>This gives the possibility to introduce a failure criterium for certain variable, like in our case pb1. We choose a less strict criterium because with a shallow sheetpile wall it is not possible to meet the requirements anyhow.</p>
-<ol start="153" class="example" type="1">
+<ol start="154" class="example" type="1">
 <li>Choose a comparison with undershooting a critical value of REF -0.5 m for the groundwater head in pb1 (see <a href="#fig-figure-PTK-Calculation01" class="quarto-xref">Figure&nbsp;29</a>).</li>
 </ol>
 <p>At the right hand side in the settings window a calculation method needs to be selected. Many statistical methods are available, like Monte Carlo method etc. They are described in the help of the PTK in the main menu. We chose FORM (First Order Reliability Method) as a fast method because it is an automated intelligent iteration process to find a design point for reliability by using first calculated realisations (p.97 in the Help manual, see PTK menu).</p>
-<div id="fig-figure-PTK-Calculation01" class="quarto-figure quarto-figure-center quarto-float anchored">
+<div id="fig-figure-PTK-Calculation01" class="quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-fig figure">
 <div aria-describedby="fig-figure-PTK-Calculation01-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <img src="figures/tutorial/figure-PTK-Calculation01.png" class="img-fluid figure-img" style="width:90.0%">
@@ -1427,11 +1428,11 @@ Figure&nbsp;29: Setting up a reliability calculation by choosing a failure crite
 </figcaption>
 </figure>
 </div>
-<ol start="154" class="example" type="1">
+<ol start="155" class="example" type="1">
 <li>Recalculate the model and go to the tab <em>Reliability</em>.</li>
 </ol>
 <p>From the result (see <a href="#fig-figure-PTK-Reliability01" class="quarto-xref">Figure&nbsp;30</a>) we conclude that the FORM method is able to find a solution in just a few iterations.</p>
-<div id="fig-figure-PTK-Reliability01" class="quarto-figure quarto-figure-center quarto-float anchored">
+<div id="fig-figure-PTK-Reliability01" class="quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-fig figure">
 <div aria-describedby="fig-figure-PTK-Reliability01-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <img src="figures/tutorial/figure-PTK-Reliability01.png" class="img-fluid figure-img" style="width:100.0%">
@@ -1449,13 +1450,13 @@ Figure&nbsp;30: Result of the reliability analysis for the selected failure crit
 <section id="creating-a-transient-model" class="level2">
 <h2 class="anchored" data-anchor-id="creating-a-transient-model">Creating a transient model</h2>
 <p>At this moment, it is not possible to create a transient (time dependent) model with correct answers to case studies with sheetpile walls. The TTim solution needs to be updated. <br> Nevertheless in this section we want to guide you on setting up a basic transient model. <br></p>
-<ol start="155" class="example" type="1">
+<ol start="156" class="example" type="1">
 <li>Return to QGIS and in the QGIS-Tim panel go to the tab <em>Model Manager</em>.</li>
 <li>In the section <em>Model Setup</em> turn on the option “Transient”.</li>
 <li>In the panel <em>Layers</em> select <em>timml Aquifer:Aquifer</em>.</li>
 </ol>
 <p>As can be seen in <a href="#fig-Panel-TimmlAquiferAttrTable_v02" class="quarto-xref">Figure&nbsp;31</a>, the matrix of properties is extended in the transient mode with cells for transient parameters, like specific storage coefficients (aquitard_s, and aquifer_s) and porosities (aquitard_npor and aquifer_npor). Take care that specific storage coefficient is a storage per meter layer thickness. In older MWell course material a speadsheet is presented for estimation of coefficient values but there we calculated storage coefficients per whole layer. Those values should be divided by layer thickness.</p>
-<div id="fig-Panel-TimmlAquiferAttrTable_v02" class="quarto-figure quarto-figure-center quarto-float anchored">
+<div id="fig-Panel-TimmlAquiferAttrTable_v02" class="quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-fig figure">
 <div aria-describedby="fig-Panel-TimmlAquiferAttrTable_v02-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <img src="figures/tutorial/Panel-Timml AquiferAttrTable_v02.png" class="img-fluid figure-img" style="width:100.0%">
@@ -1465,17 +1466,17 @@ Figure&nbsp;31: Attribute Table for Aquifer in transient condition.
 </figcaption>
 </figure>
 </div>
-<ol start="158" class="example" type="1">
+<ol start="159" class="example" type="1">
 <li>Fill in the Table with the corresponding values.</li>
 <li>In the TTim section in the <em>Layers panel</em> go to the list of elements for transient calculations.</li>
 <li>Select <em>ttim Temporal Settings:Aquifer</em> and open its <em>Attribute Table</em> (F6). Here the length of the time series is specified.</li>
 <li>Set the starting time to 0.</li>
 </ol>
 <p>But calculations take place for the range of time steps between “time_min” and “time_max”. The time unit is according to central settings in the project, mostly time in days. “Time_min” should not be zero but given a slight offset. Here we also find a “Stehfest_M” number, related to the number of terms in the calculation method performing transformation of formulas in solving differential equations. A reference date can be set to relate the calculation to real time data.</p>
-<ol start="162" class="example" type="1">
+<ol start="163" class="example" type="1">
 <li>Fill in the table according to <a href="#fig-Panel-TTimAquiferAttrTable_v01" class="quarto-xref">Figure&nbsp;32</a>.</li>
 </ol>
-<div id="fig-Panel-TTimAquiferAttrTable_v01" class="quarto-figure quarto-figure-center quarto-float anchored">
+<div id="fig-Panel-TTimAquiferAttrTable_v01" class="quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-fig figure">
 <div aria-describedby="fig-Panel-TTimAquiferAttrTable_v01-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <img src="figures/tutorial/Panel-TTim AquiferAttrTable_v01.png" class="img-fluid figure-img" style="width:70.0%">
@@ -1486,10 +1487,10 @@ Figure&nbsp;32: Table for <em>ttim Temporal Settings:Aquifer</em>
 </figure>
 </div>
 <p><strong>NB!</strong>: In QGIS it is an obligation to use a “reference_date” to get the model running and present outcomes!</p>
-<ol start="163" class="example" type="1">
+<ol start="164" class="example" type="1">
 <li>Select <em>ttim Computation Times:Domain</em> and set the time values for time steps where we want to get calculations of spatially distributed heads in mesh or raster points and contours.</li>
 </ol>
-<div id="fig-Panel-TTim_DomainAttrTable_v01" class="quarto-figure quarto-figure-center quarto-float anchored">
+<div id="fig-Panel-TTim_DomainAttrTable_v01" class="quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-fig figure">
 <div aria-describedby="fig-Panel-TTim_DomainAttrTable_v01-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <img src="figures/tutorial/Panel-TTim_DomainAttrTable_v01.png" class="img-fluid figure-img" style="width:30.0%">
@@ -1500,10 +1501,10 @@ Figure&nbsp;33: Table for <em>ttim Computation Times:Domain</em>
 </figure>
 </div>
 <p>For this case we will leave this table blank, because calculating several head distributions at different time steps is rather time consuming during this course.</p>
-<ol start="164" class="example" type="1">
+<ol start="165" class="example" type="1">
 <li>Select <em>ttim Observation:observations</em> and here we can set the time steps for a time series at certain points we want to monitor the calculation results. We set points at intervals that follow a (approximately) logarithmic increase in time intervals. Proposed values are shown in the next table.</li>
 </ol>
-<div id="fig-Panel-TTim_ObservationsAttrTable_v01" class="quarto-figure quarto-figure-center quarto-float anchored">
+<div id="fig-Panel-TTim_ObservationsAttrTable_v01" class="quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-fig figure">
 <div aria-describedby="fig-Panel-TTim_ObservationsAttrTable_v01-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <img src="figures/tutorial/Panel-TTim_ObservationsAttrTable_v01.png" class="img-fluid figure-img" style="width:40.0%">
@@ -1515,7 +1516,7 @@ Figure&nbsp;34: Table for <em>ttim Observation:observations</em>
 </div>
 <p>Don’t choose exactly the same time as when changing the flow. So if 60 is an end value, choose 59.9.</p>
 <p>In the <em>Attribute Table</em> of layer <em>ttim Well:pumping_wells</em> we can set the discharge amount. The value might change during time when excavation is considered or construction is performed in phases. For each change we have to add a line of input. In case there are a lot of switch on/off moments, this is a lot of work. <br> We just leave this option without any change because there is an other option in case each well has only a singel start and end time.</p>
-<ol start="165" class="example" type="1">
+<ol start="166" class="example" type="1">
 <li>Therefor go to the layer <em>timml Well:pumping_wells</em> layer. This layer contains simple elements to make it behave as a simple Timm element.</li>
 <li>In the <em>Attribute Table</em> make start_time=5, end_time=30 and discharge_transient=15.</li>
 <li>But fill in a value of 0 m3/d in column “Discharge” because this variable is part of TimML well element. We use the “discharge_transient” variable to define flow in TTim. Remember: Solution of TTim is superposed on solution of TimML.</li>
@@ -1560,18 +1561,7 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
     }
     return false;
   }
-  const clipboard = new window.ClipboardJS('.code-copy-button', {
-    text: function(trigger) {
-      const codeEl = trigger.previousElementSibling.cloneNode(true);
-      for (const childEl of codeEl.children) {
-        if (isCodeAnnotation(childEl)) {
-          childEl.remove();
-        }
-      }
-      return codeEl.innerText;
-    }
-  });
-  clipboard.on('success', function(e) {
+  const onCopySuccess = function(e) {
     // button target
     const button = e.trigger;
     // don't keep focus
@@ -1603,7 +1593,27 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
     }, 1000);
     // clear code selection
     e.clearSelection();
+  }
+  const getTextToCopy = function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+    text: getTextToCopy
   });
+  clipboard.on('success', onCopySuccess);
+  if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+    const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+      text: getTextToCopy,
+      container: window.document.getElementById('quarto-embedded-source-code-modal')
+    });
+    clipboardModal.on('success', onCopySuccess);
+  }
     var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
     var mailtoRegex = new RegExp(/^mailto:/);
       var filterRegex = new RegExp('/' + window.location.host + '/');
@@ -1611,7 +1621,7 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
         return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
     }
     // Inspect non-navigation links and adorn them if external
- 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool)');
+ 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
     for (var i=0; i<links.length; i++) {
       const link = links[i];
       if (!isInternal(link.href)) {
@@ -1708,7 +1718,6 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
       if (window.Quarto?.typesetMath) {
         window.Quarto.typesetMath(note);
       }
-      // TODO in 1.5, we should make sure this works without a callout special case
       if (note.classList.contains("callout")) {
         return note.outerHTML;
       } else {
