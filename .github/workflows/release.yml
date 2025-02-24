@@ -22,7 +22,7 @@ jobs:
       - name: Check out repo
         uses: actions/checkout@v4
       - name: Setup Pixi
-        uses: prefix-dev/setup-pixi@v0.8.2
+        uses: prefix-dev/setup-pixi@v0.8.3
       - name: Build with PyInstaller
         run: pixi run build-backend
       - name: Create backend ZIP
