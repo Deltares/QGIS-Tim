@@ -1,15 +1,15 @@
 [
   {
+    "listing": "/index.html",
+    "items": [
+      "/tutorial.html"
+    ]
+  },
+  {
     "listing": "/tutorial.html",
     "items": [
       "/tutorial_Rijsenhout.html",
       "/tutorial_TheHague.html"
-    ]
-  },
-  {
-    "listing": "/index.html",
-    "items": [
-      "/tutorial.html"
     ]
   }
 ]
