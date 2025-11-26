@@ -276,6 +276,7 @@ def write_output(
     output_options = data["output_options"]
     observations = data["observations"]
     discharge_observations = data["discharge_observations"]
+    particle_traces = data["particle_traces"]
     start_date = pd.to_datetime(data.get("start_date"))
 
     # Compute gridded head data and write to netCDF.
@@ -303,13 +304,20 @@ def write_output(
 
     if output_options["discharge_observations"] and discharge_observations:
         for layername, content in discharge_observations.items():
-            observations = compute_discharge_observations(model, content["data"])
-            if observations is not None:
-                tables[layername] = observations
+            computed_observations = compute_discharge_observations(model, content["data"])
+            if computed_observations is not None:
+                tables[layername] = computed_observations
+    
+    if output_options["trace_particles"]:
+        for layername, content in particle_traces.items():
+            tables[layername] = compute_particle_traces(model, content["data"])
 
     write_geopackage(tables, crs, path)
     return
 
+def compute_particle_traces(model, particle_data):
+    # Insert logic here to compute particle traces using timml/ttim model
+    pass
 
 def compute_steady(
     path: Union[pathlib.Path, str],
