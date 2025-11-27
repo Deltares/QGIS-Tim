@@ -1,4 +1,4 @@
-[project]
+[workspace]
 name = "gistim"
 version = "0.6.0"
 description = "Connects TimML and TTim Analytic Element modeling to QGIS"
@@ -17,7 +17,7 @@ zip-backend = {depends-on = "install", cmd = "python .github/workflows/create_py
 zip-plugin = "python .github/workflows/create_plugin_zip.py"
 
 [dependencies]
-python = "3.11"
+python = "3.11.*"
 future = "*"
 pip = "*"
 
