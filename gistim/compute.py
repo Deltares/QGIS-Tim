@@ -200,6 +200,61 @@ def _(
     return df
 
 
+@singledispatch
+def compute_tracelines(model, particle_starts):
+    raise TypeError("Expected timml or ttim model")
+
+
+@compute_tracelines.register
+def _(
+    model: timml.Model,
+    particle_starts: List[Dict],
+) -> Dict[str, pd.DataFrame]:
+    d = {
+        "geometry": [],
+        "datetime_start": [],
+        "datetime_end": [],
+        "label": [],
+    }
+    for kwargs in particle_starts:
+        label = kwargs.pop("label")
+        # Get win somewhere
+        trace = timml.trace.timtraceline(model, **kwargs)
+        for start, end in zip(trace[:-1], trace[1:]):
+            linesegment = [[start[0], start[1]], [end[0], end[1]]]
+            d["geometry"].append({"type": "LineString", "coordinates": linesegment})
+            d["datetime_start"].append(start[3])
+            d["datetime_end"].append(end[3])
+            d["label"].append(label)
+
+    return pd.DataFrame(d)
+
+
+@compute_tracelines.register
+def _(
+    model: ttim.ModelMaq,
+    particle_starts: List[Dict],
+) -> Dict[str, pd.DataFrame]:
+    d = {
+        "geometry": [],
+        "datetime_start": [],
+        "datetime_end": [],
+        "label": [],
+    }
+    for kwargs in particle_starts:
+        label = kwargs.pop("label")
+        # Get win somewhere
+        trace = ttim.trace.timtraceline(model, **kwargs)
+        for start, end in zip(trace[:-1], trace[1:]):
+            linesegment = [[start[0], start[1]], [end[0], end[1]]]
+            d["geometry"].append({"type": "LineString", "coordinates": linesegment})
+            d["datetime_start"].append(start[3])
+            d["datetime_end"].append(end[3])
+            d["label"].append(label)
+
+    return pd.DataFrame(d)
+
+
 def extract_discharges(elements, nlayers, **_):
     tables = {}
     for layername, content in elements.items():
@@ -308,16 +363,13 @@ def write_output(
             if computed_observations is not None:
                 tables[layername] = computed_observations
     
-    if output_options["trace_particles"]:
+    if output_options["tracelines"] and particle_traces:
         for layername, content in particle_traces.items():
-            tables[layername] = compute_particle_traces(model, content["data"])
+            tables[layername] = compute_tracelines(model, content["data"])
 
     write_geopackage(tables, crs, path)
     return
 
-def compute_particle_traces(model, particle_data):
-    # Insert logic here to compute particle traces using timml/ttim model
-    pass
 
 def compute_steady(
     path: Union[pathlib.Path, str],
