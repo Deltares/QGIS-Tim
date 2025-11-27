@@ -6,6 +6,7 @@ from qgistim.core.elements.schemata import SingleRowSchema, TableSchema
 from qgistim.core.schemata import (
     AllGreaterEqual,
     AllRequired,
+    AllOptional,
     OffsetAllRequired,
     OptionalFirstOnly,
     Positive,
@@ -26,6 +27,8 @@ class AquiferSchema(TableSchema):
         "aquifer_k": AllRequired(StrictlyPositive()),
         "semiconf_top": OptionalFirstOnly(),
         "semiconf_head": OptionalFirstOnly(),
+        "aquifer_npor": AllOptional(Positive()),
+        "aquitard_npor": AllOptional(Positive()),
     }
     timml_consistency_schemata = (
         SemiConfined(),
@@ -66,6 +69,10 @@ class Aquifer(TransientElement):
         QgsField("laplace_inversion_M", QVariant.Int),
         QgsField("start_date", QVariant.DateTime),
     )
+    timml_defaults = {
+            "aquifer_npor": QgsDefaultValue("0.2"),
+            "aquitard_npor": QgsDefaultValue("0.2"),
+    }
     ttim_defaults = {
         "time_min": QgsDefaultValue("0.01"),
         "laplace_inversion_M": QgsDefaultValue("10"),
@@ -73,8 +80,6 @@ class Aquifer(TransientElement):
     transient_columns = (
         "aquitard_s",
         "aquifer_s",
-        "aquitard_npor",
-        "aquifer_npor",
     )
     schema = AquiferSchema()
     assoc_schema = TemporalSettingsSchema()
