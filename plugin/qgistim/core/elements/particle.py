@@ -80,7 +80,7 @@ class Particle(TransientElement, abc.ABC):
             "ystart": y,
             "zstart": row["z_start"],
             "hstepmax": row["hstep_max"],
-            "vstepfraction": row["vstep_fraction"],
+            "vstepfrac": row["vstep_fraction"],
             "tmax": row["time_end"],
             "nstepmax": row["nstep_max"],
             "label": row["label"],
