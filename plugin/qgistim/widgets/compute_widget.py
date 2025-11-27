@@ -43,6 +43,7 @@ class OutputOptions(NamedTuple):
     head_observations: bool
     discharge: bool
     discharge_observations: bool
+    tracelines: bool
     spacing: float
 
 
@@ -107,6 +108,7 @@ class ComputeWidget(QWidget):
         self.head_observations_checkbox = QCheckBox("Head Observations")
         self.discharge_checkbox = QCheckBox("Discharge")
         self.discharge_observations_checkbox = QCheckBox("Discharge Observations")
+        self.tracelines_checkbox = QCheckBox("Tracelines")
 
         self.spacing_spin_box = QDoubleSpinBox()
         self.spacing_spin_box.setMinimum(0.0)
@@ -174,6 +176,7 @@ class ComputeWidget(QWidget):
         result_layout.addWidget(self.head_observations_checkbox)
         result_layout.addWidget(self.discharge_checkbox)
         result_layout.addWidget(self.discharge_observations_checkbox)
+        result_layout.addWidget(self.tracelines_checkbox)
 
         result_layout.addLayout(button_row)
 
@@ -208,6 +211,7 @@ class ComputeWidget(QWidget):
         self.head_observations_checkbox.setChecked(True)
         self.discharge_checkbox.setChecked(False)
         self.discharge_observations_checkbox.setChecked(False)
+        self.tracelines_checkbox.setChecked(False)
         self.contour_min_box.setValue(-5.0)
         self.contour_max_box.setValue(5.0)
         self.contour_step_box.setValue(0.5)
@@ -254,6 +258,7 @@ class ComputeWidget(QWidget):
             head_observations=self.head_observations_checkbox.isChecked(),
             discharge=self.discharge_checkbox.isChecked(),
             discharge_observations=self.discharge_observations_checkbox.isChecked(),
+            tracelines=self.tracelines_checkbox.isChecked(),
             spacing=self.spacing_spin_box.value(),
         )
 

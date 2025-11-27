@@ -37,10 +37,11 @@ class ParticleSchema(RowWiseSchema):
     }
     ttim_schemata = {
         "time_start": Optional(Positive()),
+        "delt": Optional(Positive()),
         "time_end": Optional(Positive()),
     }
     ttim_consistency_schemata = (
-        AllOrNone(("time_start", "time_end")),
+        AllOrNone(("time_start", "delt", "time_end")),
     )
 
 
@@ -48,6 +49,7 @@ class Particle(TransientElement, abc.ABC):
     element_type = None
     geometry_type = "Point"
     timml_attributes = (
+        QgsField("label", QVariant.String),
         QgsField("z_start", QVariant.Double),
         QgsField("time_end", QVariant.Double),
         QgsField("hstep_max", QVariant.Double),
@@ -81,6 +83,7 @@ class Particle(TransientElement, abc.ABC):
             "vstepfraction": row["vstep_fraction"],
             "tmax": row["time_end"],
             "nstepmax": row["nstep_max"],
+            "label": row["label"],
         }
 
     def process_ttim_row(self, row, grouped) -> Dict[str, Any]:
@@ -90,10 +93,11 @@ class Particle(TransientElement, abc.ABC):
             "ystart": y,
             "zstart": row["z_start"],
             "hstepmax": row["hstep_max"],
-            "vstepfraction": row["vstep_fraction"],
-            "tmin": row["time_start"],
+            "tstart": row["time_start"],
+            "delt": row["delt"],
             "tmax": row["time_end"],
             "nstepmax": row["nstep_max"],
+            "label": row["label"],
         }
 
 class Particle_Forward(Particle):

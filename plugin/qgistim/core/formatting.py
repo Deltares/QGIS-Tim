@@ -30,6 +30,8 @@ TIMML_MAPPING = {
     "Leaky Building Pit": "LeakyBuildingPit",
     "Head Observation": "Head Observation",
     "Discharge Observation": "Discharge Observation",
+    "Particle Forward": "Particle Forward",
+    "Particle Backward": "Particle Backward",
 }
 # In TTim, a constant or uniform flow may be added, but they have no effect on
 # the transient superposed result.
@@ -44,6 +46,8 @@ TTIM_MAPPING = {
     "Leaky Line Doublet": "LeakyLineDoubletString",
     "Impermeable Line Doublet": "LeakyLineDoubletString",
     "Head Observation": "Head Observation",
+    "Particle Forward": "Particle Forward",
+    "Particle Backward": "Particle Backward",
 }
 PREFIX = "    "
 
@@ -156,6 +160,14 @@ def elements_and_observations(data, mapping: Dict[str, str], tim: str):
                 observations.append(
                     f"observation_{sanitized(name)}_{i}={tim}_model.head(\n{format_kwargs(kwargs)}\n)"
                 )
+            elif plugin_name == "Particle Forward" or plugin_name == "Particle Backward":
+                direction_str = plugin_name.split()[-1].lower()
+                # Should not be added to the model.
+                # TODO: .particle is not a function in timml/ttim, needs to be handled differently
+                raise NotImplementedError("Particle trace script generation not implemented yet.")
+                # observations.append(
+                #     f"particle_{direction_str}_{sanitized(name)}_{i}={tim}_model.particle(\n{format_kwargs(kwargs)}\n)"
+                # )
             elif plugin_name == "Discharge Observation":
                 kwargs.pop("label")
                 observations.append(
@@ -248,6 +260,7 @@ def json_elements_and_observations(data, mapping: Dict[str, str]):
 
     observations = {}
     discharge_observations = {}
+    particle_traces = {}
     tim_data = {"ModelMaq": aquifer_data}
     for layername, element_data in data.items():
         prefix, name = layername.split(":")
@@ -261,10 +274,12 @@ def json_elements_and_observations(data, mapping: Dict[str, str]):
             observations[layername] = entry
         elif tim_name == "Discharge Observation":
             discharge_observations[layername] = entry
+        elif tim_name == "Particle Forward" or tim_name == "Particle Backward":
+            particle_traces[layername] = entry
         else:
             tim_data[layername] = entry
 
-    return tim_data, observations, discharge_observations
+    return tim_data, observations, discharge_observations, particle_traces
 
 
 def timml_json(
@@ -290,7 +305,7 @@ def timml_json(
     # Process TimML elements
     data = timml_data.copy()  # avoid side-effects
     domain_data = data.pop("timml Domain:Domain")
-    elements, observations, discharge_observations = json_elements_and_observations(
+    elements, observations, discharge_observations, particle_traces = json_elements_and_observations(
         data, mapping=TIMML_MAPPING
     )
     json_data = {
@@ -299,6 +314,7 @@ def timml_json(
         "discharge_observations": discharge_observations,
         "window": domain_data,
         "output_options": output_options._asdict(),
+        "particle_traces": particle_traces,
     }
     if output_options.mesh or output_options.raster:
         json_data["headgrid"] = headgrid_entry(domain_data, output_options.spacing)
