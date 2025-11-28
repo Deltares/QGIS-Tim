@@ -528,7 +528,7 @@ class ComputeWidget(QWidget):
                 labels = None
 
             _, element_type, _ = parse_name(layername)
-            renderer = ELEMENTS[element_type].renderer()
+            renderer = ELEMENTS[element_type].renderer_output()
             self.parent.output_group.add_layer(
                 layer, "vector", renderer=renderer, labels=labels
             )

@@ -73,6 +73,10 @@ class Particle(TransientElement, abc.ABC):
     def renderer(cls) -> QgsSingleSymbolRenderer:
         return cls.marker_renderer(color=GREY, size="3")
 
+    @classmethod
+    def renderer_output(cls) -> QgsSingleSymbolRenderer:
+        return cls.line_renderer(color=GREY, size="2")
+
     def process_timml_row(self, row, other=None) -> Dict[str, Any]:
         x, y = self.point_xy(row)
         return {

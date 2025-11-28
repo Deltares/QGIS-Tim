@@ -209,6 +209,13 @@ class Element(ExtractorMixin, abc.ABC):
     def renderer(cls):
         return None
 
+    @classmethod
+    def renderer_output(cls):
+        """
+        Can be overridden for output layers, e.g. output of particle points as lines.
+        """
+        return cls.renderer()
+
     def timml_layer_from_geopackage(self) -> QgsVectorLayer:
         self.timml_layer = QgsVectorLayer(
             f"{self.path}|layername={self.timml_name}", self.timml_name
