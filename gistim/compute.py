@@ -209,6 +209,7 @@ def compute_tracelines(model, particle_starts):
 def _(
     model: timml.Model,
     particle_starts: List[Dict],
+    **_,
 ) -> Dict[str, pd.DataFrame]:
     d = {
         "geometry": [],
@@ -216,6 +217,7 @@ def _(
         "datetime_end": [],
         "label": [],
     }
+    now = pd.Timestamp.now()
     for kwargs in particle_starts:
         label = kwargs.pop("label")
         # Get win somewhere
@@ -223,8 +225,8 @@ def _(
         for start, end in zip(trace[:-1], trace[1:]):
             linesegment = [[start[0], start[1]], [end[0], end[1]]]
             d["geometry"].append({"type": "LineString", "coordinates": linesegment})
-            d["datetime_start"].append(start[3])
-            d["datetime_end"].append(end[3])
+            d["datetime_start"].append(now + pd.to_timedelta(start[3], "D"))
+            d["datetime_end"].append(now + pd.to_timedelta(end[3], "D"))
             d["label"].append(label)
 
     return pd.DataFrame(d)
@@ -234,6 +236,7 @@ def _(
 def _(
     model: ttim.ModelMaq,
     particle_starts: List[Dict],
+    start_date: pd.Timestamp,
 ) -> Dict[str, pd.DataFrame]:
     d = {
         "geometry": [],
@@ -248,8 +251,8 @@ def _(
         for start, end in zip(trace[:-1], trace[1:]):
             linesegment = [[start[0], start[1]], [end[0], end[1]]]
             d["geometry"].append({"type": "LineString", "coordinates": linesegment})
-            d["datetime_start"].append(start[3])
-            d["datetime_end"].append(end[3])
+            d["datetime_start"].append(pd.to_datetime(start_date) + pd.to_timedelta(start[3], "D"))
+            d["datetime_end"].append(pd.to_datetime(start_date) + pd.to_timedelta(end[3], "D"))
             d["label"].append(label)
 
     return pd.DataFrame(d)
