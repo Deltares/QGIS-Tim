@@ -260,7 +260,7 @@ def json_elements_and_observations(data, mapping: Dict[str, str]):
 
     observations = {}
     discharge_observations = {}
-    particle_traces = {}
+    pathlines = {}
     tim_data = {"ModelMaq": aquifer_data}
     for layername, element_data in data.items():
         prefix, name = layername.split(":")
@@ -275,11 +275,11 @@ def json_elements_and_observations(data, mapping: Dict[str, str]):
         elif tim_name == "Discharge Observation":
             discharge_observations[layername] = entry
         elif tim_name == "Particle Forward" or tim_name == "Particle Backward":
-            particle_traces[layername] = entry
+            pathlines[layername] = entry
         else:
             tim_data[layername] = entry
 
-    return tim_data, observations, discharge_observations, particle_traces
+    return tim_data, observations, discharge_observations, pathlines
 
 
 def timml_json(
@@ -305,7 +305,7 @@ def timml_json(
     # Process TimML elements
     data = timml_data.copy()  # avoid side-effects
     domain_data = data.pop("timml Domain:Domain")
-    elements, observations, discharge_observations, particle_traces = json_elements_and_observations(
+    elements, observations, discharge_observations, pathlines = json_elements_and_observations(
         data, mapping=TIMML_MAPPING
     )
     json_data = {
@@ -314,7 +314,7 @@ def timml_json(
         "discharge_observations": discharge_observations,
         "window": domain_data,
         "output_options": output_options._asdict(),
-        "particle_traces": particle_traces,
+        "pathlines": pathlines,
     }
     if output_options.mesh or output_options.raster:
         json_data["headgrid"] = headgrid_entry(domain_data, output_options.spacing)

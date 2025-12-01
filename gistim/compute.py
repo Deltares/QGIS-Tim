@@ -221,8 +221,8 @@ def _(
     for kwargs in particle_starts:
         label = kwargs.pop("label")
         # Get win somewhere
-        trace = timml.trace.timtraceline(model, **kwargs)
-        for start, end in zip(trace[:-1], trace[1:]):
+        traceline = timml.trace.timtraceline(model, **kwargs)
+        for start, end in zip(traceline[:-1], traceline[1:]):
             linesegment = [[start[0], start[1], start[2]], [end[0], end[1], end[2]]]
             d["geometry"].append({"type": "LineString", "coordinates": linesegment})
             d["datetime_start"].append(now + pd.to_timedelta(start[3], "D"))
@@ -247,8 +247,8 @@ def _(
     for kwargs in particle_starts:
         label = kwargs.pop("label")
         # Get win somewhere
-        trace = ttim.trace.timtraceline(model, **kwargs)
-        for start, end in zip(trace[:-1], trace[1:]):
+        traceline = ttim.trace.timtraceline(model, **kwargs)
+        for start, end in zip(traceline[:-1], traceline[1:]):
             linesegment = [[start[0], start[1], start[2]], [end[0], end[1], end[2]]]
             d["geometry"].append({"type": "LineString", "coordinates": linesegment})
             d["datetime_start"].append(pd.to_datetime(start_date) + pd.to_timedelta(start[3], "D"))
@@ -334,7 +334,7 @@ def write_output(
     output_options = data["output_options"]
     observations = data["observations"]
     discharge_observations = data["discharge_observations"]
-    particle_traces = data["particle_traces"]
+    pathlines = data["pathlines"]
     start_date = pd.to_datetime(data.get("start_date"))
 
     # Compute gridded head data and write to netCDF.
@@ -366,8 +366,8 @@ def write_output(
             if computed_observations is not None:
                 tables[layername] = computed_observations
     
-    if output_options["tracelines"] and particle_traces:
-        for layername, content in particle_traces.items():
+    if output_options["pathlines"] and pathlines:
+        for layername, content in pathlines.items():
             tables[layername] = compute_tracelines(model, content["data"])
 
     write_geopackage(tables, crs, path)
