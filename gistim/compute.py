@@ -223,7 +223,7 @@ def _(
         # Get win somewhere
         trace = timml.trace.timtraceline(model, **kwargs)
         for start, end in zip(trace[:-1], trace[1:]):
-            linesegment = [[start[0], start[1]], [end[0], end[1]]]
+            linesegment = [[start[0], start[1], start[2]], [end[0], end[1], end[2]]]
             d["geometry"].append({"type": "LineString", "coordinates": linesegment})
             d["datetime_start"].append(now + pd.to_timedelta(start[3], "D"))
             d["datetime_end"].append(now + pd.to_timedelta(end[3], "D"))
@@ -249,7 +249,7 @@ def _(
         # Get win somewhere
         trace = ttim.trace.timtraceline(model, **kwargs)
         for start, end in zip(trace[:-1], trace[1:]):
-            linesegment = [[start[0], start[1]], [end[0], end[1]]]
+            linesegment = [[start[0], start[1], start[2]], [end[0], end[1], end[2]]]
             d["geometry"].append({"type": "LineString", "coordinates": linesegment})
             d["datetime_start"].append(pd.to_datetime(start_date) + pd.to_timedelta(start[3], "D"))
             d["datetime_end"].append(pd.to_datetime(start_date) + pd.to_timedelta(end[3], "D"))

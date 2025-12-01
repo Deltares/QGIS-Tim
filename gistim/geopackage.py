@@ -101,9 +101,15 @@ def collect_bounding_box(features, geometry_type) -> BoundingBox:
             x.append(coordinates[0])
             y.append(coordinates[1])
     else:
-        x, y = zip(
+        has_z = len(features[0]["coordinates"][0]) == 3
+        zipped_coordinates = zip(
             *itertools.chain.from_iterable(line["coordinates"] for line in features)
         )
+        if has_z:
+            x, y, _ = zipped_coordinates
+        else:
+            x, y = zipped_coordinates
+
     return BoundingBox(xmin=min(x), ymin=min(y), xmax=max(x), ymax=max(y))
 
 
