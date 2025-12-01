@@ -201,11 +201,11 @@ def _(
 
 
 @singledispatch
-def compute_tracelines(model, particle_starts):
+def compute_pathlines(model, particle_starts):
     raise TypeError("Expected timml or ttim model")
 
 
-@compute_tracelines.register
+@compute_pathlines.register
 def _(
     model: timml.Model,
     particle_starts: List[Dict],
@@ -232,7 +232,7 @@ def _(
     return pd.DataFrame(d)
 
 
-@compute_tracelines.register
+@compute_pathlines.register
 def _(
     model: ttim.ModelMaq,
     particle_starts: List[Dict],
@@ -368,7 +368,7 @@ def write_output(
     
     if output_options["pathlines"] and pathlines:
         for layername, content in pathlines.items():
-            tables[layername] = compute_tracelines(model, content["data"])
+            tables[layername] = compute_pathlines(model, content["data"])
 
     write_geopackage(tables, crs, path)
     return
