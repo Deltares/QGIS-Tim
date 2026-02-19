@@ -116,6 +116,7 @@ class Element(ExtractorMixin, abc.ABC):
     timml_defaults = {}
     ttim_defaults = {}
     assoc_defaults = {}
+    z_column = None
 
     def _initialize_default(self, path, name):
         self.name = name

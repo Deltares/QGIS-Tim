@@ -1,5 +1,6 @@
 import datetime
 from pathlib import Path
+import shutil
 from typing import NamedTuple, Tuple, Union
 
 from PyQt5.QtCore import Qt
@@ -27,7 +28,7 @@ from qgis.core import (
 )
 from qgis.gui import QgsMapLayerComboBox
 from qgistim.core import geopackage, layer_styling
-from qgistim.core.elements import ELEMENTS, parse_name
+from qgistim.core.elements import ELEMENTS, load_elements_from_geopackage, parse_name
 from qgistim.core.processing import (
     mesh_contours,
     raster_contours,
@@ -44,6 +45,7 @@ class OutputOptions(NamedTuple):
     discharge: bool
     discharge_observations: bool
     pathlines: bool
+    input_3D: bool
     spacing: float
 
 
@@ -85,6 +87,9 @@ class ComputeTask(BaseServerTask):
                 self.parent.load_mesh_result(path, output.contours)
             if output.raster:
                 self.parent.load_raster_result(path)
+            if output.input_3D:
+                self.parent.copy_relevant_vector_input_for_3D(path)
+                self.parent.load_vector_input_for_3D(path)
 
         else:
             self.push_failure_message()
@@ -109,7 +114,7 @@ class ComputeWidget(QWidget):
         self.discharge_checkbox = QCheckBox("Discharge")
         self.discharge_observations_checkbox = QCheckBox("Discharge Observations")
         self.pathlines_checkbox = QCheckBox("Particle pathlines")
-
+        self.input_3D_checkbox = QCheckBox("Input for 3D view")
         self.spacing_spin_box = QDoubleSpinBox()
         self.spacing_spin_box.setMinimum(0.0)
         self.spacing_spin_box.setMaximum(10_000.0)
@@ -177,6 +182,7 @@ class ComputeWidget(QWidget):
         result_layout.addWidget(self.discharge_checkbox)
         result_layout.addWidget(self.discharge_observations_checkbox)
         result_layout.addWidget(self.pathlines_checkbox)
+        result_layout.addWidget(self.input_3D_checkbox)
 
         result_layout.addLayout(button_row)
 
@@ -217,6 +223,7 @@ class ComputeWidget(QWidget):
         self.contour_step_box.setValue(0.5)
         self.domain_button.setEnabled(False)
         self.compute_button.setEnabled(False)
+        self.input_3D_checkbox.setChecked(False)
         return
 
     def set_minimum_contour_stop(self) -> None:
@@ -260,6 +267,7 @@ class ComputeWidget(QWidget):
             discharge_observations=self.discharge_observations_checkbox.isChecked(),
             pathlines=self.pathlines_checkbox.isChecked(),
             spacing=self.spacing_spin_box.value(),
+            input_3D=self.input_3D_checkbox.isChecked(),
         )
 
     def clear_outdated_output(self, path: str) -> None:
@@ -532,5 +540,68 @@ class ComputeWidget(QWidget):
             self.parent.output_group.add_layer(
                 layer, "vector", renderer=renderer, labels=labels
             )
+
+        return
+
+
+    def load_vector_input_for_3D(self, path: Union[Path, str]) -> None:
+        """
+        Load vector input for 3D view from the Geopackage. This should be called
+        after copy_relevant_vector_input_for_3D, which sets the z values for the
+        geometries.
+        """
+        path = Path(path)
+        gpkg_path = path.with_suffix(".input3D.gpkg")
+
+        if not gpkg_path.exists():
+            return
+
+        for layername in geopackage.layers(str(gpkg_path)):
+            layers_panel_name = f"{path.stem}-{layername}"
+
+            layer = QgsVectorLayer(
+                f"{gpkg_path}|layername={layername}", layers_panel_name
+            )
+
+            _, element_type, _ = parse_name(layername)
+            renderer = ELEMENTS[element_type].renderer()
+
+            self.parent.output_group.add_layer(
+                layer, "vector", renderer=renderer
+            )
+
+        return
+
+
+    def copy_relevant_vector_input_for_3D(self, path: Union[Path, str]) -> None:
+        """
+        Copy the vector layers from the input GeoPackage to a new GeoPackage, and
+        set z values for vector element geometries. This is necessary to properly
+        display them in 3D.
+        """
+        path = Path(path)
+        model_input = path.with_suffix(".gpkg")
+        input_3D_path = path.with_suffix(".input3D.gpkg")
+
+        # Copy geopackage to new file, so we can modify the geometries without
+        # affecting the original input.
+        shutil.copy(model_input, input_3D_path)
+
+        elements = load_elements_from_geopackage(input_3D_path)
+        for element in elements:
+            to_keep = (element.z_column is not None) and (element.timml_layer is not None)
+            if to_keep:
+                z_column = element.z_column
+                layer = element.timml_layer
+                features = layer.getFeatures()
+                for feature in features:
+                    z = feature.attributeMap[z_column]
+                    g = feature.geometry()
+                    if not g.isNull():
+                        g.get().addZValue(z)
+                        feature.setGeometry(g)
+                element.write()
+            else:
+                element.remove_from_geopackage()
 
         return

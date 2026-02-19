@@ -79,6 +79,7 @@ class HeadWell(TransientElement):
         "timeseries_id",
     )
     schema = HeadWellSchema()
+    z_column = "head"
 
     @classmethod
     def renderer(cls) -> QgsSingleSymbolRenderer:

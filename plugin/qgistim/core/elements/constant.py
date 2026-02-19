@@ -24,6 +24,7 @@ class Constant(Element):
         QgsField("label", QVariant.String),
     )
     schema = ConstantSchema()
+    z_column = "head"
 
     @classmethod
     def renderer(cls) -> QgsSingleSymbolRenderer:

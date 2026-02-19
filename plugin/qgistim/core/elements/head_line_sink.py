@@ -71,6 +71,7 @@ class HeadLineSink(TransientElement):
         "timeseries_id",
     )
     schema = HeadLineSinkSchema()
+    z_column = "head"
 
     @classmethod
     def renderer(cls) -> QgsSingleSymbolRenderer:

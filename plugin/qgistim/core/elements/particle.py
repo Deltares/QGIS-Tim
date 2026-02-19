@@ -68,6 +68,7 @@ class Particle(TransientElement, abc.ABC):
         "time_end",
     )
     schema = ParticleSchema()
+    z_column = "z_start"
 
     def process_timml_row(self, row, other=None) -> Dict[str, Any]:
         x, y = self.point_xy(row)
