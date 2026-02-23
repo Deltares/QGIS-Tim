@@ -89,8 +89,6 @@ class ComputeTask(BaseServerTask):
                 self.parent.load_raster_result(path)
             if output.input_3D:
                 self.parent.copy_relevant_vector_input_for_3D(path)
-                self.parent.load_vector_input_for_3D(path)
-
         else:
             self.push_failure_message()
         return
@@ -587,20 +585,36 @@ class ComputeWidget(QWidget):
         # affecting the original input.
         shutil.copy(model_input, input_3D_path)
 
-        elements = load_elements_from_geopackage(input_3D_path)
+        elements = load_elements_from_geopackage(str(input_3D_path))
         for element in elements:
-            to_keep = (element.z_column is not None) and (element.timml_layer is not None)
+            to_keep = (element.z_column is not None)
             if to_keep:
                 z_column = element.z_column
+                element.timml_layer_from_geopackage()
                 layer = element.timml_layer
-                features = layer.getFeatures()
-                for feature in features:
-                    z = feature.attributeMap[z_column]
+                geometry_updates = {}
+                for feature in layer.getFeatures():
+                    z = feature[z_column]
                     g = feature.geometry()
-                    if not g.isNull():
-                        g.get().addZValue(z)
-                        feature.setGeometry(g)
-                element.write()
+                    if g.isNull():
+                        continue
+                    g.get().addZValue(z)
+                    geometry_updates[feature.id()] = g
+
+                if geometry_updates:
+                    if layer.startEditing():
+                        for fid, geometry in geometry_updates.items():
+                            layer.changeGeometry(fid, geometry)
+                        layer.commitChanges()
+                    else:
+                        layer.dataProvider().changeGeometryValues(geometry_updates)
+                # layer = element.write()
+                layername = element.timml_name
+                _, element_type, _ = parse_name(layername)
+                renderer = ELEMENTS[element_type].renderer()
+                self.parent.output_group.add_layer(
+                    layer, "vector", renderer=renderer
+                )
             else:
                 element.remove_from_geopackage()
 
