@@ -111,6 +111,7 @@ class LayersPanelGroup:
         suppress: bool = None,
         on_top: bool = False,
         labels: Any = None,
+        renderer3D: Any = None,
     ) -> QgsMapLayer:
         """
         Add a layer to the Layers Panel
@@ -133,6 +134,8 @@ class LayersPanelGroup:
             Handy for transparent layers such as contours.
         labels: QgsVectorLayerSimpleLabeling, optional, default value is None
             Preset labeling for e.g. observations and contours.
+        renderer3D: Any, optional, default value is None
+            QGIS 3D layer renderer, optional
 
         Returns
         -------
@@ -152,6 +155,8 @@ class LayersPanelGroup:
             )
         if renderer is not None:
             maplayer.setRenderer(renderer)
+        if renderer3D is not None:
+            maplayer.setRenderer3D(renderer3D)
         if labels is not None:
             layer.setLabeling(labels)
             layer.setLabelsEnabled(True)

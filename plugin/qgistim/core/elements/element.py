@@ -217,6 +217,76 @@ class Element(ExtractorMixin, abc.ABC):
         """
         return cls.renderer()
 
+    @staticmethod
+    def _set_absolute_clamping(symbol):
+        try:
+            from qgis.core import Qgis
+
+            symbol.setAltitudeClamping(Qgis.AltitudeClamping.Absolute)
+        except Exception:
+            try:
+                from qgis._3d import Qgs3DTypes
+
+                symbol.setAltitudeClamping(Qgs3DTypes.AltitudeClamping.Absolute)
+            except Exception:
+                pass
+
+    @staticmethod
+    def _vector_renderer3D(symbol):
+        try:
+            from qgis._3d import QgsVectorLayer3DRenderer
+        except Exception:
+            return None
+
+        Element._set_absolute_clamping(symbol)
+        renderer = QgsVectorLayer3DRenderer()
+        renderer.setSymbol(symbol)
+        return renderer
+
+    @staticmethod
+    def point_renderer3D():
+        try:
+            from qgis._3d import QgsPoint3DSymbol
+        except Exception:
+            return None
+
+        symbol = QgsPoint3DSymbol()
+        return Element._vector_renderer3D(symbol)
+
+    @staticmethod
+    def line_renderer3D():
+        try:
+            from qgis._3d import QgsLine3DSymbol
+        except Exception:
+            return None
+
+        symbol = QgsLine3DSymbol()
+        if hasattr(symbol, "setRenderAsSimpleLines"):
+            symbol.setRenderAsSimpleLines(True)
+        return Element._vector_renderer3D(symbol)
+
+    @staticmethod
+    def polygon_renderer3D():
+        try:
+            from qgis._3d import QgsPolygon3DSymbol
+        except Exception:
+            return None
+
+        symbol = QgsPolygon3DSymbol()
+        return Element._vector_renderer3D(symbol)
+
+    @classmethod
+    def renderer3D(cls):
+        geometry_type = (cls.geometry_type or "").lower()
+        if "point" in geometry_type:
+            return cls.point_renderer3D()
+        elif "line" in geometry_type:
+            return cls.line_renderer3D()
+        elif "polygon" in geometry_type:
+            return cls.polygon_renderer3D()
+        else:
+            return None
+
     def timml_layer_from_geopackage(self) -> QgsVectorLayer:
         self.timml_layer = QgsVectorLayer(
             f"{self.path}|layername={self.timml_name}", self.timml_name
