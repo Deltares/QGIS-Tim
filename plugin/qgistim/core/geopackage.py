@@ -12,7 +12,6 @@ import sqlite3
 from contextlib import contextmanager
 from typing import List
 
-from qgis import processing
 from qgis.core import QgsVectorFileWriter, QgsVectorLayer
 
 
@@ -87,8 +86,15 @@ def write_layer(
 
 
 def remove_layer(path: str, layer: str) -> None:
-    query = {"DATABASE": f"{path}|layername={layer}", "SQL": f"drop table {layer}"}
-    try:
-        processing.run("native:spatialiteexecutesql", query)
-    except Exception:
-        raise RuntimeError(f"Failed to remove layer with {query}")
+    table = layer.replace('"', '""')
+    with sqlite3_cursor(path) as cursor:
+        cursor.execute(f'DROP TABLE IF EXISTS "{table}"')
+        cursor.execute(
+            "DELETE FROM gpkg_contents WHERE table_name = ?",
+            (layer,),
+        )
+        cursor.execute(
+            "DELETE FROM gpkg_geometry_columns WHERE table_name = ?",
+            (layer,),
+        )
+        cursor.connection.commit()
