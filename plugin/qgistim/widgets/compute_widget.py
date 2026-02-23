@@ -613,8 +613,9 @@ class ComputeWidget(QWidget):
                 layername = element.timml_name
                 _, element_type, _ = parse_name(layername)
                 renderer = ELEMENTS[element_type].renderer()
+                renderer3D = ELEMENTS[element_type].renderer3D()
                 self.parent.output_group.add_layer(
-                    layer, "vector", renderer=renderer
+                    layer, "vector", renderer=renderer, renderer3D=renderer3D
                 )
             else:
                 element.remove_from_geopackage()
