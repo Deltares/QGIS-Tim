@@ -107,6 +107,10 @@ class Particle_Forward(Particle):
     def renderer_output(cls) -> QgsSingleSymbolRenderer:
         return cls.line_renderer(color=GREY, width="1.0")
 
+    @classmethod
+    def renderer3D_output(cls):
+        return cls.line_renderer3D()
+
 class Particle_Backward(Particle):
     element_type = "Particle Backward"
 
@@ -127,3 +131,7 @@ class Particle_Backward(Particle):
     @classmethod
     def renderer_output(cls) -> QgsSingleSymbolRenderer:
         return cls.line_renderer(color=LIGHT_GREY, width="1.0")
+
+    @classmethod
+    def renderer3D_output(cls):
+        return cls.line_renderer3D()

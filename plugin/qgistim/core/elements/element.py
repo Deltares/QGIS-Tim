@@ -287,6 +287,10 @@ class Element(ExtractorMixin, abc.ABC):
         else:
             return None
 
+    @classmethod
+    def renderer3D_output(cls):
+        return cls.renderer3D()
+
     def timml_layer_from_geopackage(self) -> QgsVectorLayer:
         self.timml_layer = QgsVectorLayer(
             f"{self.path}|layername={self.timml_name}", self.timml_name

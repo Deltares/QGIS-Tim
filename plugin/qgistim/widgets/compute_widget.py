@@ -535,8 +535,9 @@ class ComputeWidget(QWidget):
 
             _, element_type, _ = parse_name(layername)
             renderer = ELEMENTS[element_type].renderer_output()
+            renderer3D = ELEMENTS[element_type].renderer3D_output()
             self.parent.output_group.add_layer(
-                layer, "vector", renderer=renderer, labels=labels
+                layer, "vector", renderer=renderer, labels=labels, renderer3D=renderer3D
             )
 
         return
