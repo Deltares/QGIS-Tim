@@ -56,6 +56,7 @@ from collections import defaultdict
 from copy import deepcopy
 from typing import Any, Dict, List, NamedTuple, Optional, Set, Tuple, Union
 
+from PyQt5.QtGui import QColor
 from PyQt5.QtWidgets import (
     QDialog,
     QHBoxLayout,
@@ -117,6 +118,7 @@ class Element(ExtractorMixin, abc.ABC):
     ttim_defaults = {}
     assoc_defaults = {}
     z_column = None
+    color3D = None
 
     def _initialize_default(self, path, name):
         self.name = name
@@ -232,29 +234,52 @@ class Element(ExtractorMixin, abc.ABC):
                 pass
 
     @staticmethod
-    def _vector_renderer3D(symbol):
+    def _set_material_ambient(symbol, color):
+        if color is None:
+            return
+
+        qcolor = color if isinstance(color, QColor) else QColor(color)
+        if not qcolor.isValid():
+            return
+
+        try:
+            from qgis._3d import QgsPhongMaterialSettings
+        except Exception:
+            return
+
+        material = QgsPhongMaterialSettings()
+        material.setAmbient(qcolor)
+        if hasattr(symbol, "setMaterialSettings"):
+            symbol.setMaterialSettings(material)
+        elif hasattr(symbol, "setMaterial"):
+            symbol.setMaterial(material)
+
+    @classmethod
+    def _vector_renderer3D(cls, symbol, **kwargs):
         try:
             from qgis._3d import QgsVectorLayer3DRenderer
         except Exception:
             return None
 
         Element._set_absolute_clamping(symbol)
+        if "color" in kwargs:
+            cls._set_material_ambient(symbol, kwargs["color"])
         renderer = QgsVectorLayer3DRenderer()
         renderer.setSymbol(symbol)
         return renderer
 
-    @staticmethod
-    def point_renderer3D():
+    @classmethod
+    def point_renderer3D(cls, **kwargs):
         try:
             from qgis._3d import QgsPoint3DSymbol
         except Exception:
             return None
 
         symbol = QgsPoint3DSymbol()
-        return Element._vector_renderer3D(symbol)
+        return cls._vector_renderer3D(symbol, **kwargs)
 
-    @staticmethod
-    def line_renderer3D():
+    @classmethod
+    def line_renderer3D(cls, **kwargs):
         try:
             from qgis._3d import QgsLine3DSymbol
         except Exception:
@@ -263,29 +288,21 @@ class Element(ExtractorMixin, abc.ABC):
         symbol = QgsLine3DSymbol()
         if hasattr(symbol, "setRenderAsSimpleLines"):
             symbol.setRenderAsSimpleLines(True)
-        return Element._vector_renderer3D(symbol)
+        return cls._vector_renderer3D(symbol, **kwargs)
 
-    @staticmethod
-    def polygon_renderer3D():
+    @classmethod
+    def polygon_renderer3D(cls, **kwargs):
         try:
             from qgis._3d import QgsPolygon3DSymbol
         except Exception:
             return None
 
         symbol = QgsPolygon3DSymbol()
-        return Element._vector_renderer3D(symbol)
+        return cls._vector_renderer3D(symbol, **kwargs)
 
     @classmethod
     def renderer3D(cls):
-        geometry_type = (cls.geometry_type or "").lower()
-        if "point" in geometry_type:
-            return cls.point_renderer3D()
-        elif "line" in geometry_type:
-            return cls.line_renderer3D()
-        elif "polygon" in geometry_type:
-            return cls.polygon_renderer3D()
-        else:
-            return None
+        return None
 
     @classmethod
     def renderer3D_output(cls):

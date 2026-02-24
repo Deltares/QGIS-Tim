@@ -77,6 +77,10 @@ class HeadLineSink(TransientElement):
     def renderer(cls) -> QgsSingleSymbolRenderer:
         return cls.line_renderer(color=BLUE, width="0.75")
 
+    @classmethod
+    def renderer3D(cls):
+        return cls.line_renderer3D(color=BLUE, width="2.0")
+
     def process_timml_row(self, row, other=None):
         return {
             "xy": self.linestring_xy(row),

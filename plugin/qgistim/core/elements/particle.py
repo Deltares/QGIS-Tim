@@ -4,10 +4,8 @@ from typing import Any, Dict
 from PyQt5.QtCore import QVariant
 from PyQt5.QtGui import QColor
 from qgis.core import (
-    QgsArrowSymbolLayer,
     QgsDefaultValue,
     QgsField,
-    QgsLineSymbol,
     QgsSingleSymbolRenderer,
 )
 from qgistim.core.elements.colors import GREY, LIGHT_GREY
@@ -15,13 +13,9 @@ from qgistim.core.elements.element import TransientElement
 from qgistim.core.elements.schemata import RowWiseSchema
 from qgistim.core.schemata import (
     AllOrNone,
-    AllRequired,
-    Membership,
-    NotBoth,
     Optional,
     Positive,
     Required,
-    StrictlyIncreasing,
     StrictlyPositive,
 )
 
@@ -108,8 +102,12 @@ class Particle_Forward(Particle):
         return cls.line_renderer(color=GREY, width="1.0")
 
     @classmethod
+    def renderer3D(cls):
+        return cls.point_renderer3D(color=LIGHT_GREY)
+
+    @classmethod
     def renderer3D_output(cls):
-        return cls.line_renderer3D()
+        return cls.line_renderer3D(color=GREY, width="2.0")
 
 class Particle_Backward(Particle):
     element_type = "Particle Backward"
@@ -133,5 +131,9 @@ class Particle_Backward(Particle):
         return cls.line_renderer(color=LIGHT_GREY, width="1.0")
 
     @classmethod
+    def renderer3D(cls):
+        return cls.point_renderer3D(color=LIGHT_GREY)
+
+    @classmethod
     def renderer3D_output(cls):
-        return cls.line_renderer3D()
+        return cls.line_renderer3D(color=LIGHT_GREY, width="2.0")
