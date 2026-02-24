@@ -237,12 +237,9 @@ class Element(ExtractorMixin, abc.ABC):
 
     @staticmethod
     def _set_material_ambient_symbol(symbol, material, color):
-        if color is None:
-            return
-
-        qcolor = color if isinstance(color, QColor) else QColor(color)
-        if not qcolor.isValid():
-            return
+        if isinstance(color, str):
+            color = tuple([int(i) for i in color.split(",")])
+        qcolor = color if isinstance(color, QColor) else QColor(*color)
 
         material.setAmbient(qcolor)
         if hasattr(symbol, "setMaterialSettings"):
@@ -286,7 +283,7 @@ class Element(ExtractorMixin, abc.ABC):
         if hasattr(symbol, "setRenderAsSimpleLines"):
             symbol.setRenderAsSimpleLines(True)
         if "width" in kwargs:
-            symbol.setWidth(kwargs["width"])
+            symbol.setWidth(float(kwargs["width"]))
         material = QgsSimpleLineMaterialSettings()
         return cls._vector_renderer3D(symbol, material, **kwargs)
 
