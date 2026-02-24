@@ -220,7 +220,9 @@ class Element(ExtractorMixin, abc.ABC):
         return cls.renderer()
 
     @staticmethod
-    def _set_absolute_clamping(symbol):
+    def _set_absolute_clamping_symbol(symbol):
+        # FUTURE: When API stabelizes, try excepts hopefully won't be necessary
+        #   anymore, nor keeping this in a separate method.
         try:
             from qgis.core import Qgis
 
@@ -234,7 +236,7 @@ class Element(ExtractorMixin, abc.ABC):
                 pass
 
     @staticmethod
-    def _set_material_ambient(symbol, color):
+    def _set_material_ambient_symbol(symbol, material, color):
         if color is None:
             return
 
@@ -242,12 +244,6 @@ class Element(ExtractorMixin, abc.ABC):
         if not qcolor.isValid():
             return
 
-        try:
-            from qgis._3d import QgsPhongMaterialSettings
-        except Exception:
-            return
-
-        material = QgsPhongMaterialSettings()
         material.setAmbient(qcolor)
         if hasattr(symbol, "setMaterialSettings"):
             symbol.setMaterialSettings(material)
@@ -255,15 +251,15 @@ class Element(ExtractorMixin, abc.ABC):
             symbol.setMaterial(material)
 
     @classmethod
-    def _vector_renderer3D(cls, symbol, **kwargs):
+    def _vector_renderer3D(cls, symbol, material, **kwargs):
         try:
             from qgis._3d import QgsVectorLayer3DRenderer
         except Exception:
             return None
 
-        Element._set_absolute_clamping(symbol)
+        cls._set_absolute_clamping_symbol(symbol)
         if "color" in kwargs:
-            cls._set_material_ambient(symbol, kwargs["color"])
+            cls._set_material_ambient_symbol(symbol, material, kwargs["color"])
         renderer = QgsVectorLayer3DRenderer()
         renderer.setSymbol(symbol)
         return renderer
@@ -271,34 +267,39 @@ class Element(ExtractorMixin, abc.ABC):
     @classmethod
     def point_renderer3D(cls, **kwargs):
         try:
-            from qgis._3d import QgsPoint3DSymbol
+            from qgis._3d import QgsPoint3DSymbol, QgsPhongMaterialSettings
         except Exception:
             return None
 
         symbol = QgsPoint3DSymbol()
-        return cls._vector_renderer3D(symbol, **kwargs)
+        material = QgsPhongMaterialSettings()
+        return cls._vector_renderer3D(symbol, material, **kwargs)
 
     @classmethod
     def line_renderer3D(cls, **kwargs):
         try:
-            from qgis._3d import QgsLine3DSymbol
+            from qgis._3d import QgsLine3DSymbol, QgsSimpleLineMaterialSettings
         except Exception:
             return None
 
         symbol = QgsLine3DSymbol()
         if hasattr(symbol, "setRenderAsSimpleLines"):
             symbol.setRenderAsSimpleLines(True)
-        return cls._vector_renderer3D(symbol, **kwargs)
+        if "width" in kwargs:
+            symbol.setWidth(kwargs["width"])
+        material = QgsSimpleLineMaterialSettings()
+        return cls._vector_renderer3D(symbol, material, **kwargs)
 
     @classmethod
     def polygon_renderer3D(cls, **kwargs):
         try:
-            from qgis._3d import QgsPolygon3DSymbol
+            from qgis._3d import QgsPolygon3DSymbol, QgsPhongMaterialSettings
         except Exception:
             return None
 
         symbol = QgsPolygon3DSymbol()
-        return cls._vector_renderer3D(symbol, **kwargs)
+        material = QgsPhongMaterialSettings()
+        return cls._vector_renderer3D(symbol, material, **kwargs)
 
     @classmethod
     def renderer3D(cls):
