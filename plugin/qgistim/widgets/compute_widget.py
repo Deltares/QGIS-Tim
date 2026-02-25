@@ -28,7 +28,7 @@ from qgis.core import (
 )
 from qgis.gui import QgsMapLayerComboBox
 from qgistim.core import geopackage, layer_styling
-from qgistim.core.elements import ELEMENTS, load_elements_from_geopackage, parse_name
+from qgistim.core.elements import Element, ELEMENTS, load_elements_from_geopackage, parse_name
 from qgistim.core.processing import (
     mesh_contours,
     raster_contours,
@@ -572,8 +572,33 @@ class ComputeWidget(QWidget):
 
         return
 
+    @staticmethod
+    def set_z_values_on_layer(element: Element, layer: QgsVectorLayer) -> None:
+        """
+        Set z values for the geometries of the given layer, based on the value
+        in the column specified by the element's z_column attribute. This is
+        necessary to properly display the layer in 3D.
+        """
+        z_column = element.z_column
+        geometry_updates = {}
+        for feature in layer.getFeatures():
+            z = feature[z_column]
+            g = feature.geometry()
+            if g.isNull():
+                continue
+            g.get().addZValue(z)
+            geometry_updates[feature.id()] = g
 
-    def copy_relevant_vector_input_for_3D(self, path: Union[Path, str]) -> None:
+        if geometry_updates:
+            if layer.startEditing():
+                for fid, geometry in geometry_updates.items():
+                    layer.changeGeometry(fid, geometry)
+                layer.commitChanges()
+            else:
+                layer.dataProvider().changeGeometryValues(geometry_updates)
+
+
+    def copy_and_add_relevant_vector_input_for_3D(self, path: Union[Path, str]) -> None:
         """
         Copy the vector layers from the input GeoPackage to a new GeoPackage, and
         set z values for vector element geometries. This is necessary to properly
@@ -591,26 +616,9 @@ class ComputeWidget(QWidget):
         for element in elements:
             to_keep = (element.z_column is not None)
             if to_keep:
-                z_column = element.z_column
                 element.timml_layer_from_geopackage()
                 layer = element.timml_layer
-                geometry_updates = {}
-                for feature in layer.getFeatures():
-                    z = feature[z_column]
-                    g = feature.geometry()
-                    if g.isNull():
-                        continue
-                    g.get().addZValue(z)
-                    geometry_updates[feature.id()] = g
-
-                if geometry_updates:
-                    if layer.startEditing():
-                        for fid, geometry in geometry_updates.items():
-                            layer.changeGeometry(fid, geometry)
-                        layer.commitChanges()
-                    else:
-                        layer.dataProvider().changeGeometryValues(geometry_updates)
-                # layer = element.write()
+                self.set_z_values_on_layer(element, layer)
                 layername = element.timml_name
                 _, element_type, _ = parse_name(layername)
                 renderer = ELEMENTS[element_type].renderer()
