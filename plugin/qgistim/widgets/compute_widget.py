@@ -88,7 +88,7 @@ class ComputeTask(BaseServerTask):
             if output.raster:
                 self.parent.load_raster_result(path)
             if output.input_3D:
-                self.parent.copy_relevant_vector_input_for_3D(path)
+                self.parent.copy_and_add_relevant_vector_input_for_3D(path)
         else:
             self.push_failure_message()
         return
