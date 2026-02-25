@@ -542,36 +542,6 @@ class ComputeWidget(QWidget):
 
         return
 
-
-    def load_vector_input_for_3D(self, path: Union[Path, str]) -> None:
-        """
-        Load vector input for 3D view from the Geopackage. This should be called
-        after copy_relevant_vector_input_for_3D, which sets the z values for the
-        geometries.
-        """
-        path = Path(path)
-        gpkg_path = path.with_suffix(".input3D.gpkg")
-
-        if not gpkg_path.exists():
-            return
-
-        for layername in geopackage.layers(str(gpkg_path)):
-            layers_panel_name = f"{path.stem}-{layername}"
-
-            layer = QgsVectorLayer(
-                f"{gpkg_path}|layername={layername}", layers_panel_name
-            )
-
-            _, element_type, _ = parse_name(layername)
-            renderer = ELEMENTS[element_type].renderer()
-            renderer3D = ELEMENTS[element_type].renderer3D()
-
-            self.parent.output_group.add_layer(
-                layer, "vector", renderer=renderer, renderer3D=renderer3D
-            )
-
-        return
-
     @staticmethod
     def set_z_values_on_layer(element: Element, layer: QgsVectorLayer) -> None:
         """
@@ -619,8 +589,7 @@ class ComputeWidget(QWidget):
                 element.timml_layer_from_geopackage()
                 layer = element.timml_layer
                 self.set_z_values_on_layer(element, layer)
-                layername = element.timml_name
-                _, element_type, _ = parse_name(layername)
+                element_type = element.element_type
                 renderer = ELEMENTS[element_type].renderer()
                 renderer3D = ELEMENTS[element_type].renderer3D()
                 self.parent.output_group.add_layer(
