@@ -589,9 +589,8 @@ class ComputeWidget(QWidget):
                 element.timml_layer_from_geopackage()
                 layer = element.timml_layer
                 self.set_z_values_on_layer(element, layer)
-                element_type = element.element_type
-                renderer = ELEMENTS[element_type].renderer()
-                renderer3D = ELEMENTS[element_type].renderer3D()
+                renderer = element.renderer()
+                renderer3D = element.renderer3D()
                 self.parent.output_group.add_layer(
                     layer, "vector", renderer=renderer, renderer3D=renderer3D
                 )
