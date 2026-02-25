@@ -103,7 +103,7 @@ class Particle_Forward(Particle):
 
     @classmethod
     def renderer3D(cls):
-        return cls.point_renderer3D(color=LIGHT_GREY)
+        return cls.point_renderer3D(color=LIGHT_GREY, size="4")
 
     @classmethod
     def renderer3D_output(cls):
@@ -132,7 +132,7 @@ class Particle_Backward(Particle):
 
     @classmethod
     def renderer3D(cls):
-        return cls.point_renderer3D(color=LIGHT_GREY)
+        return cls.point_renderer3D(color=LIGHT_GREY, size="4")
 
     @classmethod
     def renderer3D_output(cls):

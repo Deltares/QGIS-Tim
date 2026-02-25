@@ -79,7 +79,7 @@ class HeadLineSink(TransientElement):
 
     @classmethod
     def renderer3D(cls):
-        return cls.line_renderer3D(color=BLUE, width="2.0")
+        return cls.line_renderer3D(color=BLUE, width="4.0")
 
     def process_timml_row(self, row, other=None):
         return {
