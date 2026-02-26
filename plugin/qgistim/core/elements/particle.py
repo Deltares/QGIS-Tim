@@ -30,17 +30,17 @@ class ParticleSchema(RowWiseSchema):
     timml_schemata = {
         "geometry": Required(),
         "z_start": Required(),
-        "hstep_max": Required(StrictlyPositive()),
-        "vstep_fraction": Required(StrictlyPositive()),
+        "max_horizontal_step": Required(StrictlyPositive()),
+        "max_vertical_step_fraction": Required(StrictlyPositive()),
         "nstep_max": Required(StrictlyPositive()),
     }
     ttim_schemata = {
         "time_start": Optional(Positive()),
-        "delt": Optional(Positive()),
+        "time_step": Optional(Positive()),
         "time_end": Optional(Positive()),
     }
     ttim_consistency_schemata = (
-        AllOrNone(("time_start", "delt", "time_end")),
+        AllOrNone(("time_start", "time_step", "time_end")),
     )
 
 
@@ -50,13 +50,13 @@ class Particle(TransientElement, abc.ABC):
     timml_attributes = (
         QgsField("label", QVariant.String),
         QgsField("z_start", QVariant.Double),
-        QgsField("hstep_max", QVariant.Double),
-        QgsField("vstep_fraction", QVariant.Double),
+        QgsField("max_horizontal_step", QVariant.Double),
+        QgsField("max_vertical_step_fraction", QVariant.Double),
         QgsField("nstep_max", QVariant.Int),
     )
     ttim_attributes = (
         QgsField("time_start", QVariant.Double),
-        QgsField("delt", QVariant.Double),
+        QgsField("time_step", QVariant.Double),
         QgsField("time_end", QVariant.Double),
     )
     timml_defaults = {
@@ -64,7 +64,7 @@ class Particle(TransientElement, abc.ABC):
     }
     transient_columns = (
         "time_start",
-        "delt",
+        "time_step",
         "time_end",
     )
     schema = ParticleSchema()
@@ -75,8 +75,8 @@ class Particle(TransientElement, abc.ABC):
             "xstart": x,
             "ystart": y,
             "zstart": row["z_start"],
-            "hstepmax": row["hstep_max"],
-            "vstepfrac": row["vstep_fraction"],
+            "hstepmax": row["max_horizontal_step"],
+            "vstepfrac": row["max_vertical_step_fraction"],
             "nstepmax": row["nstep_max"],
             "label": row["label"],
         }
@@ -87,9 +87,9 @@ class Particle(TransientElement, abc.ABC):
             "xstart": x,
             "ystart": y,
             "zstart": row["z_start"],
-            "hstepmax": row["hstep_max"],
+            "hstepmax": row["max_horizontal_step"],
             "tstart": row["time_start"],
-            "delt": row["delt"],
+            "delt": row["time_step"],
             "tmax": row["time_end"],
             "nstepmax": row["nstep_max"],
             "label": row["label"],
