@@ -70,8 +70,8 @@ class Aquifer(TransientElement):
         QgsField("start_date", QVariant.DateTime),
     )
     timml_defaults = {
-            "aquifer_npor": QgsDefaultValue("0.2"),
-            "aquitard_npor": QgsDefaultValue("0.2"),
+            "aquifer_npor": QgsDefaultValue("0.3"),
+            "aquitard_npor": QgsDefaultValue("0.3"),
     }
     ttim_defaults = {
         "time_min": QgsDefaultValue("0.01"),
