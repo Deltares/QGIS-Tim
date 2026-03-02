@@ -140,6 +140,7 @@ def headgrid_code(domain) -> Tuple[str, str]:
 def elements_and_observations(data, mapping: Dict[str, str], tim: str):
     strings = []
     observations = []
+    tracelines = []
     model_string = textwrap.indent(f"model={tim}_model,", prefix=PREFIX)
     for layername, element_data in data.items():
         prefix, name = layername.split(":")
@@ -160,11 +161,11 @@ def elements_and_observations(data, mapping: Dict[str, str], tim: str):
                 observations.append(
                     f"observation_{sanitized(name)}_{i}={tim}_model.head(\n{format_kwargs(kwargs)}\n)"
                 )
-            elif plugin_name == "Particle Forward" or plugin_name == "Particle Backward":
+            elif plugin_name in ("Particle Forward", "Particle Backward"):
                 direction_str = plugin_name.split()[-1].lower()
-                # Should not be added to the model.
-                # TODO: .particle is not a function in timml/ttim, needs to be handled differently
-                raise NotImplementedError("Particle trace script generation not implemented yet.")
+                tracelines.append(
+                     f"traceline_{sanitized(name)}_{i} = {tim}.timtraceline((\n{format_kwargs(kwargs)}\n)"
+                )
                 # observations.append(
                 #     f"particle_{direction_str}_{sanitized(name)}_{i}={tim}_model.particle(\n{format_kwargs(kwargs)}\n)"
                 # )
@@ -274,7 +275,7 @@ def json_elements_and_observations(data, mapping: Dict[str, str]):
             observations[layername] = entry
         elif tim_name == "Discharge Observation":
             discharge_observations[layername] = entry
-        elif tim_name == "Particle Forward" or tim_name == "Particle Backward":
+        elif tim_name in ("Particle Forward", "Particle Backward"):
             pathlines[layername] = entry
         else:
             tim_data[layername] = entry
