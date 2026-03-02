@@ -220,7 +220,7 @@ def _(
     now = pd.Timestamp.now()
     for kwargs in particle_starts:
         label = kwargs.pop("label")
-        # Get win somewhere
+        # TODO: Get window from bounding box and give to tim 
         traceline = timml.trace.timtraceline(model, **kwargs)
         for start, end in zip(traceline[:-1], traceline[1:]):
             linesegment = [[start[0], start[1], start[2]], [end[0], end[1], end[2]]]
@@ -246,7 +246,7 @@ def _(
     }
     for kwargs in particle_starts:
         label = kwargs.pop("label")
-        # Get win somewhere
+        # TODO: Get window from bounding box and give to tim 
         traceline = ttim.trace.timtraceline(model, **kwargs)
         for start, end in zip(traceline[:-1], traceline[1:]):
             linesegment = [[start[0], start[1], start[2]], [end[0], end[1], end[2]]]
