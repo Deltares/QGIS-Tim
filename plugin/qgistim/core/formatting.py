@@ -172,10 +172,15 @@ def elements_and_observations(data, mapping: Dict[str, str], tim: str):
                     f"observation_{sanitized(name)}_{i}={tim}_model.head(\n{format_kwargs(kwargs)}\n)"
                 )
             elif plugin_name in ("Particle Forward", "Particle Backward"):
+                kwargs.pop("label")
+                # Work around inconsistency kwarg between elements and tracelines.
+                ml_string = model_string.replace("model=", "ml=")
                 direction_str = plugin_name.split()[-1].lower()
+                # Work around inconsistency in function name between TimML and TTim.
                 traceline_func = traceline_function(tim)
+                kwargs = format_kwargs(kwargs)
                 tracelines.append(
-                     f"traceline_{sanitized(name)}_{direction_str}_{i} = {traceline_func}(\n{format_kwargs(kwargs)}\n)"
+                     f"traceline_{sanitized(name)}_{direction_str}_{i} = {traceline_func}(\n{ml_string}\n{kwargs}\n)"
                 )
             elif plugin_name == "Discharge Observation":
                 kwargs.pop("label")
