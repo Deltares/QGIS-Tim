@@ -136,6 +136,16 @@ def headgrid_code(domain) -> Tuple[str, str]:
     t = textwrap.indent(f"t={time}", prefix=PREFIX)
     return xg, yg, t
 
+def traceline_function(tim: str) -> str:
+    """
+    Workaround inconsistency between the name of the traceline function in TimML and TTim.
+    """
+    if tim == "timml":
+        return f"{tim}.trace.timtraceline"
+    elif tim == "ttim":
+        return f"{tim}.trace.timtrace"
+    else:
+        raise ValueError(f"Unknown tim: {tim}")
 
 def elements_and_observations(data, mapping: Dict[str, str], tim: str):
     strings = []
@@ -163,12 +173,10 @@ def elements_and_observations(data, mapping: Dict[str, str], tim: str):
                 )
             elif plugin_name in ("Particle Forward", "Particle Backward"):
                 direction_str = plugin_name.split()[-1].lower()
+                traceline_func = traceline_function(tim)
                 tracelines.append(
-                     f"traceline_{sanitized(name)}_{i} = {tim}.timtraceline((\n{format_kwargs(kwargs)}\n)"
+                     f"traceline_{sanitized(name)}_{direction_str}_{i} = {traceline_func}(\n{format_kwargs(kwargs)}\n)"
                 )
-                # observations.append(
-                #     f"particle_{direction_str}_{sanitized(name)}_{i}={tim}_model.particle(\n{format_kwargs(kwargs)}\n)"
-                # )
             elif plugin_name == "Discharge Observation":
                 kwargs.pop("label")
                 observations.append(
@@ -186,7 +194,7 @@ def elements_and_observations(data, mapping: Dict[str, str], tim: str):
                     f"{tim}_{sanitized(name)}_{i} = {tim}.{tim_name}(\n{model_string}\n{kwargs}\n)"
                 )
 
-    return strings, observations
+    return strings, observations, tracelines
 
 
 def timml_script_content(data: Dict[str, Any]):
@@ -201,20 +209,22 @@ def timml_script_content(data: Dict[str, Any]):
         f"timml_model = timml.ModelMaq(\n{format_kwargs(aquifer_data)}\n)",
     ]
 
-    element_strings, observations = elements_and_observations(
+    element_strings, observations, pathlines = elements_and_observations(
         data, TIMML_MAPPING, tim="timml"
     )
     strings = strings + element_strings
-    return strings, observations
+    return strings, observations, pathlines
 
 
 def timml_script(data: Dict[str, Any]) -> str:
-    strings, observations = timml_script_content(data)
+    strings, observations, pathlines = timml_script_content(data)
     strings.append("\ntimml_model.solve()\n")
     xg, yg, _ = headgrid_code(data["timml Domain:Domain"])
     strings.append(f"head = timml_model.headgrid(\n{xg},\n{yg}\n)")
     strings.append("\n")
     strings.extend(observations)
+    strings.append("\n")
+    strings.extend(pathlines)
     return "\n".join(strings)
 
 
@@ -231,7 +241,7 @@ def ttim_script(timml_data: Dict[str, Any], ttim_data: Dict[str, Any]) -> str:
         f"\nttim_model = ttim.ModelMaq(\n{format_kwargs(aquifer_data)}\n{PREFIX}timmlmodel=timml_model,\n)"
     )
 
-    element_strings, observations = elements_and_observations(
+    element_strings, observations, pathlines = elements_and_observations(
         data, TTIM_MAPPING, tim="ttim"
     )
     strings = strings + element_strings
@@ -243,6 +253,8 @@ def ttim_script(timml_data: Dict[str, Any], ttim_data: Dict[str, Any]) -> str:
         strings.append("\n")
 
     strings.extend(observations)
+    strings.append("\n")
+    strings.extend(pathlines)
     return "\n".join(strings)
 
 
