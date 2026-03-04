@@ -38,8 +38,8 @@ class ParticleSchema(RowWiseSchema):
         "time_end": Optional(Positive()),
     }
     timml_consistency_schemata = (
-        AllGreaterEqual("z_start", "minimum_z_aquifer_and_inhomogeneities"), 
-        AllLesserEqual("z_start", "maximum_z_aquifer_and_inhomogeneities"),
+        AllGreaterEqual("z_start", "minimum_z_aquifer"), 
+        AllLesserEqual("z_start", "maximum_z_aquifer"),
     )
     ttim_consistency_schemata = (
         AllOrNone(("time_start", "time_step", "time_end")),
