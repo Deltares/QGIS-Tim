@@ -1,4 +1,5 @@
 import abc
+import numpy as np
 import operator
 from typing import Any, Dict, List, Sequence, Union
 
@@ -301,18 +302,33 @@ class StrictlyDecreasing(IterableSchema):
         return None
 
 
-class AllGreaterEqual(IterableSchema):
+class AllConditionalIterableSchema(IterableSchema):
+    operator_str = None
+
     def __init__(self, x, y):
         self.x = x
         self.y = y
 
-    def validate(self, data, _=None) -> MaybeError:
-        x = data[self.x]
-        y = data[self.y]
-        wrong = [i + 1 for i, (a, b) in enumerate(zip(x, y)) if a < b]
-        if wrong:
-            return f"{self.x} is not greater or equal to {self.y} at row(s): {format(wrong)}"
+    def validate(self, data, other=None) -> MaybeError:
+        if other is None:
+            other = {}
+        x = data[self.x] if self.x in data else other.get(self.x)
+        y = data[self.y] if self.y in data else other.get(self.y)
+        operator_func = OPERATORS[self.operator_str]
+        is_wrong = ~operator_func(np.array(x), np.array(y))
+        wrong_rows = np.argwhere(is_wrong.flatten())
+        if wrong_rows.size > 0:
+            wrong_rows = list(wrong_rows + 1)
+            return f"{self.x} not {self.operator_str} {self.y} at row(s): {format(wrong_rows)}"
         return None
+
+
+class AllGreaterEqual(AllConditionalIterableSchema):
+    operator_str = ">="
+
+
+class AllLesserEqual(AllConditionalIterableSchema):
+    operator_str = "<="
 
 
 class AtleastOneTrue(IterableSchema):

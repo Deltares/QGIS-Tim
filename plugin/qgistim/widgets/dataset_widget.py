@@ -34,7 +34,7 @@ from PyQt5.QtWidgets import (
     QWidget,
 )
 from qgis.core import Qgis, QgsProject, QgsUnitTypes
-from qgistim.core.elements import Aquifer, Domain, load_elements_from_geopackage
+from qgistim.core.elements import Element, Aquifer, Domain, load_elements_from_geopackage, PolygonInhomogeneity
 from qgistim.core.formatting import data_to_json, data_to_script
 from qgistim.widgets.compute_widget import OutputOptions
 from qgistim.widgets.error_window import ValidationDialog
@@ -209,6 +209,7 @@ class DatasetTreeWidget(QTreeWidget):
         errors if something is amiss.
         """
         data = {}
+        z_values = []
         errors = {}
         elements = {
             item.text(1): item.element
@@ -227,16 +228,35 @@ class DatasetTreeWidget(QTreeWidget):
 
         raw_data = aquifer_extraction.data
         aquifer_data = aquifer.aquifer_data(raw_data, transient=transient)
+        z_values.extend(aquifer_data["z"])
         data[name] = aquifer_data
         if transient:
             data["start_date"] = str(raw_data["start_date"].toPyDateTime())
 
-        times = set()
         other = {
             "aquifer layers": raw_data["layer"],
             "global_aquifer": raw_data,
             "semiconf_head": raw_data["semiconf_head"][0],
         }
+
+        # Next extract the inhomogeneities, since they require the aquifer data
+        # for validation, and they also contribute to the z values that are
+        # needed for validation of other elements (particles).
+        inhom_names = [name for name in elements.keys() if isinstance(elements[name], PolygonInhomogeneity)]
+        for name in inhom_names:
+            element = elements.pop(name)
+            inhom_extraction = element.extract_data(transient, other)
+            if inhom_extraction.errors:
+                errors[element.timml_name] = inhom_extraction.errors
+            elif inhom_extraction.data:
+                data[element.timml_name] = inhom_extraction.data
+                z_values_element = [z for e in inhom_extraction.data for z in e["z"]]
+                z_values.extend(z_values_element)
+
+        other["minimum_z_aquifer_and_inhomogeneities"] = min(z_values)
+        other["maximum_z_aquifer_and_inhomogeneities"] = max(z_values)
+
+        times = set()
         for name, element in elements.items():
             try:
                 extraction = element.extract_data(transient, other)

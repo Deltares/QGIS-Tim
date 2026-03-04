@@ -14,14 +14,12 @@ from qgistim.core.elements.colors import GREY, LIGHT_GREY
 from qgistim.core.elements.element import TransientElement
 from qgistim.core.elements.schemata import RowWiseSchema
 from qgistim.core.schemata import (
+    AllGreaterEqual,
+    AllLesserEqual,
     AllOrNone,
-    AllRequired,
-    Membership,
-    NotBoth,
     Optional,
     Positive,
     Required,
-    StrictlyIncreasing,
     StrictlyPositive,
 )
 
@@ -39,6 +37,10 @@ class ParticleSchema(RowWiseSchema):
         "time_step": Optional(Positive()),
         "time_end": Optional(Positive()),
     }
+    timml_consistency_schemata = (
+        AllGreaterEqual("z_start", "minimum_z_aquifer_and_inhomogeneities"), 
+        AllLesserEqual("z_start", "maximum_z_aquifer_and_inhomogeneities"),
+    )
     ttim_consistency_schemata = (
         AllOrNone(("time_start", "time_step", "time_end")),
     )
