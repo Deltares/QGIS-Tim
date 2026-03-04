@@ -209,7 +209,6 @@ class DatasetTreeWidget(QTreeWidget):
         errors if something is amiss.
         """
         data = {}
-        z_values = []
         errors = {}
         elements = {
             item.text(1): item.element
@@ -228,7 +227,6 @@ class DatasetTreeWidget(QTreeWidget):
 
         raw_data = aquifer_extraction.data
         aquifer_data = aquifer.aquifer_data(raw_data, transient=transient)
-        z_values.extend(aquifer_data["z"])
         data[name] = aquifer_data
         if transient:
             data["start_date"] = str(raw_data["start_date"].toPyDateTime())
@@ -237,10 +235,9 @@ class DatasetTreeWidget(QTreeWidget):
             "aquifer layers": raw_data["layer"],
             "global_aquifer": raw_data,
             "semiconf_head": raw_data["semiconf_head"][0],
+            "minimum_z_aquifer": min(aquifer_data["z"]),
+            "maximum_z_aquifer": max(aquifer_data["z"]),
         }
-
-        other["minimum_z_aquifer"] = min(z_values)
-        other["maximum_z_aquifer"] = max(z_values)
 
         times = set()
         for name, element in elements.items():
