@@ -302,33 +302,49 @@ class StrictlyDecreasing(IterableSchema):
         return None
 
 
-class AllConditionalIterableSchema(IterableSchema):
-    operator_str = None
-
+class AllPredicateSchema(IterableSchema, abc.ABC):
     def __init__(self, x, y):
         self.x = x
         self.y = y
+    
+    @abc.abstractmethod
+    def is_bad(self, x, y):
+         pass
+
+    @abc.abstractmethod
+    def error_message(self, wrong_rows):
+         pass
 
     def validate(self, data, other=None) -> MaybeError:
         if other is None:
             other = {}
         x = data[self.x] if self.x in data else other.get(self.x)
         y = data[self.y] if self.y in data else other.get(self.y)
-        operator_func = OPERATORS[self.operator_str]
-        is_wrong = ~operator_func(np.array(x), np.array(y))
-        wrong_rows = np.argwhere(is_wrong.flatten())
+        # Force to np arrays to also easily support comparing arrays to scalar
+        # values.
+        wrong_rows = self.is_bad(np.array(x), np.array(y))
         if wrong_rows.size > 0:
             wrong_rows = list(wrong_rows + 1)
-            return f"{self.x} not {self.operator_str} {self.y} at row(s): {format(wrong_rows)}"
+            return self.error_message(wrong_rows)
         return None
+ 
+
+class AllGreaterEqual(AllPredicateSchema):
+    def is_bad(self, x, y):
+        is_wrong = x < y
+        return np.argwhere(is_wrong.flatten())
+
+    def error_message(self, wrong):
+        return f"{self.x} is not greater or equal to {self.y} at row(s): {format(wrong)}"
 
 
-class AllGreaterEqual(AllConditionalIterableSchema):
-    operator_str = ">="
+class AllLesserEqual(AllPredicateSchema):
+    def is_bad(self, x, y):
+        is_wrong = x > y
+        return np.argwhere(is_wrong.flatten())
 
-
-class AllLesserEqual(AllConditionalIterableSchema):
-    operator_str = "<="
+    def error_message(self, wrong):
+           return f"{self.x} is not lesser or equal to {self.y} at row(s): {format(wrong)}"
 
 
 class AtleastOneTrue(IterableSchema):
