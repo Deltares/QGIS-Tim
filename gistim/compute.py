@@ -199,14 +199,25 @@ def _(
     df = pd.DataFrame(d)
     return df
 
-
 @singledispatch
-def compute_pathlines(model, particle_starts):
+def compute_pathline(model, **kwargs)
     raise TypeError("Expected timml or ttim model")
 
-
-@compute_pathlines.register
+@compute_pathline.register
 def _(
+    model: timml.Model,
+    **kwargs,
+):
+    return timml.trace.timtraceline(model, **kwargs)
+
+@compute_pathline.register
+def _(
+    model: ttim.ModelMaq,
+    **kwargs,
+):
+    return ttim.trace.timtrace(model, **kwargs)
+
+def compute_pathlines(
     model: timml.Model,
     particle_starts: List[Dict],
     start_date: pd.Timestamp,
@@ -220,35 +231,8 @@ def _(
     start_date = pd.to_datetime(start_date, utc=False)
     for kwargs in particle_starts:
         label = kwargs.pop("label")
-        # TODO: Get window from bounding box and give to tim 
-        traceline = timml.trace.timtraceline(model, **kwargs)
-        for start, end in zip(traceline[:-1], traceline[1:]):
-            linesegment = [[start[0], start[1], start[2]], [end[0], end[1], end[2]]]
-            d["geometry"].append({"type": "LineString", "coordinates": linesegment})
-            d["datetime_start"].append(start_date + pd.to_timedelta(start[3], "D"))
-            d["datetime_end"].append(start_date + pd.to_timedelta(end[3], "D"))
-            d["label"].append(label)
-
-    return pd.DataFrame(d)
-
-
-@compute_pathlines.register
-def _(
-    model: ttim.ModelMaq,
-    particle_starts: List[Dict],
-    start_date: pd.Timestamp,
-) -> Dict[str, pd.DataFrame]:
-    d = {
-        "geometry": [],
-        "datetime_start": [],
-        "datetime_end": [],
-        "label": [],
-    }
-    start_date = pd.to_datetime(start_date, utc=False)
-    for kwargs in particle_starts:
-        label = kwargs.pop("label")
-        # TODO: Get window from bounding box and give to tim 
-        traceline = ttim.trace.timtrace(model, **kwargs)
+        # FUTURE: Get window from bounding box and give to tim 
+        traceline = compute_pathline(model, **kwargs)
         for start, end in zip(traceline[:-1], traceline[1:]):
             linesegment = [[start[0], start[1], start[2]], [end[0], end[1], end[2]]]
             d["geometry"].append({"type": "LineString", "coordinates": linesegment})
