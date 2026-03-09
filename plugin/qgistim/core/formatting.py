@@ -323,6 +323,7 @@ def timml_json(
     # Process TimML elements
     data = timml_data.copy()  # avoid side-effects
     domain_data = data.pop("timml Domain:Domain")
+    start_date = data.pop("start_date")
     elements, observations, discharge_observations, pathlines = json_elements_and_observations(
         data, mapping=TIMML_MAPPING
     )
@@ -332,6 +333,7 @@ def timml_json(
         "discharge_observations": discharge_observations,
         "window": domain_data,
         "output_options": output_options._asdict(),
+        "start_date": start_date,
         "pathlines": pathlines,
     }
     if output_options.mesh or output_options.raster:
@@ -348,11 +350,9 @@ def ttim_json(
 
     data = ttim_data.copy()
     domain_data = data.pop("timml Domain:Domain")
-    start_date = data.pop("start_date")
     elements, observations, _ = json_elements_and_observations(data, mapping=TTIM_MAPPING)
 
     json_data["ttim"] = elements
-    json_data["start_date"] = start_date
     json_data["observations"] = observations
     if output_options.mesh or output_options.raster:
         json_data["headgrid"] = headgrid_entry(domain_data, output_options.spacing)

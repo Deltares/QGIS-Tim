@@ -220,16 +220,19 @@ class DatasetTreeWidget(QTreeWidget):
         # other elements.
         name = "timml Aquifer:Aquifer"
         aquifer = elements.pop(name)
+
         aquifer_extraction = aquifer.extract_data(transient)
         if aquifer_extraction.errors:
             errors[name] = aquifer_extraction.errors
             return errors, None
 
         raw_data = aquifer_extraction.data
-        aquifer_data = aquifer.aquifer_data(raw_data, transient=transient)
+        aquifer_data = aquifer.aquifer_data(raw_data, transient)
         data[name] = aquifer_data
-        if transient:
-            data["start_date"] = str(raw_data["start_date"].toPyDateTime())
+
+        data["start_date"] = str(
+            aquifer.get_start_date().toPyDateTime()
+        )
 
         other = {
             "aquifer layers": raw_data["layer"],

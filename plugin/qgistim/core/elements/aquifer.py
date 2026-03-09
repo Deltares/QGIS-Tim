@@ -1,5 +1,5 @@
 from PyQt5.QtCore import QVariant
-from qgis.core import QgsDefaultValue, QgsField
+from qgis.core import QgsDefaultValue, QgsField, QgsVectorLayerUtils
 from qgistim.core import geopackage
 from qgistim.core.elements.element import ElementExtraction, TransientElement
 from qgistim.core.elements.schemata import SingleRowSchema, TableSchema
@@ -76,6 +76,7 @@ class Aquifer(TransientElement):
     ttim_defaults = {
         "time_min": QgsDefaultValue("0.01"),
         "laplace_inversion_M": QgsDefaultValue("10"),
+        "start_date": QgsDefaultValue("now()"),
     }
     transient_columns = (
         "aquitard_s",
@@ -127,6 +128,39 @@ class Aquifer(TransientElement):
         if errors:
             return ElementExtraction(errors=errors)
         return ElementExtraction(data={**data, **time_data[0]})
+
+    def get_start_date(self):
+        """
+        Returns the start date for the aquifer, which is used in transient
+        simulations as well as particle tracking (also for steady-state models).
+        This is a special-cased method as the alternative is using
+        extract_data(transient=True) to get a start_date, which fails in
+        validation for steady-state models.
+        """
+        time_data = self.table_to_records(layer=self.ttim_layer)
+        return time_data[0]["start_date"]
+
+    def create_ttim_layer(self, crs):
+        # Initiate the self.ttim_layer and add the default values to it, so that
+        # the user doesn't have to do it manually. This to get a start_date
+        # somewhere, which is used in transient simulations as well as particle
+        # tracking.
+        super().create_ttim_layer(crs)
+        # Set defaults before row is added, so that default values are applied
+        # to the row.
+        self.set_defaults() 
+
+        if self.ttim_layer.featureCount() > 0:
+            # Return if the layer already contains features, to avoid
+            # overwriting user input.
+            return
+
+        # Add a single row to the layer, containing default values.
+        self.ttim_layer.startEditing()
+        feature = QgsVectorLayerUtils.createFeature(self.ttim_layer)
+        self.ttim_layer.addFeature(feature)
+        self.ttim_layer.commitChanges()
+        self.ttim_layer.updateExtents()
 
     def extract_data(self, transient: bool) -> ElementExtraction:
         if transient:

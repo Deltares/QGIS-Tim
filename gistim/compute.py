@@ -209,7 +209,7 @@ def compute_pathlines(model, particle_starts):
 def _(
     model: timml.Model,
     particle_starts: List[Dict],
-    **_,
+    start_date: pd.Timestamp,
 ) -> Dict[str, pd.DataFrame]:
     d = {
         "geometry": [],
@@ -217,7 +217,7 @@ def _(
         "datetime_end": [],
         "label": [],
     }
-    now = pd.Timestamp.now()
+    start_date = pd.to_datetime(start_date, utc=False)
     for kwargs in particle_starts:
         label = kwargs.pop("label")
         # TODO: Get window from bounding box and give to tim 
@@ -225,8 +225,8 @@ def _(
         for start, end in zip(traceline[:-1], traceline[1:]):
             linesegment = [[start[0], start[1], start[2]], [end[0], end[1], end[2]]]
             d["geometry"].append({"type": "LineString", "coordinates": linesegment})
-            d["datetime_start"].append(now + pd.to_timedelta(start[3], "D"))
-            d["datetime_end"].append(now + pd.to_timedelta(end[3], "D"))
+            d["datetime_start"].append(start_date + pd.to_timedelta(start[3], "D"))
+            d["datetime_end"].append(start_date + pd.to_timedelta(end[3], "D"))
             d["label"].append(label)
 
     return pd.DataFrame(d)
@@ -244,6 +244,7 @@ def _(
         "datetime_end": [],
         "label": [],
     }
+    start_date = pd.to_datetime(start_date, utc=False)
     for kwargs in particle_starts:
         label = kwargs.pop("label")
         # TODO: Get window from bounding box and give to tim 
@@ -251,8 +252,8 @@ def _(
         for start, end in zip(traceline[:-1], traceline[1:]):
             linesegment = [[start[0], start[1], start[2]], [end[0], end[1], end[2]]]
             d["geometry"].append({"type": "LineString", "coordinates": linesegment})
-            d["datetime_start"].append(pd.to_datetime(start_date) + pd.to_timedelta(start[3], "D"))
-            d["datetime_end"].append(pd.to_datetime(start_date) + pd.to_timedelta(end[3], "D"))
+            d["datetime_start"].append(start_date + pd.to_timedelta(start[3], "D"))
+            d["datetime_end"].append(start_date + pd.to_timedelta(end[3], "D"))
             d["label"].append(label)
 
     return pd.DataFrame(d)
@@ -368,7 +369,7 @@ def write_output(
     
     if output_options["pathlines"] and pathlines:
         for layername, content in pathlines.items():
-            tables[layername] = compute_pathlines(model, content["data"])
+            tables[layername] = compute_pathlines(model, content["data"], start_date)
 
     write_geopackage(tables, crs, path)
     return
