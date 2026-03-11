@@ -76,7 +76,7 @@ class Aquifer(TransientElement):
     ttim_defaults = {
         "time_min": QgsDefaultValue("0.01"),
         "laplace_inversion_M": QgsDefaultValue("10"),
-        "start_date": QgsDefaultValue("now()"),
+        "start_date": QgsDefaultValue("make_datetime(year(now()), month(now()), day(now()), 0, 0, 0)"),
     }
     transient_columns = (
         "aquitard_s",
