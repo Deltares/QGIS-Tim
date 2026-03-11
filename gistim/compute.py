@@ -200,7 +200,7 @@ def _(
     return df
 
 @singledispatch
-def compute_pathline(model, **kwargs)
+def compute_pathline(model, **kwargs):
     raise TypeError("Expected timml or ttim model")
 
 @compute_pathline.register
