@@ -15,6 +15,7 @@ def write_versions(path):
         "ttim": ttim.__version__,
         "gistim": gistim.__version__,
     }
+    os.makedirs(os.path.dirname(path), exist_ok=True)
     with open(path, "w") as f:
         json.dump(versions, f)
     return

@@ -367,7 +367,7 @@ environments:
       - pypi: https://files.pythonhosted.org/packages/09/7d/af933f0f6e0767995b4e2d705a0665e454d1c19402aa7e895de3951ebb04/scipy-1.17.1-cp311-cp311-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl
       - pypi: https://files.pythonhosted.org/packages/a6/24/4d91e05817e92e3a61c8a21e08fd0f390f5301f1c448b137c57c4bc6e543/semver-3.0.4-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/15/8f/9779aad9dd099495a94f279acbd4e9e73bf7d15f59a315675a42f1cb05db/timml-6.3.0-py3-none-any.whl
-      - pypi: https://files.pythonhosted.org/packages/26/6e/8740e757160bf4fc1a3bf5c55f54a7df48304c60cb2820644d91270a07f4/ttim-0.6.5-py3-none-any.whl
+      - pypi: https://files.pythonhosted.org/packages/77/ab/04d8ded05ebee9f8959a21b3dd8da637f14a9e08cb33cae435863e5f8564/ttim-0.8.0-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/13/f7/9d94eeea3f6475456fb5c6b72d3a3cc652c1ecd342c5491274cbfc9ebaab/uncertainties-3.1.7-py2.py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/54/a3/289d1b5703412247551fc9f2057e8726567bdd278d25c37ad834f78c851e/xarray-2023.12.0-py3-none-any.whl
       osx-64:
@@ -412,7 +412,7 @@ environments:
       - pypi: https://files.pythonhosted.org/packages/9d/76/f789f7a86709c6b087c5a2f52f911838cad707cc613162401badc665acfe/setuptools-82.0.1-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/d9/5a/e7c31adbe875f2abbb91bd84cf2dc52d792b5a01506781dbcf25c91daf11/six-1.16.0-py2.py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/15/8f/9779aad9dd099495a94f279acbd4e9e73bf7d15f59a315675a42f1cb05db/timml-6.3.0-py3-none-any.whl
-      - pypi: https://files.pythonhosted.org/packages/26/6e/8740e757160bf4fc1a3bf5c55f54a7df48304c60cb2820644d91270a07f4/ttim-0.6.5-py3-none-any.whl
+      - pypi: https://files.pythonhosted.org/packages/77/ab/04d8ded05ebee9f8959a21b3dd8da637f14a9e08cb33cae435863e5f8564/ttim-0.8.0-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/ce/e4/dccd7f47c4b64213ac01ef921a1337ee6e30e8c6466046018326977efd95/tzdata-2026.2-py2.py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/13/f7/9d94eeea3f6475456fb5c6b72d3a3cc652c1ecd342c5491274cbfc9ebaab/uncertainties-3.1.7-py2.py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/54/a3/289d1b5703412247551fc9f2057e8726567bdd278d25c37ad834f78c851e/xarray-2023.12.0-py3-none-any.whl
@@ -701,7 +701,7 @@ environments:
       - pypi: https://files.pythonhosted.org/packages/95/da/0d1df507cf574b3f224ccc3d45244c9a1d732c81dcb26b1e8a766ae271a8/scipy-1.17.1-cp311-cp311-win_amd64.whl
       - pypi: https://files.pythonhosted.org/packages/a6/24/4d91e05817e92e3a61c8a21e08fd0f390f5301f1c448b137c57c4bc6e543/semver-3.0.4-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/15/8f/9779aad9dd099495a94f279acbd4e9e73bf7d15f59a315675a42f1cb05db/timml-6.3.0-py3-none-any.whl
-      - pypi: https://files.pythonhosted.org/packages/26/6e/8740e757160bf4fc1a3bf5c55f54a7df48304c60cb2820644d91270a07f4/ttim-0.6.5-py3-none-any.whl
+      - pypi: https://files.pythonhosted.org/packages/77/ab/04d8ded05ebee9f8959a21b3dd8da637f14a9e08cb33cae435863e5f8564/ttim-0.8.0-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/ce/e4/dccd7f47c4b64213ac01ef921a1337ee6e30e8c6466046018326977efd95/tzdata-2026.2-py2.py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/13/f7/9d94eeea3f6475456fb5c6b72d3a3cc652c1ecd342c5491274cbfc9ebaab/uncertainties-3.1.7-py2.py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/54/a3/289d1b5703412247551fc9f2057e8726567bdd278d25c37ad834f78c851e/xarray-2023.12.0-py3-none-any.whl
@@ -10652,18 +10652,34 @@ packages:
   - pkg:pypi/tomli?source=hash-mapping
   size: 21561
   timestamp: 1774492402955
-- pypi: https://files.pythonhosted.org/packages/26/6e/8740e757160bf4fc1a3bf5c55f54a7df48304c60cb2820644d91270a07f4/ttim-0.6.5-py3-none-any.whl
+- pypi: https://files.pythonhosted.org/packages/77/ab/04d8ded05ebee9f8959a21b3dd8da637f14a9e08cb33cae435863e5f8564/ttim-0.8.0-py3-none-any.whl
   name: ttim
-  version: 0.6.5
-  sha256: b34c97c81c16a676f5e2b1ca76280fa92d190ee7b10d006448ad4d0343b18f84
+  version: 0.8.0
+  sha256: ee305609e87b6bb8ffe6b48060bef6f8116da000f4dd20cab2170f5fb41d184f
   requires_dist:
-  - numpy>=1.17
-  - scipy>=1.5
-  - numba>=0.5
-  - matplotlib>=3.1
-  - lmfit>=1.0
-  - pandas>=1.1
-  requires_python: '>=3.7'
+  - numpy
+  - scipy
+  - numba
+  - matplotlib
+  - lmfit
+  - pandas
+  - pytest ; extra == 'ci'
+  - pytest-cov ; extra == 'ci'
+  - pytest-sugar ; extra == 'ci'
+  - jupyter ; extra == 'ci'
+  - shapely ; extra == 'ci'
+  - coveralls ; extra == 'ci'
+  - ruff ; extra == 'ci'
+  - timml ; extra == 'ci'
+  - ttim[ci] ; extra == 'docs'
+  - sphinx ; extra == 'docs'
+  - sphinx-design ; extra == 'docs'
+  - pydata-sphinx-theme ; extra == 'docs'
+  - numpydoc ; extra == 'docs'
+  - myst-nb ; extra == 'docs'
+  - sphinxcontrib-bibtex ; extra == 'docs'
+  - sphinx-autoapi ; extra == 'docs'
+  requires_python: '>=3.11'
 - conda: https://conda.anaconda.org/conda-forge/linux-64/tzcode-2026b-h280c20c_0.conda
   sha256: 35da5b89561ed93629f751f111a092abcaaa9fdc516e09e9b4ab9880756a1871
   md5: 5c5f9b9bad2a0852ffa38833ba2a1c7d
