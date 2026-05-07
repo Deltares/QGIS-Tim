@@ -11,15 +11,13 @@ documentation = "https://deltares.github.io/QGIS-Tim"
 repository = "https://github.com/Deltares/qgis-tim"
 
 [tasks]
-install = "pip install --no-deps --editable ."
 build-backend = "pyinstaller gistim/__main__.py --name gistim"
-zip-backend = {depends-on = "install", cmd = "python .github/workflows/create_pyinstaller_zip.py"}
+zip-backend = { depends-on = "install", cmd = "python .github/workflows/create_pyinstaller_zip.py" }
 zip-plugin = "python .github/workflows/create_plugin_zip.py"
 
 [dependencies]
 python = "3.11.*"
 future = "*"
-pip = "*"
 
 # Conda-forge will distribute numpy and scipy with Intel MKL, which adds 600 MB
 # to the pyinstaller result. By installing from PyPI instead, we can skip MKL.
@@ -34,3 +32,49 @@ timml = "==6.3.0"
 ttim = "==0.6.5"
 scipy = "*"
 xarray = "*"
+qgis-plugin-manager = ">=1.7.5, <2"
+
+[target.win-64.dependencies]
+qgis = ">=3.40,<4"
+
+[target.linux-64.dependencies]
+qgis = ">=3.40,<4"
+
+
+[tasks.qgis]
+args = [{ "arg" = "profiles_path", "default" = ".pixi/qgis_env" }]
+cmd = "qgis --profiles-path {{ profiles_path }}"
+
+[tasks.install-qgis-tim-plugin]
+args = [
+    { "arg" = "profile_path", "default" = ".pixi/qgis_env/profiles/default" },
+]
+cmd = "python scripts/install_qgis_tim_plugin.py {{ profile_path }}"
+
+[tasks.install-qgis-plugin]
+args = [
+    { "arg" = "package" },
+    { "arg" = "package_name" },
+    { "arg" = "profile_path", "default" = ".pixi/qgis_env/profiles/default" },
+]
+cmd = "python scripts/install_qgis_plugin.py {{ package }} {{ profile_path }} && python scripts/enable_plugin.py {{ package_name }} {{ profile_path }}"
+
+[tasks.install-qgis-plugins]
+args = [
+    { "arg" = "profile_path", "default" = ".pixi/qgis_env/profiles/default" },
+]
+depends-on = [
+    { "task" = "install-qgis-plugin", "args" = [
+        "Plugin\\ Reloader",
+        "plugin_reloader",
+        " {{ profile_path }} ",
+    ] },
+    { "task" = "install-qgis-tim-plugin", "args" = [
+        " {{ profile_path }} ",
+    ] },
+    { "task" = "install-qgis-plugin", "args" = [
+        "debugvs",
+        "debug_vs",
+        " {{ profile_path }} ",
+    ] },
+]
