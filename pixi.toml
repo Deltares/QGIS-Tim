@@ -12,7 +12,7 @@ repository = "https://github.com/Deltares/qgis-tim"
 
 [tasks]
 build-backend = "pyinstaller gistim/__main__.py --name gistim"
-zip-backend = { depends-on = "install", cmd = "python .github/workflows/create_pyinstaller_zip.py" }
+zip-backend = { cmd = "python .github/workflows/create_pyinstaller_zip.py" }
 zip-plugin = "python .github/workflows/create_plugin_zip.py"
 
 [dependencies]
