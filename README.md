@@ -17,6 +17,7 @@ GeoPackage content to a JSON file or a Python script. The back-end reads the JSO
 necessary computations and writes result files that are loaded back into QGIS by the plugin.
 
 ## Documentation
+
 [Find the documentation here.](https://deltares.github.io/QGIS-Tim/)
 
 ## Installation
@@ -24,38 +25,53 @@ necessary computations and writes result files that are loaded back into QGIS by
 Download and install a recent version of QGIS (>=3.28):
 <https://www.qgis.org/en/site/forusers/download.html>
 
-### Method A: From the QGIS plugin database 
-1.  Open QGIS.
-3.  At the top, find the Plugins menu (\~sixth object in the menubar).
-4.  Find \"Manage and Install plugins\" (\~first object in drop-down).
-5.  Find \"All\" (\~first in left section).
-6.  Search for \"Qgis-Tim\".
-7.  Click \"Install Plugin\".
+### Method A: From the QGIS plugin database
 
-**NB** The latest release might not be available yet on the QGIS plugin database, as vetting a new release takes a few days. The latest release is always available via method B.
+1. Open QGIS.
+2. At the top, find the Plugins menu (\~sixth object in the menubar).
+3. Find \"Manage and Install plugins\" (\~first object in drop-down).
+4. Find \"All\" (\~first in left section).
+5. Search for \"Qgis-Tim\".
+6. Click \"Install Plugin\".
+
+**NB**: The latest release might not be available yet on the QGIS plugin database, as vetting a new release takes a few days. The latest release is always available via method B.
 
 ### Method B: From ZIP file
-1.  Download the \"QGIS-Tim-plugin.zip\" from the [GitHub Releases page](https://github.com/Deltares/QGIS-Tim/releases) (do not unzip!).
-2.  Open QGIS.
-3.  At the top, find the Plugins menu (\~sixth object in the menubar).
-4.  Find \"Manage and Install plugins\" (\~first object in drop-down).
-5.  Find \"Install from ZIP\" (\~fourth in left section).
-6.  Enter the path to the file \"QGIS-TIM-plugin.zip\".
-7.  Click \"Install Plugin\".
+
+1. Download the \"QGIS-Tim-plugin.zip\" from the [GitHub Releases page](https://github.com/Deltares/QGIS-Tim/releases) (do not unzip!).
+2. Open QGIS.
+3. At the top, find the Plugins menu (\~sixth object in the menubar).
+4. Find \"Manage and Install plugins\" (\~first object in drop-down).
+5. Find \"Install from ZIP\" (\~fourth in left section).
+6. Enter the path to the file \"QGIS-TIM-plugin.zip\".
+7. Click \"Install Plugin\".
 
 This will add an icon to the toolbar(s). By clicking the icon, the plugin is started.
 
 ### Install the TimML and TTim server
+
 With the plugin installed, we can already define model input and convert it to Python scripts or JSON files.
 To run TimML and TTim computations directly from QGIS, we need to install a server program which contains TimML and TTim.
 
-1.  Start the QGIS-Tim plugin by clicking the QGIS-Tim icon in the toolbar.
-2.  Find and click the "Install TimML and TTim server" button at the bottom of the plugin window.
-3.  Click the "Install latest release from GitHub" button to download and install the server program.
+1. Start the QGIS-Tim plugin by clicking the QGIS-Tim icon in the toolbar.
+2. Find and click the "Install TimML and TTim server" button at the bottom of the plugin window.
+3. Click the "Install latest release from GitHub" button to download and install the server program.
 
 Specific releases can also be manually downloaded from the [GitHub Releases page](https://github.com/Deltares/QGIS-Tim/releases):
 
-1.  Download the gistim ZIP file for your platform: Windows, macOS, or Linux.
-2.  Find and click the "Install TimML and TTim server" button at the bottom of the plugin window.
-3.  Set the path to the downloaded ZIP file in the "Install from ZIP file" section.
-4.  Click the "Install" button.
+1. Download the gistim ZIP file for your platform: Windows, macOS, or Linux.
+2. Find and click the "Install TimML and TTim server" button at the bottom of the plugin window.
+3. Set the path to the downloaded ZIP file in the "Install from ZIP file" section.
+4. Click the "Install" button.
+
+## Development
+
+This repository uses [pixi](https://pixi.sh) to install required dependencies.
+
+1. Install pixi by following [these instructions](https://pixi.prefix.dev/latest/installation/).
+2. Call `pixi install` on the command line to install all required dependencies.
+3. Call `pixi run install-qgis-plugins` to install this plugin and some debug tools inside of the included QGIS installation.
+4. Call `pixi run qgis` to start QGIS. The plugin should be installed and enabled.
+
+After making a change to the plugin, you can reload the plugin with the [plugin reloader](https://plugins.qgis.org/plugins/plugin_reloader/).
+For debugging we are still encountering an [issue](https://github.com/nextgis/qgis_devtools/issues/10) with the [QGIS DevTools plugin](https://plugins.qgis.org/plugins/devtools/).

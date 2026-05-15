@@ -17,6 +17,7 @@ zip-plugin = "python .github/workflows/create_plugin_zip.py"
 
 [dependencies]
 python = "3.11.*"
+debugpy = "*"
 future = "*"
 
 # Conda-forge will distribute numpy and scipy with Intel MKL, which adds 600 MB
@@ -73,8 +74,8 @@ depends-on = [
         " {{ profile_path }} ",
     ] },
     { "task" = "install-qgis-plugin", "args" = [
-        "debugvs",
-        "debug_vs",
+        "QGIS\\ DevTools",
+        "devtools",
         " {{ profile_path }} ",
     ] },
 ]
