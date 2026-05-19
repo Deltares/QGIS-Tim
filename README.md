@@ -69,9 +69,14 @@ Specific releases can also be manually downloaded from the [GitHub Releases page
 This repository uses [pixi](https://pixi.sh) to install required dependencies.
 
 1. Install pixi by following [these instructions](https://pixi.prefix.dev/latest/installation/).
-2. Call `pixi install` on the command line to install all required dependencies.
-3. Call `pixi run install-qgis-plugins` to install this plugin and some debug tools inside of the included QGIS installation.
-4. Call `pixi run qgis` to start QGIS. The plugin should be installed and enabled.
+2. Call `pixi install -e dev` on the command line to install all required dependencies.
+3. Call `pixi shell -e dev` to activate the development environment.
+4. Call `pixi run install-qgis-plugins` to install this plugin and some debug tools inside of the included QGIS installation.
+5. Call `pixi run install-backend` to install the backend as a symlink between the pyinstaller dist folder and %APPDATA%/qgis-tim.
+6. Call `pixi run qgis` to start QGIS. The plugin should be installed and enabled and you should be able to see the versions of timml and ttim.
 
 After making a change to the plugin, you can reload the plugin with the [plugin reloader](https://plugins.qgis.org/plugins/plugin_reloader/).
 For debugging we are still encountering an [issue](https://github.com/nextgis/qgis_devtools/issues/10) with the [QGIS DevTools plugin](https://plugins.qgis.org/plugins/devtools/).
+We recommend debugging the backend separately by simply running the backend as a sole entity and perform some separate operations.
+We can not yet connect to the backend while running the QGIS plugin.
+Instead, export to json or python and connect the debugger to a separate backend process from VS Code.
