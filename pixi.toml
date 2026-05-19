@@ -69,15 +69,15 @@ depends-on = [
     { "task" = "install-qgis-plugin", "args" = [
         "Plugin\\ Reloader",
         "plugin_reloader",
-        " {{ profile_path }} ",
+        "{{ profile_path }}",
     ] },
     { "task" = "install-qgis-tim-plugin", "args" = [
-        " {{ profile_path }} ",
+        "{{ profile_path }}",
     ] },
     { "task" = "install-qgis-plugin", "args" = [
         "QGIS\\ DevTools",
         "devtools",
-        " {{ profile_path }} ",
+        "{{ profile_path }}",
     ] },
 ]
 [feature.dev.tasks.install-backend]
