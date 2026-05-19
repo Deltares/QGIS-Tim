@@ -9,12 +9,7 @@ readme = "README.md"
 version = "0.6.0"
 maintainers = [{ name = "Huite Bootsma", email = "huite.bootsma@deltares.nl" }]
 requires-python = ">=3.9"
-dependencies = [
-    'pandas',
-    'timml>=6.3.0',
-    'ttim>=0.6.5',
-    'xarray',
-]
+dependencies = ['pandas', 'timml>=6.3.0', 'ttim>=0.8.0', 'xarray', 'numpy']
 classifiers = [
     'Development Status :: 4 - Beta',
     'Intended Audience :: Science/Research',
@@ -36,10 +31,7 @@ Code = "https://github.com/deltares/QGIS-Tim"
 Issues = "https://github.com/deltares/QGIS-Tim/issues"
 
 [tool.setuptools]
-packages = [
-    "gistim",
-    "gistim.geomet",
-]
+packages = ["gistim", "gistim.geomet"]
 license-files = ["LICENSE"]
 
 [tool.isort]
