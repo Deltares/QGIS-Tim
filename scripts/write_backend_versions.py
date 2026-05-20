@@ -3,14 +3,12 @@ import os
 
 
 def write_versions(path):
-    import timml
-    import ttim
+    import timflow
 
     import gistim
 
     versions = {
-        "timml": timml.__version__,
-        "ttim": ttim.__version__,
+        "timflow": timflow.__version__,
         "gistim": gistim.__version__,
     }
     os.makedirs(os.path.dirname(path), exist_ok=True)

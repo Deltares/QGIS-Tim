@@ -96,7 +96,7 @@ class Aquifer(TransientElement):
 
     def remove_from_geopackage(self):
         """This element may not be removed."""
-        return
+        pass
 
     def to_timml(self) -> ElementExtraction:
         missing = self.check_timml_columns()

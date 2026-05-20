@@ -5,10 +5,6 @@ import sys
 from contextlib import contextmanager, redirect_stderr, redirect_stdout
 from os import devnull
 
-# Make sure we explicitly import besselaesnumba for pyinstaller.
-# It's a dynamic import inside of timml.
-from timml.besselaesnumba import besselaesnumba  # noqa: F401
-
 import gistim.compute
 
 

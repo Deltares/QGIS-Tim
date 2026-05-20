@@ -6,9 +6,9 @@ from typing import Any, Dict, List, Union
 
 import numpy as np
 import pandas as pd
-import timml
-import ttim
 import xarray as xr
+from timflow import steady as timml
+from timflow import transient as ttim
 
 from gistim.geopackage import CoordinateReferenceSystem, write_geopackage
 from gistim.netcdf import write_raster, write_ugrid
@@ -96,7 +96,7 @@ def _(
     y = np.arange(ymax, ymin, -spacing) - 0.5 * spacing
     head = model.headgrid(xg=x, yg=y)
     nlayer = model.aq.find_aquifer_data(x[0], y[0]).naq
-    layer = [i for i in range(nlayer)]
+    layer = list(range(nlayer))
     return xr.DataArray(
         data=head,
         name="head",
@@ -133,7 +133,7 @@ def _(
         head = model.headgrid(xg=x, yg=y, t=time)
 
     # Other coordinates
-    layer = [i for i in range(nlayer)]
+    layer = list(range(nlayer))
     time = pd.to_datetime(start_date) + pd.to_timedelta(time, "D")
     return xr.DataArray(
         data=head,

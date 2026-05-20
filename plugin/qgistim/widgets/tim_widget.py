@@ -208,7 +208,7 @@ class QgisTimWidget(QWidget):
         self.compute_widget = ComputeWidget(self)
         self.install_dialog = InstallDialog(self)
 
-        self.config_button = QPushButton("Install TimML and TTim server")
+        self.config_button = QPushButton("Install timflow server")
         self.config_button.clicked.connect(self.install_dialog.show)
         self.config_button.setIcon(QgsApplication.getThemeIcon("/mActionOptions.svg"))
 

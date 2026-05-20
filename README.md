@@ -2,15 +2,14 @@
 
 QGIS-Tim is an open source project for multi-layer groundwater flow
 simulations. QGIS-Tim provides a link between QGIS and the open source analytic
-element method software: [TimML (steady-state)](https://github.com/mbakker7/timml)
-and [TTim (transient)](https://github.com/mbakker7/ttim).
+element method software: [timflow](https://github.com/timflow-org/timflow).
 
 The benefit of the analytic element method (AEM) is that no grid or
 time-stepping is required. Geohydrological features are represented by points,
 lines, and polygons. QGIS-Tim stores these features in a
 [GeoPackage](https://www.geopackage.org/).
 
-QGIS-Tim consists of a "front-end" (the QGIS plugin) and a "back-end" (the TimML and TTim server).
+QGIS-Tim consists of a "front-end" (the QGIS plugin) and a "back-end" (the timflow server).
 The front-end is a QGIS plugin that provides a limited graphical interface to setup model input,
 visualize, and analyze model input. The back-end is a Python package. The plugin converts the
 GeoPackage content to a JSON file or a Python script. The back-end reads the JSON file, does the
@@ -48,19 +47,19 @@ Download and install a recent version of QGIS (>=3.28):
 
 This will add an icon to the toolbar(s). By clicking the icon, the plugin is started.
 
-### Install the TimML and TTim server
+### Install the timflow server
 
 With the plugin installed, we can already define model input and convert it to Python scripts or JSON files.
-To run TimML and TTim computations directly from QGIS, we need to install a server program which contains TimML and TTim.
+To run timflow computations directly from QGIS, we need to install a server program which contains timflow.
 
 1. Start the QGIS-Tim plugin by clicking the QGIS-Tim icon in the toolbar.
-2. Find and click the "Install TimML and TTim server" button at the bottom of the plugin window.
+2. Find and click the "Install timflow server" button at the bottom of the plugin window.
 3. Click the "Install latest release from GitHub" button to download and install the server program.
 
 Specific releases can also be manually downloaded from the [GitHub Releases page](https://github.com/Deltares/QGIS-Tim/releases):
 
 1. Download the gistim ZIP file for your platform: Windows, macOS, or Linux.
-2. Find and click the "Install TimML and TTim server" button at the bottom of the plugin window.
+2. Find and click the "Install timflow server" button at the bottom of the plugin window.
 3. Set the path to the downloaded ZIP file in the "Install from ZIP file" section.
 4. Click the "Install" button.
 
@@ -73,7 +72,7 @@ This repository uses [pixi](https://pixi.sh) to install required dependencies.
 3. Call `pixi shell -e dev` to activate the development environment.
 4. Call `pixi run install-qgis-plugins` to install this plugin and some debug tools inside of the included QGIS installation.
 5. Call `pixi run install-backend` to install the backend as a symlink between the pyinstaller dist folder and %APPDATA%/qgis-tim.
-6. Call `pixi run qgis` to start QGIS. The plugin should be installed and enabled and you should be able to see the versions of timml and ttim.
+6. Call `pixi run qgis` to start QGIS. The plugin should be installed and enabled and you should be able to see the versions of timflow.
 
 After making a change to the plugin, you can reload the plugin with the [plugin reloader](https://plugins.qgis.org/plugins/plugin_reloader/).
 For debugging we are still encountering an [issue](https://github.com/nextgis/qgis_devtools/issues/10) with the [QGIS DevTools plugin](https://plugins.qgis.org/plugins/devtools/).

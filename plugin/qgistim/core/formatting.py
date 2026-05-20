@@ -183,7 +183,7 @@ def timml_script_content(data: Dict[str, Any]):
 
     strings = [
         "import numpy as np",
-        "import timml",
+        "from timflow import steady as timml",
         "",
         f"timml_model = timml.ModelMaq(\n{format_kwargs(aquifer_data)}\n)",
     ]
@@ -207,7 +207,7 @@ def timml_script(data: Dict[str, Any]) -> str:
 
 def ttim_script(timml_data: Dict[str, Any], ttim_data: Dict[str, Any]) -> str:
     strings, _ = timml_script_content(timml_data)
-    strings.insert(2, "import ttim")
+    strings.insert(2, "from timflow import transient as ttim")
 
     data = ttim_data.copy()  # avoid side-effects
     aquifer_data = data.pop("timml Aquifer:Aquifer")

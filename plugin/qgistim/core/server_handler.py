@@ -1,6 +1,6 @@
 """
 This module contains the logic for starting, communicating with, and killing a
-separate (conda) interpreter, which is running TimML and TTim.
+separate (conda) interpreter, which is running timflow.
 
 For thread safety: DO NOT INCLUDE QGIS CALLS HERE.
 """
