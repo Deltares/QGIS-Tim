@@ -1,6 +1,6 @@
 import abc
 import operator
-from typing import Any, Dict, List, Sequence, Union
+from typing import List, Union
 
 OPERATORS = {
     "<": operator.lt,
@@ -185,14 +185,14 @@ class StrictlyPositive(BaseSchema):
 
 
 class AllOrNone(BaseSchema):
-    def __init__(self, *variables: Sequence[str]):
+    def __init__(self, *variables: str):
         self.variables = variables
 
     def validate(self, data, _=None) -> MaybeError:
         present = [data.get(v) is not None for v in self.variables]
         if any(present) != all(present):
-            vars = ", ".join(self.variables)
-            return f"Exactly all or none of the following variables must be provided: {vars}"
+            _vars = ", ".join(self.variables)
+            return f"Exactly all or none of the following variables must be provided: {_vars}"
         return None
 
 
@@ -246,7 +246,7 @@ class CircularGeometry(BaseSchema):
 class Range(IterableSchema):
     def validate(self, data, _=None) -> MaybeError:
         expected = list(range(len(data)))
-        if not data == expected:
+        if data != expected:
             return f"Expected {format(expected)}; received {format(data)}"
         return None
 
@@ -255,7 +255,7 @@ class Equals(IterableSchema):
     def __init__(self, other: str):
         self.other = other
 
-    def validate(self, data, other: Dict[str, Any]) -> MaybeError:
+    def validate(self, data, other=None) -> MaybeError:
         other_data = other[self.other]
         if data != other_data:
             return f"Values are not equal to values of {self.other}: {data} versus {other_data}"
@@ -355,10 +355,10 @@ class SemiConfined(ConsistencySchema):
 
 
 class RequiresConfinedAquifer(ConsistencySchema):
-    def validate(self, _, other: Dict[str, Any]) -> MaybeError:
+    def validate(self, _, other=None) -> MaybeError:
         if other.get("semiconf_head") is not None:
             return "this element requires a confined aquifer without a semi-confined top."
-        return
+        return None
 
 
 class SingleRow(ConsistencySchema):

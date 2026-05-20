@@ -8,7 +8,7 @@ description = "Connects TimML and TTim Analytic Element modeling to QGIS"
 readme = "README.md"
 version = "0.6.0"
 maintainers = [{ name = "Huite Bootsma", email = "huite.bootsma@deltares.nl" }]
-requires-python = ">=3.9"
+requires-python = ">=3.11"
 dependencies = ['pandas', 'timml>=6.3.0', 'ttim>=0.8.0', 'xarray', 'numpy']
 classifiers = [
     'Development Status :: 4 - Beta',
@@ -48,3 +48,19 @@ ignore = [
 
 [tool.ruff.lint.pydocstyle]
 convention = "numpy"
+
+[tool.mypy]
+python_version = "3.11"
+
+warn_unused_configs = true
+warn_redundant_casts = true
+warn_unused_ignores = true
+strict_equality = true
+extra_checks = true
+disallow_subclassing_any = true
+disallow_untyped_decorators = true
+disallow_any_generics = true
+
+[[tool.mypy.overrides]]
+module = ["qgis.*"]
+ignore_missing_imports = true

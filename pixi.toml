@@ -35,9 +35,9 @@ debugpy = "*"
 ruff = "*"
 pre-commit = "*"
 mypy = "*"
-pyqt-stubs = "*"
 
 [feature.dev.pypi-dependencies]
+qgis-stubs = "*"
 qgis-plugin-manager = ">=1.7.5, <2"
 
 [feature.dev.target.win-64.dependencies]
@@ -55,6 +55,7 @@ install = { depends-on = [
     "install-backend",
 ] }
 lint = "pre-commit run --all"
+mypy = "mypy ."
 
 [feature.dev.tasks.qgis]
 args = [{ "arg" = "profiles_path", "default" = ".pixi/qgis_env" }]
