@@ -14,9 +14,7 @@ def install_qgis_plugin(plugin_name: str, profile_path: str) -> None:
         env["QGIS_PLUGIN_MANAGER_QGIS_VERSION"] = "3.40"
 
         subprocess.check_call(["qgis-plugin-manager", "init"], cwd=plugin_path, env=env)
-        subprocess.check_call(
-            ["qgis-plugin-manager", "update"], cwd=plugin_path, env=env
-        )
+        subprocess.check_call(["qgis-plugin-manager", "update"], cwd=plugin_path, env=env)
         subprocess.check_call(
             [
                 "qgis-plugin-manager",

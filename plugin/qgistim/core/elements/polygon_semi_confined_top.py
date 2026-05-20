@@ -2,6 +2,7 @@ from copy import deepcopy
 
 from PyQt5.QtCore import QVariant
 from qgis.core import QgsDefaultValue, QgsField, QgsSingleSymbolRenderer
+
 from qgistim.core.elements.colors import BLUE, TRANSPARENT_BLUE
 from qgistim.core.elements.element import Element
 from qgistim.core.elements.schemata import RowWiseSchema
@@ -37,9 +38,7 @@ class PolygonSemiConfinedTop(Element):
 
     @classmethod
     def renderer(cls) -> QgsSingleSymbolRenderer:
-        return cls.polygon_renderer(
-            color=TRANSPARENT_BLUE, color_border=BLUE, width_border="0.75"
-        )
+        return cls.polygon_renderer(color=TRANSPARENT_BLUE, color_border=BLUE, width_border="0.75")
 
     def process_timml_row(self, row, other):
         raw_data = deepcopy(other["global_aquifer"])

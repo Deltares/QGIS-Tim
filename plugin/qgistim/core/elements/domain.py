@@ -8,6 +8,7 @@ from qgis.core import (
     QgsPointXY,
     QgsSingleSymbolRenderer,
 )
+
 from qgistim.core.elements.colors import BLACK
 from qgistim.core.elements.element import ElementExtraction, TransientElement
 from qgistim.core.elements.schemata import SingleRowSchema
@@ -37,9 +38,7 @@ class Domain(TransientElement):
         """
         Results in transparent fill, with a medium thick black border line.
         """
-        return cls.polygon_renderer(
-            color="255,0,0,0", color_border=BLACK, width_border="0.75"
-        )
+        return cls.polygon_renderer(color="255,0,0,0", color_border=BLACK, width_border="0.75")
 
     def remove_from_geopackage(self):
         pass
@@ -67,9 +66,7 @@ class Domain(TransientElement):
 
     def to_timml(self, other) -> ElementExtraction:
         data = self.table_to_records(layer=self.timml_layer)
-        errors = self.schema.validate_timml(
-            name=self.timml_layer.name(), data=data, other=other
-        )
+        errors = self.schema.validate_timml(name=self.timml_layer.name(), data=data, other=other)
         if errors:
             return ElementExtraction(errors=errors)
         else:
@@ -89,9 +86,7 @@ class Domain(TransientElement):
         data = timml_extraction.data
 
         timeseries = self.table_to_dict(layer=self.ttim_layer)
-        errors = self.schema.validate_timeseries(
-            name=self.ttim_layer.name(), data=timeseries
-        )
+        errors = self.schema.validate_timeseries(name=self.ttim_layer.name(), data=timeseries)
         if errors:
             return ElementExtraction(errors=errors)
         if timeseries["time"]:

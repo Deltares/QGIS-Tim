@@ -5,6 +5,7 @@ It ensures the underlying widgets can talk to each other. It also manages the
 connection to the QGIS Layers Panel, and ensures there is a group for the Tim
 layers there.
 """
+
 from typing import Any, Dict, Union
 
 from PyQt5.QtCore import Qt
@@ -16,6 +17,7 @@ from PyQt5.QtWidgets import (
     QWidget,
 )
 from qgis.core import QgsApplication, QgsEditFormConfig, QgsMapLayer, QgsProject
+
 from qgistim.core.server_handler import ServerHandler
 from qgistim.core.task import BaseServerTask
 from qgistim.widgets.compute_widget import ComputeWidget
@@ -146,9 +148,7 @@ class LayersPanelGroup:
         if suppress is not None:
             config = maplayer.editFormConfig()
             config.setSuppress(
-                QgsEditFormConfig.SuppressOn
-                if suppress
-                else QgsEditFormConfig.SuppressDefault
+                QgsEditFormConfig.SuppressOn if suppress else QgsEditFormConfig.SuppressDefault
             )
         if renderer is not None:
             maplayer.setRenderer(renderer)

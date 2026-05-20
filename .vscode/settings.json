@@ -1,0 +1,11 @@
+{
+    "editor.formatOnSave": true,
+    "[python]": {
+        "editor.defaultFormatter": "charliermarsh.ruff",
+        "editor.codeActionsOnSave": {
+            "source.fixAll": "explicit"
+        }
+    },
+    "mypy-type-checker.importStrategy": "fromEnvironment",
+    "files.insertFinalNewline": true
+}

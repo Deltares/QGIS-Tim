@@ -398,9 +398,7 @@ def _dump_point(obj, big_endian, meta):
     coords = obj["coordinates"]
     num_dims = len(coords)
 
-    wkb_string, byte_fmt, _ = _header_bytefmt_byteorder(
-        "Point", num_dims, big_endian, meta
-    )
+    wkb_string, byte_fmt, _ = _header_bytefmt_byteorder("Point", num_dims, big_endian, meta)
 
     wkb_string += struct.pack(byte_fmt, *coords)
     return wkb_string
@@ -616,14 +614,10 @@ def _load_point(big_endian, type_bytes, data_bytes):
         # of removing ambiguity, we will treat all XYM geometries as XYZM when
         # generate the GeoJSON. A default Z value of `0.0` will be given in
         # this case.
-        coords = list(
-            struct.unpack("%sddd" % endian_token, as_bin_str(take(24, data_bytes)))
-        )
+        coords = list(struct.unpack("%sddd" % endian_token, as_bin_str(take(24, data_bytes))))
         coords.insert(2, 0.0)
     elif type_bytes == WKB_ZM["Point"]:
-        coords = struct.unpack(
-            "%sdddd" % endian_token, as_bin_str(take(32, data_bytes))
-        )
+        coords = struct.unpack("%sdddd" % endian_token, as_bin_str(take(32, data_bytes)))
 
     return dict(type="Point", coordinates=list(coords))
 
@@ -682,9 +676,7 @@ def _load_polygon(big_endian, type_bytes, data_bytes):
 
     while True:
         ring = []
-        [num_verts] = struct.unpack(
-            "%sl" % endian_token, as_bin_str(take(4, data_bytes))
-        )
+        [num_verts] = struct.unpack("%sl" % endian_token, as_bin_str(take(4, data_bytes)))
 
         verts_wkb = as_bin_str(take(8 * num_verts * num_dims, data_bytes))
         verts = block_splitter(verts_wkb, 8)
@@ -784,9 +776,7 @@ def _load_multilinestring(big_endian, type_bytes, data_bytes):
             assert ls_endian == LITTLE_ENDIAN
             assert ls_type[::-1] == _WKB[dim]["LineString"]
 
-        [num_verts] = struct.unpack(
-            "%sl" % endian_token, as_bin_str(take(4, data_bytes))
-        )
+        [num_verts] = struct.unpack("%sl" % endian_token, as_bin_str(take(4, data_bytes)))
         num_values = num_dims * num_verts
         values = struct.unpack(
             endian_token + "d" * num_values,
@@ -837,14 +827,10 @@ def _load_multipolygon(big_endian, type_bytes, data_bytes):
             assert poly_endian == LITTLE_ENDIAN
             assert poly_type[::-1] == _WKB[dim]["Polygon"]
 
-        [num_rings] = struct.unpack(
-            "%sl" % endian_token, as_bin_str(take(4, data_bytes))
-        )
+        [num_rings] = struct.unpack("%sl" % endian_token, as_bin_str(take(4, data_bytes)))
         for _ in range(num_rings):
             ring = []
-            [num_verts] = struct.unpack(
-                "%sl" % endian_token, as_bin_str(take(4, data_bytes))
-            )
+            [num_verts] = struct.unpack("%sl" % endian_token, as_bin_str(take(4, data_bytes)))
             for _ in range(num_verts):
                 vert_wkb = as_bin_str(take(8 * num_dims, data_bytes))
                 fmt = "%s" + "d" * num_dims

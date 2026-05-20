@@ -39,4 +39,3 @@ jobs:
         run: gh release upload ${{ github.ref_name }} dist/QGIS-Tim-plugin.zip
         env:
           GITHUB_TOKEN: ${{ github.TOKEN }}
- 

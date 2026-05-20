@@ -1,17 +1,18 @@
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import (
-    QFileDialog,
     QDialog,
-    QPushButton,
-    QVBoxLayout,
+    QFileDialog,
+    QGridLayout,
+    QGroupBox,
     QHBoxLayout,
     QLabel,
     QLineEdit,
     QMessageBox,
-    QGroupBox,
-    QGridLayout,
+    QPushButton,
+    QVBoxLayout,
 )
-from qgis.core import Qgis, QgsTask, QgsApplication
+from qgis.core import Qgis, QgsApplication, QgsTask
+
 from qgistim.core.install_backend import install_from_github, install_from_zip
 
 
@@ -128,7 +129,7 @@ class InstallDialog(QDialog):
         layout.addWidget(self.close_button, stretch=0, alignment=Qt.AlignRight)
         layout.addStretch()
         self.setLayout(layout)
- 
+
     def initialize_version_view(self):
         version_widgets = {}
         version_layout = QGridLayout()
@@ -143,7 +144,7 @@ class InstallDialog(QDialog):
             for j, widget in enumerate(widgets):
                 version_layout.addWidget(widget, i, j)
         return version_widgets, version_layout
-    
+
     def update_versions(self):
         versions = self.parent.server_handler.versions()
         for package in ["timml", "ttim", "gistim"]:
@@ -175,9 +176,7 @@ class InstallDialog(QDialog):
         )
         if reply == QMessageBox.No:
             return
-        self.install_task = InstallZipTask(
-            self, path=path, message_bar=self.parent.message_bar
-        )
+        self.install_task = InstallZipTask(self, path=path, message_bar=self.parent.message_bar)
         self.enable_install_buttons(False)
         QgsApplication.taskManager().addTask(self.install_task)
         return

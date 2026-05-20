@@ -26,11 +26,8 @@ def format(data) -> str:
 class BaseSchema(abc.ABC):
     """Base class for single value."""
 
-    def __init__(self):
-        pass
-
     @abc.abstractmethod
-    def validate(self, data, other) -> MaybeError:
+    def validate(self, data, other=None) -> MaybeError:
         pass
 
     def validate_many(self, data, other) -> ErrorList:
@@ -53,6 +50,10 @@ class IterableSchema(abc.ABC):
     def __init__(self, *schemata):
         self.schemata = schemata
 
+    @abc.abstractmethod
+    def validate(self, data, other=None) -> MaybeError:
+        pass
+
     def validate_many(self, data, other) -> ErrorList:
         error = self.validate(data, other)
         if error:
@@ -66,7 +67,7 @@ class SchemaContainer(abc.ABC):
         self.schemata = schemata
 
     @abc.abstractmethod
-    def validate(self):
+    def validate(self, data, other=None) -> MaybeError:
         pass
 
     def _validate_schemata(self, data, other=None) -> ErrorList:
@@ -83,7 +84,7 @@ class IterableSchemaContainer(abc.ABC):
         self.schemata = schemata
 
     @abc.abstractmethod
-    def validate(self):
+    def validate(self, data, other=None) -> MaybeError:
         pass
 
     def _validate_schemata(self, data, other=None) -> ErrorList:
@@ -191,10 +192,7 @@ class AllOrNone(BaseSchema):
         present = [data.get(v) is not None for v in self.variables]
         if any(present) != all(present):
             vars = ", ".join(self.variables)
-            return (
-                "Exactly all or none of the following variables must be "
-                f"provided: {vars}"
-            )
+            return f"Exactly all or none of the following variables must be provided: {vars}"
         return None
 
 
@@ -218,9 +216,7 @@ class Membership(BaseSchema):
             return None
         member_values = other[self.members_key]
         if data not in member_values:
-            return (
-                f"Value {data} not found in {self.members_key}: {format(member_values)}"
-            )
+            return f"Value {data} not found in {self.members_key}: {format(member_values)}"
         return None
 
 
@@ -262,10 +258,7 @@ class Equals(IterableSchema):
     def validate(self, data, other: Dict[str, Any]) -> MaybeError:
         other_data = other[self.other]
         if data != other_data:
-            return (
-                f"Values are not equal to values of {self.other}: "
-                f"{data} versus {other_data}"
-            )
+            return f"Values are not equal to values of {self.other}: {data} versus {other_data}"
         return None
 
 
@@ -364,9 +357,7 @@ class SemiConfined(ConsistencySchema):
 class RequiresConfinedAquifer(ConsistencySchema):
     def validate(self, _, other: Dict[str, Any]) -> MaybeError:
         if other.get("semiconf_head") is not None:
-            return (
-                "this element requires a confined aquifer without a semi-confined top."
-            )
+            return "this element requires a confined aquifer without a semi-confined top."
         return
 
 

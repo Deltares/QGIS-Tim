@@ -53,9 +53,7 @@ class TestAllOrNone(TestCase):
         d = {"a": 1, "b": 2, "c": 3}
         self.assertIsNone(schema.validate(d))
         d = {"a": None, "b": 2, "c": 3}
-        expected = (
-            "Exactly all or none of the following variables must be provided: a, b, c"
-        )
+        expected = "Exactly all or none of the following variables must be provided: a, b, c"
         self.assertEqual(schema.validate(d), expected)
 
 
@@ -69,9 +67,7 @@ class TestNotBoth(TestCase):
         d = {"a": None, "b": 1}
         self.assertIsNone(schema.validate(d))
         d = {"a": 1, "b": 1}
-        self.assertEqual(
-            schema.validate(d), "Either a or b should be provided, not both."
-        )
+        self.assertEqual(schema.validate(d), "Either a or b should be provided, not both.")
 
 
 class TestMembership(TestCase):
@@ -80,18 +76,14 @@ class TestMembership(TestCase):
         other = {"model layers": [1, 2, 3]}
         self.assertIsNone(schema.validate(None, other))
         self.assertIsNone(schema.validate(1, other))
-        self.assertEqual(
-            schema.validate(0, other), "Value 0 not found in model layers: 1, 2, 3"
-        )
+        self.assertEqual(schema.validate(0, other), "Value 0 not found in model layers: 1, 2, 3")
 
 
 class TestAllRequired(TestCase):
     def test_all_required(self):
         schema = AllRequired(Positive())
         self.assertEqual(schema.validate([1, 2, 3]), [])
-        self.assertEqual(
-            schema.validate([None, 2, None]), ["No values provided at row(s): 1, 3"]
-        )
+        self.assertEqual(schema.validate([None, 2, None]), ["No values provided at row(s): 1, 3"])
         self.assertEqual(schema.validate([1, 2, -1]), ["Non-positive value: -1"])
 
 
@@ -99,9 +91,7 @@ class TestOffsetAllRequired(TestCase):
     def test_offset_all_required(self):
         schema = OffsetAllRequired(Positive())
         self.assertEqual(schema.validate([None, 2, 3]), [])
-        self.assertEqual(
-            schema.validate([None, 2, None]), ["No values provided at row(s): 3"]
-        )
+        self.assertEqual(schema.validate([None, 2, None]), ["No values provided at row(s): 3"])
         self.assertEqual(schema.validate([None, 2, -1]), ["Non-positive value: -1"])
 
 
@@ -116,17 +106,13 @@ class TestAllOptional(TestCase):
         schema = OptionalFirstOnly()
         self.assertEqual(schema.validate([None, None, None]), [])
         self.assertEqual(schema.validate([1, None, None]), [])
-        self.assertEqual(
-            schema.validate([1, 1, None]), ["Only the first value may be filled in."]
-        )
+        self.assertEqual(schema.validate([1, 1, None]), ["Only the first value may be filled in."])
 
     def test_all_optional_first_only_positive(self):
         schema = OptionalFirstOnly(Positive())
         self.assertEqual(schema.validate([None, None, None]), [])
         self.assertEqual(schema.validate([1, None, None]), [])
-        self.assertEqual(
-            schema.validate([1, 1, None]), ["Only the first value may be filled in."]
-        )
+        self.assertEqual(schema.validate([1, 1, None]), ["Only the first value may be filled in."])
         self.assertEqual(schema.validate([-1, None, None]), ["Non-positive value: -1"])
 
 
@@ -134,9 +120,7 @@ class TestRange(TestCase):
     def test_range(self):
         schema = Range()
         self.assertIsNone(schema.validate([0, 1, 2, 3]))
-        self.assertEqual(
-            schema.validate([1, 2, 3]), "Expected 0, 1, 2; received 1, 2, 3"
-        )
+        self.assertEqual(schema.validate([1, 2, 3]), "Expected 0, 1, 2; received 1, 2, 3")
 
 
 class TestIncreasing(TestCase):
@@ -144,9 +128,7 @@ class TestIncreasing(TestCase):
         schema = Increasing()
         self.assertIsNone(schema.validate([0, 1, 2, 3]))
         self.assertIsNone(schema.validate([0, 1, 1, 2, 3]))
-        self.assertEqual(
-            schema.validate([1, 0, 2]), "Values are not increasing: 1, 0, 2"
-        )
+        self.assertEqual(schema.validate([1, 0, 2]), "Values are not increasing: 1, 0, 2")
 
 
 class TestStrictlyIncreasing(TestCase):
@@ -168,9 +150,7 @@ class TestDecreasing(TestCase):
         schema = Decreasing()
         self.assertIsNone(schema.validate([3, 2, 1, 0]))
         self.assertIsNone(schema.validate([3, 2, 2, 1, 1]))
-        self.assertEqual(
-            schema.validate([1, 0, 2]), "Values are not decreasing: 1, 0, 2"
-        )
+        self.assertEqual(schema.validate([1, 0, 2]), "Values are not decreasing: 1, 0, 2")
 
 
 class TestStrictlyDecreasing(TestCase):
@@ -204,9 +184,7 @@ class TestOptionalFirstOnly(TestCase):
         schema = OptionalFirstOnly()
         self.assertEqual(schema.validate([None, None]), [])
         self.assertEqual(schema.validate([1, None]), [])
-        self.assertEqual(
-            schema.validate([1, 1]), ["Only the first value may be filled in."]
-        )
+        self.assertEqual(schema.validate([1, 1]), ["Only the first value may be filled in."])
 
 
 class TestSemiConfined(TestCase):

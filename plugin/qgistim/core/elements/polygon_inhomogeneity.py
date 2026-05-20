@@ -2,6 +2,7 @@ from typing import Any, Dict
 
 from PyQt5.QtCore import QVariant
 from qgis.core import QgsDefaultValue, QgsField, QgsSingleSymbolRenderer
+
 from qgistim.core.elements.colors import GREY, TRANSPARENT_GREY
 from qgistim.core.elements.element import AssociatedElement
 from qgistim.core.elements.schemata import RowWiseSchema, TableSchema
@@ -81,9 +82,7 @@ class PolygonInhomogeneity(AssociatedElement):
 
     @classmethod
     def renderer(cls) -> QgsSingleSymbolRenderer:
-        return cls.polygon_renderer(
-            color=TRANSPARENT_GREY, color_border=GREY, width_border="0.75"
-        )
+        return cls.polygon_renderer(color=TRANSPARENT_GREY, color_border=GREY, width_border="0.75")
 
     def process_timml_row(self, row: Dict[str, Any], grouped: Dict[int, Any]):
         inhom_id = row["inhomogeneity_id"]

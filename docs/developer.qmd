@@ -5,7 +5,7 @@ title: "Developer Notes"
 ## Pixi
 QGIS-Tim uses pixi to manage installing dependencies and run common tasks.
 
-Follow the instructions on the [Getting Started page](https://pixi.sh/). 
+Follow the instructions on the [Getting Started page](https://pixi.sh/).
 
 ### PyInstaller
 To build the TimML and TTim server application with PyInstaller, run `pixi run build-backend`

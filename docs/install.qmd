@@ -12,8 +12,8 @@ Download and install a recent version of QGIS (>=3.28):
 <https://www.qgis.org/en/site/forusers/download.html>{target="_blank"}
 
 ## 2. Install the QGIS plugin
- 
-### Method A: From the QGIS plugin database (recommended) 
+
+### Method A: From the QGIS plugin database (recommended)
 
 1.  Open QGIS.
 3.  At the top, find the Plugins menu (\~sixth object in the menubar).
@@ -22,7 +22,7 @@ Download and install a recent version of QGIS (>=3.28):
 6.  Search for \"Qgis-Tim\".
 7.  Click \"Install Plugin\".
 
-### Method B: From ZIP file 
+### Method B: From ZIP file
 1.  Download the \"QGIS-Tim-plugin.zip\" from the [GitHub Releases page](https://github.com/Deltares/QGIS-Tim/releases) (do not unzip!).
 2.  Open QGIS.
 3.  At the top, find the Plugins menu (\~sixth object in the menubar).

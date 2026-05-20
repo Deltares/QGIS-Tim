@@ -61,8 +61,6 @@ class TestAquiferSchema(TestCase):
             "semiconf_head": [None],
         }
         expected = {
-            "Table:": [
-                "aquifer_top is not greater or equal to aquifer_bottom at row(s): 1, 2"
-            ]
+            "Table:": ["aquifer_top is not greater or equal to aquifer_bottom at row(s): 1, 2"]
         }
         self.assertEqual(schema.validate_timml(data), expected)

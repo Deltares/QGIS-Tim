@@ -34,5 +34,17 @@ Issues = "https://github.com/deltares/QGIS-Tim/issues"
 packages = ["gistim", "gistim.geomet"]
 license-files = ["LICENSE"]
 
-[tool.isort]
-profile = "black"
+[tool.ruff]
+line-length = 100
+target-version = "py311" # keep as the lowest for backwards compatible changes.
+
+[tool.ruff.lint]
+# enable pydocstyle (E), pyflake (F) and isort (I),bugbear (B)
+select = ["E", "F", "I", "B", "ICN", "TID"]
+ignore = [
+    "E501",
+    "B905", # TODO: Fix zip without strict keyword
+]
+
+[tool.ruff.lint.pydocstyle]
+convention = "numpy"

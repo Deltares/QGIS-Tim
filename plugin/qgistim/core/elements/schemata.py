@@ -44,28 +44,18 @@ class SchemaBase(abc.ABC):
         return errors
 
     @classmethod
-    def validate_timeseries(
-        cls, name: str, data: Dict[str, Any], other=None
-    ) -> Dict[str, List]:
+    def validate_timeseries(cls, name: str, data: Dict[str, Any], other=None) -> Dict[str, List]:
         vd = ValidationData(cls.timeseries_schemata, (), name, data, other)
         return cls._validate_table(vd)
 
     @classmethod
-    def validate_timml(
-        cls, name: str, data: Dict[str, Any], other=None
-    ) -> Dict[str, List]:
-        vd = ValidationData(
-            cls.timml_schemata, cls.timml_consistency_schemata, name, data, other
-        )
+    def validate_timml(cls, name: str, data: Dict[str, Any], other=None) -> Dict[str, List]:
+        vd = ValidationData(cls.timml_schemata, cls.timml_consistency_schemata, name, data, other)
         return cls._validate(vd)
 
     @classmethod
-    def validate_ttim(
-        cls, name: str, data: Dict[str, Any], other=None
-    ) -> Dict[str, List]:
-        vd = ValidationData(
-            cls.ttim_schemata, cls.ttim_consistency_schemata, name, data, other
-        )
+    def validate_ttim(cls, name: str, data: Dict[str, Any], other=None) -> Dict[str, List]:
+        vd = ValidationData(cls.ttim_schemata, cls.ttim_consistency_schemata, name, data, other)
         return cls._validate(vd)
 
     @abc.abstractclassmethod
@@ -126,9 +116,5 @@ class SingleRowSchema(RowWiseSchema, abc.ABC):
     def _validate(vd: ValidationData) -> Dict[str, List]:
         nrow = len(vd.data)
         if nrow != 1:
-            return {
-                vd.name: [
-                    f"Table must contain a single row. Table contains {nrow} rows."
-                ]
-            }
+            return {vd.name: [f"Table must contain a single row. Table contains {nrow} rows."]}
         return RowWiseSchema._validate(vd)

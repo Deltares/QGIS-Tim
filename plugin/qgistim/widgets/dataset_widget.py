@@ -10,6 +10,7 @@ Not every TimML element has a TTim equivalent (yet). This means that when a
 user chooses the transient simulation mode, a number of elements must be
 disabled (such as inhomogeneities).
 """
+
 import json
 from pathlib import Path
 from shutil import copy
@@ -34,9 +35,9 @@ from PyQt5.QtWidgets import (
     QWidget,
 )
 from qgis.core import Qgis, QgsProject, QgsUnitTypes
+
 from qgistim.core.elements import Aquifer, Domain, load_elements_from_geopackage
 from qgistim.core.formatting import data_to_json, data_to_script
-from qgistim.widgets.compute_widget import OutputOptions
 from qgistim.widgets.error_window import ValidationDialog
 
 SUPPORTED_TTIM_ELEMENTS = set(
@@ -145,11 +146,7 @@ class DatasetTreeWidget(QTreeWidget):
 
         # Collect the selected items
         selection = self.selectedItems()
-        selection = [
-            item
-            for item in selection
-            if not isinstance(item.element, (Aquifer, Domain))
-        ]
+        selection = [item for item in selection if not isinstance(item.element, (Aquifer, Domain))]
         # Append associated items
         for item in selection:
             if item.assoc_item is not None and item.assoc_item not in selection:
@@ -211,9 +208,7 @@ class DatasetTreeWidget(QTreeWidget):
         data = {}
         errors = {}
         elements = {
-            item.text(1): item.element
-            for item in self.items()
-            if item.timml_checkbox.isChecked()
+            item.text(1): item.element for item in self.items() if item.timml_checkbox.isChecked()
         }
 
         # First convert the aquifer, since we need its data to validate
@@ -247,10 +242,7 @@ class DatasetTreeWidget(QTreeWidget):
                     if extraction.times:
                         times.update(extraction.times)
             except RuntimeError as e:
-                if (
-                    e.args[0]
-                    == "wrapped C/C++ object of type QgsVectorLayer has been deleted"
-                ):
+                if e.args[0] == "wrapped C/C++ object of type QgsVectorLayer has been deleted":
                     # Delay of Qt garbage collection to blame?
                     pass
                 else:
@@ -288,7 +280,9 @@ class DatasetWidget(QWidget):
         self.new_geopackage_button.clicked.connect(self.new_geopackage)
         self.save_geopackage_button.clicked.connect(self.save_geopackage)
         self.restore_geopackage_button.clicked.connect(self.restore_geopackage)
-        self.suppress_popup_checkbox = QCheckBox("Suppress attribute form pop-up after feature creation")
+        self.suppress_popup_checkbox = QCheckBox(
+            "Suppress attribute form pop-up after feature creation"
+        )
         self.suppress_popup_checkbox.stateChanged.connect(self.suppress_popup_changed)
         self.remove_button.clicked.connect(self.remove_geopackage_layer)
         self.add_button.clicked.connect(self.add_selection_to_qgis)
