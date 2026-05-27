@@ -54,7 +54,7 @@ install = { depends-on = [
     "install-qgis-plugins",
     "install-backend",
 ] }
-lint = "pre-commit run --all"
+lint = "pre-commit run --all-files"
 mypy = "mypy ."
 
 [feature.dev.tasks.qgis]
