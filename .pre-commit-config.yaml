@@ -1,5 +1,5 @@
 ---
-exclude: docs/tutorial-QGIS-TIM_files/libs/
+exclude: docs/tutorial-QGIS-TIM_files/libs/|docs/_extensions/quarto-ext/
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v6.0.0
