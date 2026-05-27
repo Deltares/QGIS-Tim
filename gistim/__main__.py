@@ -9,7 +9,7 @@ from os import devnull
 # It's a dynamic import inside of timml.
 from timml.besselaesnumba import besselaesnumba  # noqa: F401
 
-import gistim
+import gistim.compute
 
 
 @contextmanager
@@ -70,7 +70,6 @@ def compute(args) -> None:
     else:
         transient = args.transient[0]
     gistim.compute.compute(path=args.path[0], transient=transient)
-    return
 
 
 if __name__ == "__main__":
