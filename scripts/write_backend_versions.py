@@ -1,11 +1,12 @@
-import os
 import json
+import os
 
 
 def write_versions(path):
     import timml
-    import gistim
     import ttim
+
+    import gistim
 
     versions = {
         "timml": timml.__version__,

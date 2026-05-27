@@ -9,7 +9,7 @@ from os import devnull
 # It's a dynamic import inside of timml.
 from timml.besselaesnumba import besselaesnumba  # noqa: F401
 
-import gistim
+import gistim.compute
 
 
 @contextmanager
@@ -65,12 +65,8 @@ def serve(_) -> None:
 
 
 def compute(args) -> None:
-    if args.transient is None:
-        transient = False
-    else:
-        transient = args.transient[0]
+    transient = args.transient or False
     gistim.compute.compute(path=args.path[0], transient=transient)
-    return
 
 
 if __name__ == "__main__":
@@ -85,7 +81,6 @@ if __name__ == "__main__":
     parser_compute.set_defaults(func=compute)
     parser_compute.add_argument("path", type=str, nargs=1, help="path to JSON file")
     parser_compute.add_argument("--transient", action=argparse.BooleanOptionalAction)
-    parser_compute.set_defaults(transient=False)
 
     # Parse and call the appropriate function
     args = parser.parse_args()

@@ -32,8 +32,12 @@ numpy = "*"
 
 [feature.dev.dependencies]
 debugpy = "*"
+ruff = "*"
+pre-commit = "*"
+mypy = "*"
 
 [feature.dev.pypi-dependencies]
+qgis-stubs = "*"
 qgis-plugin-manager = ">=1.7.5, <2"
 
 [feature.dev.target.win-64.dependencies]
@@ -42,6 +46,16 @@ qgis = ">=3.40,<4"
 [feature.dev.target.linux-64.dependencies]
 qgis = ">=3.40,<4"
 
+
+[feature.dev.tasks]
+install-pre-commit = "pre-commit install"
+install = { depends-on = [
+    "install-pre-commit",
+    "install-qgis-plugins",
+    "install-backend",
+] }
+lint = "pre-commit run --all-files"
+mypy = "mypy ."
 
 [feature.dev.tasks.qgis]
 args = [{ "arg" = "profiles_path", "default" = ".pixi/qgis_env" }]

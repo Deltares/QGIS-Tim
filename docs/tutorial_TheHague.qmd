@@ -152,14 +152,14 @@ The case in this tutorial is located in The Netherlands, so next we select the a
 > a. Close this window.
 
 ### Install plugins
-This is the moment to import four plugins needed for this tutorial: 
+This is the moment to import four plugins needed for this tutorial:
 
-- the QGIS-Tim plugin (developed by Deltares). 
+- the QGIS-Tim plugin (developed by Deltares).
 - the iMOD plugin (developed by Deltares).
 - the Value Tool. A plugin to display in table or plot values from raster layers (or mesh layers) at the current mouse position.
 - the PDOK plugin. This plugin gives access to a large database from which we will load the topographic maps and use the navigation option.
 
-To install the plugins from QGIS you need an internet connection! 
+To install the plugins from QGIS you need an internet connection!
 
 > No internet connection? Follow the next steps to import the two Deltares' plugins from a ZIP file provided in the Tutorial Dataset.
 >
@@ -169,7 +169,7 @@ To install the plugins from QGIS you need an internet connection!
 > a. Click *Install Plugin*.
 > a. In the same way, install the QGIS-Tim plugin using the ZIP file "QGIS-Tim_Tutorial\\QGIS-Tim-plugin.zip".
 
-If you have an internet connection, all four plugins can be downloaded within QGIS. 
+If you have an internet connection, all four plugins can be downloaded within QGIS.
 
 (@) At the top, find the Plugins menu (\~sixth object in the menubar).
 (@) Find \"Manage and Install plugins\" (\~first object in drop-down).

@@ -28,8 +28,7 @@ def create_windows_directory_link(source: Path, target: Path) -> None:
     )
     if result.returncode != 0:
         raise RuntimeError(
-            "Failed to create backend link. "
-            f"mklink output: {result.stdout} {result.stderr}"
+            f"Failed to create backend link. mklink output: {result.stdout} {result.stderr}"
         )
     print(f"Created junction: {target} -> {source}")
 

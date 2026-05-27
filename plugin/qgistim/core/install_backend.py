@@ -1,14 +1,16 @@
 """Downloads and installs from GitHub or installs from zipfile."""
-from typing import Dict
-from pathlib import Path
-from zipfile import ZipFile
-from io import BytesIO
-import json
-import requests
+
 import hashlib
+import json
+import os
 import platform
 import shutil
-import os
+from io import BytesIO
+from pathlib import Path
+from typing import Dict
+from zipfile import ZipFile
+
+import requests
 
 
 def get_gistim_dir() -> Path:
@@ -39,8 +41,7 @@ def download_assets(assets: Dict[str, str]) -> ZipFile:
     github_system = SYSTEMS.get(user_system)
     if github_system is None:
         raise ValueError(
-            f"Unsupported OS: {user_system}. "
-            f"Only {', '.join(SYSTEMS.keys())} are supported."
+            f"Unsupported OS: {user_system}. Only {', '.join(SYSTEMS.keys())} are supported."
         )
     # Get checksum
     checksum_url = assets[f"sha256-checksum-{github_system}.txt"]

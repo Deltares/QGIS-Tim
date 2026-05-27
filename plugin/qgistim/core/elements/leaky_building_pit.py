@@ -2,6 +2,7 @@ from typing import Any, Dict
 
 from PyQt5.QtCore import QVariant
 from qgis.core import QgsDefaultValue, QgsField, QgsSingleSymbolRenderer
+
 from qgistim.core.elements.colors import RED, TRANSPARENT_RED
 from qgistim.core.elements.element import AssociatedElement
 from qgistim.core.elements.schemata import RowWiseSchema, TableSchema

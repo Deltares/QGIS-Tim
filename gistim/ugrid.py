@@ -46,8 +46,7 @@ def _coord(da, dim):
     else:  # undefined -> equidistant
         if da[dim].size == 1:
             raise ValueError(
-                f"DataArray has size 1 along {dim}, so cellsize must be provided"
-                " as a coordinate."
+                f"DataArray has size 1 along {dim}, so cellsize must be provided as a coordinate."
             )
         dxs = np.diff(da[dim].values)
         dx = dxs[0]

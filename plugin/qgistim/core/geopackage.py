@@ -8,6 +8,7 @@ This module lightly wraps a few QGIS built in functions to:
     * Remove a layer from a geopackage
 
 """
+
 import sqlite3
 from contextlib import contextmanager
 from typing import List
@@ -90,5 +91,5 @@ def remove_layer(path: str, layer: str) -> None:
     query = {"DATABASE": f"{path}|layername={layer}", "SQL": f"drop table {layer}"}
     try:
         processing.run("native:spatialiteexecutesql", query)
-    except Exception:
-        raise RuntimeError(f"Failed to remove layer with {query}")
+    except Exception as ex:
+        raise RuntimeError(f"Failed to remove layer with {query}") from ex

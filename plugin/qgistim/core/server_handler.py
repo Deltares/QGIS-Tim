@@ -4,6 +4,7 @@ separate (conda) interpreter, which is running TimML and TTim.
 
 For thread safety: DO NOT INCLUDE QGIS CALLS HERE.
 """
+
 import json
 import os
 import platform
@@ -35,14 +36,14 @@ class ServerHandler:
         else:
             gistim_dir = Path(os.environ["HOME"]) / ".qgis-tim"
         return gistim_dir
-    
+
     @staticmethod
     def get_interpreter() -> Path:
         if platform.system() == "Windows":
             return ServerHandler.get_gistim_dir() / "gistim.exe"
         else:
             return ServerHandler.get_gistim_dir() / "gistim"
-        
+
     @staticmethod
     def versions():
         path = ServerHandler.get_gistim_dir() / "versions.json"

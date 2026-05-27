@@ -2,6 +2,7 @@ from copy import deepcopy
 
 from PyQt5.QtCore import QVariant
 from qgis.core import QgsDefaultValue, QgsField, QgsSingleSymbolRenderer
+
 from qgistim.core.elements.colors import BLUE, TRANSPARENT_BLUE
 from qgistim.core.elements.element import Element
 from qgistim.core.elements.schemata import RowWiseSchema

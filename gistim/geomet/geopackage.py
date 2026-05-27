@@ -56,7 +56,6 @@ def dumps(obj, big_endian=True):
     """
     Dump a GeoJSON-like dict to a GeoPackage bytestring.
 
-
     If the dict contains a top-level 'meta' key like so:
 
     ```
@@ -331,12 +330,12 @@ def _build_geopackage_header(obj, is_little_endian):
 
     try:
         envelope_indicator = _dim_to_indicator[len(envelope)]
-    except KeyError:
+    except KeyError as ex:
         raise ValueError(
             "Bounding box must be of length 2*n where "
             "n is the number of dimensions represented "
             "in the contained geometries."
-        )
+        ) from ex
 
     pack_args = [
         _GeoPackage.MAGIC1,
@@ -370,7 +369,7 @@ def _check_is_valid(data):
     valid, reason = is_valid(data)
     if not valid:
         raise ValueError(
-            "Could not read Geopackage geometry " "because of errors: " + reason
+            "Could not read Geopackage geometry because of errors: " + reason
         )
 
 
