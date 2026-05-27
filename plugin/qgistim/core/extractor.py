@@ -21,11 +21,6 @@ class ExtractorMixin:
     Mixin class to extract all data from QgsVectorLayers.
     """
 
-    def __new__(cls, *args, **kwargs):
-        if cls is ExtractorMixin:
-            raise TypeError("ExtractorMixin cannot be instantiated directly.")
-        return super().__new__(cls)
-
     @staticmethod
     def argsort(seq):
         return sorted(range(len(seq)), key=seq.__getitem__)
