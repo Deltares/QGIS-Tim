@@ -1,4 +1,4 @@
-from PyQt5.QtCore import QVariant
+from PyQt5.QtCore import QMetaType
 from qgis.core import QgsDefaultValue, QgsField
 
 from qgistim.core import geopackage
@@ -50,22 +50,22 @@ class Aquifer(TransientElement):
     element_type = "Aquifer"
     geometry_type = "No Geometry"
     timml_attributes = [
-        QgsField("layer", QVariant.Int),
-        QgsField("aquifer_top", QVariant.Double),
-        QgsField("aquifer_bottom", QVariant.Double),
-        QgsField("aquitard_c", QVariant.Double),
-        QgsField("aquifer_k", QVariant.Double),
-        QgsField("semiconf_top", QVariant.Double),
-        QgsField("semiconf_head", QVariant.Double),
-        QgsField("aquitard_s", QVariant.Double),
-        QgsField("aquifer_s", QVariant.Double),
-        QgsField("aquitard_npor", QVariant.Double),
-        QgsField("aquifer_npor", QVariant.Double),
+        QgsField("layer", QMetaType.Type.Int),
+        QgsField("aquifer_top", QMetaType.Type.Double),
+        QgsField("aquifer_bottom", QMetaType.Type.Double),
+        QgsField("aquitard_c", QMetaType.Type.Double),
+        QgsField("aquifer_k", QMetaType.Type.Double),
+        QgsField("semiconf_top", QMetaType.Type.Double),
+        QgsField("semiconf_head", QMetaType.Type.Double),
+        QgsField("aquitard_s", QMetaType.Type.Double),
+        QgsField("aquifer_s", QMetaType.Type.Double),
+        QgsField("aquitard_npor", QMetaType.Type.Double),
+        QgsField("aquifer_npor", QMetaType.Type.Double),
     ]
     ttim_attributes = (
-        QgsField("time_min", QVariant.Double),
-        QgsField("laplace_inversion_M", QVariant.Int),
-        QgsField("start_date", QVariant.DateTime),
+        QgsField("time_min", QMetaType.Type.Double),
+        QgsField("laplace_inversion_M", QMetaType.Type.Int),
+        QgsField("start_date", QMetaType.Type.QDateTime),
     )
     ttim_defaults = {
         "time_min": QgsDefaultValue("0.01"),

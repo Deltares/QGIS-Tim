@@ -1,4 +1,4 @@
-from PyQt5.QtCore import QVariant
+from PyQt5.QtCore import QMetaType
 from qgis.core import QgsDefaultValue, QgsField, QgsSingleSymbolRenderer
 
 from qgistim.core.elements.colors import RED
@@ -19,9 +19,9 @@ class ImpermeableLineDoublet(Element):
     element_type = "Impermeable Line Doublet"
     geometry_type = "Linestring"
     timml_attributes = (
-        QgsField("order", QVariant.Int),
-        QgsField("layer", QVariant.Int),
-        QgsField("label", QVariant.String),
+        QgsField("order", QMetaType.Type.Int),
+        QgsField("layer", QMetaType.Type.Int),
+        QgsField("label", QMetaType.Type.QString),
     )
     timml_defaults = {
         "order": QgsDefaultValue("4"),

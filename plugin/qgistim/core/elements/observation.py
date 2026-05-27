@@ -1,4 +1,4 @@
-from PyQt5.QtCore import QVariant
+from PyQt5.QtCore import QMetaType
 from qgis.core import QgsDefaultValue, QgsField, QgsSingleSymbolRenderer
 
 from qgistim.core.elements.colors import LIGHT_BLUE
@@ -28,12 +28,12 @@ class HeadObservation(TransientElement):
     element_type = "Head Observation"
     geometry_type = "Point"
     timml_attributes = (
-        QgsField("label", QVariant.String),
-        QgsField("timeseries_id", QVariant.Int),
+        QgsField("label", QMetaType.Type.QString),
+        QgsField("timeseries_id", QMetaType.Type.Int),
     )
     ttim_attributes = (
-        QgsField("timeseries_id", QVariant.Int),
-        QgsField("time", QVariant.Double),
+        QgsField("timeseries_id", QMetaType.Type.Int),
+        QgsField("time", QMetaType.Type.Double),
     )
     timml_defaults = {
         "timeseries_id": QgsDefaultValue("1"),

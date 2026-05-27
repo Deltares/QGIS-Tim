@@ -24,7 +24,7 @@ from qgistim.core.schemata import (
 
 class TestPositive(TestCase):
     def test_positive(self):
-        self.assertEqual(Positive().validate(-1), "Non-positive value: -1")
+        self.assertEqual(Positive().validate(-1), "Number is not positive (>=0): -1")
         self.assertIsNone(Positive().validate(0))
         self.assertIsNone(Positive().validate(1))
 
@@ -34,13 +34,17 @@ class TestOptional(TestCase):
         self.assertEqual(Optional(Positive()).validate(None), [])
         self.assertEqual(Optional(Positive()).validate(0), [])
         self.assertEqual(Optional(Positive()).validate(1), [])
-        self.assertEqual(Optional(Positive()).validate(-1), ["Non-positive value: -1"])
+        self.assertEqual(
+            Optional(Positive()).validate(-1), ["Number is not positive (>=0): -1"]
+        )
 
 
 class TestRequired(TestCase):
     def test_required(self):
         self.assertEqual(Required(Positive()).validate(None), ["a value is required."])
-        self.assertEqual(Required(Positive()).validate(-1), ["Non-positive value: -1"])
+        self.assertEqual(
+            Required(Positive()).validate(-1), ["Number is not positive (>=0): -1"]
+        )
         self.assertEqual(Required(Positive()).validate(0), [])
         self.assertEqual(Required(Positive()).validate(1), [])
 
@@ -92,7 +96,9 @@ class TestAllRequired(TestCase):
         self.assertEqual(
             schema.validate([None, 2, None]), ["No values provided at row(s): 1, 3"]
         )
-        self.assertEqual(schema.validate([1, 2, -1]), ["Non-positive value: -1"])
+        self.assertEqual(
+            schema.validate([1, 2, -1]), ["Number is not positive (>=0): -1"]
+        )
 
 
 class TestOffsetAllRequired(TestCase):
@@ -102,7 +108,9 @@ class TestOffsetAllRequired(TestCase):
         self.assertEqual(
             schema.validate([None, 2, None]), ["No values provided at row(s): 3"]
         )
-        self.assertEqual(schema.validate([None, 2, -1]), ["Non-positive value: -1"])
+        self.assertEqual(
+            schema.validate([None, 2, -1]), ["Number is not positive (>=0): -1"]
+        )
 
 
 class TestAllOptional(TestCase):
@@ -110,7 +118,9 @@ class TestAllOptional(TestCase):
         schema = AllOptional(Positive())
         self.assertEqual(schema.validate([None, None, None]), [])
         self.assertEqual(schema.validate([1, 2, 3]), [])
-        self.assertEqual(schema.validate([-1, 2, 3]), ["Non-positive value: -1"])
+        self.assertEqual(
+            schema.validate([-1, 2, 3]), ["Number is not positive (>=0): -1"]
+        )
 
     def test_all_optional_first_only(self):
         schema = OptionalFirstOnly()
@@ -127,7 +137,9 @@ class TestAllOptional(TestCase):
         self.assertEqual(
             schema.validate([1, 1, None]), ["Only the first value may be filled in."]
         )
-        self.assertEqual(schema.validate([-1, None, None]), ["Non-positive value: -1"])
+        self.assertEqual(
+            schema.validate([-1, None, None]), ["Number is not positive (>=0): -1"]
+        )
 
 
 class TestRange(TestCase):
@@ -249,4 +261,6 @@ class TestSingleRow(TestCase):
         schema = SingleRow()
         self.assertIsNone(schema.validate([{"a": 1}]))
         data = [{"a": 1}, {"a": 2}]
-        self.assertEqual(schema.validate(data), "Table may contain only one row.")
+        self.assertEqual(
+            schema.validate(data), "Table must contain one row, found 2 rows."
+        )

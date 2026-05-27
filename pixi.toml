@@ -35,6 +35,7 @@ debugpy = "*"
 ruff = "*"
 pre-commit = "*"
 mypy = "*"
+pytest = ">=9.0.3,<10"
 
 [feature.dev.pypi-dependencies]
 qgis-stubs = "*"
@@ -56,6 +57,9 @@ install = { depends-on = [
 ] }
 lint = "pre-commit run --all-files"
 mypy = "mypy ."
+test-qgis = { cmd = "python scripts/run_qgis_ui_tests.py", depends-on = [
+    "install-qgis-tim-plugin",
+] }
 
 [feature.dev.tasks.qgis]
 args = [{ "arg" = "profiles_path", "default" = ".pixi/qgis_env" }]

@@ -1,4 +1,4 @@
-from PyQt5.QtCore import QVariant
+from PyQt5.QtCore import QMetaType
 from qgis.core import QgsDefaultValue, QgsField, QgsSingleSymbolRenderer
 
 from qgistim.core.elements.colors import GREEN
@@ -46,21 +46,21 @@ class LineSinkDitch(TransientElement):
     element_type = "Line Sink Ditch"
     geometry_type = "Linestring"
     timml_attributes = (
-        QgsField("discharge", QVariant.Double),
-        QgsField("resistance", QVariant.Double),
-        QgsField("width", QVariant.Double),
-        QgsField("order", QVariant.Int),
-        QgsField("layer", QVariant.Int),
-        QgsField("label", QVariant.String),
-        QgsField("time_start", QVariant.Double),
-        QgsField("time_end", QVariant.Double),
-        QgsField("discharge_transient", QVariant.Double),
-        QgsField("timeseries_id", QVariant.Int),
+        QgsField("discharge", QMetaType.Type.Double),
+        QgsField("resistance", QMetaType.Type.Double),
+        QgsField("width", QMetaType.Type.Double),
+        QgsField("order", QMetaType.Type.Int),
+        QgsField("layer", QMetaType.Type.Int),
+        QgsField("label", QMetaType.Type.QString),
+        QgsField("time_start", QMetaType.Type.Double),
+        QgsField("time_end", QMetaType.Type.Double),
+        QgsField("discharge_transient", QMetaType.Type.Double),
+        QgsField("timeseries_id", QMetaType.Type.Int),
     )
     ttim_attributes = (
-        QgsField("timeseries_id", QVariant.Int),
-        QgsField("time_start", QVariant.Double),
-        QgsField("discharge", QVariant.Double),
+        QgsField("timeseries_id", QMetaType.Type.Int),
+        QgsField("time_start", QMetaType.Type.Double),
+        QgsField("discharge", QMetaType.Type.Double),
     )
     timml_defaults = {
         "order": QgsDefaultValue("4"),

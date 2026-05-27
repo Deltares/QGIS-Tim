@@ -1,6 +1,6 @@
 from typing import Any, Dict
 
-from PyQt5.QtCore import QVariant
+from PyQt5.QtCore import QMetaType
 from PyQt5.QtGui import QColor
 from qgis.core import (
     QgsArrowSymbolLayer,
@@ -54,20 +54,20 @@ class HeadWell(TransientElement):
     element_type = "Head Well"
     geometry_type = "Point"
     timml_attributes = (
-        QgsField("head", QVariant.Double),
-        QgsField("radius", QVariant.Double),
-        QgsField("resistance", QVariant.Double),
-        QgsField("layer", QVariant.Int),
-        QgsField("label", QVariant.String),
-        QgsField("time_start", QVariant.Double),
-        QgsField("time_end", QVariant.Double),
-        QgsField("head_transient", QVariant.Double),
-        QgsField("timeseries_id", QVariant.Int),
+        QgsField("head", QMetaType.Type.Double),
+        QgsField("radius", QMetaType.Type.Double),
+        QgsField("resistance", QMetaType.Type.Double),
+        QgsField("layer", QMetaType.Type.Int),
+        QgsField("label", QMetaType.Type.QString),
+        QgsField("time_start", QMetaType.Type.Double),
+        QgsField("time_end", QMetaType.Type.Double),
+        QgsField("head_transient", QMetaType.Type.Double),
+        QgsField("timeseries_id", QMetaType.Type.Int),
     )
     ttim_attributes = (
-        QgsField("timeseries_id", QVariant.Int),
-        QgsField("time_start", QVariant.Double),
-        QgsField("head", QVariant.Double),
+        QgsField("timeseries_id", QMetaType.Type.Int),
+        QgsField("time_start", QMetaType.Type.Double),
+        QgsField("head", QMetaType.Type.Double),
     )
     timml_defaults = {
         "radius": QgsDefaultValue("0.1"),

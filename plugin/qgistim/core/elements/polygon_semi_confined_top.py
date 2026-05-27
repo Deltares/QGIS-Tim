@@ -1,6 +1,6 @@
 from copy import deepcopy
 
-from PyQt5.QtCore import QVariant
+from PyQt5.QtCore import QMetaType
 from qgis.core import QgsDefaultValue, QgsField, QgsSingleSymbolRenderer
 
 from qgistim.core.elements.colors import BLUE, TRANSPARENT_BLUE
@@ -24,11 +24,11 @@ class PolygonSemiConfinedTop(Element):
     element_type = "Polygon Semi-Confined Top"
     geometry_type = "Polygon"
     timml_attributes = (
-        QgsField("aquitard_c", QVariant.Double),
-        QgsField("semiconf_top", QVariant.Double),
-        QgsField("semiconf_head", QVariant.Double),
-        QgsField("order", QVariant.Int),
-        QgsField("ndegrees", QVariant.Int),
+        QgsField("aquitard_c", QMetaType.Type.Double),
+        QgsField("semiconf_top", QMetaType.Type.Double),
+        QgsField("semiconf_head", QMetaType.Type.Double),
+        QgsField("order", QMetaType.Type.Int),
+        QgsField("ndegrees", QMetaType.Type.Int),
     )
     timml_defaults = {
         "order": QgsDefaultValue("4"),
