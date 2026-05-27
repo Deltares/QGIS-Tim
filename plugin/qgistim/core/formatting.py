@@ -188,7 +188,9 @@ def timml_script_content(data: Dict[str, Any]):
         f"timml_model = timml.ModelMaq(\n{format_kwargs(aquifer_data)}\n)",
     ]
 
-    element_strings, observations = elements_and_observations(data, TIMML_MAPPING, tim="timml")
+    element_strings, observations = elements_and_observations(
+        data, TIMML_MAPPING, tim="timml"
+    )
     strings = strings + element_strings
     return strings, observations
 
@@ -216,7 +218,9 @@ def ttim_script(timml_data: Dict[str, Any], ttim_data: Dict[str, Any]) -> str:
         f"\nttim_model = ttim.ModelMaq(\n{format_kwargs(aquifer_data)}\n{PREFIX}timmlmodel=timml_model,\n)"
     )
 
-    element_strings, observations = elements_and_observations(data, TTIM_MAPPING, tim="ttim")
+    element_strings, observations = elements_and_observations(
+        data, TTIM_MAPPING, tim="ttim"
+    )
     strings = strings + element_strings
     strings.append("\ntimml_model.solve()\nttim_model.solve()\n")
 
@@ -311,7 +315,9 @@ def ttim_json(
     data = ttim_data.copy()
     domain_data = data.pop("timml Domain:Domain")
     start_date = data.pop("start_date")
-    elements, observations, _ = json_elements_and_observations(data, mapping=TTIM_MAPPING)
+    elements, observations, _ = json_elements_and_observations(
+        data, mapping=TTIM_MAPPING
+    )
 
     json_data["ttim"] = elements
     json_data["start_date"] = start_date

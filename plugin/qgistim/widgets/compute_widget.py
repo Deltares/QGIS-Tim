@@ -264,7 +264,10 @@ class ComputeWidget(QWidget):
         netcdf_paths = (path.with_suffix(".nc"), path.with_suffix(".ugrid.nc"))
         for layer in QgsProject.instance().mapLayers().values():
             source = layer.source()
-            if Path(source) in netcdf_paths or Path(source.partition("|")[0]) == gpkg_path:
+            if (
+                Path(source) in netcdf_paths
+                or Path(source.partition("|")[0]) == gpkg_path
+            ):
                 QgsProject.instance().removeMapLayer(layer.id())
         return
 
@@ -304,7 +307,9 @@ class ComputeWidget(QWidget):
                 step=step,
             )
         else:
-            raise TypeError(f"Expected QgsMeshLayer or QgsRasterLayer, got: {type(layer).__name__}")
+            raise TypeError(
+                f"Expected QgsMeshLayer or QgsRasterLayer, got: {type(layer).__name__}"
+            )
 
         # Re-use layer if it already exists. Otherwise add a new layer.
         project_layers = {
@@ -323,7 +328,9 @@ class ComputeWidget(QWidget):
 
     def set_output_path(self) -> None:
         current = self.output_path
-        path, _ = QFileDialog.getSaveFileName(self, "Save output as...", current, "*.gpkg")
+        path, _ = QFileDialog.getSaveFileName(
+            self, "Save output as...", current, "*.gpkg"
+        )
 
         if path != "":  # Empty string in case of cancel button press
             self.output_line_edit.setText(str(Path(path).with_suffix("")))
@@ -349,7 +356,9 @@ class ComputeWidget(QWidget):
         transient = self.parent.dataset_widget.transient
 
         path = Path(self.output_path).absolute().with_suffix(".json")
-        invalid_input = self.parent.dataset_widget.convert_to_json(path, transient=transient)
+        invalid_input = self.parent.dataset_widget.convert_to_json(
+            path, transient=transient
+        )
         # Early return in case some problems are found.
         if invalid_input:
             return
@@ -377,7 +386,9 @@ class ComputeWidget(QWidget):
         self.compute_task = ComputeTask(self, task_data, self.parent.message_bar)
         self.start_task = self.parent.start_interpreter_task()
         if self.start_task is not None:
-            self.compute_task.addSubTask(self.start_task, [], QgsTask.ParentDependsOnSubTask)
+            self.compute_task.addSubTask(
+                self.start_task, [], QgsTask.ParentDependsOnSubTask
+            )
         self.set_interpreter_interaction(False)
         QgsApplication.taskManager().addTask(self.compute_task)
         return
@@ -493,12 +504,17 @@ class ComputeWidget(QWidget):
         for layername in geopackage.layers(str(gpkg_path)):
             layers_panel_name = f"{path.stem}-{layername}"
 
-            layer = QgsVectorLayer(f"{gpkg_path}|layername={layername}", layers_panel_name)
+            layer = QgsVectorLayer(
+                f"{gpkg_path}|layername={layername}", layers_panel_name
+            )
             # Set the temporal properties if it's a temporal layer
             set_temporal_properties(layer)
 
             # Special-case the labelling for observations and discharge.
-            if "timml Head Observation:" in layername or "ttim Head Observation" in layername:
+            if (
+                "timml Head Observation:" in layername
+                or "ttim Head Observation" in layername
+            ):
                 labels = layer_styling.number_labels("head_layer0")
             elif "timml Discharge Observation:" in layername:
                 labels = layer_styling.number_labels("discharge_layer0")
@@ -509,6 +525,8 @@ class ComputeWidget(QWidget):
 
             _, element_type, _ = parse_name(layername)
             renderer = ELEMENTS[element_type].renderer()
-            self.parent.output_group.add_layer(layer, "vector", renderer=renderer, labels=labels)
+            self.parent.output_group.add_layer(
+                layer, "vector", renderer=renderer, labels=labels
+            )
 
         return

@@ -229,7 +229,9 @@ class Element(ExtractorMixin, abc.ABC):
         return
 
     def write(self):
-        self.timml_layer = geopackage.write_layer(self.path, self.timml_layer, self.timml_name)
+        self.timml_layer = geopackage.write_layer(
+            self.path, self.timml_layer, self.timml_name
+        )
         self.set_defaults()
 
     def remove_from_geopackage(self):
@@ -264,7 +266,9 @@ class Element(ExtractorMixin, abc.ABC):
         return {}
 
     def check_timml_columns(self):
-        return self._check_table_columns(attributes=self.timml_attributes, layer=self.timml_layer)
+        return self._check_table_columns(
+            attributes=self.timml_attributes, layer=self.timml_layer
+        )
 
     def to_timml(self, other=None) -> ElementExtraction:
         missing = self.check_timml_columns()
@@ -272,7 +276,9 @@ class Element(ExtractorMixin, abc.ABC):
             return ElementExtraction(errors=missing)
 
         data = self.table_to_records(layer=self.timml_layer)
-        errors = self.schema.validate_timml(name=self.timml_layer.name(), data=data, other=other)
+        errors = self.schema.validate_timml(
+            name=self.timml_layer.name(), data=data, other=other
+        )
 
         if errors:
             return ElementExtraction(errors=errors)
@@ -306,7 +312,9 @@ class Element(ExtractorMixin, abc.ABC):
 
         kaq = data["aquifer_k"]
         c = data["aquitard_c"]
-        z = [data["semiconf_top"][0]] + interleave(data["aquifer_top"], data["aquifer_bottom"])
+        z = [data["semiconf_top"][0]] + interleave(
+            data["aquifer_top"], data["aquifer_bottom"]
+        )
         porosity = interleave(data["aquitard_npor"], data["aquifer_npor"])
         s_aquifer = data["aquifer_s"]
         s_aquitard = data["aquitard_s"]
@@ -370,8 +378,12 @@ class TransientElement(Element, abc.ABC):
         )
 
     def write(self):
-        self.timml_layer = geopackage.write_layer(self.path, self.timml_layer, self.timml_name)
-        self.ttim_layer = geopackage.write_layer(self.path, self.ttim_layer, self.ttim_name)
+        self.timml_layer = geopackage.write_layer(
+            self.path, self.timml_layer, self.timml_name
+        )
+        self.ttim_layer = geopackage.write_layer(
+            self.path, self.ttim_layer, self.ttim_name
+        )
         self.set_defaults()
 
     def remove_from_geopackage(self):
@@ -403,7 +415,9 @@ class TransientElement(Element, abc.ABC):
         transient_value = row[f"{variable}_transient"]
 
         start_and_stop = (
-            row_start is not None and row_end is not None and transient_value is not None
+            row_start is not None
+            and row_end is not None
+            and transient_value is not None
         )
 
         if timeseries_id is not None:
@@ -421,7 +435,9 @@ class TransientElement(Element, abc.ABC):
             return [(0.0, 0.0)], {0.0}
 
     def check_ttim_columns(self):
-        return self._check_table_columns(attributes=self.ttim_attributes, layer=self.ttim_layer)
+        return self._check_table_columns(
+            attributes=self.ttim_attributes, layer=self.ttim_layer
+        )
 
     def to_ttim(self, other):
         missing = self.check_ttim_columns()
@@ -436,7 +452,9 @@ class TransientElement(Element, abc.ABC):
             other["ttim timeseries IDs"] = {None}
 
         data = self.table_to_records(self.timml_layer)
-        errors = self.schema.validate_ttim(name=self.timml_layer.name(), data=data, other=other)
+        errors = self.schema.validate_ttim(
+            name=self.timml_layer.name(), data=data, other=other
+        )
         if errors:
             return ElementExtraction(errors=errors)
 
@@ -490,8 +508,12 @@ class AssociatedElement(Element, abc.ABC):
         )
 
     def write(self):
-        self.timml_layer = geopackage.write_layer(self.path, self.timml_layer, self.timml_name)
-        self.assoc_layer = geopackage.write_layer(self.path, self.assoc_layer, self.assoc_name)
+        self.timml_layer = geopackage.write_layer(
+            self.path, self.timml_layer, self.timml_name
+        )
+        self.assoc_layer = geopackage.write_layer(
+            self.path, self.assoc_layer, self.assoc_name
+        )
         self.set_defaults()
 
     def remove_from_geopackage(self):
@@ -508,7 +530,9 @@ class AssociatedElement(Element, abc.ABC):
         properties = self.table_to_dict(self.assoc_layer)
         other = other.copy()  # Avoid side-effects
         if properties:
-            other["properties inhomogeneity_id"] = list(set(properties["inhomogeneity_id"]))
+            other["properties inhomogeneity_id"] = list(
+                set(properties["inhomogeneity_id"])
+            )
         else:
             other["properties inhomogeneity_id"] = [None]
 

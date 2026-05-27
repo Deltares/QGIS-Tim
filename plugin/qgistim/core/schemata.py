@@ -216,7 +216,9 @@ class Membership(BaseSchema):
             return None
         member_values = other[self.members_key]
         if data not in member_values:
-            return f"Value {data} not found in {self.members_key}: {format(member_values)}"
+            return (
+                f"Value {data} not found in {self.members_key}: {format(member_values)}"
+            )
         return None
 
 
@@ -357,7 +359,9 @@ class SemiConfined(ConsistencySchema):
 class RequiresConfinedAquifer(ConsistencySchema):
     def validate(self, _, other=None) -> MaybeError:
         if other.get("semiconf_head") is not None:
-            return "this element requires a confined aquifer without a semi-confined top."
+            return (
+                "this element requires a confined aquifer without a semi-confined top."
+            )
         return None
 
 

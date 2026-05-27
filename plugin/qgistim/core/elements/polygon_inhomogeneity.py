@@ -82,7 +82,9 @@ class PolygonInhomogeneity(AssociatedElement):
 
     @classmethod
     def renderer(cls) -> QgsSingleSymbolRenderer:
-        return cls.polygon_renderer(color=TRANSPARENT_GREY, color_border=GREY, width_border="0.75")
+        return cls.polygon_renderer(
+            color=TRANSPARENT_GREY, color_border=GREY, width_border="0.75"
+        )
 
     def process_timml_row(self, row: Dict[str, Any], grouped: Dict[int, Any]):
         inhom_id = row["inhomogeneity_id"]

@@ -35,7 +35,7 @@ packages = ["gistim", "gistim.geomet"]
 license-files = ["LICENSE"]
 
 [tool.ruff]
-line-length = 100
+line-length = 88
 target-version = "py311" # keep as the lowest for backwards compatible changes.
 
 [tool.ruff.lint]

@@ -148,7 +148,9 @@ class LayersPanelGroup:
         if suppress is not None:
             config = maplayer.editFormConfig()
             config.setSuppress(
-                QgsEditFormConfig.SuppressOn if suppress else QgsEditFormConfig.SuppressDefault
+                QgsEditFormConfig.SuppressOn
+                if suppress
+                else QgsEditFormConfig.SuppressDefault
             )
         if renderer is not None:
             maplayer.setRenderer(renderer)

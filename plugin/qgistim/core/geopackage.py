@@ -75,7 +75,9 @@ def write_layer(
     options.layerName = layername
     if not newfile:
         options.actionOnExistingFile = QgsVectorFileWriter.CreateOrOverwriteLayer
-    write_result, error_message = QgsVectorFileWriter.writeAsVectorFormat(layer, path, options)
+    write_result, error_message = QgsVectorFileWriter.writeAsVectorFormat(
+        layer, path, options
+    )
     if write_result != QgsVectorFileWriter.NoError:
         raise RuntimeError(
             f"Layer {layername} could not be written to geopackage: {path}"

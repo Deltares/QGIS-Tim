@@ -176,7 +176,9 @@ class InstallDialog(QDialog):
         )
         if reply == QMessageBox.No:
             return
-        self.install_task = InstallZipTask(self, path=path, message_bar=self.parent.message_bar)
+        self.install_task = InstallZipTask(
+            self, path=path, message_bar=self.parent.message_bar
+        )
         self.enable_install_buttons(False)
         QgsApplication.taskManager().addTask(self.install_task)
         return

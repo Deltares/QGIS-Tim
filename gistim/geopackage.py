@@ -102,7 +102,9 @@ def collect_bounding_box(features, geometry_type) -> BoundingBox:
             x.append(coordinates[0])
             y.append(coordinates[1])
     else:
-        x, y = zip(*itertools.chain.from_iterable(line["coordinates"] for line in features))
+        x, y = zip(
+            *itertools.chain.from_iterable(line["coordinates"] for line in features)
+        )
     return BoundingBox(xmin=min(x), ymin=min(y), xmax=max(x), ymax=max(y))
 
 
@@ -174,7 +176,9 @@ def write_geopackage(
             table_names.append(layername)
             geometry_types.append(geometry_type)
             bounding_boxes.append(bounding_box)
-            dataframe.to_sql(layername, con=connection, dtype=force_sql_datetime(dataframe))
+            dataframe.to_sql(
+                layername, con=connection, dtype=force_sql_datetime(dataframe)
+            )
 
         # Create mandatory geopackage tables.
         gpkg_contents = create_gpkg_contents(

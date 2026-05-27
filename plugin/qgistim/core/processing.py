@@ -167,7 +167,9 @@ def transient_contours(
                 QgsMeshRendererScalarSettings.NeighbourAverage,
             )
             if not geom.isNull():
-                mdal_time = layer.datasetMetadata(QgsMeshDatasetIndex(index, time_index)).time()
+                mdal_time = layer.datasetMetadata(
+                    QgsMeshDatasetIndex(index, time_index)
+                ).time()
                 date = ref_time + datetime.timedelta(hours=mdal_time)
                 feature_data.append(TransientContourData(geom, value, date))
 
@@ -177,7 +179,9 @@ def transient_contours(
     # Create a dictionary to find the end date to accompany every
     # starting date
     dates = sorted(list(set(item.datetime for item in feature_data)))
-    end_dates = {a: b - datetime.timedelta(minutes=1) for a, b in zip(dates[:-1], dates[1:])}
+    end_dates = {
+        a: b - datetime.timedelta(minutes=1) for a, b in zip(dates[:-1], dates[1:])
+    }
     end_dates[dates[-1]] = dates[-1] + datetime.timedelta(minutes=1)
 
     # Add items to layer

@@ -89,7 +89,9 @@ class Aquifer(TransientElement):
         self.timml_layer = geopackage.write_layer(
             self.path, self.timml_layer, self.timml_name, newfile=True
         )
-        self.ttim_layer = geopackage.write_layer(self.path, self.ttim_layer, self.ttim_name)
+        self.ttim_layer = geopackage.write_layer(
+            self.path, self.ttim_layer, self.ttim_name
+        )
         self.set_defaults()
 
     def remove_from_geopackage(self):
@@ -114,7 +116,9 @@ class Aquifer(TransientElement):
         time_data = self.table_to_records(layer=self.ttim_layer)
         errors = {
             **self.schema.validate_ttim(name=self.timml_layer.name(), data=data),
-            **self.assoc_schema.validate_ttim(name=self.ttim_layer.name(), data=time_data),
+            **self.assoc_schema.validate_ttim(
+                name=self.ttim_layer.name(), data=time_data
+            ),
         }
         if errors:
             return ElementExtraction(errors=errors)

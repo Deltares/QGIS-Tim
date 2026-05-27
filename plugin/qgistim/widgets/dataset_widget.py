@@ -145,7 +145,11 @@ class DatasetTreeWidget(QTreeWidget):
         """
         # Collect the selected items
         selection = self.selectedItems()
-        selection = [item for item in selection if not isinstance(item.element, (Aquifer, Domain))]
+        selection = [
+            item
+            for item in selection
+            if not isinstance(item.element, (Aquifer, Domain))
+        ]
         # Append associated items
         for item in selection:
             if item.assoc_item is not None and item.assoc_item not in selection:
@@ -207,7 +211,9 @@ class DatasetTreeWidget(QTreeWidget):
         data = {}
         errors = {}
         elements = {
-            item.text(1): item.element for item in self.items() if item.timml_checkbox.isChecked()
+            item.text(1): item.element
+            for item in self.items()
+            if item.timml_checkbox.isChecked()
         }
 
         # First convert the aquifer, since we need its data to validate
@@ -241,7 +247,10 @@ class DatasetTreeWidget(QTreeWidget):
                     if extraction.times:
                         times.update(extraction.times)
             except RuntimeError as e:
-                if e.args[0] == "wrapped C/C++ object of type QgsVectorLayer has been deleted":
+                if (
+                    e.args[0]
+                    == "wrapped C/C++ object of type QgsVectorLayer has been deleted"
+                ):
                     # Delay of Qt garbage collection to blame?
                     pass
                 else:

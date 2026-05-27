@@ -41,7 +41,9 @@ class QgisTimPlugin:
 
     def initGui(self):
         icon_name = "icon.png"
-        self.action_timml = self.add_action(icon_name, "QGIS-Tim", self.toggle_timml, True)
+        self.action_timml = self.add_action(
+            icon_name, "QGIS-Tim", self.toggle_timml, True
+        )
 
     def toggle_timml(self):
         if self.tim_widget is None:

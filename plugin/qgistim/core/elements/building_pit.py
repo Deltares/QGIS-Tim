@@ -84,7 +84,9 @@ class BuildingPit(AssociatedElement):
 
     @classmethod
     def renderer(cls) -> QgsSingleSymbolRenderer:
-        return cls.polygon_renderer(color=TRANSPARENT_RED, color_border=RED, width_border="0.75")
+        return cls.polygon_renderer(
+            color=TRANSPARENT_RED, color_border=RED, width_border="0.75"
+        )
 
     def process_timml_row(self, row: Dict[str, Any], grouped: Dict[int, Any]):
         inhom_id = row["inhomogeneity_id"]

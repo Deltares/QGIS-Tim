@@ -38,7 +38,9 @@ class PolygonSemiConfinedTop(Element):
 
     @classmethod
     def renderer(cls) -> QgsSingleSymbolRenderer:
-        return cls.polygon_renderer(color=TRANSPARENT_BLUE, color_border=BLUE, width_border="0.75")
+        return cls.polygon_renderer(
+            color=TRANSPARENT_BLUE, color_border=BLUE, width_border="0.75"
+        )
 
     def process_timml_row(self, row, other):
         raw_data = deepcopy(other["global_aquifer"])
