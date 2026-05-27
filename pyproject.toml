@@ -39,7 +39,7 @@ line-length = 100
 target-version = "py311" # keep as the lowest for backwards compatible changes.
 
 [tool.ruff.lint]
-# enable pydocstyle (E), pyflake (F) and isort (I),bugbear (B)
+# enable errors (E), pyflake (F) and isort (I),bugbear (B)
 select = ["E", "F", "I", "B", "ICN", "TID"]
 ignore = [
     "E501",

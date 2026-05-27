@@ -56,7 +56,6 @@ def dumps(obj, big_endian=True):
     """
     Dump a GeoJSON-like dict to a GeoPackage bytestring.
 
-
     If the dict contains a top-level 'meta' key like so:
 
     ```

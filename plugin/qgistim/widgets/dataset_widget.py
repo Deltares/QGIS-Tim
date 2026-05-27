@@ -143,7 +143,6 @@ class DatasetTreeWidget(QTreeWidget):
         * The QGIS layer panel
         * The geopackage
         """
-
         # Collect the selected items
         selection = self.selectedItems()
         selection = [item for item in selection if not isinstance(item.element, (Aquifer, Domain))]
