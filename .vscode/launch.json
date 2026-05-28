@@ -9,8 +9,16 @@
             "console": "integratedTerminal",
             "args": [
                 "compute",
-                "${workspaceFolder}/testdata/test.json"
+                "${input:computeGistimJsonPath}"
             ]
+        }
+    ],
+    "inputs": [
+        {
+            "id": "computeGistimJsonPath",
+            "type": "promptString",
+            "description": "Path to the JSON input file for the compute command",
+            "default": "${workspaceFolder}/testdata/test.json"
         }
     ]
 }
