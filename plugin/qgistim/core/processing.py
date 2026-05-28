@@ -150,8 +150,8 @@ def transient_contours(
     provider.addAttributes(
         [
             QgsField("head", QMetaType.Type.Double),
-            QgsField("datetime_start", QMetaType.Type.DateTime),
-            QgsField("datetime_end", QMetaType.Type.DateTime),
+            QgsField("datetime_start", QMetaType.Type.QDateTime),
+            QgsField("datetime_end", QMetaType.Type.QDateTime),
         ]
     )
     contour_layer.updateFields()
