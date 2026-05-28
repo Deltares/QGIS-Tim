@@ -261,7 +261,7 @@ class QgisTimWidget(QWidget):
 
     def execute(self, data: Dict[str, str]) -> Dict[str, Any]:
         """
-        Execute a command, and check whether it executed succesfully.
+        Execute a command, and check whether it executed successfully.
         """
         response = self.server_handler.send(data)
         return response
