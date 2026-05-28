@@ -12,7 +12,7 @@ To build the timflow server application with PyInstaller, run `pixi run build-ba
 
 This creates a built PyInstaller application in `./dist/gistim`.
 
-Run `pixi run -e dev install-backend` to create a symlink between %APPDATA%/qgistim and ./dist/gistim.
+Run `pixi run -e dev install-backend` to create a symlink between %APPDATA%/qgis-tim and ./dist/gistim.
 
 ## Creating new release
 
