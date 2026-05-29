@@ -12,13 +12,11 @@ requires-python = ">=3.11"
 license = "GPL-2.0"
 
 [tool.setuptools]
-packages = ["qgistim", "qgistim.core", "qgistim.qt", "qgistim.widgets"]
+package-dir = { qgistim = "." }
 
-[tool.setuptools.package-dir]
-qgistim = "."
-"qgistim.core" = "core"
-"qgistim.qt" = "qt"
-"qgistim.widgets" = "widgets"
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["qgistim*"]
 
 [project.urls]
 Home = "https://github.com/deltares/QGIS-Tim"
