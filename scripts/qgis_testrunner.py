@@ -124,8 +124,8 @@ def __run_test():
                 f"No callable test entrypoint found for {test_module_name}"
             )
         print(f"QGIS Test Runner Inside - executing function {function_name}")
-        function_name()
-        __exit_qgis(0)
+        exit_code = function_name()
+        __exit_qgis(exit_code)
     except Exception as e:
         logging.error(f"QGIS Test Runner Inside - [FAILED] Exception: {e}")  # noqa: LOG015
         # Print tb
