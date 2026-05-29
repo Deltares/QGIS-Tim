@@ -1,0 +1,26 @@
+[build-system]
+requires = ["setuptools>=77", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "qgistim"
+description = "QGIS plugin for TimML and TTim analytic element workflows"
+readme = "README.txt"
+version = "0.6.0"
+maintainers = [{ name = "Huite Bootsma", email = "huite.bootsma@deltares.nl" }]
+requires-python = ">=3.11"
+license = "GPL-2.0"
+
+[tool.setuptools]
+packages = ["qgistim", "qgistim.core", "qgistim.qt", "qgistim.widgets"]
+
+[tool.setuptools.package-dir]
+qgistim = "."
+"qgistim.core" = "core"
+"qgistim.qt" = "qt"
+"qgistim.widgets" = "widgets"
+
+[project.urls]
+Home = "https://github.com/deltares/QGIS-Tim"
+Code = "https://github.com/deltares/QGIS-Tim"
+Issues = "https://github.com/deltares/QGIS-Tim/issues"
