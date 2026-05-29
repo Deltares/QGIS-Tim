@@ -30,7 +30,7 @@ ttim = ">=0.8.0"
 xarray = "*"
 numpy = "*"
 gistim = { path = "gistim", editable = true }
-qgistim = { path = "plugin/qgistim", editable = true }
+qgistim = { path = "plugin", editable = true }
 
 [feature.dev.dependencies]
 debugpy = "*"
