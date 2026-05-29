@@ -60,8 +60,12 @@ install = { depends-on = [
 ] }
 lint = "pre-commit run --all-files"
 mypy = "mypy ."
-test = { cmd = "pytest test_plugin", depends-on = ["install-qgis-tim-plugin"] }
 clean = "rm -rf .qgis-settings"
+
+[feature.dev.tasks.test]
+cmd = "pytest {{ test_path }}"
+args = [{ "arg" = "test_path", "default" = "test_plugin" }]
+depends-on = ["install-qgis-tim-plugin"]
 
 [feature.dev.tasks.qgis]
 args = [{ "arg" = "profiles_path", "default" = ".qgis-settings" }]

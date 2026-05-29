@@ -1,7 +1,25 @@
 from pathlib import Path
 
+import pytest
 from qgis.core import QgsApplication, QgsSettings
 from qgis.utils import findPlugins
+
+
+@pytest.fixture
+def restore_qgistim_enabled_setting(request: pytest.FixtureRequest) -> None:
+    """Restore qgistim enabled setting after a test mutates it."""
+    settings = QgsSettings()
+    key = "PythonPlugins/qgistim"
+    had_value = settings.contains(key)
+    old_value = settings.value(key, False, type=bool) if had_value else None
+
+    def _restore() -> None:
+        if had_value:
+            settings.setValue(key, old_value)
+        else:
+            settings.remove(key)
+
+    request.addfinalizer(_restore)
 
 
 def test_plugin_is_installed_and_enabled() -> None:
@@ -23,7 +41,7 @@ def test_plugin_is_installed_and_enabled() -> None:
     assert settings.value("PythonPlugins/qgistim", False, type=bool)
 
 
-def test_plugin_is_installed_not_enabled() -> None:
+def test_plugin_is_installed_not_enabled(restore_qgistim_enabled_setting) -> None:
     """Test the started QGIS app does not see qgistim as enabled."""
     settings_dir = Path(QgsApplication.qgisSettingsDirPath())
     plugin_root = settings_dir / "python" / "plugins"
