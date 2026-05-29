@@ -5,7 +5,7 @@ readme = "qgistim/README.txt"
 version = "0.6.0"
 maintainers = [{ name = "Huite Bootsma", email = "huite.bootsma@deltares.nl" }]
 requires-python = ">=3.11"
-license = "GPL-2.0"
+license = { text = "GPL-2.0" }
 
 [project.urls]
 Home = "https://github.com/deltares/QGIS-Tim"
