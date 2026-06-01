@@ -24,7 +24,7 @@ class InstallTask(QgsTask):
         if result:
             self.message_bar.pushMessage(
                 title="Info",
-                text="Successfully installed TimFlow server",
+                text="Successfully installed timflow server",
                 level=Qgis.Info,
             )
         else:
