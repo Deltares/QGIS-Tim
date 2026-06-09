@@ -136,6 +136,7 @@ def headgrid_code(domain) -> Tuple[str, str]:
     t = textwrap.indent(f"t={time}", prefix=PREFIX)
     return xg, yg, t
 
+
 def traceline_function(tim: str) -> str:
     """
     Workaround inconsistency between the name of the traceline function in TimML and TTim.
@@ -146,6 +147,7 @@ def traceline_function(tim: str) -> str:
         return f"{tim}.trace.timtrace"
     else:
         raise ValueError(f"Unknown tim: {tim}")
+
 
 def elements_and_observations(data, mapping: Dict[str, str], tim: str):
     strings = []
@@ -180,7 +182,7 @@ def elements_and_observations(data, mapping: Dict[str, str], tim: str):
                 traceline_func = traceline_function(tim)
                 kwargs = format_kwargs(kwargs)
                 tracelines.append(
-                     f"traceline_{sanitized(name)}_{direction_str}_{i} = {traceline_func}(\n{ml_string}\n{kwargs}\n)"
+                    f"traceline_{sanitized(name)}_{direction_str}_{i} = {traceline_func}(\n{ml_string}\n{kwargs}\n)"
                 )
             elif plugin_name == "Discharge Observation":
                 kwargs.pop("label")
@@ -324,8 +326,8 @@ def timml_json(
     data = timml_data.copy()  # avoid side-effects
     domain_data = data.pop("timml Domain:Domain")
     start_date = data.pop("start_date")
-    elements, observations, discharge_observations, pathlines = json_elements_and_observations(
-        data, mapping=TIMML_MAPPING
+    elements, observations, discharge_observations, pathlines = (
+        json_elements_and_observations(data, mapping=TIMML_MAPPING)
     )
     json_data = {
         "timml": elements,

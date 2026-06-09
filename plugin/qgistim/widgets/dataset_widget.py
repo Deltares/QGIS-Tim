@@ -35,6 +35,7 @@ from PyQt5.QtWidgets import (
     QWidget,
 )
 from qgis.core import Qgis, QgsProject, QgsUnitTypes
+
 from qgistim.core.elements import Aquifer, Domain, load_elements_from_geopackage
 from qgistim.core.formatting import data_to_json, data_to_script
 from qgistim.widgets.error_window import ValidationDialog
@@ -229,9 +230,7 @@ class DatasetTreeWidget(QTreeWidget):
         aquifer_data = aquifer.aquifer_data(raw_data, transient)
         data[name] = aquifer_data
 
-        data["start_date"] = str(
-            aquifer.get_start_date().toPyDateTime()
-        )
+        data["start_date"] = str(aquifer.get_start_date().toPyDateTime())
 
         other = {
             "aquifer layers": raw_data["layer"],

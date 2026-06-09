@@ -199,9 +199,11 @@ def _(
     df = pd.DataFrame(d)
     return df
 
+
 @singledispatch
 def compute_pathline(model, **kwargs):
     raise TypeError("Expected timml or ttim model")
+
 
 @compute_pathline.register
 def _(
@@ -210,12 +212,14 @@ def _(
 ):
     return timml.trace.timtraceline(model, **kwargs)
 
+
 @compute_pathline.register
 def _(
     model: ttim.ModelMaq,
     **kwargs,
 ):
     return ttim.trace.timtrace(model, **kwargs)
+
 
 def compute_pathlines(
     model: timml.Model,
@@ -231,7 +235,7 @@ def compute_pathlines(
     start_date = pd.to_datetime(start_date, utc=False)
     for kwargs in particle_starts:
         label = kwargs.pop("label")
-        # FUTURE: Get window from bounding box and give to tim 
+        # FUTURE: Get window from bounding box and give to tim
         traceline = compute_pathline(model, **kwargs)
         for start, end in zip(traceline[:-1], traceline[1:]):
             linesegment = [[start[0], start[1], start[2]], [end[0], end[1], end[2]]]
@@ -347,10 +351,12 @@ def write_output(
 
     if output_options["discharge_observations"] and discharge_observations:
         for layername, content in discharge_observations.items():
-            computed_observations = compute_discharge_observations(model, content["data"])
+            computed_observations = compute_discharge_observations(
+                model, content["data"]
+            )
             if computed_observations is not None:
                 tables[layername] = computed_observations
-    
+
     if output_options["pathlines"] and pathlines:
         for layername, content in pathlines.items():
             tables[layername] = compute_pathlines(model, content["data"], start_date)

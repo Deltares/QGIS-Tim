@@ -1,12 +1,13 @@
 from PyQt5.QtCore import QVariant
 from qgis.core import QgsDefaultValue, QgsField, QgsVectorLayerUtils
+
 from qgistim.core import geopackage
 from qgistim.core.elements.element import ElementExtraction, TransientElement
 from qgistim.core.elements.schemata import SingleRowSchema, TableSchema
 from qgistim.core.schemata import (
     AllGreaterEqual,
-    AllRequired,
     AllOptional,
+    AllRequired,
     OffsetAllRequired,
     OptionalFirstOnly,
     Positive,
@@ -70,13 +71,15 @@ class Aquifer(TransientElement):
         QgsField("start_date", QVariant.DateTime),
     )
     timml_defaults = {
-            "aquifer_npor": QgsDefaultValue("0.3"),
-            "aquitard_npor": QgsDefaultValue("0.3"),
+        "aquifer_npor": QgsDefaultValue("0.3"),
+        "aquitard_npor": QgsDefaultValue("0.3"),
     }
     ttim_defaults = {
         "time_min": QgsDefaultValue("0.01"),
         "laplace_inversion_M": QgsDefaultValue("10"),
-        "start_date": QgsDefaultValue("make_datetime(year(now()), month(now()), day(now()), 0, 0, 0)"),
+        "start_date": QgsDefaultValue(
+            "make_datetime(year(now()), month(now()), day(now()), 0, 0, 0)"
+        ),
     }
     transient_columns = (
         "aquitard_s",
@@ -148,7 +151,7 @@ class Aquifer(TransientElement):
         super().create_ttim_layer(crs)
         # Set defaults before row is added, so that default values are applied
         # to the row.
-        self.set_defaults() 
+        self.set_defaults()
 
         if self.ttim_layer.featureCount() > 0:
             # Return if the layer already contains features, to avoid

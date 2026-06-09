@@ -2,14 +2,12 @@ import abc
 from typing import Any, Dict
 
 from PyQt5.QtCore import QVariant
-from PyQt5.QtGui import QColor
 from qgis.core import (
-    QgsArrowSymbolLayer,
     QgsDefaultValue,
     QgsField,
-    QgsLineSymbol,
     QgsSingleSymbolRenderer,
 )
+
 from qgistim.core.elements.colors import GREY, LIGHT_GREY
 from qgistim.core.elements.element import TransientElement
 from qgistim.core.elements.schemata import RowWiseSchema
@@ -38,12 +36,10 @@ class ParticleSchema(RowWiseSchema):
         "time_end": Optional(Positive()),
     }
     timml_consistency_schemata = (
-        AllGreaterEqual("z_start", "minimum_z_aquifer"), 
+        AllGreaterEqual("z_start", "minimum_z_aquifer"),
         AllLesserEqual("z_start", "maximum_z_aquifer"),
     )
-    ttim_consistency_schemata = (
-        AllOrNone(("time_start", "time_step", "time_end")),
-    )
+    ttim_consistency_schemata = (AllOrNone(("time_start", "time_step", "time_end")),)
 
 
 class Particle(TransientElement, abc.ABC):
@@ -97,6 +93,7 @@ class Particle(TransientElement, abc.ABC):
             "label": row["label"],
         }
 
+
 class Particle_Forward(Particle):
     element_type = "Particle Forward"
 
@@ -108,17 +105,22 @@ class Particle_Forward(Particle):
     def renderer_output(cls) -> QgsSingleSymbolRenderer:
         return cls.line_renderer(color=GREY, width="1.0")
 
+
 class Particle_Backward(Particle):
     element_type = "Particle Backward"
 
     def process_timml_row(self, row, other=None) -> Dict[str, Any]:
         data = super().process_timml_row(row, other)
-        data["hstepmax"] = -data["hstepmax"] # Reverse horizontal step reverses direction
+        data["hstepmax"] = -data[
+            "hstepmax"
+        ]  # Reverse horizontal step reverses direction
         return data
 
     def process_ttim_row(self, row, grouped) -> Dict[str, Any]:
         data = super().process_ttim_row(row, grouped)
-        data["hstepmax"] = -data["hstepmax"] # Reverse horizontal step reverses direction
+        data["hstepmax"] = -data[
+            "hstepmax"
+        ]  # Reverse horizontal step reverses direction
         return data
 
     @classmethod

@@ -75,8 +75,10 @@ from qgis.core import (
 from qgistim.core import geopackage
 from qgistim.core.extractor import ExtractorMixin
 
+
 def _interleave(a, b):
     return [value for pair in zip(a, b) for value in pair]
+
 
 class ElementExtraction(NamedTuple):
     errors: Optional[Dict[str, Any]] = None

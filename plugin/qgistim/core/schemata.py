@@ -1,7 +1,8 @@
 import abc
-import numpy as np
 import operator
 from typing import List, Union
+
+import numpy as np
 
 OPERATORS = {
     "<": operator.lt,
@@ -301,14 +302,14 @@ class AllPredicateSchema(IterableSchema, abc.ABC):
     def __init__(self, x, y):
         self.x = x
         self.y = y
-    
+
     @abc.abstractmethod
     def is_bad(self, x, y):
-         pass
+        pass
 
     @abc.abstractmethod
     def error_message(self, wrong_rows):
-         pass
+        pass
 
     def validate(self, data, other=None) -> MaybeError:
         if other is None:
@@ -322,7 +323,7 @@ class AllPredicateSchema(IterableSchema, abc.ABC):
             wrong_rows = list(wrong_rows + 1)
             return self.error_message(wrong_rows)
         return None
- 
+
 
 class AllGreaterEqual(AllPredicateSchema):
     def is_bad(self, x, y):
@@ -330,7 +331,9 @@ class AllGreaterEqual(AllPredicateSchema):
         return np.argwhere(is_wrong.flatten())
 
     def error_message(self, wrong):
-        return f"{self.x} is not greater or equal to {self.y} at row(s): {format(wrong)}"
+        return (
+            f"{self.x} is not greater or equal to {self.y} at row(s): {format(wrong)}"
+        )
 
 
 class AllLesserEqual(AllPredicateSchema):
@@ -339,7 +342,7 @@ class AllLesserEqual(AllPredicateSchema):
         return np.argwhere(is_wrong.flatten())
 
     def error_message(self, wrong):
-           return f"{self.x} is not lesser or equal to {self.y} at row(s): {format(wrong)}"
+        return f"{self.x} is not lesser or equal to {self.y} at row(s): {format(wrong)}"
 
 
 class AtleastOneTrue(IterableSchema):
