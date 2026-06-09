@@ -22,7 +22,7 @@ jobs:
       - name: Check out repo
         uses: actions/checkout@v6
       - name: Setup Pixi
-        uses: prefix-dev/setup-pixi@v0.9.3
+        uses: prefix-dev/setup-pixi@v0.9.6
       - name: Build with PyInstaller
         run: pixi run build-backend
       - name: Create backend ZIP
@@ -39,4 +39,3 @@ jobs:
         run: gh release upload ${{ github.ref_name }} dist/QGIS-Tim-plugin.zip
         env:
           GITHUB_TOKEN: ${{ github.TOKEN }}
- 

@@ -71,6 +71,7 @@ from qgis.core import (
     QgsSingleSymbolRenderer,
     QgsVectorLayer,
 )
+
 from qgistim.core import geopackage
 from qgistim.core.extractor import ExtractorMixin
 
@@ -269,10 +270,7 @@ class Element(ExtractorMixin, abc.ABC):
         missing = set(attr.name() for attr in attributes) - fields
         if missing:
             columns = ",".join(missing)
-            msg = (
-                f"Table is missing columns: {columns}. "
-                "Remove and recreate the layer."
-            )
+            msg = f"Table is missing columns: {columns}. Remove and recreate the layer."
             return {"Table:": [msg]}
         return {}
 

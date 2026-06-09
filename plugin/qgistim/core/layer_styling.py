@@ -5,6 +5,7 @@ We'd like contours to look the same consistently. A Domain should be
 transparent, not obscuring the view. A head grid should have pseudocoloring,
 ideally with a legend stretching from minimum to maximum.
 """
+
 from typing import List
 
 from PyQt5.QtGui import QColor

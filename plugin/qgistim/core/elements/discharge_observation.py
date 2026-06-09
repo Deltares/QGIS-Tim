@@ -1,6 +1,6 @@
-
 from PyQt5.QtCore import QVariant
 from qgis.core import QgsDefaultValue, QgsField, QgsSingleSymbolRenderer
+
 from qgistim.core.elements.colors import LIGHT_BLUE
 from qgistim.core.elements.element import Element
 from qgistim.core.elements.schemata import RowWiseSchema
@@ -24,7 +24,7 @@ class DischargeObservation(Element):
     timml_attributes = (
         QgsField("legendre_method", QVariant.Bool),
         QgsField("ndegrees", QVariant.Int),
-        QgsField("label", QVariant.String)
+        QgsField("label", QVariant.String),
     )
     timml_defaults = {
         "legendre_method": QgsDefaultValue("True"),

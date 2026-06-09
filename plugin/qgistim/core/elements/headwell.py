@@ -9,6 +9,7 @@ from qgis.core import (
     QgsLineSymbol,
     QgsSingleSymbolRenderer,
 )
+
 from qgistim.core.elements.colors import BLUE
 from qgistim.core.elements.element import TransientElement
 from qgistim.core.elements.schemata import RowWiseSchema

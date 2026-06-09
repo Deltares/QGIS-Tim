@@ -1,7 +1,7 @@
 import abc
 import numpy as np
 import operator
-from typing import Any, Dict, List, Sequence, Union
+from typing import List, Union
 
 OPERATORS = {
     "<": operator.lt,
@@ -27,11 +27,8 @@ def format(data) -> str:
 class BaseSchema(abc.ABC):
     """Base class for single value."""
 
-    def __init__(self):
-        pass
-
     @abc.abstractmethod
-    def validate(self, data, other) -> MaybeError:
+    def validate(self, data, other=None) -> MaybeError:
         pass
 
     def validate_many(self, data, other) -> ErrorList:
@@ -54,6 +51,10 @@ class IterableSchema(abc.ABC):
     def __init__(self, *schemata):
         self.schemata = schemata
 
+    @abc.abstractmethod
+    def validate(self, data, other=None) -> MaybeError:
+        pass
+
     def validate_many(self, data, other) -> ErrorList:
         error = self.validate(data, other)
         if error:
@@ -67,7 +68,7 @@ class SchemaContainer(abc.ABC):
         self.schemata = schemata
 
     @abc.abstractmethod
-    def validate(self):
+    def validate(self, data, other=None) -> MaybeError:
         pass
 
     def _validate_schemata(self, data, other=None) -> ErrorList:
@@ -84,7 +85,7 @@ class IterableSchemaContainer(abc.ABC):
         self.schemata = schemata
 
     @abc.abstractmethod
-    def validate(self):
+    def validate(self, data, other=None) -> MaybeError:
         pass
 
     def _validate_schemata(self, data, other=None) -> ErrorList:
@@ -185,17 +186,14 @@ class StrictlyPositive(BaseSchema):
 
 
 class AllOrNone(BaseSchema):
-    def __init__(self, *variables: Sequence[str]):
+    def __init__(self, *variables: str):
         self.variables = variables
 
     def validate(self, data, _=None) -> MaybeError:
         present = [data.get(v) is not None for v in self.variables]
         if any(present) != all(present):
-            vars = ", ".join(self.variables)
-            return (
-                "Exactly all or none of the following variables must be "
-                f"provided: {vars}"
-            )
+            _vars = ", ".join(self.variables)
+            return f"Exactly all or none of the following variables must be provided: {_vars}"
         return None
 
 
@@ -251,7 +249,7 @@ class CircularGeometry(BaseSchema):
 class Range(IterableSchema):
     def validate(self, data, _=None) -> MaybeError:
         expected = list(range(len(data)))
-        if not data == expected:
+        if data != expected:
             return f"Expected {format(expected)}; received {format(data)}"
         return None
 
@@ -260,13 +258,10 @@ class Equals(IterableSchema):
     def __init__(self, other: str):
         self.other = other
 
-    def validate(self, data, other: Dict[str, Any]) -> MaybeError:
+    def validate(self, data, other=None) -> MaybeError:
         other_data = other[self.other]
         if data != other_data:
-            return (
-                f"Values are not equal to values of {self.other}: "
-                f"{data} versus {other_data}"
-            )
+            return f"Values are not equal to values of {self.other}: {data} versus {other_data}"
         return None
 
 
@@ -394,12 +389,12 @@ class SemiConfined(ConsistencySchema):
 
 
 class RequiresConfinedAquifer(ConsistencySchema):
-    def validate(self, _, other: Dict[str, Any]) -> MaybeError:
+    def validate(self, _, other=None) -> MaybeError:
         if other.get("semiconf_head") is not None:
             return (
                 "this element requires a confined aquifer without a semi-confined top."
             )
-        return
+        return None
 
 
 class SingleRow(ConsistencySchema):

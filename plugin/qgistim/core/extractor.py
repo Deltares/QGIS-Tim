@@ -1,4 +1,3 @@
-import abc
 from collections import defaultdict
 from typing import Any, Dict, List, Tuple
 
@@ -17,7 +16,7 @@ def remove_zero_length(geometry) -> List:
     return coordinates
 
 
-class ExtractorMixin(abc.ABC):
+class ExtractorMixin:
     """
     Mixin class to extract all data from QgsVectorLayers.
     """

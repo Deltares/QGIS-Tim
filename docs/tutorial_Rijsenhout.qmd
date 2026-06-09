@@ -59,14 +59,14 @@ The case in this tutorial is located in The Netherlands, so next we select the a
 > a. Close this window.
 
 ### Install plugins
-This is the moment to import four plugins needed for this tutorial: 
+This is the moment to import four plugins needed for this tutorial:
 
-- the QGIS-Tim plugin (developed by Deltares). 
+- the QGIS-Tim plugin (developed by Deltares).
 - the iMOD plugin (developed by Deltares).
 - the Value Tool. A plugin to display in table or plot values from raster layers (or mesh layers) at the current mouse position.
 - the PDOK plugin. This plugin gives access to a large database from which we will load the topographic maps and use the navigation option.
 
-To install the plugins from QGIS you need an internet connection! 
+To install the plugins from QGIS you need an internet connection!
 
 > No internet connection? Follow the next steps to import the two Deltares' plugins from a ZIP file provided in the Tutorial Dataset.
 >
@@ -76,7 +76,7 @@ To install the plugins from QGIS you need an internet connection!
 > a. Click *Install Plugin*.
 > a. In the same way, install the QGIS-Tim plugin using the ZIP file "QGIS-Tim_Tutorial\\QGIS-Tim-plugin.zip".
 
-If you have an internet connection, all four plugins can be downloaded within QGIS. 
+If you have an internet connection, all four plugins can be downloaded within QGIS.
 
 (@) At the top, find the Plugins menu (\~sixth object in the menubar).
 (@) Find \"Manage and Install plugins\" (\~first object in drop-down).
@@ -279,11 +279,11 @@ A single aquifer is of course not enough to describe the geology of our project 
 (@) From the menu select *Open Attribute Table* and the table opens in a new window. Once again, press F6 for a quick open of the Attribute Table.
 (@) Start the editing mode with a click on the *Toggle Editing Mode* button (![](figures/tutorial/button-Qgis-AttributeTable-StartEditingMode.png ){width=4%}).
 (@) Add three extra aquifers / features; click three times on the *Add Feature* button (![](figures/tutorial/button-AttributeTable-AddFeature.png){width=15%}).
-(@) See that for the new elemenst the **fid** is set to *Autogenerate*. Be aware that your QGIS probably resorts the layers and brings the existing layer (layer=0) to the botom of your table.  
+(@) See that for the new elemenst the **fid** is set to *Autogenerate*. Be aware that your QGIS probably resorts the layers and brings the existing layer (layer=0) to the botom of your table.
 
 The Holocene top layer is not a distinguished layer but a resistance on top of layer 0.
 
-(@) Fill the features with the values from the table below. <br> **NB** Never change the **fid=1** of the first layer, even if it is not on top of your table. 
+(@) Fill the features with the values from the table below. <br> **NB** Never change the **fid=1** of the first layer, even if it is not on top of your table.
 
 |fid|layer|aquifer_top|aquifer_bottom|aquitard_c|aquifer_k|semiconf_top|semiconf_head|
 |---|---|---|---|---|---|---|---|
@@ -318,7 +318,7 @@ Now we introduce a new but frequently used element: the sheet pile.
 You probably tried to close the building pit but either your lines cross or do not close actually when zooming in. To close the pit, let's snap both start and end point together.
 
 (@) First enable the snapping mode with a click on the button (![](figures/tutorial/button_EnableSnapping.png){width=4%}), available on the Snapping Toolbar.
-(@) Make sure the Tolerance is set to 0.00 (![](figures/tutorial/button_ToolbarSnappingTollerance.png){width=25%}) in the Snapping Toolbar. 
+(@) Make sure the Tolerance is set to 0.00 (![](figures/tutorial/button_ToolbarSnappingTollerance.png){width=25%}) in the Snapping Toolbar.
 (@) Then activate the *Vertex Tool* with a click on the button ![](figures/tutorial/button_VertexTool.png){width=4%}.
 (@) Move your mouse to the start point location and when it shows a small circle, click your left mouse button.
 (@) Next, move your mouse towards the end point and you see the snapping active: the end point gets a small fuchsia box.
@@ -353,11 +353,11 @@ Now let's experience what it is to close and open QGIS including your QGIS-Tim p
 *The Tim panel is empty but why?* <br>
 It is not possible for the plugin to automaticcaly read your geopackage as it is loaded in the *Layers* panel. But there is good news. QGIS-Tim added a hidden line to your QGIS project file \*.qgz. This line contains the full path to your last active geopackage file \*.gpkg. Based on this information QGIS-Tim can restore your last active Tim project.
 
-(@) In the tab *Model Manager* click the button *Restore*. 
-(@) A window pops up asking you if you agree to restore the last active project. 
-(@) Click *Yes* and you see the *Model Manager* is filled with all project information. 
+(@) In the tab *Model Manager* click the button *Restore*.
+(@) A window pops up asking you if you agree to restore the last active project.
+(@) Click *Yes* and you see the *Model Manager* is filled with all project information.
 
-In the backgorund the plugin first removes all layers and than opens the geopackage again. You did not see it, did you? It happend in a blink of an eye. 
+In the backgorund the plugin first removes all layers and than opens the geopackage again. You did not see it, did you? It happend in a blink of an eye.
 
 ## Model 5: add infiltration of drainwater
 To prevent damage on the private properties caused by the dewatering, the authorities demand 50% of the drained flux to be infiltrated. For the infiltration a horizontal well of 400 m is used. In Tim this element is called "Line Sink Ditch". Let's add this element just along the road (Aalsmeerderweg) southeast of the project area.
@@ -387,19 +387,19 @@ We have the Value Tool and the Cross section tool to check for calculated values
 (@) Give the layer a name, e.g. "Piezometers".
 (@) Select the new layer "timml Head Observation:Piezometers".
 (@) Start editing with the *Toggle Editing Mode* and use *Add Point Feature* button (![](figures/tutorial/button_AddPointFeature.png){width=4%}).
-(@) Click with your left mouse button to place a point near point A.  
-(@) In the poped up window fill in Label = A and click *OK*. 
-(@) Go to the layer "timml Head Observation:Piezometers", click your right mouse button and activate "![](figures/tutorial/icon-showlabels.png){width=4%} show labels" 
+(@) Click with your left mouse button to place a point near point A.
+(@) In the poped up window fill in Label = A and click *OK*.
+(@) Go to the layer "timml Head Observation:Piezometers", click your right mouse button and activate "![](figures/tutorial/icon-showlabels.png){width=4%} show labels"
 (@) Add point B close to the dwatering well (@fig-figure_ObservationsLocations).
 
 ![Observation locations (*A*-*E*) together with other Tim elements](figures/tutorial/figure_ObservationsLocations.png){width=80% #fig-figure_ObservationsLocations}
 
 Are you tired of the pop-up window every time you add a point? There is an option to add points C to E in one serie and fill in the labels afterwards.
 
-(@) On the tab *Model Manager*, in the lowest section, check the option "Suppress attribute form pop-up after feature creation". 
+(@) On the tab *Model Manager*, in the lowest section, check the option "Suppress attribute form pop-up after feature creation".
 (@) Place points C to E.
-(@) Open the Attribute Table from layer "timml Head Observation:Piezometers" and fill in the Labels C to E. 
-(@) Save your changes and stop the editing mode. 
+(@) Open the Attribute Table from layer "timml Head Observation:Piezometers" and fill in the Labels C to E.
+(@) Save your changes and stop the editing mode.
 (@) Compute the model again.
 
 The observed values are saved in a new layer under the existing group "case-Rijsenhout output" and sub group "vector".
@@ -414,7 +414,7 @@ One way of displaying the calculated results is still missing: contour lines.
 (@) In the section *Contour* select layer "case-Rijsenhout-head_layer_0".
 (@) Define the contours from -9 to -5 with an increment of 0.10 and click *Redraw contours*.
 
-A layer with your contours is saved in the group "case-Rijsenhout-output:vector". Your map hopefully looks like @fig-figure_Contourlines. If not, try to change the contour settings and create a better contour map or check the layer so it will be displayed. 
+A layer with your contours is saved in the group "case-Rijsenhout-output:vector". Your map hopefully looks like @fig-figure_Contourlines. If not, try to change the contour settings and create a better contour map or check the layer so it will be displayed.
 
 ![Calculated heads, displayed as contour lines](figures/tutorial/figure_Contourlines.png){width=90% #fig-figure_Contourlines}
 

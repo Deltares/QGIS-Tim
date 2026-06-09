@@ -1,6 +1,7 @@
 """
 Setup a dockwidget to hold the qgistim plugin widgets.
 """
+
 from pathlib import Path
 
 from qgis.gui import QgsDockWidget

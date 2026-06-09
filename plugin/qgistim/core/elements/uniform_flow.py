@@ -1,5 +1,6 @@
 from PyQt5.QtCore import QVariant
 from qgis.core import QgsField
+
 from qgistim.core.elements.element import Element
 from qgistim.core.elements.schemata import SingleRowSchema
 from qgistim.core.schemata import Required, RequiresConfinedAquifer

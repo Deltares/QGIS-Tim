@@ -2,6 +2,7 @@ from functools import partial
 
 from PyQt5.QtWidgets import QGridLayout, QPushButton, QVBoxLayout, QWidget
 from qgis.core import Qgis
+
 from qgistim.core.elements import ELEMENTS
 
 

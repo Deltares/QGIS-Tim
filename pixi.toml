@@ -10,27 +10,94 @@ homepage = "https://deltares.github.io/QGIS-Tim"
 documentation = "https://deltares.github.io/QGIS-Tim"
 repository = "https://github.com/Deltares/qgis-tim"
 
-[tasks]
-install = "pip install --no-deps --editable ."
-build-backend = "pyinstaller gistim/__main__.py --name gistim"
-zip-backend = {depends-on = "install", cmd = "python .github/workflows/create_pyinstaller_zip.py"}
+[feature.build.tasks]
+build-backend = "pyinstaller gistim/__main__.py --name gistim -y && python scripts/write_backend_versions.py"
+zip-backend = { cmd = "python .github/workflows/create_pyinstaller_zip.py", depends-on = [
+    "build-backend",
+] }
 zip-plugin = "python .github/workflows/create_plugin_zip.py"
 
 [dependencies]
 python = "3.11.*"
-future = "*"
-pip = "*"
 
-# Conda-forge will distribute numpy and scipy with Intel MKL, which adds 600 MB
-# to the pyinstaller result. By installing from PyPI instead, we can skip MKL.
-# We do need to declare `future` explicitly, as pixi will complain that on PyPI,
-# no wheels can be found.
-[pypi-dependencies]
-lmfit = "*"
-numpy = "*"
-pandas = "*"
+[feature.build.dependencies]
 pyinstaller = "*"
-timml = "==6.3.0"
-ttim = "==0.6.5"
-scipy = "*"
+
+[pypi-dependencies]
+pandas = "*"
+timml = ">=6.3.0"
+ttim = ">=0.8.0"
 xarray = "*"
+numpy = "*"
+
+[feature.dev.dependencies]
+debugpy = "*"
+ruff = "*"
+pre-commit = "*"
+mypy = "*"
+
+[feature.dev.pypi-dependencies]
+qgis-stubs = "*"
+qgis-plugin-manager = ">=1.7.5, <2"
+
+[feature.dev.target.win-64.dependencies]
+qgis = ">=3.40,<4"
+
+[feature.dev.target.linux-64.dependencies]
+qgis = ">=3.40,<4"
+
+
+[feature.dev.tasks]
+install-pre-commit = "pre-commit install"
+install = { depends-on = [
+    "install-pre-commit",
+    "install-qgis-plugins",
+    "install-backend",
+] }
+lint = "pre-commit run --all-files"
+mypy = "mypy ."
+
+[feature.dev.tasks.qgis]
+args = [{ "arg" = "profiles_path", "default" = ".pixi/qgis_env" }]
+cmd = "qgis --profiles-path {{ profiles_path }}"
+
+[feature.dev.tasks.install-qgis-tim-plugin]
+args = [
+    { "arg" = "profile_path", "default" = ".pixi/qgis_env/profiles/default" },
+]
+cmd = "python scripts/install_qgis_tim_plugin.py {{ profile_path }}"
+
+[feature.dev.tasks.install-qgis-plugin]
+args = [
+    { "arg" = "package" },
+    { "arg" = "package_name" },
+    { "arg" = "profile_path", "default" = ".pixi/qgis_env/profiles/default" },
+]
+cmd = "python scripts/install_qgis_plugin.py {{ package }} {{ profile_path }} && python scripts/enable_plugin.py {{ package_name }} {{ profile_path }}"
+
+[feature.dev.tasks.install-qgis-plugins]
+args = [
+    { "arg" = "profile_path", "default" = ".pixi/qgis_env/profiles/default" },
+]
+depends-on = [
+    { "task" = "install-qgis-plugin", "args" = [
+        "Plugin\\ Reloader",
+        "plugin_reloader",
+        "{{ profile_path }}",
+    ] },
+    { "task" = "install-qgis-tim-plugin", "args" = [
+        "{{ profile_path }}",
+    ] },
+    { "task" = "install-qgis-plugin", "args" = [
+        "QGIS\\ DevTools",
+        "devtools",
+        "{{ profile_path }}",
+    ] },
+]
+[feature.dev.tasks.install-backend]
+cmd = "python scripts/link_backend_dir.py"
+depends-on = [{ "task" = "build-backend", environment = "build" }]
+
+[environments]
+dev = { features = ["dev"] }
+build = { features = ["build"] }

@@ -290,13 +290,13 @@ def _(model: timml.Model, observations: Dict):
         ndeg = kwargs["ndeg"]
         discharges = model.intnormflux(xy=xy, method=method, ndeg=ndeg)
 
-        # Store the output per line segment. 
+        # Store the output per line segment.
         for q_layered, vertex0, vertex1 in zip(discharges.T, xy[:-1], xy[1:]):
             row = {f"discharge_layer{i}": q for i, q in enumerate(q_layered)}
             row["geometry"] = {
                 "type": "LineString",
                 "coordinates": [vertex0, vertex1],
-                "label": kwargs["label"]
+                "label": kwargs["label"],
             }
             table_rows.append(row)
 

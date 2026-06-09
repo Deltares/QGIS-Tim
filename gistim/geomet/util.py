@@ -44,7 +44,7 @@ def block_splitter(data, block_size):
         Desired (maximum) block size.
     """
     buf = []
-    for i, datum in enumerate(data):
+    for _, datum in enumerate(data):
         buf.append(datum)
         if len(buf) == block_size:
             yield buf

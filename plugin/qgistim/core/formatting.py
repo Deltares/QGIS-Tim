@@ -350,7 +350,9 @@ def ttim_json(
 
     data = ttim_data.copy()
     domain_data = data.pop("timml Domain:Domain")
-    elements, observations, _ = json_elements_and_observations(data, mapping=TTIM_MAPPING)
+    elements, observations, _ = json_elements_and_observations(
+        data, mapping=TTIM_MAPPING
+    )
 
     json_data["ttim"] = elements
     json_data["observations"] = observations

@@ -9,6 +9,7 @@ different algorithm which generates minor "knickpoints" which do not occur with
 the contouring algorithm for structured data (likely because interpolation is
 simpler). However, sliding through different timesteps works out of the box.
 """
+
 from typing import Union
 
 import numpy as np
@@ -45,8 +46,7 @@ def _coord(da, dim):
     else:  # undefined -> equidistant
         if da[dim].size == 1:
             raise ValueError(
-                f"DataArray has size 1 along {dim}, so cellsize must be provided"
-                " as a coordinate."
+                f"DataArray has size 1 along {dim}, so cellsize must be provided as a coordinate."
             )
         dxs = np.diff(da[dim].values)
         dx = dxs[0]
@@ -150,9 +150,7 @@ def ugrid2d_topology(data: Union[xr.DataArray, xr.Dataset]) -> xr.Dataset:
     # Compute all vertices, these are the ugrid nodes
     node_y, node_x = (a.ravel() for a in np.meshgrid(ycoord, xcoord, indexing="ij"))
     face_y, face_x = (a.ravel() for a in np.meshgrid(y, x, indexing="ij"))
-    linear_index = np.arange(node_x.size, dtype=int).reshape(
-        ycoord.size, xcoord.size
-    )
+    linear_index = np.arange(node_x.size, dtype=int).reshape(ycoord.size, xcoord.size)
     # Allocate face_node_connectivity
     nfaces = (ycoord.size - 1) * (xcoord.size - 1)
     face_nodes = np.empty((nfaces, 4))
@@ -183,9 +181,9 @@ def ugrid2d_data(da: xr.DataArray) -> xr.DataArray:
     """
     if da.dims[:-2] == ("y", "x"):
         raise ValueError('Last two dimensions must be ("y", "x").')
-    extra_dims = list(set(da.dims) - set(["y", "x"]))
+    extra_dims = list(set(da.dims) - {"y", "x"})
     shape = da.data.shape
-    new_shape = shape[:-2] + (np.product(shape[-2:]),)
+    new_shape = shape[:-2] + (np.prod(shape[-2:]),)
     try:
         return xr.DataArray(
             data=da.data.reshape(new_shape),

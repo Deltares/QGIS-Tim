@@ -8,6 +8,7 @@ from qgis.core import (
     QgsPointXY,
     QgsSingleSymbolRenderer,
 )
+
 from qgistim.core.elements.colors import BLACK
 from qgistim.core.elements.element import ElementExtraction, TransientElement
 from qgistim.core.elements.schemata import SingleRowSchema
