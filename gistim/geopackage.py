@@ -8,7 +8,6 @@ import sqlite3
 from pathlib import Path
 from typing import Dict, List, NamedTuple, Tuple
 
-import numpy as np
 import pandas as pd
 
 from gistim.geomet import geopackage
@@ -136,7 +135,7 @@ def force_sql_datetime(df: pd.DataFrame):
     return {
         colname: "DATETIME"
         for colname, dtype in df.dtypes.to_dict().items()
-        if np.issubdtype(dtype, np.datetime64)
+        if pd.api.types.is_datetime64_any_dtype(dtype)
     }
 
 
