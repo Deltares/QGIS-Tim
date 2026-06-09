@@ -77,11 +77,14 @@ This repository uses [pixi](https://pixi.sh) to install required dependencies.
 
 After making a change to the plugin, you can reload the plugin with the [plugin reloader](https://plugins.qgis.org/plugins/plugin_reloader/).
 
-You can debug the plugin itself with the [QGIS DevTools plugin](https://plugins.qgis.org/plugins/devtools/). Follow the [steps](https://docs.nextgis.com/docs_ngqgis/source/devtools.html?utm_source=qgis_plugin&utm_medium=readme&utm_campaign=constant&utm_term=devtools&utm_content=en) to get the debugger running. It comes down to:
+You can debug the plugin itself with the [QGIS DevTools plugin](https://plugins.qgis.org/plugins/devtools/). We set up our pixi development environment such, that it comes down to:
 
 * `pixi run qgis`.
 * Press the start button: ![Start button from QGIS DevTools plugin](https://docs.nextgis.com/_images/start_button.png).
 * In VS Code, press `F5` to *Attach to QGIS*. The ports in the QGIS DevTools plugin and the launch.json file should match.
+
+This should be enough to get started with debugging.
+[For further setup information see the QGIS DevTools docs.](https://docs.nextgis.com/docs_ngqgis/source/devtools.html?utm_source=qgis_plugin&utm_medium=readme&utm_campaign=constant&utm_term=devtools&utm_content=en)
 
 We recommend debugging the backend separately by simply running the backend as a sole entity and perform some separate operations.
 We can not yet connect to the backend while running the QGIS plugin.
