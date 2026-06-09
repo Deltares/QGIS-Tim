@@ -1,0 +1,13 @@
+[project]
+name = "qgistim"
+description = "QGIS plugin for TimML and TTim analytic element workflows"
+readme = "qgistim/README.txt"
+version = "0.6.0"
+maintainers = [{ name = "Huite Bootsma", email = "huite.bootsma@deltares.nl" }]
+requires-python = ">=3.11"
+license = { text = "GPL-2.0" }
+
+[project.urls]
+Home = "https://github.com/deltares/QGIS-Tim"
+Code = "https://github.com/deltares/QGIS-Tim"
+Issues = "https://github.com/deltares/QGIS-Tim/issues"

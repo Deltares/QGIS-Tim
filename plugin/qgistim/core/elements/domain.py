@@ -1,6 +1,6 @@
 from typing import Any, Tuple
 
-from PyQt5.QtCore import QVariant
+from PyQt5.QtCore import QMetaType
 from qgis.core import (
     QgsFeature,
     QgsField,
@@ -25,7 +25,7 @@ class DomainSchema(SingleRowSchema):
 class Domain(TransientElement):
     element_type = "Domain"
     geometry_type = "Polygon"
-    ttim_attributes = (QgsField("time", QVariant.Double),)
+    ttim_attributes = (QgsField("time", QMetaType.Type.Double),)
     schema = DomainSchema()
 
     def __init__(self, path: str, name: str):

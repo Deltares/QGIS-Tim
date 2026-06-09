@@ -11,7 +11,7 @@ from typing import NamedTuple
 
 import numpy as np
 import processing
-from PyQt5.QtCore import QDateTime, QVariant
+from PyQt5.QtCore import QDateTime, QMetaType
 from qgis.analysis import QgsMeshContours
 from qgis.core import (
     QgsFeature,
@@ -112,7 +112,7 @@ def steady_contours(
     provider = contour_layer.dataProvider()
     provider.addAttributes(
         [
-            QgsField("head", QVariant.Double),
+            QgsField("head", QMetaType.Type.Double),
         ]
     )
     contour_layer.updateFields()
@@ -149,9 +149,9 @@ def transient_contours(
     provider = contour_layer.dataProvider()
     provider.addAttributes(
         [
-            QgsField("head", QVariant.Double),
-            QgsField("datetime_start", QVariant.DateTime),
-            QgsField("datetime_end", QVariant.DateTime),
+            QgsField("head", QMetaType.Type.Double),
+            QgsField("datetime_start", QMetaType.Type.QDateTime),
+            QgsField("datetime_end", QMetaType.Type.QDateTime),
         ]
     )
     contour_layer.updateFields()

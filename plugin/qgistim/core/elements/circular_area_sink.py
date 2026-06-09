@@ -1,6 +1,6 @@
 from typing import Any, Dict
 
-from PyQt5.QtCore import QVariant
+from PyQt5.QtCore import QMetaType
 from qgis.core import QgsField
 
 from qgistim.core.elements.colors import GREEN, TRANSPARENT_GREEN
@@ -45,18 +45,18 @@ class CircularAreaSink(TransientElement):
     element_type = "Circular Area Sink"
     geometry_type = "Polygon"
     timml_attributes = (
-        QgsField("rate", QVariant.Double),
-        QgsField("layer", QVariant.Int),
-        QgsField("label", QVariant.String),
-        QgsField("time_start", QVariant.Double),
-        QgsField("time_end", QVariant.Double),
-        QgsField("rate_transient", QVariant.Double),
-        QgsField("timeseries_id", QVariant.Int),
+        QgsField("rate", QMetaType.Type.Double),
+        QgsField("layer", QMetaType.Type.Int),
+        QgsField("label", QMetaType.Type.QString),
+        QgsField("time_start", QMetaType.Type.Double),
+        QgsField("time_end", QMetaType.Type.Double),
+        QgsField("rate_transient", QMetaType.Type.Double),
+        QgsField("timeseries_id", QMetaType.Type.Int),
     )
     ttim_attributes = (
-        QgsField("timeseries_id", QVariant.Int),
-        QgsField("time_start", QVariant.Double),
-        QgsField("rate", QVariant.Double),
+        QgsField("timeseries_id", QMetaType.Type.Int),
+        QgsField("time_start", QMetaType.Type.Double),
+        QgsField("rate", QMetaType.Type.Double),
     )
     transient_columns = (
         "time_start",

@@ -29,16 +29,20 @@ timml = ">=6.3.0"
 ttim = ">=0.8.0"
 xarray = "*"
 numpy = "*"
+gistim = { path = "gistim", editable = true }
+qgistim = { path = "plugin", editable = true }
 
 [feature.dev.dependencies]
 debugpy = "*"
 ruff = "*"
 pre-commit = "*"
 mypy = "*"
+pytest = ">=9.0.3,<10"
 
 [feature.dev.pypi-dependencies]
 qgis-stubs = "*"
 qgis-plugin-manager = ">=1.7.5, <2"
+pytest-qgis = ">=4.0.1,<5"
 
 [feature.dev.target.win-64.dependencies]
 qgis = ">=3.40,<4"
@@ -56,14 +60,20 @@ install = { depends-on = [
 ] }
 lint = "pre-commit run --all-files"
 mypy = "mypy ."
+clean = "rm -rf .qgis-settings"
+
+[feature.dev.tasks.test]
+cmd = "pytest {{ test_path }}"
+args = [{ "arg" = "test_path", "default" = "test_plugin" }]
+depends-on = ["install-qgis-tim-plugin"]
 
 [feature.dev.tasks.qgis]
-args = [{ "arg" = "profiles_path", "default" = ".pixi/qgis_env" }]
+args = [{ "arg" = "profiles_path", "default" = ".qgis-settings" }]
 cmd = "qgis --profiles-path {{ profiles_path }}"
 
 [feature.dev.tasks.install-qgis-tim-plugin]
 args = [
-    { "arg" = "profile_path", "default" = ".pixi/qgis_env/profiles/default" },
+    { "arg" = "profile_path", "default" = ".qgis-settings/profiles/default" },
 ]
 cmd = "python scripts/install_qgis_tim_plugin.py {{ profile_path }}"
 
@@ -71,13 +81,13 @@ cmd = "python scripts/install_qgis_tim_plugin.py {{ profile_path }}"
 args = [
     { "arg" = "package" },
     { "arg" = "package_name" },
-    { "arg" = "profile_path", "default" = ".pixi/qgis_env/profiles/default" },
+    { "arg" = "profile_path", "default" = ".qgis-settings/profiles/default" },
 ]
 cmd = "python scripts/install_qgis_plugin.py {{ package }} {{ profile_path }} && python scripts/enable_plugin.py {{ package_name }} {{ profile_path }}"
 
 [feature.dev.tasks.install-qgis-plugins]
 args = [
-    { "arg" = "profile_path", "default" = ".pixi/qgis_env/profiles/default" },
+    { "arg" = "profile_path", "default" = ".qgis-settings/profiles/default" },
 ]
 depends-on = [
     { "task" = "install-qgis-plugin", "args" = [

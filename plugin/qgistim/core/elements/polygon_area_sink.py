@@ -1,6 +1,6 @@
 from copy import deepcopy
 
-from PyQt5.QtCore import QVariant
+from PyQt5.QtCore import QMetaType
 from qgis.core import QgsDefaultValue, QgsField, QgsSingleSymbolRenderer
 
 from qgistim.core.elements.colors import GREEN, TRANSPARENT_GREEN
@@ -22,9 +22,9 @@ class PolygonAreaSink(Element):
     element_type = "Polygon Area Sink"
     geometry_type = "Polygon"
     timml_attributes = (
-        QgsField("rate", QVariant.Double),
-        QgsField("order", QVariant.Int),
-        QgsField("ndegrees", QVariant.Int),
+        QgsField("rate", QMetaType.Type.Double),
+        QgsField("order", QMetaType.Type.Int),
+        QgsField("ndegrees", QMetaType.Type.Int),
     )
     timml_defaults = {
         "order": QgsDefaultValue("4"),

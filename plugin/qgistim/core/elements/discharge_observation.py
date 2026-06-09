@@ -1,4 +1,4 @@
-from PyQt5.QtCore import QVariant
+from PyQt5.QtCore import QMetaType
 from qgis.core import QgsDefaultValue, QgsField, QgsSingleSymbolRenderer
 
 from qgistim.core.elements.colors import LIGHT_BLUE
@@ -22,9 +22,9 @@ class DischargeObservation(Element):
     element_type = "Discharge Observation"
     geometry_type = "Linestring"
     timml_attributes = (
-        QgsField("legendre_method", QVariant.Bool),
-        QgsField("ndegrees", QVariant.Int),
-        QgsField("label", QVariant.String),
+        QgsField("legendre_method", QMetaType.Type.Bool),
+        QgsField("ndegrees", QMetaType.Type.Int),
+        QgsField("label", QMetaType.Type.QString),
     )
     timml_defaults = {
         "legendre_method": QgsDefaultValue("True"),

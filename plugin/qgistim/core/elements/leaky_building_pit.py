@@ -1,6 +1,6 @@
 from typing import Any, Dict
 
-from PyQt5.QtCore import QVariant
+from PyQt5.QtCore import QMetaType
 from qgis.core import QgsDefaultValue, QgsField, QgsSingleSymbolRenderer
 
 from qgistim.core.elements.colors import RED, TRANSPARENT_RED
@@ -55,23 +55,23 @@ class LeakyBuildingPit(AssociatedElement):
     element_type = "Leaky Building Pit"
     geometry_type = "Polygon"
     timml_attributes = (
-        QgsField("inhomogeneity_id", QVariant.Int),
-        QgsField("order", QVariant.Int),
-        QgsField("ndegrees", QVariant.Int),
+        QgsField("inhomogeneity_id", QMetaType.Type.Int),
+        QgsField("order", QMetaType.Type.Int),
+        QgsField("ndegrees", QMetaType.Type.Int),
     )
     assoc_attributes = [
-        QgsField("inhomogeneity_id", QVariant.Int),
-        QgsField("layer", QVariant.Int),
-        QgsField("aquifer_top", QVariant.Double),
-        QgsField("aquifer_bottom", QVariant.Double),
-        QgsField("aquitard_c", QVariant.Double),
-        QgsField("aquifer_k", QVariant.Double),
-        QgsField("semiconf_top", QVariant.Double),
-        QgsField("semiconf_head", QVariant.Double),
-        QgsField("resistance", QVariant.Double),
-        QgsField("wall_in_layer", QVariant.Bool),
-        QgsField("aquitard_npor", QVariant.Double),
-        QgsField("aquifer_npor", QVariant.Double),
+        QgsField("inhomogeneity_id", QMetaType.Type.Int),
+        QgsField("layer", QMetaType.Type.Int),
+        QgsField("aquifer_top", QMetaType.Type.Double),
+        QgsField("aquifer_bottom", QMetaType.Type.Double),
+        QgsField("aquitard_c", QMetaType.Type.Double),
+        QgsField("aquifer_k", QMetaType.Type.Double),
+        QgsField("semiconf_top", QMetaType.Type.Double),
+        QgsField("semiconf_head", QMetaType.Type.Double),
+        QgsField("resistance", QMetaType.Type.Double),
+        QgsField("wall_in_layer", QMetaType.Type.Bool),
+        QgsField("aquitard_npor", QMetaType.Type.Double),
+        QgsField("aquifer_npor", QMetaType.Type.Double),
     ]
     timml_defaults = {
         "order": QgsDefaultValue("4"),

@@ -85,3 +85,4 @@ plugin/qgistim.zip
 
 # pixi environments
 .pixi
+.qgis-settings

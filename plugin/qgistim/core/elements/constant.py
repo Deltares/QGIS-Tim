@@ -1,4 +1,4 @@
-from PyQt5.QtCore import QVariant
+from PyQt5.QtCore import QMetaType
 from qgis.core import QgsField, QgsSingleSymbolRenderer
 
 from qgistim.core.elements.colors import RED
@@ -20,9 +20,9 @@ class Constant(Element):
     element_type = "Constant"
     geometry_type = "Point"
     timml_attributes = (
-        QgsField("head", QVariant.Double),
-        QgsField("layer", QVariant.Int),
-        QgsField("label", QVariant.String),
+        QgsField("head", QMetaType.Type.Double),
+        QgsField("layer", QMetaType.Type.Int),
+        QgsField("label", QMetaType.Type.QString),
     )
     schema = ConstantSchema()
 
