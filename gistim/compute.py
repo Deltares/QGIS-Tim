@@ -6,34 +6,33 @@ from typing import Any, Dict, List, Union
 
 import numpy as np
 import pandas as pd
+import timflow
 import xarray as xr
-from timflow import steady as timml
-from timflow import transient as ttim
 
 from gistim.geopackage import CoordinateReferenceSystem, write_geopackage
 from gistim.netcdf import write_raster, write_ugrid
 
 TIMML_MAPPING = {
-    "Constant": timml.Constant,
-    "Uflow": timml.Uflow,
-    "CircAreaSink": timml.CircAreaSink,
-    "Well": timml.Well,
-    "HeadWell": timml.HeadWell,
-    "PolygonInhomMaq": timml.PolygonInhomMaq,
-    "RiverString": timml.RiverString,
-    "DitchString": timml.DitchString,
-    "LeakyWallString": timml.LeakyWallString,
-    "ImpermeableWallString": timml.ImpermeableWallString,
-    "BuildingPit": timml.BuildingPitMaq,
-    "LeakyBuildingPit": timml.LeakyBuildingPitMaq,
+    "Constant": timflow.steady.Constant,
+    "Uflow": timflow.steady.Uflow,
+    "CircAreaSink": timflow.steady.CircAreaSink,
+    "Well": timflow.steady.Well,
+    "HeadWell": timflow.steady.HeadWell,
+    "PolygonInhomMaq": timflow.steady.PolygonInhomMaq,
+    "RiverString": timflow.steady.RiverString,
+    "DitchString": timflow.steady.DitchString,
+    "LeakyWallString": timflow.steady.LeakyWallString,
+    "ImpermeableWallString": timflow.steady.ImpermeableWallString,
+    "BuildingPit": timflow.steady.BuildingPitMaq,
+    "LeakyBuildingPit": timflow.steady.LeakyBuildingPitMaq,
 }
 TTIM_MAPPING = {
-    "CircAreaSink": ttim.CircAreaSink,
-    "Well": ttim.Well,
-    "HeadWell": ttim.HeadWell,
-    "RiverString": ttim.RiverString,
-    "DitchString": ttim.DitchString,
-    "LeakyWallString": ttim.LeakyWallString,
+    "CircAreaSink": timflow.transient.CircAreaSink,
+    "Well": timflow.transient.Well,
+    "HeadWell": timflow.transient.HeadWell,
+    "RiverString": timflow.transient.RiverString,
+    "DitchString": timflow.transient.DitchString,
+    "LeakyWallString": timflow.transient.LeakyWallString,
 }
 
 
@@ -49,14 +48,14 @@ def initialize_elements(model, mapping, data):
 
 def initialize_timml(data):
     aquifer = data.pop("ModelMaq")
-    timml_model = timml.ModelMaq(**aquifer)
+    timml_model = timflow.steady.ModelMaq(**aquifer)
     elements = initialize_elements(timml_model, TIMML_MAPPING, data)
     return timml_model, elements
 
 
 def initialize_ttim(data, timml_model):
     aquifer = data.pop("ModelMaq")
-    ttim_model = ttim.ModelMaq(**aquifer, steady=timml_model)
+    ttim_model = timflow.transient.ModelMaq(**aquifer, steady=timml_model)
     elements = initialize_elements(ttim_model, TTIM_MAPPING, data)
     return ttim_model, elements
 
@@ -68,7 +67,7 @@ def headgrid(model, **kwargs):
 
 @headgrid.register
 def _(
-    model: timml.Model,
+    model: timflow.steady.Model,
     xmin: float,
     xmax: float,
     ymin: float,
@@ -82,7 +81,7 @@ def _(
 
     Parameters
     ----------
-    model: timml.Model
+    model: timflow.steady.Model
         Solved model to get heads from
     data: Dict[str, Any]
 
@@ -107,7 +106,7 @@ def _(
 
 @headgrid.register
 def _(
-    model: ttim.ModelMaq,
+    model: timflow.transient.ModelMaq,
     xmin: float,
     xmax: float,
     ymin: float,
@@ -150,7 +149,7 @@ def compute_head_observations(model, observations):
 
 @compute_head_observations.register
 def _(
-    model: timml.Model,
+    model: timflow.steady.Model,
     observations: Dict,
     **_,
 ) -> Dict[str, pd.DataFrame]:
@@ -169,7 +168,7 @@ def _(
 
 @compute_head_observations.register
 def _(
-    model: ttim.ModelMaq, observations: Dict, start_date: pd.Timestamp
+    model: timflow.transient.ModelMaq, observations: Dict, start_date: pd.Timestamp
 ) -> Dict[str, pd.DataFrame]:
     d = {
         "geometry": [],
@@ -205,7 +204,7 @@ def extract_discharges(elements, nlayers, **_):
     for layername, content in elements.items():
         sample = content[0]
 
-        if isinstance(sample, timml.WellBase):
+        if isinstance(sample, timflow.steady.WellBase):
             table_rows = []
             for well in content:
                 row = {f"discharge_layer{i}": q for i, q in enumerate(well.discharge())}
@@ -216,7 +215,9 @@ def extract_discharges(elements, nlayers, **_):
                 table_rows.append(row)
             tables[f"discharge-{layername}"] = pd.DataFrame.from_records(table_rows)
 
-        elif isinstance(sample, (timml.DitchString, timml.RiverString)):
+        elif isinstance(
+            sample, (timflow.steady.DitchString, timflow.steady.RiverString)
+        ):
             table_rows = []
             for linestring in content:
                 discharges = linestring.discharge_per_linesink()
@@ -239,7 +240,7 @@ def compute_discharge_observations(model, observations):
 
 
 @compute_discharge_observations.register
-def _(model: timml.Model, observations: Dict):
+def _(model: timflow.steady.Model, observations: Dict):
     table_rows = []
     for kwargs in observations:
         xy = kwargs["xy"]
@@ -261,13 +262,13 @@ def _(model: timml.Model, observations: Dict):
 
 
 @compute_discharge_observations.register
-def _(model: ttim.ModelMaq, observations: Dict):
+def _(model: timflow.transient.ModelMaq, observations: Dict):
     # intnormflux is not supported by ttim (yet).
     return None
 
 
 def write_output(
-    model: Union[timml.Model, ttim.ModelMaq],
+    model: Union[timflow.steady.Model, timflow.transient.ModelMaq],
     elements: Dict[str, Any],
     data: Dict[str, Any],
     path: Union[pathlib.Path, str],

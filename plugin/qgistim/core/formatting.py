@@ -148,7 +148,7 @@ def elements_and_observations(data, mapping: Dict[str, str], tim: str):
             if plugin_name == "Head Observation":
                 # Should not be added to the model.
                 # Would result in e.g.:
-                # observation_piezometer_0 = timml.head(
+                # observation_piezometer_0 = timflow.steady.head(
                 #     x=10.0,
                 #     y=20.0,
                 # )
@@ -164,7 +164,7 @@ def elements_and_observations(data, mapping: Dict[str, str], tim: str):
             else:
                 # Has to be added to the model.
                 # Would result in e.g.:
-                # timml_extraction_0 = timml.Well(
+                # timml_extraction_0 = timflow.steady.Well(
                 #     model=timml_model,
                 #     ...
                 # )
@@ -183,9 +183,9 @@ def timml_script_content(data: Dict[str, Any]):
 
     strings = [
         "import numpy as np",
-        "from timflow import steady as timml",
+        "import timflow",
         "",
-        f"timml_model = timml.ModelMaq(\n{format_kwargs(aquifer_data)}\n)",
+        f"timml_model = timflow.steady.ModelMaq(\n{format_kwargs(aquifer_data)}\n)",
     ]
 
     element_strings, observations = elements_and_observations(
@@ -215,7 +215,7 @@ def ttim_script(timml_data: Dict[str, Any], ttim_data: Dict[str, Any]) -> str:
     data.pop("start_date")
 
     strings.append(
-        f"\nttim_model = ttim.ModelMaq(\n{format_kwargs(aquifer_data)}\n{PREFIX}steady=timml_model,\n)"
+        f"\nttim_model = timflow.transient.ModelMaq(\n{format_kwargs(aquifer_data)}\n{PREFIX}steady=timml_model,\n)"
     )
 
     element_strings, observations = elements_and_observations(
