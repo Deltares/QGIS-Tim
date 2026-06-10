@@ -207,7 +207,6 @@ def timml_script(data: Dict[str, Any]) -> str:
 
 def ttim_script(timml_data: Dict[str, Any], ttim_data: Dict[str, Any]) -> str:
     strings, _ = timml_script_content(timml_data)
-    strings.insert(2, "from timflow import transient as ttim")
 
     data = ttim_data.copy()  # avoid side-effects
     aquifer_data = data.pop("timml Aquifer:Aquifer")
