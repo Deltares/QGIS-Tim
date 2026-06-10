@@ -75,7 +75,16 @@ This repository uses [pixi](https://pixi.sh) to install required dependencies.
 6. Call `pixi run qgis` to start QGIS. The plugin should be installed and enabled and you should be able to see the versions of timflow.
 
 After making a change to the plugin, you can reload the plugin with the [plugin reloader](https://plugins.qgis.org/plugins/plugin_reloader/).
-For debugging we are still encountering an [issue](https://github.com/nextgis/qgis_devtools/issues/10) with the [QGIS DevTools plugin](https://plugins.qgis.org/plugins/devtools/).
+
+You can debug the plugin itself with the [QGIS DevTools plugin](https://plugins.qgis.org/plugins/devtools/). We set up our pixi development environment such, that it comes down to:
+
+* `pixi run qgis`.
+* Press the start button: ![Start button from QGIS DevTools plugin](https://docs.nextgis.com/_images/start_button.png).
+* In VS Code, press `F5` to *Attach to QGIS*. The ports in the QGIS DevTools plugin and the launch.json file should match.
+
+This should be enough to get started with debugging.
+[For further setup information see the QGIS DevTools docs.](https://docs.nextgis.com/docs_ngqgis/source/devtools.html?utm_source=qgis_plugin&utm_medium=readme&utm_campaign=constant&utm_term=devtools&utm_content=en)
+
 We recommend debugging the backend separately by simply running the backend as a sole entity and perform some separate operations.
 We can not yet connect to the backend while running the QGIS plugin.
 Instead, export to json or python and connect the debugger to a separate backend process from VS Code.
