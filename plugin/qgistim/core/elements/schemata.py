@@ -51,7 +51,7 @@ class SchemaBase(abc.ABC):
         return cls._validate_table(vd)
 
     @classmethod
-    def validate_timml(
+    def validate_steady(
         cls, name: str, data: Dict[str, Any], other=None
     ) -> Dict[str, List]:
         vd = ValidationData(
@@ -60,7 +60,7 @@ class SchemaBase(abc.ABC):
         return cls._validate(vd)
 
     @classmethod
-    def validate_ttim(
+    def validate_transient(
         cls, name: str, data: Dict[str, Any], other=None
     ) -> Dict[str, List]:
         vd = ValidationData(
