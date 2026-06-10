@@ -86,8 +86,8 @@ class Domain(TransientElement):
             )
 
     def extract_transient_data(self, other) -> ElementExtraction:
-        timml_extraction = self.extract_steady_data(other)
-        data = timml_extraction.data
+        steady_extraction = self.extract_steady_data(other)
+        data = steady_extraction.data
 
         timeseries = self.table_to_dict(layer=self.transient_layer)
         errors = self.schema.validate_timeseries(

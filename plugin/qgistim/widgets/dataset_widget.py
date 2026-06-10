@@ -91,15 +91,17 @@ class DatasetTreeWidget(QTreeWidget):
             self.takeTopLevelItem(index)
         return
 
-    def add_item(self, timml_name: str, ttim_name: str = None, enabled: bool = True):
+    def add_item(
+        self, steady_name: str, transient_name: str = None, enabled: bool = True
+    ):
         item = QTreeWidgetItem()
         self.addTopLevelItem(item)
         item.steady_checkbox = QCheckBox()
         item.steady_checkbox.setChecked(True)
         item.steady_checkbox.setEnabled(enabled)
         self.setItemWidget(item, 0, item.steady_checkbox)
-        item.setText(1, timml_name)
-        item.setText(2, ttim_name)
+        item.setText(1, steady_name)
+        item.setText(2, transient_name)
         item.assoc_item = None
         return item
 
@@ -111,8 +113,8 @@ class DatasetTreeWidget(QTreeWidget):
             enabled = True
 
         item = self.add_item(
-            timml_name=element.steady_name,
-            ttim_name=element.transient_name,
+            steady_name=element.steady_name,
+            transient_name=element.transient_name,
             enabled=enabled,
         )
         item.element = element
@@ -576,19 +578,19 @@ class DatasetWidget(QWidget):
             self.validation_dialog.close()
             self.validation_dialog = None
 
-        errors, timml_data = self.dataset_tree.extract_data(transient=False)
+        errors, steady_data = self.dataset_tree.extract_data(transient=False)
         if errors:
             self.validation_dialog = ValidationDialog(errors)
             return Extraction(success=False)
 
-        ttim_data = None
+        transient_data = None
         if transient:
-            errors, ttim_data = self.dataset_tree.extract_data(transient=True)
+            errors, transient_data = self.dataset_tree.extract_data(transient=True)
             if errors:
                 self.validation_dialog = ValidationDialog(errors)
                 return Extraction(success=False)
 
-        return Extraction(steady=timml_data, transient=ttim_data)
+        return Extraction(steady=steady_data, transient=transient_data)
 
     def save_as_python(self) -> None:
         outpath, _ = QFileDialog.getSaveFileName(self, "Select file", "", "*.py")
