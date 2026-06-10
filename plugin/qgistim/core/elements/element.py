@@ -105,7 +105,7 @@ class NameDialog(QDialog):
 
 class Element(ExtractorMixin, abc.ABC):
     """
-    Abstract base class for "ordinary" timml elements.
+    Abstract base class for "ordinary" tim elements.
     """
 
     element_type = None
