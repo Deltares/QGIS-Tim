@@ -56,7 +56,7 @@ def initialize_timml(data):
 
 def initialize_ttim(data, timml_model):
     aquifer = data.pop("ModelMaq")
-    ttim_model = ttim.ModelMaq(**aquifer, timmlmodel=timml_model)
+    ttim_model = ttim.ModelMaq(**aquifer, steady=timml_model)
     elements = initialize_elements(ttim_model, TTIM_MAPPING, data)
     return ttim_model, elements
 
@@ -126,7 +126,7 @@ def _(
     nlayer = model.aq.find_aquifer_data(x[0], y[0]).naq
 
     if 0.0 in time:
-        steady_head = model.timmlmodel.headgrid(xg=x, yg=y)[:, np.newaxis, :, :]
+        steady_head = model.steady.headgrid(xg=x, yg=y)[:, np.newaxis, :, :]
         transient_head = model.headgrid(xg=x, yg=y, t=time[1:])
         head = np.hstack((steady_head, transient_head))
     else:

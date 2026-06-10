@@ -215,7 +215,7 @@ def ttim_script(timml_data: Dict[str, Any], ttim_data: Dict[str, Any]) -> str:
     data.pop("start_date")
 
     strings.append(
-        f"\nttim_model = ttim.ModelMaq(\n{format_kwargs(aquifer_data)}\n{PREFIX}timmlmodel=timml_model,\n)"
+        f"\nttim_model = ttim.ModelMaq(\n{format_kwargs(aquifer_data)}\n{PREFIX}steady=timml_model,\n)"
     )
 
     element_strings, observations = elements_and_observations(
