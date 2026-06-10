@@ -12,7 +12,7 @@ import xarray as xr
 from gistim.geopackage import CoordinateReferenceSystem, write_geopackage
 from gistim.netcdf import write_raster, write_ugrid
 
-TIMML_MAPPING = {
+STEADY_MAPPING = {
     "Constant": timflow.steady.Constant,
     "Uflow": timflow.steady.Uflow,
     "CircAreaSink": timflow.steady.CircAreaSink,
@@ -26,7 +26,7 @@ TIMML_MAPPING = {
     "BuildingPit": timflow.steady.BuildingPitMaq,
     "LeakyBuildingPit": timflow.steady.LeakyBuildingPitMaq,
 }
-TTIM_MAPPING = {
+TRANSIENT_MAPPING = {
     "CircAreaSink": timflow.transient.CircAreaSink,
     "Well": timflow.transient.Well,
     "HeadWell": timflow.transient.HeadWell,
@@ -46,23 +46,23 @@ def initialize_elements(model, mapping, data):
     return elements
 
 
-def initialize_timml(data):
+def initialize_steady(data):
     aquifer = data.pop("ModelMaq")
-    timml_model = timflow.steady.ModelMaq(**aquifer)
-    elements = initialize_elements(timml_model, TIMML_MAPPING, data)
-    return timml_model, elements
+    steady_model = timflow.steady.ModelMaq(**aquifer)
+    elements = initialize_elements(steady_model, STEADY_MAPPING, data)
+    return steady_model, elements
 
 
-def initialize_ttim(data, timml_model):
+def initialize_transient(data, steady_model):
     aquifer = data.pop("ModelMaq")
-    ttim_model = timflow.transient.ModelMaq(**aquifer, steady=timml_model)
-    elements = initialize_elements(ttim_model, TTIM_MAPPING, data)
-    return ttim_model, elements
+    transient_model = timflow.transient.ModelMaq(**aquifer, steady=steady_model)
+    elements = initialize_elements(transient_model, TRANSIENT_MAPPING, data)
+    return transient_model, elements
 
 
 @singledispatch
 def headgrid(model, **kwargs):
-    raise TypeError("Expected timml or ttim model")
+    raise TypeError("Expected steady or transient model")
 
 
 @headgrid.register
@@ -76,7 +76,7 @@ def _(
     **_,
 ) -> xr.DataArray:
     """
-    Compute the headgrid of the TimML model, and store the results
+    Compute the headgrid of the steady model, and store the results
     in an xarray DataArray with the appropriate dimensions.
 
     Parameters
@@ -144,7 +144,7 @@ def _(
 
 @singledispatch
 def compute_head_observations(model, observations):
-    raise TypeError("Expected timml or ttim model")
+    raise TypeError("Expected steady or transient model")
 
 
 @compute_head_observations.register
@@ -236,7 +236,7 @@ def extract_discharges(elements, nlayers, **_):
 
 @singledispatch
 def compute_discharge_observations(model, observations):
-    raise TypeError("Expected timml or ttim model")
+    raise TypeError("Expected steady or transient model")
 
 
 @compute_discharge_observations.register
@@ -318,11 +318,11 @@ def compute_steady(
     with open(path, "r") as f:
         data = json.load(f)
 
-    timml_model, elements = initialize_timml(data["timml"])
-    timml_model.solve()
+    steady_model, elements = initialize_steady(data["timml"])
+    steady_model.solve()
 
     write_output(
-        timml_model,
+        steady_model,
         elements,
         data,
         path,
@@ -336,14 +336,16 @@ def compute_transient(
     with open(path, "r") as f:
         data = json.load(f)
 
-    timml_model, _ = initialize_timml(data["timml"])
-    ttim_model, ttim_elements = initialize_ttim(data["ttim"], timml_model)
-    timml_model.solve()
-    ttim_model.solve()
+    steady_model, _ = initialize_steady(data["timml"])
+    transient_model, transient_elements = initialize_transient(
+        data["ttim"], steady_model
+    )
+    steady_model.solve()
+    transient_model.solve()
 
     write_output(
-        ttim_model,
-        ttim_elements,
+        transient_model,
+        transient_elements,
         data,
         path,
     )

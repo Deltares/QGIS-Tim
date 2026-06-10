@@ -12,7 +12,7 @@ import numpy as np
 
 from qgistim.widgets.compute_widget import OutputOptions
 
-TIMML_MAPPING = {
+STEADY_MAPPING = {
     "Constant": "Constant",
     "Uniform Flow": "Uflow",
     "Circular Area Sink": "CircAreaSink",
@@ -33,7 +33,7 @@ TIMML_MAPPING = {
 }
 # In TTim, a constant or uniform flow may be added, but they have no effect on
 # the transient superposed result.
-TTIM_MAPPING = {
+TRANSIENT_MAPPING = {
     "Constant": None,
     "Uniform Flow": None,
     "Circular Area Sink": "CircAreaSink",
@@ -183,7 +183,7 @@ def elements_and_observations(data, mapping: Dict[str, str], tim: str):
     return strings, observations
 
 
-def timml_script_content(data: Dict[str, Any]):
+def steady_script_content(data: Dict[str, Any]):
     data = data.copy()  # avoid side-effects
     aquifer_data = data.pop("timml Aquifer:Aquifer")
     data.pop("timml Domain:Domain")
@@ -196,14 +196,14 @@ def timml_script_content(data: Dict[str, Any]):
     ]
 
     element_strings, observations = elements_and_observations(
-        data, TIMML_MAPPING, tim="timml"
+        data, STEADY_MAPPING, tim="timml"
     )
     strings = strings + element_strings
     return strings, observations
 
 
-def timml_script(data: Dict[str, Any]) -> str:
-    strings, observations = timml_script_content(data)
+def steady_script(data: Dict[str, Any]) -> str:
+    strings, observations = steady_script_content(data)
     strings.append("\ntimml_model.solve()\n")
     xg, yg, _ = headgrid_code(data["timml Domain:Domain"])
     strings.append(f"head = timml_model.headgrid(\n{xg},\n{yg}\n)")
@@ -212,10 +212,12 @@ def timml_script(data: Dict[str, Any]) -> str:
     return "\n".join(strings)
 
 
-def ttim_script(timml_data: Dict[str, Any], ttim_data: Dict[str, Any]) -> str:
-    strings, _ = timml_script_content(timml_data)
+def transient_script(
+    steady_data: Dict[str, Any], transient_data: Dict[str, Any]
+) -> str:
+    strings, _ = steady_script_content(steady_data)
 
-    data = ttim_data.copy()  # avoid side-effects
+    data = transient_data.copy()  # avoid side-effects
     aquifer_data = data.pop("timml Aquifer:Aquifer")
     domain_data = data.pop("timml Domain:Domain")
     data.pop("start_date")
@@ -225,7 +227,7 @@ def ttim_script(timml_data: Dict[str, Any], ttim_data: Dict[str, Any]) -> str:
     )
 
     element_strings, observations = elements_and_observations(
-        data, TTIM_MAPPING, tim="ttim"
+        data, TRANSIENT_MAPPING, tim="ttim"
     )
     strings = strings + element_strings
     strings.append("\ntimml_model.solve()\nttim_model.solve()\n")
@@ -240,13 +242,13 @@ def ttim_script(timml_data: Dict[str, Any], ttim_data: Dict[str, Any]) -> str:
 
 
 def data_to_script(
-    timml_data: Dict[str, Any],
-    ttim_data: Union[Dict[str, Any], None],
+    steady_data: Dict[str, Any],
+    transient_data: Union[Dict[str, Any], None],
 ) -> str:
-    if ttim_data is None:
-        return timml_script(timml_data)
+    if transient_data is None:
+        return steady_script(steady_data)
     else:
-        return ttim_script(timml_data, ttim_data)
+        return transient_script(steady_data, transient_data)
 
 
 def json_elements_and_observations(data, mapping: Dict[str, str]):
@@ -273,14 +275,14 @@ def json_elements_and_observations(data, mapping: Dict[str, str]):
     return tim_data, observations, discharge_observations
 
 
-def timml_json(
-    timml_data: Dict[str, Any],
+def steady_json(
+    steady_data: Dict[str, Any],
     output_options: OutputOptions,
 ) -> Dict[str, Any]:
     """
     Take the data and add:
 
-    * the TimML type
+    * the timflow type
     * the layer name
 
     Parameters
@@ -294,10 +296,10 @@ def timml_json(
         Data ready to dump to JSON.
     """
     # Process TimML elements
-    data = timml_data.copy()  # avoid side-effects
+    data = steady_data.copy()  # avoid side-effects
     domain_data = data.pop("timml Domain:Domain")
     elements, observations, discharge_observations = json_elements_and_observations(
-        data, mapping=TIMML_MAPPING
+        data, mapping=STEADY_MAPPING
     )
     json_data = {
         "timml": elements,
@@ -311,18 +313,18 @@ def timml_json(
     return json_data
 
 
-def ttim_json(
-    timml_data: Dict[str, Any],
-    ttim_data: Dict[str, Any],
+def transient_json(
+    steady_data: Dict[str, Any],
+    transient_data: Dict[str, Any],
     output_options: OutputOptions,
 ) -> Dict[str, Any]:
-    json_data = timml_json(timml_data, output_options)
+    json_data = steady_json(steady_data, output_options)
 
-    data = ttim_data.copy()
+    data = transient_data.copy()
     domain_data = data.pop("timml Domain:Domain")
     start_date = data.pop("start_date")
     elements, observations, _ = json_elements_and_observations(
-        data, mapping=TTIM_MAPPING
+        data, mapping=TRANSIENT_MAPPING
     )
 
     json_data["ttim"] = elements
@@ -334,11 +336,11 @@ def ttim_json(
 
 
 def data_to_json(
-    timml_data: Dict[str, Any],
-    ttim_data: Union[Dict[str, Any], None],
+    steady_data: Dict[str, Any],
+    transient_data: Union[Dict[str, Any], None],
     output_options: OutputOptions,
 ) -> Dict[str, Any]:
-    if ttim_data is None:
-        return timml_json(timml_data, output_options)
+    if transient_data is None:
+        return steady_json(steady_data, output_options)
     else:
-        return ttim_json(timml_data, ttim_data, output_options)
+        return transient_json(steady_data, transient_data, output_options)
