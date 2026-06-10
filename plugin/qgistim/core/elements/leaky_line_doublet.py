@@ -19,13 +19,13 @@ class LeakyWallSchema(RowWiseSchema):
 class LeakyWall(Element):
     element_type = "Leaky Wall"
     geometry_type = "Linestring"
-    timml_attributes = (
+    steady_attributes = (
         QgsField("resistance", QVariant.Double),
         QgsField("order", QVariant.Int),
         QgsField("layer", QVariant.Int),
         QgsField("label", QVariant.String),
     )
-    timml_defaults = {
+    steady_defaults = {
         "order": QgsDefaultValue("4"),
     }
     schema = LeakyWallSchema()

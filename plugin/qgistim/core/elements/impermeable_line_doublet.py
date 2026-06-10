@@ -18,12 +18,12 @@ class ImpermeableWallSchema(RowWiseSchema):
 class ImpermeableWall(Element):
     element_type = "Impermeable Wall"
     geometry_type = "Linestring"
-    timml_attributes = (
+    steady_attributes = (
         QgsField("order", QVariant.Int),
         QgsField("layer", QVariant.Int),
         QgsField("label", QVariant.String),
     )
-    timml_defaults = {
+    steady_defaults = {
         "order": QgsDefaultValue("4"),
     }
     schema = ImpermeableWallSchema()

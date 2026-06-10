@@ -45,7 +45,7 @@ class RiverSchema(RowWiseSchema):
 class River(TransientElement):
     element_type = "River"
     geometry_type = "Linestring"
-    timml_attributes = (
+    steady_attributes = (
         QgsField("head", QVariant.Double),
         QgsField("resistance", QVariant.Double),
         QgsField("width", QVariant.Double),
@@ -57,12 +57,12 @@ class River(TransientElement):
         QgsField("head_transient", QVariant.Double),
         QgsField("timeseries_id", QVariant.Int),
     )
-    ttim_attributes = (
+    transient_attributes = (
         QgsField("timeseries_id", QVariant.Int),
         QgsField("time_start", QVariant.Double),
         QgsField("head", QVariant.Double),
     )
-    timml_defaults = {
+    steady_defaults = {
         "order": QgsDefaultValue("4"),
     }
     transient_columns = (

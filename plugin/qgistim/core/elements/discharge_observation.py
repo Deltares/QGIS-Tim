@@ -21,12 +21,12 @@ class DischargeObservationSchema(RowWiseSchema):
 class DischargeObservation(Element):
     element_type = "Discharge Observation"
     geometry_type = "Linestring"
-    timml_attributes = (
+    steady_attributes = (
         QgsField("legendre_method", QVariant.Bool),
         QgsField("ndegrees", QVariant.Int),
         QgsField("label", QVariant.String),
     )
-    timml_defaults = {
+    steady_defaults = {
         "legendre_method": QgsDefaultValue("True"),
         "ndegrees": QgsDefaultValue("10"),
     }

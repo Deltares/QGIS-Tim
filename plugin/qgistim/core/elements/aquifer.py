@@ -49,7 +49,7 @@ class TemporalSettingsSchema(SingleRowSchema):
 class Aquifer(TransientElement):
     element_type = "Aquifer"
     geometry_type = "No Geometry"
-    timml_attributes = [
+    steady_attributes = [
         QgsField("layer", QVariant.Int),
         QgsField("aquifer_top", QVariant.Double),
         QgsField("aquifer_bottom", QVariant.Double),
@@ -62,12 +62,12 @@ class Aquifer(TransientElement):
         QgsField("aquitard_npor", QVariant.Double),
         QgsField("aquifer_npor", QVariant.Double),
     ]
-    ttim_attributes = (
+    transient_attributes = (
         QgsField("time_min", QVariant.Double),
         QgsField("laplace_inversion_M", QVariant.Int),
         QgsField("start_date", QVariant.DateTime),
     )
-    ttim_defaults = {
+    transient_defaults = {
         "time_min": QgsDefaultValue("0.01"),
         "laplace_inversion_M": QgsDefaultValue("10"),
     }

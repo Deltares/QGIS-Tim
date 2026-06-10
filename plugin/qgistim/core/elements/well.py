@@ -49,7 +49,7 @@ class WellSchema(RowWiseSchema):
 class Well(TransientElement):
     element_type = "Well"
     geometry_type = "Point"
-    timml_attributes = (
+    steady_attributes = (
         QgsField("discharge", QVariant.Double),
         QgsField("radius", QVariant.Double),
         QgsField("resistance", QVariant.Double),
@@ -62,12 +62,12 @@ class Well(TransientElement):
         QgsField("slug", QVariant.Bool),
         QgsField("timeseries_id", QVariant.Int),
     )
-    ttim_attributes = (
+    transient_attributes = (
         QgsField("timeseries_id", QVariant.Int),
         QgsField("time_start", QVariant.Double),
         QgsField("discharge", QVariant.Double),
     )
-    timml_defaults = {
+    steady_defaults = {
         "radius": QgsDefaultValue("0.1"),
         "resistance": QgsDefaultValue("0.0"),
         "slug": QgsDefaultValue("False"),

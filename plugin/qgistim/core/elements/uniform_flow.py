@@ -17,7 +17,7 @@ class UniformFlowSchema(SingleRowSchema):
 class UniformFlow(Element):
     element_type = "Uniform Flow"
     geometry_type = "No geometry"
-    timml_attributes = (
+    steady_attributes = (
         QgsField("slope", QVariant.Double),
         QgsField("angle", QVariant.Double),
         QgsField("label", QVariant.String),

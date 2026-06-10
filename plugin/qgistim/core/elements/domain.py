@@ -25,7 +25,7 @@ class DomainSchema(SingleRowSchema):
 class Domain(TransientElement):
     element_type = "Domain"
     geometry_type = "Polygon"
-    ttim_attributes = (QgsField("time", QVariant.Double),)
+    transient_attributes = (QgsField("time", QVariant.Double),)
     schema = DomainSchema()
 
     def __init__(self, path: str, name: str):

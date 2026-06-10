@@ -54,7 +54,7 @@ class AssociatedLeakyBuildingPitchema(TableSchema):
 class LeakyBuildingPit(AssociatedElement):
     element_type = "Leaky Building Pit"
     geometry_type = "Polygon"
-    timml_attributes = (
+    steady_attributes = (
         QgsField("inhomogeneity_id", QVariant.Int),
         QgsField("order", QVariant.Int),
         QgsField("ndegrees", QVariant.Int),
@@ -73,7 +73,7 @@ class LeakyBuildingPit(AssociatedElement):
         QgsField("aquitard_npor", QVariant.Double),
         QgsField("aquifer_npor", QVariant.Double),
     ]
-    timml_defaults = {
+    steady_defaults = {
         "order": QgsDefaultValue("4"),
         "ndegrees": QgsDefaultValue("6"),
         "inhomogeneity_id": QgsDefaultValue("1"),

@@ -21,12 +21,12 @@ class PolygonAreaSinkSchema(RowWiseSchema):
 class PolygonAreaSink(Element):
     element_type = "Polygon Area Sink"
     geometry_type = "Polygon"
-    timml_attributes = (
+    steady_attributes = (
         QgsField("rate", QVariant.Double),
         QgsField("order", QVariant.Int),
         QgsField("ndegrees", QVariant.Int),
     )
-    timml_defaults = {
+    steady_defaults = {
         "order": QgsDefaultValue("4"),
         "ndegrees": QgsDefaultValue("6"),
     }

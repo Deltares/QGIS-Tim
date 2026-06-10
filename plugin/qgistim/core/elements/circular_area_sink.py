@@ -44,7 +44,7 @@ class CircularAreaSinkSchema(RowWiseSchema):
 class CircularAreaSink(TransientElement):
     element_type = "Circular Area Sink"
     geometry_type = "Polygon"
-    timml_attributes = (
+    steady_attributes = (
         QgsField("rate", QVariant.Double),
         QgsField("layer", QVariant.Int),
         QgsField("label", QVariant.String),
@@ -53,7 +53,7 @@ class CircularAreaSink(TransientElement):
         QgsField("rate_transient", QVariant.Double),
         QgsField("timeseries_id", QVariant.Int),
     )
-    ttim_attributes = (
+    transient_attributes = (
         QgsField("timeseries_id", QVariant.Int),
         QgsField("time_start", QVariant.Double),
         QgsField("rate", QVariant.Double),

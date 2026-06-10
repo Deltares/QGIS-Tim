@@ -19,7 +19,7 @@ class ConstantSchema(SingleRowSchema):
 class Constant(Element):
     element_type = "Constant"
     geometry_type = "Point"
-    timml_attributes = (
+    steady_attributes = (
         QgsField("head", QVariant.Double),
         QgsField("layer", QVariant.Int),
         QgsField("label", QVariant.String),

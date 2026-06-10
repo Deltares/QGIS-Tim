@@ -23,14 +23,14 @@ class PolygonSemiConfinedTopSchema(RowWiseSchema):
 class PolygonSemiConfinedTop(Element):
     element_type = "Polygon Semi-Confined Top"
     geometry_type = "Polygon"
-    timml_attributes = (
+    steady_attributes = (
         QgsField("aquitard_c", QVariant.Double),
         QgsField("semiconf_top", QVariant.Double),
         QgsField("semiconf_head", QVariant.Double),
         QgsField("order", QVariant.Int),
         QgsField("ndegrees", QVariant.Int),
     )
-    timml_defaults = {
+    steady_defaults = {
         "order": QgsDefaultValue("4"),
         "ndegrees": QgsDefaultValue("6"),
     }

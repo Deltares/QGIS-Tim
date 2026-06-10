@@ -110,12 +110,12 @@ class Element(ExtractorMixin, abc.ABC):
 
     element_type = None
     geometry_type = None
-    timml_attributes = ()
-    ttim_attributes = ()
+    steady_attributes = ()
+    transient_attributes = ()
     assoc_attributes = ()
     transient_columns = ()
-    timml_defaults = {}
-    ttim_defaults = {}
+    steady_defaults = {}
+    transient_defaults = {}
     assoc_defaults = {}
 
     def _initialize_default(self, path, name):
@@ -164,7 +164,7 @@ class Element(ExtractorMixin, abc.ABC):
             crs=crs,
             geometry_type=self.geometry_type,
             name=self.timml_name,
-            attributes=self.timml_attributes,
+            attributes=self.steady_attributes,
         )
 
     def create_ttim_layer(self, crs: Any):
@@ -181,7 +181,7 @@ class Element(ExtractorMixin, abc.ABC):
     def set_defaults(self):
         for layer, defaults in zip(
             (self.timml_layer, self.ttim_layer, self.assoc_layer),
-            (self.timml_defaults, self.ttim_defaults, self.assoc_defaults),
+            (self.steady_defaults, self.transient_defaults, self.assoc_defaults),
         ):
             if layer is None:
                 continue
@@ -267,7 +267,7 @@ class Element(ExtractorMixin, abc.ABC):
 
     def check_timml_columns(self):
         return self._check_table_columns(
-            attributes=self.timml_attributes, layer=self.timml_layer
+            attributes=self.steady_attributes, layer=self.timml_layer
         )
 
     def to_timml(self, other=None) -> ElementExtraction:
@@ -368,7 +368,7 @@ class TransientElement(Element, abc.ABC):
             crs=crs,
             geometry_type="No Geometry",
             name=self.ttim_name,
-            attributes=self.ttim_attributes,
+            attributes=self.transient_attributes,
         )
 
     def ttim_layer_from_geopackage(self):
@@ -436,7 +436,7 @@ class TransientElement(Element, abc.ABC):
 
     def check_ttim_columns(self):
         return self._check_table_columns(
-            attributes=self.ttim_attributes, layer=self.ttim_layer
+            attributes=self.transient_attributes, layer=self.ttim_layer
         )
 
     def to_ttim(self, other):
@@ -522,7 +522,7 @@ class AssociatedElement(Element, abc.ABC):
 
     def to_timml(self, other) -> ElementExtraction:
         missing = self._check_table_columns(
-            attributes=self.timml_attributes, layer=self.timml_layer
+            attributes=self.steady_attributes, layer=self.timml_layer
         )
         if missing:
             return ElementExtraction(errors=missing)

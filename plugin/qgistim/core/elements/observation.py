@@ -27,18 +27,18 @@ class HeadObservationSchema(RowWiseSchema):
 class HeadObservation(TransientElement):
     element_type = "Head Observation"
     geometry_type = "Point"
-    timml_attributes = (
+    steady_attributes = (
         QgsField("label", QVariant.String),
         QgsField("timeseries_id", QVariant.Int),
     )
-    ttim_attributes = (
+    transient_attributes = (
         QgsField("timeseries_id", QVariant.Int),
         QgsField("time", QVariant.Double),
     )
-    timml_defaults = {
+    steady_defaults = {
         "timeseries_id": QgsDefaultValue("1"),
     }
-    ttim_defaults = {
+    transient_defaults = {
         "timeseries_id": QgsDefaultValue("1"),
     }
     transient_columns = ("timeseries_id",)

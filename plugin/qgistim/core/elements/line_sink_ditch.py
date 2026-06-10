@@ -45,7 +45,7 @@ class DitchSchema(RowWiseSchema):
 class Ditch(TransientElement):
     element_type = "Ditch"
     geometry_type = "Linestring"
-    timml_attributes = (
+    steady_attributes = (
         QgsField("discharge", QVariant.Double),
         QgsField("resistance", QVariant.Double),
         QgsField("width", QVariant.Double),
@@ -57,12 +57,12 @@ class Ditch(TransientElement):
         QgsField("discharge_transient", QVariant.Double),
         QgsField("timeseries_id", QVariant.Int),
     )
-    ttim_attributes = (
+    transient_attributes = (
         QgsField("timeseries_id", QVariant.Int),
         QgsField("time_start", QVariant.Double),
         QgsField("discharge", QVariant.Double),
     )
-    timml_defaults = {
+    steady_defaults = {
         "order": QgsDefaultValue("4"),
     }
     transient_columns = (
