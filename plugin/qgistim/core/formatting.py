@@ -137,6 +137,11 @@ def elements_and_observations(data, mapping: Dict[str, str], tim: str):
     strings = []
     observations = []
     model_string = textwrap.indent(f"model={tim}_model,", prefix=PREFIX)
+    if tim == "ttim":
+        module_name = "transient"
+    else:
+        module_name = "steady"
+
     for layername, element_data in data.items():
         prefix, name = layername.split(":")
         plugin_name = re.split("timml |ttim ", prefix)[1]
@@ -170,7 +175,7 @@ def elements_and_observations(data, mapping: Dict[str, str], tim: str):
                 # )
                 kwargs = format_kwargs(kwargs)
                 strings.append(
-                    f"{tim}_{sanitized(name)}_{i} = {tim}.{tim_name}(\n{model_string}\n{kwargs}\n)"
+                    f"{tim}_{sanitized(name)}_{i} = timflow.{module_name}.{tim_name}(\n{model_string}\n{kwargs}\n)"
                 )
 
     return strings, observations
