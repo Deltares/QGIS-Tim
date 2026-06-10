@@ -308,9 +308,9 @@ Let's now check the calculated heads for the 4 layers, first with the *Value Too
 Now we introduce a new but frequently used element: the sheet pile.
 
 (@) Return to the QGIS-Tim panel and go to the tab *Elements*.
-(@) Click on the element "Leaky Line Doublet".
+(@) Click on the element "Leaky Wall".
 (@) Give the layer a name, e.g. "sheetpile".
-(@) In your geopackage select the layer "timml Leaky Line Doublet:sheetpile" and start editing using the *Toggle Editing Mode* button (![](figures/tutorial/button-Qgis-AttributeTable-StartEditingMode.png ){width=4%}).
+(@) In your geopackage select the layer "timml Leaky Wall:sheetpile" and start editing using the *Toggle Editing Mode* button (![](figures/tutorial/button-Qgis-AttributeTable-StartEditingMode.png ){width=4%}).
 (@) In the editing mode, the *Add Line Feature* button (![](figures/tutorial/button_AddLineFeature.png){width=4%}) is available. Click the button and draw a box around the 5 bombs (click left to start, click right to close).
 (@) In the *Feature Attributes* window make resistance = 1500 and layer = 0.
 (@) Click *OK*.
@@ -360,16 +360,16 @@ It is not possible for the plugin to automaticcaly read your geopackage as it is
 In the backgorund the plugin first removes all layers and than opens the geopackage again. You did not see it, did you? It happend in a blink of an eye.
 
 ## Model 5: add infiltration of drainwater
-To prevent damage on the private properties caused by the dewatering, the authorities demand 50% of the drained flux to be infiltrated. For the infiltration a horizontal well of 400 m is used. In Tim this element is called "Line Sink Ditch". Let's add this element just along the road (Aalsmeerderweg) southeast of the project area.
+To prevent damage on the private properties caused by the dewatering, the authorities demand 50% of the drained flux to be infiltrated. For the infiltration a horizontal well of 400 m is used. In Tim this element is called "Ditch". Let's add this element just along the road (Aalsmeerderweg) southeast of the project area.
 
-(@) On the tab *Elements* in QGIS-Tim click on the element "Line Sink Ditch".
+(@) On the tab *Elements* in QGIS-Tim click on the element "Ditch".
 (@) Give the layer a name, e.g. "InfiltrationWell".
 
-See that layer "timml Line Sink Ditch:InfiltrationWell" is added to the timml sub group in your geopackage with 'line' as geometry. For the transient version of the model a table with the same name is added to the ttim sub group. Next step is to add the location of the horizontal well and its capacity.
+See that layer "timml Ditch:InfiltrationWell" is added to the timml sub group in your geopackage with 'line' as geometry. For the transient version of the model a table with the same name is added to the ttim sub group. Next step is to add the location of the horizontal well and its capacity.
 
 (@) Click the *Measure Line" button (![](figures/tutorial/button_MeasureLine.png){width=4%}) from the "Attributes Toolbar".
 (@) With your left mouse button try to get an idea what a distance of 400 m along the road looks like. Close the window.
-(@) Select the layer "timml Line Sink Ditch:InfiltrationWell".
+(@) Select the layer "timml Ditch:InfiltrationWell".
 (@) Start editing with the *Toggle Editing Mode*.
 (@) Use the *Add Line Feature* button (![](figures/tutorial/button_AddLineFeature.png){width=4%}) to draw a 400 m line (click left to start, click right to close).
 (@) Fill these feature within the table: discharge = -1000 (negative abstraction is flux into the model), resistance = 1, width = 1, layer = 0! not *NULL* ;-). By default order = 4.

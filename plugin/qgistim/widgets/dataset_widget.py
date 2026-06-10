@@ -48,11 +48,11 @@ SUPPORTED_TTIM_ELEMENTS = set(
         "Uniform Flow",
         "Well",
         "Head Well",
-        "Head Line Sink",
-        "Line Sink Ditch",
+        "River",
+        "Ditch",
         "Circular Area Sink",
-        "Impermeable Line Doublet",
-        "Leaky Line Doublet",
+        "Impermeable Wall",
+        "Leaky Wall",
         "Head Observation",
     ]
 )

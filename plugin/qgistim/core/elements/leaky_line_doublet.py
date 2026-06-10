@@ -17,7 +17,7 @@ class LeakyLineDoubletSchema(RowWiseSchema):
 
 
 class LeakyLineDoublet(Element):
-    element_type = "Leaky Line Doublet"
+    element_type = "Leaky Wall"
     geometry_type = "Linestring"
     timml_attributes = (
         QgsField("resistance", QVariant.Double),

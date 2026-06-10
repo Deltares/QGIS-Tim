@@ -16,7 +16,7 @@ class ImpermeableLineDoubletSchema(RowWiseSchema):
 
 
 class ImpermeableLineDoublet(Element):
-    element_type = "Impermeable Line Doublet"
+    element_type = "Impermeable Wall"
     geometry_type = "Linestring"
     timml_attributes = (
         QgsField("order", QVariant.Int),

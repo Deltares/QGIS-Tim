@@ -297,17 +297,17 @@ We are now ready to define our first steady state model by parameterizing our Aq
 
 In the QGIS-Tim Window we now introduce the following elements for ground water modelling in the QGIS-Tim tab *Element*:
 
-- Leaky Line Doublet
+- Leaky Wall
 - Well
 
-### Adding a Leaky Line Doublet
+### Adding a Leaky Wall
 
-(@) In the QGIS-Tim window go to tab *Elements* and select the button *Leaky Line Doublet*.
+(@) In the QGIS-Tim window go to tab *Elements* and select the button *Leaky Wall*.
 (@) Fill in the name of the layer in the pop-up panel, e.g. 'sheet_pile', and click *OK* and this new Layer is added to the *Layers* panel.
 
 First, we will *draw* the location of the sheet pile before *adding* the parameter values.
 
-(@) In the *Layers* panel right click on the layer ![](figures/tutorial/figure_Leakylinedoublet_icon.png){width=4%} *timml Leaky Line Doublet:sheet_pile* and start the editing mode by clicking the *Toggle Editing* button (![](figures/tutorial/button-Qgis-AttributeTable-StartEditingMode.png ){width=4%}).
+(@) In the *Layers* panel right click on the layer ![](figures/tutorial/figure_Leakylinedoublet_icon.png){width=4%} *timml Leaky Wall:sheet_pile* and start the editing mode by clicking the *Toggle Editing* button (![](figures/tutorial/button-Qgis-AttributeTable-StartEditingMode.png ){width=4%}).
 
 Two important remarks before drawing the sheet pile:
 
@@ -323,14 +323,14 @@ Two important remarks before drawing the sheet pile:
 (@) Draw the sheet pile around the building pit (start south corner) with your left mouse button and close the feature on the first point.
 (@) In the pop-up window fill in the resistance (1000 d, see \* below) and layer number (layer=0, see \*\* below) as in @fig-LeakylinedoubletFeatureAttributes and click OK to close the window.
 
-![The characteristics of the Leaky line doublet](figures/tutorial/figure_LeakylinedoubletFeatureAttributes.png){width=60% #fig-LeakylinedoubletFeatureAttributes fig-align="left"}
+![The characteristics of the Leaky Wall](figures/tutorial/figure_LeakylinedoubletFeatureAttributes.png){width=60% #fig-LeakylinedoubletFeatureAttributes fig-align="left"}
 
 > Remarks to the provided values: <br>
 > \* Because of a known issue in the TimML software, until this issue is resolved, the value of the resistance must be multiplied by the permeability. For normal sheet pile walls a resistance value of 100-250 d for interlock leakage is a good choice. In this case the chosen value needs to be increased by multiplying with the applicable aquifer permeability in the effected layer (R=100 d becomes R=10*100 d). <br>
 > \*\* In the real-world counting starts with 1. However, Tim is programmed in Python and in Python counting starts with 0. You will get used to it.
 
 (@) Close the editing mode with a click on (![](figures/tutorial/button-Qgis-AttributeTable-StartEditingMode.png ){width=4%}) and you are asked to save your changes.
-(@) Open the attribute table for *Leaky Line Doublet* (click ![](figures/tutorial/button-Qgis-OpenAttributeTable.png){width=3%} or press F6) to check hydraulic resistance values for the sheet pile walls.
+(@) Open the attribute table for *Leaky Wall* (click ![](figures/tutorial/button-Qgis-OpenAttributeTable.png){width=3%} or press F6) to check hydraulic resistance values for the sheet pile walls.
 
 ### Adding a Well
 
@@ -353,7 +353,7 @@ Two important remarks before drawing the sheet pile:
 
 When you finished the input of the wells and their parameters, you have to look back to the combination of wells and sheet pile wall. The reason is that near a well the flow is strong and therefore the flow through the wall is increased. This may lead to extremities in the calculation if wall segments are chosen too large. Tim uses control points but they are set at regular distances on the doublet (the number of control points is 1+order). It is necessary to divide the wall in smaller sections near well locations. The length of each section should be chosen equal to approximately the distance of the wall to the nearest well.
 
-(@) Select the Leaky Line Doublet in the *Layers* panel and start the editing mode.
+(@) Select the Leaky Wall in the *Layers* panel and start the editing mode.
 (@) Activate the Vertex Tool (![](figures/tutorial/button_VertexTool.png){width=4%}) and then hoover along the sheet pile line in your drawing. The line element near your pointer lights up.
 (@) With the combination of **Shift + double left click**, you can add a new vertex to the line. Repeat that for the number of points you want to add.
 
@@ -448,7 +448,7 @@ Check in the *Layers* panel and see that the results are not overwritten but add
 Let's now run Variant 2.
 
 (@) In layer *timml Aquifer:...* reset the value for "aquitard_c" in layer 1 to the default of 40 d.
-(@) In layer *timml Leaky Line Doublet:...* change the value for "resistance" into 5000 d (500x10).
+(@) In layer *timml Leaky Wall:...* change the value for "resistance" into 5000 d (500x10).
 (@) In the QGIS-Tim panel go to the tab *Results* and change the name of the output, e.g. case-TheHague_v2.
 (@) Click *Compute* to run variant 2.
 (@) Fill in your calculated heads at the observation locations in the table above.
@@ -461,16 +461,16 @@ Suppose the best guess value of the clay layer resistance was right, then a miti
 
 If we want to create extra depth of the sheet pile we will have to introduce it in a deeper layer. There are 2 options to implement it in your model:
 
-- Add a copy of the geometry of the sheet pile wall to the existing *Leaky Line Doublet* shape and assign it to layer 1.
-- We recommend to create an extra *Leaky Line Doublet* element. In this case it is more easy to switch on/off this additional element in your sensitivity analysis.
+- Add a copy of the geometry of the sheet pile wall to the existing *Leaky Wall* shape and assign it to layer 1.
+- We recommend to create an extra *Leaky Wall* element. In this case it is more easy to switch on/off this additional element in your sensitivity analysis.
 
-How to copy the sheet pile wall to an extra *Leaky Line Doublet* element?
+How to copy the sheet pile wall to an extra *Leaky Wall* element?
 
-(@) In the QGIS-Tim panel go to the tab *Elements* and add a second *Leaky Line Doublet* and give it a name, e.g. "sheet_pile_L1"
+(@) In the QGIS-Tim panel go to the tab *Elements* and add a second *Leaky Wall* and give it a name, e.g. "sheet_pile_L1"
 (@) Go to the tab *Model Manager* and see that the element separately is added to the list. Here is can switch this element on / off for a calculation.
-(@) In the *Layers* panel select the new layer *timml Leaky Line Doublet:sheet_pile_l1*.
+(@) In the *Layers* panel select the new layer *timml Leaky Wall:sheet_pile_l1*.
 (@) Open its *Attribute Table* (F6) and start the editing mode. The table is empty.
-(@) Also open the *Attribute Table* of the first *Leaky Line Doublet* and select the existing element.
+(@) Also open the *Attribute Table* of the first *Leaky Wall* and select the existing element.
 (@) Click on the *Copy* button (![](figures/tutorial/button_Copy_Selected_Row.png){width=3%}) in the source table to copy the selected row to the clipboard.
 
  ![](figures/tutorial/figure_Leakylinedoublet_copy.png){width=70%}
@@ -509,9 +509,9 @@ Still, probably some decrease of interlock leakage is needed when sheet piles ar
 
 ## Effect of a not closed wall (about 20 cm)
 Authorities are afraid that leakage incidents could be harmful for surrounding monuments.
-The effect of leakage can be studied by creating a fictitious little opening in the wall. This can be done e.g. by changing the values of first and last coordinate of the leaky line doublet.
+The effect of leakage can be studied by creating a fictitious little opening in the wall. This can be done e.g. by changing the values of first and last coordinate of the Leaky Wall.
 
-(@) Select the *Leaky Line Doublet* in the *Layers* panel
+(@) Select the *Leaky Wall* in the *Layers* panel
 (@) In the editing toolbar go to the toggle editing option (![](figures/tutorial/button-Qgis-AttributeTable-StartEditingMode.png){width=4%}) and check the vertex option (![](figures/tutorial/button_VertexTool.png){width=4%}).
 (@) On the drawing panel select a point in the line element of the wall and right click.
 

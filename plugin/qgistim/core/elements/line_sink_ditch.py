@@ -43,7 +43,7 @@ class LineSinkDitchSchema(RowWiseSchema):
 
 
 class LineSinkDitch(TransientElement):
-    element_type = "Line Sink Ditch"
+    element_type = "Ditch"
     geometry_type = "Linestring"
     timml_attributes = (
         QgsField("discharge", QVariant.Double),

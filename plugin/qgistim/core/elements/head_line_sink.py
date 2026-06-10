@@ -43,7 +43,7 @@ class HeadLineSinkSchema(RowWiseSchema):
 
 
 class HeadLineSink(TransientElement):
-    element_type = "Head Line Sink"
+    element_type = "River"
     geometry_type = "Linestring"
     timml_attributes = (
         QgsField("head", QVariant.Double),
