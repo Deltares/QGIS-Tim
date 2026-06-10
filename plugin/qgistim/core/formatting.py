@@ -137,6 +137,8 @@ def elements_and_observations(data, mapping: Dict[str, str], tim: str):
     strings = []
     observations = []
     model_string = textwrap.indent(f"model={tim}_model,", prefix=PREFIX)
+    # TODO: Rename everything to "steady" and "transient" instead of "timml" and
+    #   "ttim", and remove the conditional. ``tim`` will call
     if tim == "ttim":
         module_name = "transient"
     else:
