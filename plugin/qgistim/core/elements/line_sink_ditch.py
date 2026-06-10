@@ -17,7 +17,7 @@ from qgistim.core.schemata import (
 )
 
 
-class LineSinkDitchSchema(RowWiseSchema):
+class DitchSchema(RowWiseSchema):
     timml_schemata = {
         "geometry": Required(),
         "discharge": Required(),
@@ -42,7 +42,7 @@ class LineSinkDitchSchema(RowWiseSchema):
     }
 
 
-class LineSinkDitch(TransientElement):
+class Ditch(TransientElement):
     element_type = "Ditch"
     geometry_type = "Linestring"
     timml_attributes = (
@@ -71,7 +71,7 @@ class LineSinkDitch(TransientElement):
         "discharge_transient",
         "timeseries_id",
     )
-    schema = LineSinkDitchSchema()
+    schema = DitchSchema()
 
     @classmethod
     def renderer(cls) -> QgsSingleSymbolRenderer:

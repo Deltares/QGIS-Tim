@@ -64,9 +64,9 @@
        </property>
        <layout class="QGridLayout" name="gridLayout_3">
         <item row="4" column="1">
-         <widget class="QPushButton" name="lineSinkDitchButton">
+         <widget class="QPushButton" name="DitchButton">
           <property name="text">
-           <string>LineSinkDitch</string>
+           <string>Ditch</string>
           </property>
          </widget>
         </item>
@@ -85,9 +85,9 @@
          </widget>
         </item>
         <item row="7" column="1">
-         <widget class="QPushButton" name="leakyLineDoubletButton">
+         <widget class="QPushButton" name="LeakyWallButton">
           <property name="text">
-           <string>LeakyLineDoublet</string>
+           <string>LeakyWall</string>
           </property>
          </widget>
         </item>
@@ -99,16 +99,16 @@
          </widget>
         </item>
         <item row="8" column="1">
-         <widget class="QPushButton" name="impLineDoubletButton">
+         <widget class="QPushButton" name="ImpermeableWallButton">
           <property name="text">
-           <string>ImpLineDoublet</string>
+           <string>ImpermeableWall</string>
           </property>
          </widget>
         </item>
         <item row="3" column="1">
-         <widget class="QPushButton" name="headLineSinkButton">
+         <widget class="QPushButton" name="RiverButton">
           <property name="text">
-           <string>HeadLineSink</string>
+           <string>River</string>
           </property>
          </widget>
         </item>

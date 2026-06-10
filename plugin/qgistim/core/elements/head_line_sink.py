@@ -17,7 +17,7 @@ from qgistim.core.schemata import (
 )
 
 
-class HeadLineSinkSchema(RowWiseSchema):
+class RiverSchema(RowWiseSchema):
     timml_schemata = {
         "geometry": Required(),
         "head": Required(),
@@ -42,7 +42,7 @@ class HeadLineSinkSchema(RowWiseSchema):
     }
 
 
-class HeadLineSink(TransientElement):
+class River(TransientElement):
     element_type = "River"
     geometry_type = "Linestring"
     timml_attributes = (
@@ -71,7 +71,7 @@ class HeadLineSink(TransientElement):
         "head_transient",
         "timeseries_id",
     )
-    schema = HeadLineSinkSchema()
+    schema = RiverSchema()
 
     @classmethod
     def renderer(cls) -> QgsSingleSymbolRenderer:

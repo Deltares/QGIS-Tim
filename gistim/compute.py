@@ -20,10 +20,10 @@ TIMML_MAPPING = {
     "Well": timml.Well,
     "HeadWell": timml.HeadWell,
     "PolygonInhomMaq": timml.PolygonInhomMaq,
-    "HeadLineSinkString": timml.HeadLineSinkString,
-    "LineSinkDitchString": timml.LineSinkDitchString,
-    "LeakyLineDoubletString": timml.LeakyLineDoubletString,
-    "ImpLineDoubletString": timml.ImpLineDoubletString,
+    "RiverString": timml.RiverString,
+    "DitchString": timml.DitchString,
+    "LeakyWallString": timml.LeakyWallString,
+    "ImpermeableWallString": timml.ImpermeableWallString,
     "BuildingPit": timml.BuildingPitMaq,
     "LeakyBuildingPit": timml.LeakyBuildingPitMaq,
 }
@@ -31,9 +31,9 @@ TTIM_MAPPING = {
     "CircAreaSink": ttim.CircAreaSink,
     "Well": ttim.Well,
     "HeadWell": ttim.HeadWell,
-    "HeadLineSinkString": ttim.HeadLineSinkString,
-    "LineSinkDitchString": ttim.LineSinkDitchString,
-    "LeakyLineDoubletString": ttim.LeakyLineDoubletString,
+    "RiverString": ttim.RiverString,
+    "DitchString": ttim.DitchString,
+    "LeakyWallString": ttim.LeakyWallString,
 }
 
 
@@ -216,7 +216,7 @@ def extract_discharges(elements, nlayers, **_):
                 table_rows.append(row)
             tables[f"discharge-{layername}"] = pd.DataFrame.from_records(table_rows)
 
-        elif isinstance(sample, (timml.LineSinkDitchString, timml.HeadLineSinkString)):
+        elif isinstance(sample, (timml.DitchString, timml.RiverString)):
             table_rows = []
             for linestring in content:
                 discharges = linestring.discharge_per_linesink()
