@@ -94,10 +94,10 @@ class DatasetTreeWidget(QTreeWidget):
     def add_item(self, timml_name: str, ttim_name: str = None, enabled: bool = True):
         item = QTreeWidgetItem()
         self.addTopLevelItem(item)
-        item.timml_checkbox = QCheckBox()
-        item.timml_checkbox.setChecked(True)
-        item.timml_checkbox.setEnabled(enabled)
-        self.setItemWidget(item, 0, item.timml_checkbox)
+        item.steady_checkbox = QCheckBox()
+        item.steady_checkbox.setChecked(True)
+        item.steady_checkbox.setEnabled(enabled)
+        self.setItemWidget(item, 0, item.steady_checkbox)
         item.setText(1, timml_name)
         item.setText(2, ttim_name)
         item.assoc_item = None
@@ -111,7 +111,9 @@ class DatasetTreeWidget(QTreeWidget):
             enabled = True
 
         item = self.add_item(
-            timml_name=element.timml_name, ttim_name=element.ttim_name, enabled=enabled
+            timml_name=element.steady_name,
+            ttim_name=element.transient_name,
+            enabled=enabled,
         )
         item.element = element
         return
@@ -127,8 +129,8 @@ class DatasetTreeWidget(QTreeWidget):
             prefix, _ = item.text(1).split(":")
             _, elementtype = prefix.split("timml ")
             if elementtype not in SUPPORTED_TTIM_ELEMENTS:
-                item.timml_checkbox.setChecked(not transient)
-                item.timml_checkbox.setEnabled(not transient)
+                item.steady_checkbox.setChecked(not transient)
+                item.steady_checkbox.setEnabled(not transient)
 
             # Hide transient columns in the TimML layers:
             item.element.on_transient_changed(transient)
@@ -173,8 +175,8 @@ class DatasetTreeWidget(QTreeWidget):
 
         for element in elements:
             for layer in [
-                element.timml_layer,
-                element.ttim_layer,
+                element.steady_layer,
+                element.transient_layer,
                 element.assoc_layer,
             ]:
                 # QGIS layers
@@ -213,7 +215,7 @@ class DatasetTreeWidget(QTreeWidget):
         elements = {
             item.text(1): item.element
             for item in self.items()
-            if item.timml_checkbox.isChecked()
+            if item.steady_checkbox.isChecked()
         }
 
         # First convert the aquifer, since we need its data to validate
@@ -361,12 +363,12 @@ class DatasetWidget(QWidget):
         suppress = self.suppress_popup_checkbox.isChecked()
         # Start adding the layers
         maplayer = self.parent.input_group.add_layer(
-            element.timml_layer, "timml", element.renderer(), suppress
+            element.steady_layer, "timml", element.renderer(), suppress
         )
-        self.parent.input_group.add_layer(element.ttim_layer, "ttim")
+        self.parent.input_group.add_layer(element.transient_layer, "ttim")
         self.parent.input_group.add_layer(element.assoc_layer, "timml")
         # Set cell size if the item is a domain layer
-        if item.element.timml_name.split(":")[0] == "timml Domain":
+        if item.element.steady_name.split(":")[0] == "timml Domain":
             if maplayer.featureCount() <= 0:
                 return
             feature = next(iter(maplayer.getFeatures()))
@@ -405,7 +407,7 @@ class DatasetWidget(QWidget):
         self.dataset_tree.sortByColumn(0, Qt.SortOrder.AscendingOrder)
         self.parent.enable_geopackage_buttons()
         self.on_transient_changed()
-        self.model_crs = self.domain_item().element.timml_layer.crs()
+        self.model_crs = self.domain_item().element.steady_layer.crs()
         self.parent.qgs_project.writeEntry("qgistim", "geopackage_path", self.path)
         self.parent.qgs_project.writeEntry("qgistim", "input_group", input_group)
         return
@@ -531,7 +533,7 @@ class DatasetWidget(QWidget):
     def suppress_popup_changed(self):
         suppress = self.suppress_popup_checkbox.isChecked()
         for item in self.dataset_tree.items():
-            layer = item.element.timml_layer
+            layer = item.element.steady_layer
             if layer is not None:
                 config = layer.editFormConfig()
                 config.setSuppress(suppress)
@@ -541,8 +543,8 @@ class DatasetWidget(QWidget):
     def active_elements(self):
         active_elements = {}
         for item in self.dataset_tree.items():
-            active_elements[item.text(1)] = not (item.timml_checkbox.isChecked() == 0)
-            active_elements[item.text(2)] = not (item.timml_checkbox.isChecked() == 0)
+            active_elements[item.text(1)] = not (item.steady_checkbox.isChecked() == 0)
+            active_elements[item.text(2)] = not (item.steady_checkbox.isChecked() == 0)
         return active_elements
 
     def domain_item(self):

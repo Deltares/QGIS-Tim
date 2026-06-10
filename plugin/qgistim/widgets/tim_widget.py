@@ -321,12 +321,12 @@ class QgisTimWidget(QWidget):
         suppress = self.dataset_widget.suppress_popup_checkbox.isChecked()
         self.dataset_widget.add_element(element)
         self.input_group.add_layer(
-            element.timml_layer,
+            element.steady_layer,
             "timml",
             renderer=element.renderer(),
             suppress=suppress,
         )
-        self.input_group.add_layer(element.ttim_layer, "ttim")
+        self.input_group.add_layer(element.transient_layer, "ttim")
         self.input_group.add_layer(element.assoc_layer, "timml")
 
     # QGIS layers

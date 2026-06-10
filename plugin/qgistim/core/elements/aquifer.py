@@ -82,15 +82,15 @@ class Aquifer(TransientElement):
 
     def __init__(self, path: str, name: str):
         self._initialize_default(path, name)
-        self.timml_name = f"timml {self.element_type}:Aquifer"
-        self.ttim_name = "ttim Temporal Settings:Aquifer"
+        self.steady_name = f"timml {self.element_type}:Aquifer"
+        self.transient_name = "ttim Temporal Settings:Aquifer"
 
     def write(self):
-        self.timml_layer = geopackage.write_layer(
-            self.path, self.timml_layer, self.timml_name, newfile=True
+        self.steady_layer = geopackage.write_layer(
+            self.path, self.steady_layer, self.steady_name, newfile=True
         )
-        self.ttim_layer = geopackage.write_layer(
-            self.path, self.ttim_layer, self.ttim_name
+        self.transient_layer = geopackage.write_layer(
+            self.path, self.transient_layer, self.transient_name
         )
         self.set_defaults()
 
@@ -103,8 +103,8 @@ class Aquifer(TransientElement):
         if missing:
             return ElementExtraction(errors=missing)
 
-        data = self.table_to_dict(layer=self.timml_layer)
-        errors = self.schema.validate_timml(name=self.timml_layer.name(), data=data)
+        data = self.table_to_dict(layer=self.steady_layer)
+        errors = self.schema.validate_timml(name=self.steady_layer.name(), data=data)
         return ElementExtraction(errors=errors, data=data)
 
     def to_ttim(self) -> ElementExtraction:
@@ -112,12 +112,12 @@ class Aquifer(TransientElement):
         if missing:
             return ElementExtraction(errors=missing)
 
-        data = self.table_to_dict(layer=self.timml_layer)
-        time_data = self.table_to_records(layer=self.ttim_layer)
+        data = self.table_to_dict(layer=self.steady_layer)
+        time_data = self.table_to_records(layer=self.transient_layer)
         errors = {
-            **self.schema.validate_ttim(name=self.timml_layer.name(), data=data),
+            **self.schema.validate_ttim(name=self.steady_layer.name(), data=data),
             **self.assoc_schema.validate_ttim(
-                name=self.ttim_layer.name(), data=time_data
+                name=self.transient_layer.name(), data=time_data
             ),
         }
         if errors:
