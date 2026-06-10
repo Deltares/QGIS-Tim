@@ -7,7 +7,7 @@ from qgistim.core.elements.schemata import RowWiseSchema
 from qgistim.core.schemata import Membership, Positive, Required
 
 
-class ImpermeableLineDoubletSchema(RowWiseSchema):
+class ImpermeableWallSchema(RowWiseSchema):
     timml_schemata = {
         "geometry": Required(),
         "order": Required(Positive()),
@@ -15,7 +15,7 @@ class ImpermeableLineDoubletSchema(RowWiseSchema):
     }
 
 
-class ImpermeableLineDoublet(Element):
+class ImpermeableWall(Element):
     element_type = "Impermeable Wall"
     geometry_type = "Linestring"
     timml_attributes = (
@@ -26,7 +26,7 @@ class ImpermeableLineDoublet(Element):
     timml_defaults = {
         "order": QgsDefaultValue("4"),
     }
-    schema = ImpermeableLineDoubletSchema()
+    schema = ImpermeableWallSchema()
 
     @classmethod
     def renderer(cls) -> QgsSingleSymbolRenderer:
@@ -41,7 +41,7 @@ class ImpermeableLineDoublet(Element):
         }
 
     def to_ttim(self, other):
-        # TTim doesn't have an ImpermeableLineDoublet, we need to add "imp" as
+        # TTim doesn't have an ImpermeableWall, we need to add "imp" as
         # the resistance entry.
         _, data = self.to_timml(other)
         out = []

@@ -13,7 +13,7 @@ from qgistim.core.elements.domain import Domain
 from qgistim.core.elements.element import Element
 from qgistim.core.elements.head_line_sink import River
 from qgistim.core.elements.headwell import HeadWell, RemoteHeadWell
-from qgistim.core.elements.impermeable_line_doublet import ImpermeableLineDoublet
+from qgistim.core.elements.impermeable_line_doublet import ImpermeableWall
 from qgistim.core.elements.leaky_building_pit import LeakyBuildingPit
 from qgistim.core.elements.leaky_line_doublet import LeakyWall
 from qgistim.core.elements.line_sink_ditch import Ditch
@@ -37,7 +37,7 @@ ELEMENTS = {
         River,
         Ditch,
         CircularAreaSink,
-        ImpermeableLineDoublet,
+        ImpermeableWall,
         LeakyWall,
         PolygonAreaSink,
         PolygonSemiConfinedTop,
