@@ -19,10 +19,10 @@ class ValidationData(NamedTuple):
 
 class SchemaBase(abc.ABC):
     # TODO: check for presence of columns
-    timml_schemata: Dict[str, Union[SchemaContainer, IterableSchemaContainer]] = {}
-    timml_consistency_schemata: Tuple[ConsistencySchema] = ()
-    ttim_schemata: Dict[str, Union[SchemaContainer, IterableSchemaContainer]] = {}
-    ttim_consistency_schemata: Tuple[ConsistencySchema] = ()
+    steady_schemata: Dict[str, Union[SchemaContainer, IterableSchemaContainer]] = {}
+    steady_consistency_schemata: Tuple[ConsistencySchema] = ()
+    transient_schemata: Dict[str, Union[SchemaContainer, IterableSchemaContainer]] = {}
+    transient_consistency_schemata: Tuple[ConsistencySchema] = ()
     timeseries_schemata: Dict[str, Union[SchemaContainer, IterableSchemaContainer]] = {}
 
     @staticmethod
@@ -55,7 +55,7 @@ class SchemaBase(abc.ABC):
         cls, name: str, data: Dict[str, Any], other=None
     ) -> Dict[str, List]:
         vd = ValidationData(
-            cls.timml_schemata, cls.timml_consistency_schemata, name, data, other
+            cls.steady_schemata, cls.steady_consistency_schemata, name, data, other
         )
         return cls._validate(vd)
 
@@ -64,7 +64,11 @@ class SchemaBase(abc.ABC):
         cls, name: str, data: Dict[str, Any], other=None
     ) -> Dict[str, List]:
         vd = ValidationData(
-            cls.ttim_schemata, cls.ttim_consistency_schemata, name, data, other
+            cls.transient_schemata,
+            cls.transient_consistency_schemata,
+            name,
+            data,
+            other,
         )
         return cls._validate(vd)
 

@@ -8,7 +8,7 @@ from qgistim.core.schemata import Membership, Positive, Required
 
 
 class ImpermeableWallSchema(RowWiseSchema):
-    timml_schemata = {
+    steady_schemata = {
         "geometry": Required(),
         "order": Required(Positive()),
         "layer": Required(Membership("aquifer layers")),

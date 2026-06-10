@@ -8,12 +8,12 @@ from qgistim.core.schemata import Membership, Required, RequiresConfinedAquifer
 
 
 class ConstantSchema(SingleRowSchema):
-    timml_schemata = {
+    steady_schemata = {
         "geometry": Required(),
         "head": Required(),
         "layer": Required(Membership("aquifer layers")),
     }
-    timml_consistency_schemata = (RequiresConfinedAquifer(),)
+    steady_consistency_schemata = (RequiresConfinedAquifer(),)
 
 
 class Constant(Element):

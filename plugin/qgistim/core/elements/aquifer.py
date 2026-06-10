@@ -19,7 +19,7 @@ from qgistim.core.schemata import (
 
 
 class AquiferSchema(TableSchema):
-    timml_schemata = {
+    steady_schemata = {
         "layer": AllRequired(Range()),
         "aquifer_top": AllRequired(StrictlyDecreasing()),
         "aquifer_bottom": AllRequired(StrictlyDecreasing()),
@@ -28,18 +28,18 @@ class AquiferSchema(TableSchema):
         "semiconf_top": OptionalFirstOnly(),
         "semiconf_head": OptionalFirstOnly(),
     }
-    timml_consistency_schemata = (
+    steady_consistency_schemata = (
         SemiConfined(),
         AllGreaterEqual("aquifer_top", "aquifer_bottom"),
     )
-    ttim_schemata = {
+    transient_schemata = {
         "aquitard_s": OffsetAllRequired(Positive()),
         "aquifer_s": AllRequired(Positive()),
     }
 
 
 class TemporalSettingsSchema(SingleRowSchema):
-    ttim_schemata = {
+    transient_schemata = {
         "time_min": Required(StrictlyPositive()),
         "laplace_inversion_M": Required(StrictlyPositive()),
         "start_date": Required(),

@@ -18,7 +18,7 @@ from qgistim.core.schemata import (
 
 
 class DitchSchema(RowWiseSchema):
-    timml_schemata = {
+    steady_schemata = {
         "geometry": Required(),
         "discharge": Required(),
         "resistance": Required(Positive()),
@@ -26,11 +26,11 @@ class DitchSchema(RowWiseSchema):
         "order": Required(Positive()),
         "layer": Required(Membership("aquifer layers")),
     }
-    ttim_consistency_schemata = (
+    transient_consistency_schemata = (
         AllOrNone("time_start", "time_end", "discharge_transient"),
         NotBoth("time_start", "timeseries_id"),
     )
-    ttim_schemata = {
+    transient_schemata = {
         "time_start": Optional(Positive()),
         "time_end": Optional(Positive()),
         "timeseries_id": Optional(Membership("ttim timeseries IDs")),

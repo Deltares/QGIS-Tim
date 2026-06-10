@@ -14,10 +14,10 @@ from qgistim.core.schemata import (
 
 
 class HeadObservationSchema(RowWiseSchema):
-    timml_schemata = {
+    steady_schemata = {
         "geometry": Required(),
     }
-    ttim_schemata = {"timeseries_id": Required(Membership("ttim timeseries IDs"))}
+    transient_schemata = {"timeseries_id": Required(Membership("ttim timeseries IDs"))}
     timeseries_schemata = {
         "timeseries_id": AllRequired(),
         "time": AllRequired(Positive(), StrictlyIncreasing()),

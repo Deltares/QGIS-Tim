@@ -22,7 +22,7 @@ from qgistim.core.schemata import (
 
 
 class PolygonInhomogeneitySchema(RowWiseSchema):
-    timml_schemata = {
+    steady_schemata = {
         "geometry": Required(),
         "inhomogeneity_id": Required(Membership("properties inhomogeneity_id")),
         "order": Required(Positive()),
@@ -31,7 +31,7 @@ class PolygonInhomogeneitySchema(RowWiseSchema):
 
 
 class AssociatedPolygonInhomogeneitySchema(TableSchema):
-    timml_schemata = {
+    steady_schemata = {
         "inhomogeneity_id": AllRequired(),
         "layer": AllRequired(Equals("aquifer layers")),
         "aquifer_top": AllRequired(StrictlyDecreasing()),
@@ -42,7 +42,7 @@ class AssociatedPolygonInhomogeneitySchema(TableSchema):
         "semiconf_head": OptionalFirstOnly(),
         "rate": OptionalFirstOnly(),
     }
-    timml_consistency_schemata = (
+    steady_consistency_schemata = (
         SemiConfined(),
         AllGreaterEqual("aquifer_top", "aquifer_bottom"),
     )

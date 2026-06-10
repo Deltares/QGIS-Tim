@@ -8,7 +8,7 @@ from qgistim.core.schemata import Membership, Positive, Required, StrictlyPositi
 
 
 class LeakyWallSchema(RowWiseSchema):
-    timml_schemata = {
+    steady_schemata = {
         "geometry": Required(),
         "resistance": Required(StrictlyPositive()),
         "order": Required(Positive()),

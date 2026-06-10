@@ -24,7 +24,7 @@ from qgistim.core.schemata import (
 
 
 class LeakyBuildingPitSchema(RowWiseSchema):
-    timml_schemata = {
+    steady_schemata = {
         "geometry": Required(),
         "inhomogeneity_id": Required(Membership("properties inhomogeneity_id")),
         "order": Required(Positive()),
@@ -33,7 +33,7 @@ class LeakyBuildingPitSchema(RowWiseSchema):
 
 
 class AssociatedLeakyBuildingPitchema(TableSchema):
-    timml_schemata = {
+    steady_schemata = {
         "inhomogeneity_id": AllRequired(),
         "layer": AllRequired(Equals("aquifer layers")),
         "aquifer_top": AllRequired(StrictlyDecreasing()),
@@ -45,7 +45,7 @@ class AssociatedLeakyBuildingPitchema(TableSchema):
         "resistance": RequiredFirstOnly(StrictlyPositive()),
         "wall_in_layer": AllRequired(AtleastOneTrue()),
     }
-    timml_consistency_schemata = (
+    steady_consistency_schemata = (
         SemiConfined(),
         AllGreaterEqual("aquifer_top", "aquifer_bottom"),
     )

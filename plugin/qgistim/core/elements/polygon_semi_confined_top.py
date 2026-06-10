@@ -10,7 +10,7 @@ from qgistim.core.schemata import Positive, Required, StrictlyPositive
 
 
 class PolygonSemiConfinedTopSchema(RowWiseSchema):
-    timml_schemata = {
+    steady_schemata = {
         "geometry": Required(),
         "aquitard_c": Required(StrictlyPositive()),
         "semiconf_top": Required(),

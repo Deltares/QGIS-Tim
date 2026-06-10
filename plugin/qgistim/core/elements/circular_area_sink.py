@@ -20,17 +20,17 @@ from qgistim.core.schemata import (
 
 
 class CircularAreaSinkSchema(RowWiseSchema):
-    timml_schemata = {
+    steady_schemata = {
         "geometry": Required(CircularGeometry()),
         "rate": Required(),
         "layer": Required(Membership("aquifer layers")),
     }
-    ttim_schemata = {
+    transient_schemata = {
         "time_start": Optional(Positive()),
         "time_end": Optional(Positive()),
         "timeseries_id": Optional(Membership("ttim timeseries IDs")),
     }
-    ttim_consistency_schemata = (
+    transient_consistency_schemata = (
         AllOrNone("time_start", "time_end", "rate_transient"),
         NotBoth("time_start", "timeseries_id"),
     )

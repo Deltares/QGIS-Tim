@@ -11,7 +11,7 @@ from qgistim.core.schemata import (
 
 
 class DischargeObservationSchema(RowWiseSchema):
-    timml_schemata = {
+    steady_schemata = {
         "geometry": Required(),
         "legendre_method": Required(),
         "ndegrees": Required(Positive()),

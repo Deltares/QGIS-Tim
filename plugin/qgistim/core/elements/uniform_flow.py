@@ -7,11 +7,11 @@ from qgistim.core.schemata import Required, RequiresConfinedAquifer
 
 
 class UniformFlowSchema(SingleRowSchema):
-    timml_schemata = {
+    steady_schemata = {
         "slope": Required(),
         "angle": Required(),
     }
-    timml_consistency_schemata = (RequiresConfinedAquifer(),)
+    steady_consistency_schemata = (RequiresConfinedAquifer(),)
 
 
 class UniformFlow(Element):

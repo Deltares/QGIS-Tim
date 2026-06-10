@@ -20,22 +20,22 @@ from qgistim.core.schemata import (
 
 
 class WellSchema(RowWiseSchema):
-    timml_schemata = {
+    steady_schemata = {
         "geometry": Required(),
         "discharge": Required(),
         "radius": Required(StrictlyPositive()),
         "resistance": Required(Positive()),
         "layer": Required(Membership("aquifer layers")),
     }
-    timml_consistency_schemata = (ConditionallyRequired("slug", "caisson_radius"),)
-    ttim_schemata = {
+    steady_consistency_schemata = (ConditionallyRequired("slug", "caisson_radius"),)
+    transient_schemata = {
         "caisson_radius": Optional(StrictlyPositive()),
         "slug": Required(),
         "time_start": Optional(Positive()),
         "time_end": Optional(Positive()),
         "timeseries_id": Optional(Membership("ttim timeseries IDs")),
     }
-    ttim_consistency_schemata = (
+    transient_consistency_schemata = (
         AllOrNone(("time_start", "time_end", "discharge_transient")),
         NotBoth("time_start", "timeseries_id"),
     )

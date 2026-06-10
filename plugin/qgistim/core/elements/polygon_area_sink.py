@@ -10,7 +10,7 @@ from qgistim.core.schemata import Positive, Required
 
 
 class PolygonAreaSinkSchema(RowWiseSchema):
-    timml_schemata = {
+    steady_schemata = {
         "geometry": Required(),
         "rate": Required(),
         "order": Required(Positive()),

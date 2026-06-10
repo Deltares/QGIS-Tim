@@ -16,7 +16,7 @@ from qgistim.core.schemata import AllRequired, Positive, Required, StrictlyIncre
 
 
 class DomainSchema(SingleRowSchema):
-    timml_schemata = {"geometry": Required()}
+    steady_schemata = {"geometry": Required()}
     timeseries_schemata = {
         "time": AllRequired(Positive(), StrictlyIncreasing()),
     }
