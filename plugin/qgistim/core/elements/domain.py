@@ -66,9 +66,9 @@ class Domain(TransientElement):
         canvas.refresh()
         return ymax, ymin
 
-    def to_timml(self, other) -> ElementExtraction:
+    def extract_steady_data(self, other) -> ElementExtraction:
         data = self.table_to_records(layer=self.steady_layer)
-        errors = self.schema.validate_timml(
+        errors = self.schema.validate_steady(
             name=self.steady_layer.name(), data=data, other=other
         )
         if errors:
@@ -85,8 +85,8 @@ class Domain(TransientElement):
                 }
             )
 
-    def to_ttim(self, other) -> ElementExtraction:
-        timml_extraction = self.to_timml(other)
+    def extract_transient_data(self, other) -> ElementExtraction:
+        timml_extraction = self.extract_steady_data(other)
         data = timml_extraction.data
 
         timeseries = self.table_to_dict(layer=self.transient_layer)

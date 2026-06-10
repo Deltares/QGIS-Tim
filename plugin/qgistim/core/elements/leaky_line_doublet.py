@@ -34,7 +34,7 @@ class LeakyWall(Element):
     def renderer(cls) -> QgsSingleSymbolRenderer:
         return cls.line_renderer(color=RED, width="0.75", outline_style="dash")
 
-    def process_timml_row(self, row, other=None):
+    def process_steady_row(self, row, other=None):
         return {
             "xy": self.linestring_xy(row),
             "res": row["resistance"],

@@ -94,7 +94,7 @@ class LeakyBuildingPit(AssociatedElement):
             outline_style="dash",
         )
 
-    def process_timml_row(self, row: Dict[str, Any], grouped: Dict[int, Any]):
+    def process_steady_row(self, row: Dict[str, Any], grouped: Dict[int, Any]):
         inhom_id = row["inhomogeneity_id"]
         raw_data = grouped[inhom_id]
         aquifer_data = self.aquifer_data(raw_data, transient=False)

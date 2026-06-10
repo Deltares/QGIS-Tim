@@ -48,7 +48,7 @@ class HeadObservation(TransientElement):
     def renderer(cls) -> QgsSingleSymbolRenderer:
         return cls.marker_renderer(color=LIGHT_BLUE, name="triangle", size="3")
 
-    def process_timml_row(self, row, other=None):
+    def process_steady_row(self, row, other=None):
         x, y = self.point_xy(row)
         return {
             "x": x,
@@ -56,7 +56,7 @@ class HeadObservation(TransientElement):
             "label": row["label"],
         }
 
-    def process_ttim_row(self, row, grouped):
+    def process_transient_row(self, row, grouped):
         x, y = self.point_xy(row)
         times = grouped[row["timeseries_id"]]["time"]
         return {

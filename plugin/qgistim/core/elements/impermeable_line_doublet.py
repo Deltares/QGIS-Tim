@@ -32,7 +32,7 @@ class ImpermeableWall(Element):
     def renderer(cls) -> QgsSingleSymbolRenderer:
         return cls.line_renderer(color=RED, width="0.75")
 
-    def process_timml_row(self, row, other=None):
+    def process_steady_row(self, row, other=None):
         return {
             "xy": self.linestring_xy(row),
             "layers": row["layer"],
@@ -40,10 +40,10 @@ class ImpermeableWall(Element):
             "label": row["label"],
         }
 
-    def to_ttim(self, other):
+    def extract_transient_data(self, other):
         # TTim doesn't have an ImpermeableWall, we need to add "imp" as
         # the resistance entry.
-        _, data = self.to_timml(other)
+        _, data = self.extract_steady_data(other)
         out = []
         for row in data:
             out.append(

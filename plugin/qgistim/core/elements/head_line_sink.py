@@ -77,7 +77,7 @@ class River(TransientElement):
     def renderer(cls) -> QgsSingleSymbolRenderer:
         return cls.line_renderer(color=BLUE, width="0.75")
 
-    def process_timml_row(self, row, other=None):
+    def process_steady_row(self, row, other=None):
         return {
             "xy": self.linestring_xy(row),
             "hls": row["head"],
@@ -88,7 +88,7 @@ class River(TransientElement):
             "label": row["label"],
         }
 
-    def process_ttim_row(self, row, grouped):
+    def process_transient_row(self, row, grouped):
         tsandh, times = self.transient_input(row, grouped, "head")
         return {
             "xy": self.linestring_xy(row),

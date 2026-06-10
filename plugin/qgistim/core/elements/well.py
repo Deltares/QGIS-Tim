@@ -86,7 +86,7 @@ class Well(TransientElement):
     def renderer(cls) -> QgsSingleSymbolRenderer:
         return cls.marker_renderer(color=GREEN, size="3")
 
-    def process_timml_row(self, row, other=None) -> Dict[str, Any]:
+    def process_steady_row(self, row, other=None) -> Dict[str, Any]:
         x, y = self.point_xy(row)
         return {
             "xw": x,
@@ -98,7 +98,7 @@ class Well(TransientElement):
             "label": row["label"],
         }
 
-    def process_ttim_row(self, row, grouped):
+    def process_transient_row(self, row, grouped):
         x, y = self.point_xy(row)
         tsandQ, times = self.transient_input(row, grouped, "discharge")
         return {

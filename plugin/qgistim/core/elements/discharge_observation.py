@@ -36,7 +36,7 @@ class DischargeObservation(Element):
     def renderer(cls) -> QgsSingleSymbolRenderer:
         return cls.line_renderer(color=LIGHT_BLUE, width="0.75", outline_style="dash")
 
-    def process_timml_row(self, row, other=None):
+    def process_steady_row(self, row, other=None):
         return {
             "xy": self.linestring_xy(row),
             "method": "legendre" if row["legendre_method"] else "quad",

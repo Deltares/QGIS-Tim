@@ -42,7 +42,7 @@ class PolygonSemiConfinedTop(Element):
             color=TRANSPARENT_BLUE, color_border=BLUE, width_border="0.75"
         )
 
-    def process_timml_row(self, row, other):
+    def process_steady_row(self, row, other):
         raw_data = deepcopy(other["global_aquifer"])
         raw_data["aquitard_c"][0] = row["aquitard_c"]
         raw_data["semiconf_top"][0] = row["semiconf_top"]

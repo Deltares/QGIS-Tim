@@ -38,7 +38,7 @@ class PolygonAreaSink(Element):
             color=TRANSPARENT_GREEN, color_border=GREEN, width_border="0.75"
         )
 
-    def process_timml_row(self, row, other):
+    def process_steady_row(self, row, other):
         raw_data = deepcopy(other["global_aquifer"])
         raw_data["aquitard_c"][0] = None
         raw_data["semiconf_top"][0] = None

@@ -77,7 +77,7 @@ class Ditch(TransientElement):
     def renderer(cls) -> QgsSingleSymbolRenderer:
         return cls.line_renderer(color=GREEN, width="0.75")
 
-    def process_timml_row(self, row, other=None):
+    def process_steady_row(self, row, other=None):
         return {
             "xy": self.linestring_xy(row),
             "Qls": row["discharge"],
@@ -88,7 +88,7 @@ class Ditch(TransientElement):
             "label": row["label"],
         }
 
-    def process_ttim_row(self, row, grouped):
+    def process_transient_row(self, row, grouped):
         tsandQ, times = self.transient_input(row, grouped, "discharge")
         return {
             "xy": self.linestring_xy(row),

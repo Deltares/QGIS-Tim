@@ -85,7 +85,7 @@ class HeadWell(TransientElement):
     def renderer(cls) -> QgsSingleSymbolRenderer:
         return cls.marker_renderer(color=BLUE, size="3")
 
-    def process_timml_row(self, row, other=None) -> Dict[str, Any]:
+    def process_steady_row(self, row, other=None) -> Dict[str, Any]:
         x, y = self.point_xy(row)
         return {
             "xw": x,
@@ -97,7 +97,7 @@ class HeadWell(TransientElement):
             "label": row["label"],
         }
 
-    def process_ttim_row(self, row, grouped):
+    def process_transient_row(self, row, grouped):
         x, y = self.point_xy(row)
         tsandh, times = self.transient_input(row, grouped, "head")
         return {
@@ -125,7 +125,7 @@ class RemoteHeadWell(HeadWell):
         symbol.changeSymbolLayer(0, arrow)
         return QgsSingleSymbolRenderer(symbol)
 
-    def process_timml_row(self, row, other=None) -> Dict[str, Any]:
+    def process_steady_row(self, row, other=None) -> Dict[str, Any]:
         xy = self.linestring_xy(row)
         xw, yw = xy[-1]
         xc, yc = xy[0]

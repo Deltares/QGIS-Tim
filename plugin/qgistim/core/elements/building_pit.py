@@ -88,7 +88,7 @@ class BuildingPit(AssociatedElement):
             color=TRANSPARENT_RED, color_border=RED, width_border="0.75"
         )
 
-    def process_timml_row(self, row: Dict[str, Any], grouped: Dict[int, Any]):
+    def process_steady_row(self, row: Dict[str, Any], grouped: Dict[int, Any]):
         inhom_id = row["inhomogeneity_id"]
         raw_data = grouped[inhom_id]
         layers = [i for i, active in enumerate(raw_data["wall_in_layer"]) if active]

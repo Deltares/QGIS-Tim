@@ -80,7 +80,7 @@ class CircularAreaSink(TransientElement):
         radius = ((x - xc) ** 2 + (y - yc) ** 2) ** 0.5
         return xc, yc, radius
 
-    def process_timml_row(self, row, other=None) -> Dict[str, Any]:
+    def process_steady_row(self, row, other=None) -> Dict[str, Any]:
         xc, yc, radius = self._centroid_and_radius(row)
         return {
             "xc": xc,
@@ -90,7 +90,7 @@ class CircularAreaSink(TransientElement):
             "label": row["label"],
         }
 
-    def process_ttim_row(self, row, grouped):
+    def process_transient_row(self, row, grouped):
         xc, yc, radius = self._centroid_and_radius(row)
         tsandN, times = self.transient_input(row, grouped, "rate")
         return {

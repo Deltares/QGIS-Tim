@@ -98,25 +98,25 @@ class Aquifer(TransientElement):
         """This element may not be removed."""
         pass
 
-    def to_timml(self) -> ElementExtraction:
-        missing = self.check_timml_columns()
+    def extract_steady_data(self) -> ElementExtraction:
+        missing = self.check_steady_columns()
         if missing:
             return ElementExtraction(errors=missing)
 
         data = self.table_to_dict(layer=self.steady_layer)
-        errors = self.schema.validate_timml(name=self.steady_layer.name(), data=data)
+        errors = self.schema.validate_steady(name=self.steady_layer.name(), data=data)
         return ElementExtraction(errors=errors, data=data)
 
-    def to_ttim(self) -> ElementExtraction:
-        missing = self.check_ttim_columns()
+    def extract_transient_data(self) -> ElementExtraction:
+        missing = self.check_transient_columns()
         if missing:
             return ElementExtraction(errors=missing)
 
         data = self.table_to_dict(layer=self.steady_layer)
         time_data = self.table_to_records(layer=self.transient_layer)
         errors = {
-            **self.schema.validate_ttim(name=self.steady_layer.name(), data=data),
-            **self.assoc_schema.validate_ttim(
+            **self.schema.validate_transient(name=self.steady_layer.name(), data=data),
+            **self.assoc_schema.validate_transient(
                 name=self.transient_layer.name(), data=time_data
             ),
         }
@@ -126,6 +126,6 @@ class Aquifer(TransientElement):
 
     def extract_data(self, transient: bool) -> ElementExtraction:
         if transient:
-            return self.to_ttim()
+            return self.extract_transient_data()
         else:
-            return self.to_timml()
+            return self.extract_steady_data()

@@ -159,7 +159,7 @@ class Element(ExtractorMixin, abc.ABC):
         layer.setCrs(crs)
         return layer
 
-    def create_timml_layer(self, crs: Any):
+    def create_steady_layer(self, crs: Any):
         self.steady_layer = self.create_layer(
             crs=crs,
             geometry_type=self.geometry_type,
@@ -167,15 +167,15 @@ class Element(ExtractorMixin, abc.ABC):
             attributes=self.steady_attributes,
         )
 
-    def create_ttim_layer(self, crs: Any):
+    def create_transient_layer(self, crs: Any):
         pass
 
     def create_assoc_layer(self, crs: Any):
         pass
 
     def create_layers(self, crs: Any):
-        self.create_timml_layer(crs)
-        self.create_ttim_layer(crs)
+        self.create_steady_layer(crs)
+        self.create_transient_layer(crs)
         self.create_assoc_layer(crs)
 
     def set_defaults(self):
@@ -210,12 +210,12 @@ class Element(ExtractorMixin, abc.ABC):
     def renderer(cls):
         return None
 
-    def timml_layer_from_geopackage(self) -> QgsVectorLayer:
+    def steady_layer_from_geopackage(self) -> QgsVectorLayer:
         self.steady_layer = QgsVectorLayer(
             f"{self.path}|layername={self.steady_name}", self.steady_name
         )
 
-    def ttim_layer_from_geopackage(self):
+    def transient_layer_from_geopackage(self):
         return
 
     def assoc_layer_from_geopackage(self):
@@ -265,35 +265,35 @@ class Element(ExtractorMixin, abc.ABC):
             return {"Table:": [msg]}
         return {}
 
-    def check_timml_columns(self):
+    def check_steady_columns(self):
         return self._check_table_columns(
             attributes=self.steady_attributes, layer=self.steady_layer
         )
 
-    def to_timml(self, other=None) -> ElementExtraction:
-        missing = self.check_timml_columns()
+    def extract_steady_data(self, other=None) -> ElementExtraction:
+        missing = self.check_steady_columns()
         if missing:
             return ElementExtraction(errors=missing)
 
         data = self.table_to_records(layer=self.steady_layer)
-        errors = self.schema.validate_timml(
+        errors = self.schema.validate_steady(
             name=self.steady_layer.name(), data=data, other=other
         )
 
         if errors:
             return ElementExtraction(errors=errors)
         else:
-            elements = [self.process_timml_row(row=row, other=other) for row in data]
+            elements = [self.process_steady_row(row=row, other=other) for row in data]
             return ElementExtraction(data=elements)
 
-    def to_ttim(self, other=None) -> ElementExtraction:
-        return self.to_timml(other)
+    def extract_transient_data(self, other=None) -> ElementExtraction:
+        return self.extract_steady_data(other)
 
     def extract_data(self, transient: bool, other=None) -> ElementExtraction:
         if transient:
-            return self.to_ttim(other)
+            return self.extract_transient_data(other)
         else:
-            return self.to_timml(other)
+            return self.extract_steady_data(other)
 
     @staticmethod
     def aquifer_data(data, transient: bool):
@@ -363,7 +363,7 @@ class TransientElement(Element, abc.ABC):
         self.steady_name = f"timml {self.element_type}:{name}"
         self.transient_name = f"ttim {self.element_type}:{name}"
 
-    def create_ttim_layer(self, crs: Any):
+    def create_transient_layer(self, crs: Any):
         self.transient_layer = self.create_layer(
             crs=crs,
             geometry_type="No Geometry",
@@ -371,7 +371,7 @@ class TransientElement(Element, abc.ABC):
             attributes=self.transient_attributes,
         )
 
-    def ttim_layer_from_geopackage(self):
+    def transient_layer_from_geopackage(self):
         self.transient_layer = QgsVectorLayer(
             f"{self.path}|layername={self.transient_name}",
             self.transient_name,
@@ -439,8 +439,8 @@ class TransientElement(Element, abc.ABC):
             attributes=self.transient_attributes, layer=self.transient_layer
         )
 
-    def to_ttim(self, other):
-        missing = self.check_ttim_columns()
+    def extract_transient_data(self, other):
+        missing = self.check_transient_columns()
         if missing:
             return ElementExtraction(errors=missing)
 
@@ -452,7 +452,7 @@ class TransientElement(Element, abc.ABC):
             other["ttim timeseries IDs"] = {None}
 
         data = self.table_to_records(self.steady_layer)
-        errors = self.schema.validate_ttim(
+        errors = self.schema.validate_transient(
             name=self.steady_layer.name(), data=data, other=other
         )
         if errors:
@@ -475,7 +475,7 @@ class TransientElement(Element, abc.ABC):
         elements = []
         times = set()
         for row in data:
-            row_data, row_times = self.process_ttim_row(row, grouped)
+            row_data, row_times = self.process_transient_row(row, grouped)
             elements.append(row_data)
             times.update(row_times)
 
@@ -520,7 +520,7 @@ class AssociatedElement(Element, abc.ABC):
         geopackage.remove_layer(self.path, self.steady_name)
         geopackage.remove_layer(self.path, self.assoc_name)
 
-    def to_timml(self, other) -> ElementExtraction:
+    def extract_steady_data(self, other) -> ElementExtraction:
         missing = self._check_table_columns(
             attributes=self.steady_attributes, layer=self.steady_layer
         )
@@ -537,7 +537,7 @@ class AssociatedElement(Element, abc.ABC):
             other["properties inhomogeneity_id"] = [None]
 
         data = self.table_to_records(self.steady_layer)
-        errors = self.schema.validate_timml(
+        errors = self.schema.validate_steady(
             name=self.steady_layer.name(),
             data=data,
             other=other,
@@ -548,7 +548,7 @@ class AssociatedElement(Element, abc.ABC):
         grouped = self.groupby(properties, "inhomogeneity_id")
         errors = {}
         for inhom_id, group in grouped.items():
-            _errors = self.assoc_schema.validate_timml(
+            _errors = self.assoc_schema.validate_steady(
                 name=f"Properties, inhomogeneity_id {inhom_id}",
                 data=group,
                 other=other,
@@ -558,8 +558,8 @@ class AssociatedElement(Element, abc.ABC):
         if errors:
             return ElementExtraction(errors=errors)
 
-        elements = [self.process_timml_row(row=row, grouped=grouped) for row in data]
+        elements = [self.process_steady_row(row=row, grouped=grouped) for row in data]
         return ElementExtraction(data=elements)
 
-    def to_ttim(self, _):
+    def extract_transient_data(self, _):
         raise NotImplementedError(f"{type(self).__name__} is not supported in TTim.")
