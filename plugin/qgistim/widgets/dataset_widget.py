@@ -59,8 +59,8 @@ SUPPORTED_TTIM_ELEMENTS = set(
 
 
 class Extraction(NamedTuple):
-    timml: Dict[str, Any] = None
-    ttim: Dict[str, Any] = None
+    steady: Dict[str, Any] = None
+    transient: Dict[str, Any] = None
     success: bool = True
 
 
@@ -586,7 +586,7 @@ class DatasetWidget(QWidget):
                 self.validation_dialog = ValidationDialog(errors)
                 return Extraction(success=False)
 
-        return Extraction(timml=timml_data, ttim=ttim_data)
+        return Extraction(steady=timml_data, transient=ttim_data)
 
     def save_as_python(self) -> None:
         outpath, _ = QFileDialog.getSaveFileName(self, "Select file", "", "*.py")
@@ -597,7 +597,7 @@ class DatasetWidget(QWidget):
         if not extraction.success:
             return
 
-        script = data_to_script(extraction.timml, extraction.ttim)
+        script = data_to_script(extraction.steady, extraction.transient)
         with open(outpath, "w") as f:
             f.write(script)
 
@@ -631,8 +631,8 @@ class DatasetWidget(QWidget):
             return True
 
         json_data = data_to_json(
-            extraction.timml,
-            extraction.ttim,
+            extraction.steady,
+            extraction.transient,
             output_options=self.parent.compute_widget.output_options,
         )
 
