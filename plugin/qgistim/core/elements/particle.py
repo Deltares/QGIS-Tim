@@ -53,8 +53,6 @@ class Particle(TransientElement, abc.ABC):
         QgsField("max_horizontal_step", QVariant.Double),
         QgsField("max_vertical_step_fraction", QVariant.Double),
         QgsField("nstep_max", QVariant.Int),
-    )
-    transient_attributes = (
         QgsField("time_start", QVariant.Double),
         QgsField("time_step", QVariant.Double),
         QgsField("time_end", QVariant.Double),
