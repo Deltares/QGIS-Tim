@@ -8,18 +8,18 @@ from qgistim.core.schemata import Membership, Required, RequiresConfinedAquifer
 
 
 class ConstantSchema(SingleRowSchema):
-    timml_schemata = {
+    steady_schemata = {
         "geometry": Required(),
         "head": Required(),
         "layer": Required(Membership("aquifer layers")),
     }
-    timml_consistency_schemata = (RequiresConfinedAquifer(),)
+    steady_consistency_schemata = (RequiresConfinedAquifer(),)
 
 
 class Constant(Element):
     element_type = "Constant"
     geometry_type = "Point"
-    timml_attributes = (
+    steady_attributes = (
         QgsField("head", QVariant.Double),
         QgsField("layer", QVariant.Int),
         QgsField("label", QVariant.String),
@@ -30,7 +30,7 @@ class Constant(Element):
     def renderer(cls) -> QgsSingleSymbolRenderer:
         return cls.marker_renderer(color=RED, name="star", size="5")
 
-    def process_timml_row(self, row, other=None):
+    def process_steady_row(self, row, other=None):
         x, y = self.point_xy(row)
         return {
             "xr": x,

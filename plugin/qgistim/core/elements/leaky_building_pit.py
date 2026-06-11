@@ -24,7 +24,7 @@ from qgistim.core.schemata import (
 
 
 class LeakyBuildingPitSchema(RowWiseSchema):
-    timml_schemata = {
+    steady_schemata = {
         "geometry": Required(),
         "inhomogeneity_id": Required(Membership("properties inhomogeneity_id")),
         "order": Required(Positive()),
@@ -33,7 +33,7 @@ class LeakyBuildingPitSchema(RowWiseSchema):
 
 
 class AssociatedLeakyBuildingPitchema(TableSchema):
-    timml_schemata = {
+    steady_schemata = {
         "inhomogeneity_id": AllRequired(),
         "layer": AllRequired(Equals("aquifer layers")),
         "aquifer_top": AllRequired(StrictlyDecreasing()),
@@ -45,7 +45,7 @@ class AssociatedLeakyBuildingPitchema(TableSchema):
         "resistance": RequiredFirstOnly(StrictlyPositive()),
         "wall_in_layer": AllRequired(AtleastOneTrue()),
     }
-    timml_consistency_schemata = (
+    steady_consistency_schemata = (
         SemiConfined(),
         AllGreaterEqual("aquifer_top", "aquifer_bottom"),
     )
@@ -54,7 +54,7 @@ class AssociatedLeakyBuildingPitchema(TableSchema):
 class LeakyBuildingPit(AssociatedElement):
     element_type = "Leaky Building Pit"
     geometry_type = "Polygon"
-    timml_attributes = (
+    steady_attributes = (
         QgsField("inhomogeneity_id", QVariant.Int),
         QgsField("order", QVariant.Int),
         QgsField("ndegrees", QVariant.Int),
@@ -73,7 +73,7 @@ class LeakyBuildingPit(AssociatedElement):
         QgsField("aquitard_npor", QVariant.Double),
         QgsField("aquifer_npor", QVariant.Double),
     ]
-    timml_defaults = {
+    steady_defaults = {
         "order": QgsDefaultValue("4"),
         "ndegrees": QgsDefaultValue("6"),
         "inhomogeneity_id": QgsDefaultValue("1"),
@@ -94,7 +94,7 @@ class LeakyBuildingPit(AssociatedElement):
             outline_style="dash",
         )
 
-    def process_timml_row(self, row: Dict[str, Any], grouped: Dict[int, Any]):
+    def process_steady_row(self, row: Dict[str, Any], grouped: Dict[int, Any]):
         inhom_id = row["inhomogeneity_id"]
         raw_data = grouped[inhom_id]
         aquifer_data = self.aquifer_data(raw_data, transient=False)

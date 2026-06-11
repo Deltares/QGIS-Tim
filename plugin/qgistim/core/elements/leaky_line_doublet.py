@@ -7,8 +7,8 @@ from qgistim.core.elements.schemata import RowWiseSchema
 from qgistim.core.schemata import Membership, Positive, Required, StrictlyPositive
 
 
-class LeakyLineDoubletSchema(RowWiseSchema):
-    timml_schemata = {
+class LeakyWallSchema(RowWiseSchema):
+    steady_schemata = {
         "geometry": Required(),
         "resistance": Required(StrictlyPositive()),
         "order": Required(Positive()),
@@ -16,25 +16,25 @@ class LeakyLineDoubletSchema(RowWiseSchema):
     }
 
 
-class LeakyLineDoublet(Element):
-    element_type = "Leaky Line Doublet"
+class LeakyWall(Element):
+    element_type = "Leaky Wall"
     geometry_type = "Linestring"
-    timml_attributes = (
+    steady_attributes = (
         QgsField("resistance", QVariant.Double),
         QgsField("order", QVariant.Int),
         QgsField("layer", QVariant.Int),
         QgsField("label", QVariant.String),
     )
-    timml_defaults = {
+    steady_defaults = {
         "order": QgsDefaultValue("4"),
     }
-    schema = LeakyLineDoubletSchema()
+    schema = LeakyWallSchema()
 
     @classmethod
     def renderer(cls) -> QgsSingleSymbolRenderer:
         return cls.line_renderer(color=RED, width="0.75", outline_style="dash")
 
-    def process_timml_row(self, row, other=None):
+    def process_steady_row(self, row, other=None):
         return {
             "xy": self.linestring_xy(row),
             "res": row["resistance"],

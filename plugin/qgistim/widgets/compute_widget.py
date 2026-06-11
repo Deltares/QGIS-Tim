@@ -517,11 +517,11 @@ class ComputeWidget(QWidget):
 
             # Special-case the labelling for observations and discharge.
             if (
-                "timml Head Observation:" in layername
-                or "ttim Head Observation" in layername
+                "steady-state Head Observation:" in layername
+                or "transient Head Observation" in layername
             ):
                 labels = layer_styling.number_labels("head_layer0")
-            elif "timml Discharge Observation:" in layername:
+            elif "steady-state Discharge Observation:" in layername:
                 labels = layer_styling.number_labels("discharge_layer0")
             elif "discharge-" in layername:
                 labels = layer_styling.number_labels("discharge_layer0")

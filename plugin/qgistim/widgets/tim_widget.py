@@ -121,7 +121,7 @@ class LayersPanelGroup:
         ----------
         layer:
             QGIS map layer, raster or vector layer. May be None, in which case
-            nothing is done (useful for optional ttim and associated layers).
+            nothing is done (useful for optional transient and associated layers).
         destination: str
             Legend group
         renderer:
@@ -165,8 +165,8 @@ class LayersPanelGroup:
 class InputGroup(LayersPanelGroup):
     def create_group(self) -> None:
         self._create_group()
-        self.create_subgroup("timml")
-        self.create_subgroup("ttim")
+        self.create_subgroup("steady-state")
+        self.create_subgroup("transient")
         return
 
 
@@ -208,7 +208,7 @@ class QgisTimWidget(QWidget):
         self.compute_widget = ComputeWidget(self)
         self.install_dialog = InstallDialog(self)
 
-        self.config_button = QPushButton("Install TimML and TTim server")
+        self.config_button = QPushButton("Install timflow server")
         self.config_button.clicked.connect(self.install_dialog.show)
         self.config_button.setIcon(QgsApplication.getThemeIcon("/mActionOptions.svg"))
 
@@ -261,7 +261,7 @@ class QgisTimWidget(QWidget):
 
     def execute(self, data: Dict[str, str]) -> Dict[str, Any]:
         """
-        Execute a command, and check whether it executed succesfully.
+        Execute a command, and check whether it executed successfully.
         """
         response = self.server_handler.send(data)
         return response
@@ -321,13 +321,13 @@ class QgisTimWidget(QWidget):
         suppress = self.dataset_widget.suppress_popup_checkbox.isChecked()
         self.dataset_widget.add_element(element)
         self.input_group.add_layer(
-            element.timml_layer,
-            "timml",
+            element.steady_layer,
+            "steady-state",
             renderer=element.renderer(),
             suppress=suppress,
         )
-        self.input_group.add_layer(element.ttim_layer, "ttim")
-        self.input_group.add_layer(element.assoc_layer, "timml")
+        self.input_group.add_layer(element.transient_layer, "transient")
+        self.input_group.add_layer(element.assoc_layer, "steady-state")
 
     # QGIS layers
     # -----------

@@ -3,7 +3,7 @@ This widgets displays the available elements in the GeoPackage.
 
 This widget also allows enabling or disabling individual elements for a
 computation. It also forms the link between the geometry layers and the
-associated layers for homogeneities, or for timeseries layers for ttim
+associated layers for homogeneities, or for timeseries layers for transient
 elements.
 
 Not every TimML element has a TTim equivalent (yet). This means that when a
@@ -48,19 +48,19 @@ SUPPORTED_TTIM_ELEMENTS = set(
         "Uniform Flow",
         "Well",
         "Head Well",
-        "Head Line Sink",
-        "Line Sink Ditch",
+        "River",
+        "Ditch",
         "Circular Area Sink",
-        "Impermeable Line Doublet",
-        "Leaky Line Doublet",
+        "Impermeable Wall",
+        "Leaky Wall",
         "Head Observation",
     ]
 )
 
 
 class Extraction(NamedTuple):
-    timml: Dict[str, Any] = None
-    ttim: Dict[str, Any] = None
+    steady: Dict[str, Any] = None
+    transient: Dict[str, Any] = None
     success: bool = True
 
 
@@ -91,15 +91,17 @@ class DatasetTreeWidget(QTreeWidget):
             self.takeTopLevelItem(index)
         return
 
-    def add_item(self, timml_name: str, ttim_name: str = None, enabled: bool = True):
+    def add_item(
+        self, steady_name: str, transient_name: str = None, enabled: bool = True
+    ):
         item = QTreeWidgetItem()
         self.addTopLevelItem(item)
-        item.timml_checkbox = QCheckBox()
-        item.timml_checkbox.setChecked(True)
-        item.timml_checkbox.setEnabled(enabled)
-        self.setItemWidget(item, 0, item.timml_checkbox)
-        item.setText(1, timml_name)
-        item.setText(2, ttim_name)
+        item.steady_checkbox = QCheckBox()
+        item.steady_checkbox.setChecked(True)
+        item.steady_checkbox.setEnabled(enabled)
+        self.setItemWidget(item, 0, item.steady_checkbox)
+        item.setText(1, steady_name)
+        item.setText(2, transient_name)
         item.assoc_item = None
         return item
 
@@ -111,7 +113,9 @@ class DatasetTreeWidget(QTreeWidget):
             enabled = True
 
         item = self.add_item(
-            timml_name=element.timml_name, ttim_name=element.ttim_name, enabled=enabled
+            steady_name=element.steady_name,
+            transient_name=element.transient_name,
+            enabled=enabled,
         )
         item.element = element
         return
@@ -122,13 +126,13 @@ class DatasetTreeWidget(QTreeWidget):
         Inhomogeneities, or switch them on again.
         """
         self.setColumnHidden(2, not transient)
-        # Disable unsupported ttim items, such as inhomogeneities
+        # Disable unsupported transient items, such as inhomogeneities
         for item in self.items():
             prefix, _ = item.text(1).split(":")
-            _, elementtype = prefix.split("timml ")
+            _, elementtype = prefix.split("steady-state ")
             if elementtype not in SUPPORTED_TTIM_ELEMENTS:
-                item.timml_checkbox.setChecked(not transient)
-                item.timml_checkbox.setEnabled(not transient)
+                item.steady_checkbox.setChecked(not transient)
+                item.steady_checkbox.setEnabled(not transient)
 
             # Hide transient columns in the TimML layers:
             item.element.on_transient_changed(transient)
@@ -173,8 +177,8 @@ class DatasetTreeWidget(QTreeWidget):
 
         for element in elements:
             for layer in [
-                element.timml_layer,
-                element.ttim_layer,
+                element.steady_layer,
+                element.transient_layer,
                 element.assoc_layer,
             ]:
                 # QGIS layers
@@ -213,12 +217,12 @@ class DatasetTreeWidget(QTreeWidget):
         elements = {
             item.text(1): item.element
             for item in self.items()
-            if item.timml_checkbox.isChecked()
+            if item.steady_checkbox.isChecked()
         }
 
         # First convert the aquifer, since we need its data to validate
         # other elements.
-        name = "timml Aquifer:Aquifer"
+        name = "steady-state Aquifer:Aquifer"
         aquifer = elements.pop(name)
 
         aquifer_extraction = aquifer.extract_data(transient)
@@ -262,7 +266,7 @@ class DatasetTreeWidget(QTreeWidget):
 
         if transient:
             if times and (times != {0}):
-                data["timml Aquifer:Aquifer"]["tmax"] = max(times)
+                data["steady-state Aquifer:Aquifer"]["tmax"] = max(times)
             else:
                 errors["Model"] = {"TTim input:": ["No transient forcing defined."]}
 
@@ -365,12 +369,12 @@ class DatasetWidget(QWidget):
         suppress = self.suppress_popup_checkbox.isChecked()
         # Start adding the layers
         maplayer = self.parent.input_group.add_layer(
-            element.timml_layer, "timml", element.renderer(), suppress
+            element.steady_layer, "steady-state", element.renderer(), suppress
         )
-        self.parent.input_group.add_layer(element.ttim_layer, "ttim")
-        self.parent.input_group.add_layer(element.assoc_layer, "timml")
+        self.parent.input_group.add_layer(element.transient_layer, "transient")
+        self.parent.input_group.add_layer(element.assoc_layer, "steady-state")
         # Set cell size if the item is a domain layer
-        if item.element.timml_name.split(":")[0] == "timml Domain":
+        if item.element.steady_name.split(":")[0] == "steady-state Domain":
             if maplayer.featureCount() <= 0:
                 return
             feature = next(iter(maplayer.getFeatures()))
@@ -409,7 +413,7 @@ class DatasetWidget(QWidget):
         self.dataset_tree.sortByColumn(0, Qt.SortOrder.AscendingOrder)
         self.parent.enable_geopackage_buttons()
         self.on_transient_changed()
-        self.model_crs = self.domain_item().element.timml_layer.crs()
+        self.model_crs = self.domain_item().element.steady_layer.crs()
         self.parent.qgs_project.writeEntry("qgistim", "geopackage_path", self.path)
         self.parent.qgs_project.writeEntry("qgistim", "input_group", input_group)
         return
@@ -535,7 +539,7 @@ class DatasetWidget(QWidget):
     def suppress_popup_changed(self):
         suppress = self.suppress_popup_checkbox.isChecked()
         for item in self.dataset_tree.items():
-            layer = item.element.timml_layer
+            layer = item.element.steady_layer
             if layer is not None:
                 config = layer.editFormConfig()
                 config.setSuppress(suppress)
@@ -545,8 +549,8 @@ class DatasetWidget(QWidget):
     def active_elements(self):
         active_elements = {}
         for item in self.dataset_tree.items():
-            active_elements[item.text(1)] = not (item.timml_checkbox.isChecked() == 0)
-            active_elements[item.text(2)] = not (item.timml_checkbox.isChecked() == 0)
+            active_elements[item.text(1)] = not (item.steady_checkbox.isChecked() == 0)
+            active_elements[item.text(2)] = not (item.steady_checkbox.isChecked() == 0)
         return active_elements
 
     def domain_item(self):
@@ -578,19 +582,19 @@ class DatasetWidget(QWidget):
             self.validation_dialog.close()
             self.validation_dialog = None
 
-        errors, timml_data = self.dataset_tree.extract_data(transient=False)
+        errors, steady_data = self.dataset_tree.extract_data(transient=False)
         if errors:
             self.validation_dialog = ValidationDialog(errors)
             return Extraction(success=False)
 
-        ttim_data = None
+        transient_data = None
         if transient:
-            errors, ttim_data = self.dataset_tree.extract_data(transient=True)
+            errors, transient_data = self.dataset_tree.extract_data(transient=True)
             if errors:
                 self.validation_dialog = ValidationDialog(errors)
                 return Extraction(success=False)
 
-        return Extraction(timml=timml_data, ttim=ttim_data)
+        return Extraction(steady=steady_data, transient=transient_data)
 
     def save_as_python(self) -> None:
         outpath, _ = QFileDialog.getSaveFileName(self, "Select file", "", "*.py")
@@ -601,7 +605,7 @@ class DatasetWidget(QWidget):
         if not extraction.success:
             return
 
-        script = data_to_script(extraction.timml, extraction.ttim)
+        script = data_to_script(extraction.steady, extraction.transient)
         with open(outpath, "w") as f:
             f.write(script)
 
@@ -635,8 +639,8 @@ class DatasetWidget(QWidget):
             return True
 
         json_data = data_to_json(
-            extraction.timml,
-            extraction.ttim,
+            extraction.steady,
+            extraction.transient,
             output_options=self.parent.compute_widget.output_options,
         )
 

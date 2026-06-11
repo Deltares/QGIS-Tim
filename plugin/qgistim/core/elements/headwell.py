@@ -27,19 +27,19 @@ from qgistim.core.schemata import (
 
 
 class HeadWellSchema(RowWiseSchema):
-    timml_schemata = {
+    steady_schemata = {
         "geometry": Required(),
         "head": Required(),
         "radius": Required(StrictlyPositive()),
         "resistance": Required(Positive()),
         "layer": Required(Membership("aquifer layers")),
     }
-    ttim_schemata = {
+    transient_schemata = {
         "time_start": Optional(Positive()),
         "time_end": Optional(Positive()),
-        "timeseries_id": Optional(Membership("ttim timeseries IDs")),
+        "timeseries_id": Optional(Membership("transient timeseries IDs")),
     }
-    ttim_consistency_schemata = (
+    transient_consistency_schemata = (
         AllOrNone(("time_start", "time_end", "head_transient")),
         NotBoth("time_start", "timeseries_id"),
     )
@@ -53,7 +53,7 @@ class HeadWellSchema(RowWiseSchema):
 class HeadWell(TransientElement):
     element_type = "Head Well"
     geometry_type = "Point"
-    timml_attributes = (
+    steady_attributes = (
         QgsField("head", QVariant.Double),
         QgsField("radius", QVariant.Double),
         QgsField("resistance", QVariant.Double),
@@ -64,12 +64,12 @@ class HeadWell(TransientElement):
         QgsField("head_transient", QVariant.Double),
         QgsField("timeseries_id", QVariant.Int),
     )
-    ttim_attributes = (
+    transient_attributes = (
         QgsField("timeseries_id", QVariant.Int),
         QgsField("time_start", QVariant.Double),
         QgsField("head", QVariant.Double),
     )
-    timml_defaults = {
+    steady_defaults = {
         "radius": QgsDefaultValue("0.1"),
         "resistance": QgsDefaultValue("0.0"),
     }
@@ -85,7 +85,7 @@ class HeadWell(TransientElement):
     def renderer(cls) -> QgsSingleSymbolRenderer:
         return cls.marker_renderer(color=BLUE, size="3")
 
-    def process_timml_row(self, row, other=None) -> Dict[str, Any]:
+    def process_steady_row(self, row, other=None) -> Dict[str, Any]:
         x, y = self.point_xy(row)
         return {
             "xw": x,
@@ -97,7 +97,7 @@ class HeadWell(TransientElement):
             "label": row["label"],
         }
 
-    def process_ttim_row(self, row, grouped):
+    def process_transient_row(self, row, grouped):
         x, y = self.point_xy(row)
         tsandh, times = self.transient_input(row, grouped, "head")
         return {
@@ -125,7 +125,7 @@ class RemoteHeadWell(HeadWell):
         symbol.changeSymbolLayer(0, arrow)
         return QgsSingleSymbolRenderer(symbol)
 
-    def process_timml_row(self, row, other=None) -> Dict[str, Any]:
+    def process_steady_row(self, row, other=None) -> Dict[str, Any]:
         xy = self.linestring_xy(row)
         xw, yw = xy[-1]
         xc, yc = xy[0]

@@ -7,32 +7,32 @@ from qgistim.core.elements.schemata import RowWiseSchema
 from qgistim.core.schemata import Membership, Positive, Required
 
 
-class ImpermeableLineDoubletSchema(RowWiseSchema):
-    timml_schemata = {
+class ImpermeableWallSchema(RowWiseSchema):
+    steady_schemata = {
         "geometry": Required(),
         "order": Required(Positive()),
         "layer": Required(Membership("aquifer layers")),
     }
 
 
-class ImpermeableLineDoublet(Element):
-    element_type = "Impermeable Line Doublet"
+class ImpermeableWall(Element):
+    element_type = "Impermeable Wall"
     geometry_type = "Linestring"
-    timml_attributes = (
+    steady_attributes = (
         QgsField("order", QVariant.Int),
         QgsField("layer", QVariant.Int),
         QgsField("label", QVariant.String),
     )
-    timml_defaults = {
+    steady_defaults = {
         "order": QgsDefaultValue("4"),
     }
-    schema = ImpermeableLineDoubletSchema()
+    schema = ImpermeableWallSchema()
 
     @classmethod
     def renderer(cls) -> QgsSingleSymbolRenderer:
         return cls.line_renderer(color=RED, width="0.75")
 
-    def process_timml_row(self, row, other=None):
+    def process_steady_row(self, row, other=None):
         return {
             "xy": self.linestring_xy(row),
             "layers": row["layer"],
@@ -40,10 +40,10 @@ class ImpermeableLineDoublet(Element):
             "label": row["label"],
         }
 
-    def to_ttim(self, other):
-        # TTim doesn't have an ImpermeableLineDoublet, we need to add "imp" as
+    def extract_transient_data(self, other):
+        # TTim doesn't have an ImpermeableWall, we need to add "imp" as
         # the resistance entry.
-        _, data = self.to_timml(other)
+        _, data = self.extract_steady_data(other)
         out = []
         for row in data:
             out.append(

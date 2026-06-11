@@ -10,7 +10,7 @@ from qgistim.core.schemata import Positive, Required, StrictlyPositive
 
 
 class PolygonSemiConfinedTopSchema(RowWiseSchema):
-    timml_schemata = {
+    steady_schemata = {
         "geometry": Required(),
         "aquitard_c": Required(StrictlyPositive()),
         "semiconf_top": Required(),
@@ -23,14 +23,14 @@ class PolygonSemiConfinedTopSchema(RowWiseSchema):
 class PolygonSemiConfinedTop(Element):
     element_type = "Polygon Semi-Confined Top"
     geometry_type = "Polygon"
-    timml_attributes = (
+    steady_attributes = (
         QgsField("aquitard_c", QVariant.Double),
         QgsField("semiconf_top", QVariant.Double),
         QgsField("semiconf_head", QVariant.Double),
         QgsField("order", QVariant.Int),
         QgsField("ndegrees", QVariant.Int),
     )
-    timml_defaults = {
+    steady_defaults = {
         "order": QgsDefaultValue("4"),
         "ndegrees": QgsDefaultValue("6"),
     }
@@ -42,7 +42,7 @@ class PolygonSemiConfinedTop(Element):
             color=TRANSPARENT_BLUE, color_border=BLUE, width_border="0.75"
         )
 
-    def process_timml_row(self, row, other):
+    def process_steady_row(self, row, other):
         raw_data = deepcopy(other["global_aquifer"])
         raw_data["aquitard_c"][0] = row["aquitard_c"]
         raw_data["semiconf_top"][0] = row["semiconf_top"]

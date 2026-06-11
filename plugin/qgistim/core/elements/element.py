@@ -109,33 +109,33 @@ class NameDialog(QDialog):
 
 class Element(ExtractorMixin, abc.ABC):
     """
-    Abstract base class for "ordinary" timml elements.
+    Abstract base class for "ordinary" tim elements.
     """
 
     element_type = None
     geometry_type = None
-    timml_attributes = ()
-    ttim_attributes = ()
+    steady_attributes = ()
+    transient_attributes = ()
     assoc_attributes = ()
     transient_columns = ()
-    timml_defaults = {}
-    ttim_defaults = {}
+    steady_defaults = {}
+    transient_defaults = {}
     assoc_defaults = {}
 
     def _initialize_default(self, path, name):
         self.name = name
         self.path = path
-        self.timml_name = None
-        self.ttim_name = None
+        self.steady_name = None
+        self.transient_name = None
         self.assoc_name = None
-        self.timml_layer = None
-        self.ttim_layer = None
+        self.steady_layer = None
+        self.transient_layer = None
         self.assoc_layer = None
         self.item = None
 
     def __init__(self, path: str, name: str):
         self._initialize_default(path, name)
-        self.timml_name = f"timml {self.element_type}:{name}"
+        self.steady_name = f"steady-state {self.element_type}:{name}"
 
     @classmethod
     def dialog(cls, path: str, crs: Any, iface: Any, names: List[str]):
@@ -163,29 +163,29 @@ class Element(ExtractorMixin, abc.ABC):
         layer.setCrs(crs)
         return layer
 
-    def create_timml_layer(self, crs: Any):
-        self.timml_layer = self.create_layer(
+    def create_steady_layer(self, crs: Any):
+        self.steady_layer = self.create_layer(
             crs=crs,
             geometry_type=self.geometry_type,
-            name=self.timml_name,
-            attributes=self.timml_attributes,
+            name=self.steady_name,
+            attributes=self.steady_attributes,
         )
 
-    def create_ttim_layer(self, crs: Any):
+    def create_transient_layer(self, crs: Any):
         pass
 
     def create_assoc_layer(self, crs: Any):
         pass
 
     def create_layers(self, crs: Any):
-        self.create_timml_layer(crs)
-        self.create_ttim_layer(crs)
+        self.create_steady_layer(crs)
+        self.create_transient_layer(crs)
         self.create_assoc_layer(crs)
 
     def set_defaults(self):
         for layer, defaults in zip(
-            (self.timml_layer, self.ttim_layer, self.assoc_layer),
-            (self.timml_defaults, self.ttim_defaults, self.assoc_defaults),
+            (self.steady_layer, self.transient_layer, self.assoc_layer),
+            (self.steady_defaults, self.transient_defaults, self.assoc_defaults),
         ):
             if layer is None:
                 continue
@@ -221,32 +221,32 @@ class Element(ExtractorMixin, abc.ABC):
         """
         return cls.renderer()
 
-    def timml_layer_from_geopackage(self) -> QgsVectorLayer:
-        self.timml_layer = QgsVectorLayer(
-            f"{self.path}|layername={self.timml_name}", self.timml_name
+    def steady_layer_from_geopackage(self) -> QgsVectorLayer:
+        self.steady_layer = QgsVectorLayer(
+            f"{self.path}|layername={self.steady_name}", self.steady_name
         )
 
-    def ttim_layer_from_geopackage(self):
+    def transient_layer_from_geopackage(self):
         return
 
     def assoc_layer_from_geopackage(self):
         return
 
     def load_layers_from_geopackage(self) -> None:
-        self.timml_layer_from_geopackage()
-        self.ttim_layer_from_geopackage()
+        self.steady_layer_from_geopackage()
+        self.transient_layer_from_geopackage()
         self.assoc_layer_from_geopackage()
         self.set_defaults()
         return
 
     def write(self):
-        self.timml_layer = geopackage.write_layer(
-            self.path, self.timml_layer, self.timml_name
+        self.steady_layer = geopackage.write_layer(
+            self.path, self.steady_layer, self.steady_name
         )
         self.set_defaults()
 
     def remove_from_geopackage(self):
-        geopackage.remove_layer(self.path, self.timml_name)
+        geopackage.remove_layer(self.path, self.steady_name)
 
     def on_transient_changed(self, _):
         return
@@ -276,35 +276,35 @@ class Element(ExtractorMixin, abc.ABC):
             return {"Table:": [msg]}
         return {}
 
-    def check_timml_columns(self):
+    def check_steady_columns(self):
         return self._check_table_columns(
-            attributes=self.timml_attributes, layer=self.timml_layer
+            attributes=self.steady_attributes, layer=self.steady_layer
         )
 
-    def to_timml(self, other=None) -> ElementExtraction:
-        missing = self.check_timml_columns()
+    def extract_steady_data(self, other=None) -> ElementExtraction:
+        missing = self.check_steady_columns()
         if missing:
             return ElementExtraction(errors=missing)
 
-        data = self.table_to_records(layer=self.timml_layer)
-        errors = self.schema.validate_timml(
-            name=self.timml_layer.name(), data=data, other=other
+        data = self.table_to_records(layer=self.steady_layer)
+        errors = self.schema.validate_steady(
+            name=self.steady_layer.name(), data=data, other=other
         )
 
         if errors:
             return ElementExtraction(errors=errors)
         else:
-            elements = [self.process_timml_row(row=row, other=other) for row in data]
+            elements = [self.process_steady_row(row=row, other=other) for row in data]
             return ElementExtraction(data=elements)
 
-    def to_ttim(self, other=None) -> ElementExtraction:
-        return self.to_timml(other)
+    def extract_transient_data(self, other=None) -> ElementExtraction:
+        return self.extract_steady_data(other)
 
     def extract_data(self, transient: bool, other=None) -> ElementExtraction:
         if transient:
-            return self.to_ttim(other)
+            return self.extract_transient_data(other)
         else:
-            return self.to_timml(other)
+            return self.extract_steady_data(other)
 
     @staticmethod
     def get_z_data(data) -> list[float]:
@@ -367,53 +367,53 @@ class Element(ExtractorMixin, abc.ABC):
 
 class TransientElement(Element, abc.ABC):
     """
-    Abstract base class for transient (ttim) elements.
+    Abstract base class for transient (transient) elements.
     """
 
     def __init__(self, path: str, name: str):
         self._initialize_default(path, name)
-        self.timml_name = f"timml {self.element_type}:{name}"
-        self.ttim_name = f"ttim {self.element_type}:{name}"
+        self.steady_name = f"steady-state {self.element_type}:{name}"
+        self.transient_name = f"transient {self.element_type}:{name}"
 
-    def create_ttim_layer(self, crs: Any):
-        self.ttim_layer = self.create_layer(
+    def create_transient_layer(self, crs: Any):
+        self.transient_layer = self.create_layer(
             crs=crs,
             geometry_type="No Geometry",
-            name=self.ttim_name,
-            attributes=self.ttim_attributes,
+            name=self.transient_name,
+            attributes=self.transient_attributes,
         )
 
-    def ttim_layer_from_geopackage(self):
-        self.ttim_layer = QgsVectorLayer(
-            f"{self.path}|layername={self.ttim_name}",
-            self.ttim_name,
+    def transient_layer_from_geopackage(self):
+        self.transient_layer = QgsVectorLayer(
+            f"{self.path}|layername={self.transient_name}",
+            self.transient_name,
         )
 
     def write(self):
-        self.timml_layer = geopackage.write_layer(
-            self.path, self.timml_layer, self.timml_name
+        self.steady_layer = geopackage.write_layer(
+            self.path, self.steady_layer, self.steady_name
         )
-        self.ttim_layer = geopackage.write_layer(
-            self.path, self.ttim_layer, self.ttim_name
+        self.transient_layer = geopackage.write_layer(
+            self.path, self.transient_layer, self.transient_name
         )
         self.set_defaults()
 
     def remove_from_geopackage(self):
-        geopackage.remove_layer(self.path, self.timml_name)
-        geopackage.remove_layer(self.path, self.ttim_name)
+        geopackage.remove_layer(self.path, self.steady_name)
+        geopackage.remove_layer(self.path, self.transient_name)
 
     def on_transient_changed(self, transient: bool):
         if len(self.transient_columns) == 0:
             return
 
-        config = self.timml_layer.attributeTableConfig()
+        config = self.steady_layer.attributeTableConfig()
         columns = config.columns()
 
         for i, column in enumerate(columns):
             if column.name in self.transient_columns:
                 config.setColumnHidden(i, not transient)
 
-        self.timml_layer.setAttributeTableConfig(config)
+        self.steady_layer.setAttributeTableConfig(config)
         return
 
     @staticmethod
@@ -446,26 +446,26 @@ class TransientElement(Element, abc.ABC):
         else:
             return [(0.0, 0.0)], {0.0}
 
-    def check_ttim_columns(self):
+    def check_transient_columns(self):
         return self._check_table_columns(
-            attributes=self.ttim_attributes, layer=self.ttim_layer
+            attributes=self.transient_attributes, layer=self.transient_layer
         )
 
-    def to_ttim(self, other):
-        missing = self.check_ttim_columns()
+    def extract_transient_data(self, other):
+        missing = self.check_transient_columns()
         if missing:
             return ElementExtraction(errors=missing)
 
         other = other.copy()  # avoid side-effects
-        timeseries = self.table_to_dict(self.ttim_layer)
+        timeseries = self.table_to_dict(self.transient_layer)
         if timeseries:
-            other["ttim timeseries IDs"] = set(timeseries["timeseries_id"])
+            other["transient timeseries IDs"] = set(timeseries["timeseries_id"])
         else:
-            other["ttim timeseries IDs"] = {None}
+            other["transient timeseries IDs"] = {None}
 
-        data = self.table_to_records(self.timml_layer)
-        errors = self.schema.validate_ttim(
-            name=self.timml_layer.name(), data=data, other=other
+        data = self.table_to_records(self.steady_layer)
+        errors = self.schema.validate_transient(
+            name=self.steady_layer.name(), data=data, other=other
         )
         if errors:
             return ElementExtraction(errors=errors)
@@ -487,7 +487,7 @@ class TransientElement(Element, abc.ABC):
         elements = []
         times = set()
         for row in data:
-            row_data, row_times = self.process_ttim_row(row, grouped)
+            row_data, row_times = self.process_transient_row(row, grouped)
             elements.append(row_data)
             times.update(row_times)
 
@@ -502,8 +502,8 @@ class AssociatedElement(Element, abc.ABC):
 
     def __init__(self, path: str, name: str):
         self._initialize_default(path, name)
-        self.timml_name = f"timml {self.element_type}:{name}"
-        self.assoc_name = f"timml {self.element_type} Properties:{name}"
+        self.steady_name = f"steady-state {self.element_type}:{name}"
+        self.assoc_name = f"steady-state {self.element_type} Properties:{name}"
 
     def create_assoc_layer(self, crs: Any):
         self.assoc_layer = self.create_layer(
@@ -520,8 +520,8 @@ class AssociatedElement(Element, abc.ABC):
         )
 
     def write(self):
-        self.timml_layer = geopackage.write_layer(
-            self.path, self.timml_layer, self.timml_name
+        self.steady_layer = geopackage.write_layer(
+            self.path, self.steady_layer, self.steady_name
         )
         self.assoc_layer = geopackage.write_layer(
             self.path, self.assoc_layer, self.assoc_name
@@ -529,12 +529,12 @@ class AssociatedElement(Element, abc.ABC):
         self.set_defaults()
 
     def remove_from_geopackage(self):
-        geopackage.remove_layer(self.path, self.timml_name)
+        geopackage.remove_layer(self.path, self.steady_name)
         geopackage.remove_layer(self.path, self.assoc_name)
 
-    def to_timml(self, other) -> ElementExtraction:
+    def extract_steady_data(self, other) -> ElementExtraction:
         missing = self._check_table_columns(
-            attributes=self.timml_attributes, layer=self.timml_layer
+            attributes=self.steady_attributes, layer=self.steady_layer
         )
         if missing:
             return ElementExtraction(errors=missing)
@@ -548,9 +548,9 @@ class AssociatedElement(Element, abc.ABC):
         else:
             other["properties inhomogeneity_id"] = [None]
 
-        data = self.table_to_records(self.timml_layer)
-        errors = self.schema.validate_timml(
-            name=self.timml_layer.name(),
+        data = self.table_to_records(self.steady_layer)
+        errors = self.schema.validate_steady(
+            name=self.steady_layer.name(),
             data=data,
             other=other,
         )
@@ -560,7 +560,7 @@ class AssociatedElement(Element, abc.ABC):
         grouped = self.groupby(properties, "inhomogeneity_id")
         errors = {}
         for inhom_id, group in grouped.items():
-            _errors = self.assoc_schema.validate_timml(
+            _errors = self.assoc_schema.validate_steady(
                 name=f"Properties, inhomogeneity_id {inhom_id}",
                 data=group,
                 other=other,
@@ -570,8 +570,8 @@ class AssociatedElement(Element, abc.ABC):
         if errors:
             return ElementExtraction(errors=errors)
 
-        elements = [self.process_timml_row(row=row, grouped=grouped) for row in data]
+        elements = [self.process_steady_row(row=row, grouped=grouped) for row in data]
         return ElementExtraction(data=elements)
 
-    def to_ttim(self, _):
+    def extract_transient_data(self, _):
         raise NotImplementedError(f"{type(self).__name__} is not supported in TTim.")

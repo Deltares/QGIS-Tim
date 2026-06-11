@@ -6,34 +6,33 @@ from typing import Any, Dict, List, Union
 
 import numpy as np
 import pandas as pd
-import timml
-import ttim
+import timflow
 import xarray as xr
 
 from gistim.geopackage import CoordinateReferenceSystem, write_geopackage
 from gistim.netcdf import write_raster, write_ugrid
 
-TIMML_MAPPING = {
-    "Constant": timml.Constant,
-    "Uflow": timml.Uflow,
-    "CircAreaSink": timml.CircAreaSink,
-    "Well": timml.Well,
-    "HeadWell": timml.HeadWell,
-    "PolygonInhomMaq": timml.PolygonInhomMaq,
-    "HeadLineSinkString": timml.HeadLineSinkString,
-    "LineSinkDitchString": timml.LineSinkDitchString,
-    "LeakyLineDoubletString": timml.LeakyLineDoubletString,
-    "ImpLineDoubletString": timml.ImpLineDoubletString,
-    "BuildingPit": timml.BuildingPitMaq,
-    "LeakyBuildingPit": timml.LeakyBuildingPitMaq,
+STEADY_MAPPING = {
+    "Constant": timflow.steady.Constant,
+    "Uflow": timflow.steady.Uflow,
+    "CircAreaSink": timflow.steady.CircAreaSink,
+    "Well": timflow.steady.Well,
+    "HeadWell": timflow.steady.HeadWell,
+    "PolygonInhomMaq": timflow.steady.PolygonInhomMaq,
+    "RiverString": timflow.steady.RiverString,
+    "DitchString": timflow.steady.DitchString,
+    "LeakyWallString": timflow.steady.LeakyWallString,
+    "ImpermeableWallString": timflow.steady.ImpermeableWallString,
+    "BuildingPit": timflow.steady.BuildingPitMaq,
+    "LeakyBuildingPit": timflow.steady.LeakyBuildingPitMaq,
 }
-TTIM_MAPPING = {
-    "CircAreaSink": ttim.CircAreaSink,
-    "Well": ttim.Well,
-    "HeadWell": ttim.HeadWell,
-    "HeadLineSinkString": ttim.HeadLineSinkString,
-    "LineSinkDitchString": ttim.LineSinkDitchString,
-    "LeakyLineDoubletString": ttim.LeakyLineDoubletString,
+TRANSIENT_MAPPING = {
+    "CircAreaSink": timflow.transient.CircAreaSink,
+    "Well": timflow.transient.Well,
+    "HeadWell": timflow.transient.HeadWell,
+    "RiverString": timflow.transient.RiverString,
+    "DitchString": timflow.transient.DitchString,
+    "LeakyWallString": timflow.transient.LeakyWallString,
 }
 
 
@@ -47,28 +46,28 @@ def initialize_elements(model, mapping, data):
     return elements
 
 
-def initialize_timml(data):
+def initialize_steady(data):
     aquifer = data.pop("ModelMaq")
-    timml_model = timml.ModelMaq(**aquifer)
-    elements = initialize_elements(timml_model, TIMML_MAPPING, data)
-    return timml_model, elements
+    steady_model = timflow.steady.ModelMaq(**aquifer)
+    elements = initialize_elements(steady_model, STEADY_MAPPING, data)
+    return steady_model, elements
 
 
-def initialize_ttim(data, timml_model):
+def initialize_transient(data, steady_model):
     aquifer = data.pop("ModelMaq")
-    ttim_model = ttim.ModelMaq(**aquifer, timmlmodel=timml_model)
-    elements = initialize_elements(ttim_model, TTIM_MAPPING, data)
-    return ttim_model, elements
+    transient_model = timflow.transient.ModelMaq(**aquifer, steady=steady_model)
+    elements = initialize_elements(transient_model, TRANSIENT_MAPPING, data)
+    return transient_model, elements
 
 
 @singledispatch
 def headgrid(model, **kwargs):
-    raise TypeError("Expected timml or ttim model")
+    raise TypeError("Expected steady or transient model")
 
 
 @headgrid.register
 def _(
-    model: timml.Model,
+    model: timflow.steady.Model,
     xmin: float,
     xmax: float,
     ymin: float,
@@ -77,12 +76,12 @@ def _(
     **_,
 ) -> xr.DataArray:
     """
-    Compute the headgrid of the TimML model, and store the results
+    Compute the headgrid of the steady model, and store the results
     in an xarray DataArray with the appropriate dimensions.
 
     Parameters
     ----------
-    model: timml.Model
+    model: timflow.steady.Model
         Solved model to get heads from
     data: Dict[str, Any]
 
@@ -96,7 +95,7 @@ def _(
     y = np.arange(ymax, ymin, -spacing) - 0.5 * spacing
     head = model.headgrid(xg=x, yg=y)
     nlayer = model.aq.find_aquifer_data(x[0], y[0]).naq
-    layer = [i for i in range(nlayer)]
+    layer = list(range(nlayer))
     return xr.DataArray(
         data=head,
         name="head",
@@ -107,7 +106,7 @@ def _(
 
 @headgrid.register
 def _(
-    model: ttim.ModelMaq,
+    model: timflow.transient.ModelMaq,
     xmin: float,
     xmax: float,
     ymin: float,
@@ -126,14 +125,14 @@ def _(
     nlayer = model.aq.find_aquifer_data(x[0], y[0]).naq
 
     if 0.0 in time:
-        steady_head = model.timmlmodel.headgrid(xg=x, yg=y)[:, np.newaxis, :, :]
+        steady_head = model.steady.headgrid(xg=x, yg=y)[:, np.newaxis, :, :]
         transient_head = model.headgrid(xg=x, yg=y, t=time[1:])
         head = np.hstack((steady_head, transient_head))
     else:
         head = model.headgrid(xg=x, yg=y, t=time)
 
     # Other coordinates
-    layer = [i for i in range(nlayer)]
+    layer = list(range(nlayer))
     time = pd.to_datetime(start_date) + pd.to_timedelta(time, "D")
     return xr.DataArray(
         data=head,
@@ -145,12 +144,12 @@ def _(
 
 @singledispatch
 def compute_head_observations(model, observations):
-    raise TypeError("Expected timml or ttim model")
+    raise TypeError("Expected steady or transient model")
 
 
 @compute_head_observations.register
 def _(
-    model: timml.Model,
+    model: timflow.steady.Model,
     observations: Dict,
     **_,
 ) -> Dict[str, pd.DataFrame]:
@@ -169,7 +168,7 @@ def _(
 
 @compute_head_observations.register
 def _(
-    model: ttim.ModelMaq, observations: Dict, start_date: pd.Timestamp
+    model: timflow.transient.ModelMaq, observations: Dict, start_date: pd.Timestamp
 ) -> Dict[str, pd.DataFrame]:
     d = {
         "geometry": [],
@@ -202,27 +201,27 @@ def _(
 
 @singledispatch
 def compute_pathline(model, **kwargs):
-    raise TypeError("Expected timml or ttim model")
+    raise TypeError("Expected steady-state or transient model")
 
 
 @compute_pathline.register
 def _(
-    model: timml.Model,
+    model: timflow.steady.Model,
     **kwargs,
 ):
-    return timml.trace.timtraceline(model, **kwargs)
+    return timflow.steady.trace.timtraceline(model, **kwargs)
 
 
 @compute_pathline.register
 def _(
-    model: ttim.ModelMaq,
+    model: timflow.transient.ModelMaq,
     **kwargs,
 ):
-    return ttim.trace.timtrace(model, **kwargs)
+    return timflow.transient.trace.timtrace(model, **kwargs)
 
 
 def compute_pathlines(
-    model: timml.Model,
+    model: timflow.steady.Model,
     particle_starts: List[Dict],
     start_date: pd.Timestamp,
 ) -> Dict[str, pd.DataFrame]:
@@ -252,7 +251,7 @@ def extract_discharges(elements, nlayers, **_):
     for layername, content in elements.items():
         sample = content[0]
 
-        if isinstance(sample, timml.WellBase):
+        if isinstance(sample, timflow.steady.WellBase):
             table_rows = []
             for well in content:
                 row = {f"discharge_layer{i}": q for i, q in enumerate(well.discharge())}
@@ -263,7 +262,9 @@ def extract_discharges(elements, nlayers, **_):
                 table_rows.append(row)
             tables[f"discharge-{layername}"] = pd.DataFrame.from_records(table_rows)
 
-        elif isinstance(sample, (timml.LineSinkDitchString, timml.HeadLineSinkString)):
+        elif isinstance(
+            sample, (timflow.steady.DitchString, timflow.steady.RiverString)
+        ):
             table_rows = []
             for linestring in content:
                 discharges = linestring.discharge_per_linesink()
@@ -282,11 +283,11 @@ def extract_discharges(elements, nlayers, **_):
 
 @singledispatch
 def compute_discharge_observations(model, observations):
-    raise TypeError("Expected timml or ttim model")
+    raise TypeError("Expected steady or transient model")
 
 
 @compute_discharge_observations.register
-def _(model: timml.Model, observations: Dict):
+def _(model: timflow.steady.Model, observations: Dict):
     table_rows = []
     for kwargs in observations:
         xy = kwargs["xy"]
@@ -308,13 +309,13 @@ def _(model: timml.Model, observations: Dict):
 
 
 @compute_discharge_observations.register
-def _(model: ttim.ModelMaq, observations: Dict):
-    # intnormflux is not supported by ttim (yet).
+def _(model: timflow.transient.ModelMaq, observations: Dict):
+    # intnormflux is not supported by transient (yet).
     return None
 
 
 def write_output(
-    model: Union[timml.Model, ttim.ModelMaq],
+    model: Union[timflow.steady.Model, timflow.transient.ModelMaq],
     elements: Dict[str, Any],
     data: Dict[str, Any],
     path: Union[pathlib.Path, str],
@@ -371,11 +372,11 @@ def compute_steady(
     with open(path, "r") as f:
         data = json.load(f)
 
-    timml_model, elements = initialize_timml(data["timml"])
-    timml_model.solve()
+    steady_model, elements = initialize_steady(data["steady-state"])
+    steady_model.solve()
 
     write_output(
-        timml_model,
+        steady_model,
         elements,
         data,
         path,
@@ -389,14 +390,16 @@ def compute_transient(
     with open(path, "r") as f:
         data = json.load(f)
 
-    timml_model, _ = initialize_timml(data["timml"])
-    ttim_model, ttim_elements = initialize_ttim(data["ttim"], timml_model)
-    timml_model.solve()
-    ttim_model.solve()
+    steady_model, _ = initialize_steady(data["steady-state"])
+    transient_model, transient_elements = initialize_transient(
+        data["transient"], steady_model
+    )
+    steady_model.solve()
+    transient_model.solve()
 
     write_output(
-        ttim_model,
-        ttim_elements,
+        transient_model,
+        transient_elements,
         data,
         path,
     )

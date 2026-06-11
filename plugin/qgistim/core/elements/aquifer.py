@@ -20,7 +20,7 @@ from qgistim.core.schemata import (
 
 
 class AquiferSchema(TableSchema):
-    timml_schemata = {
+    steady_schemata = {
         "layer": AllRequired(Range()),
         "aquifer_top": AllRequired(StrictlyDecreasing()),
         "aquifer_bottom": AllRequired(StrictlyDecreasing()),
@@ -31,18 +31,18 @@ class AquiferSchema(TableSchema):
         "aquifer_npor": AllOptional(Positive()),
         "aquitard_npor": AllOptional(Positive()),
     }
-    timml_consistency_schemata = (
+    steady_consistency_schemata = (
         SemiConfined(),
         AllGreaterEqual("aquifer_top", "aquifer_bottom"),
     )
-    ttim_schemata = {
+    transient_schemata = {
         "aquitard_s": OffsetAllRequired(Positive()),
         "aquifer_s": AllRequired(Positive()),
     }
 
 
 class TemporalSettingsSchema(SingleRowSchema):
-    ttim_schemata = {
+    transient_schemata = {
         "time_min": Required(StrictlyPositive()),
         "laplace_inversion_M": Required(StrictlyPositive()),
         "start_date": Required(),
@@ -52,7 +52,7 @@ class TemporalSettingsSchema(SingleRowSchema):
 class Aquifer(TransientElement):
     element_type = "Aquifer"
     geometry_type = "No Geometry"
-    timml_attributes = [
+    steady_attributes = [
         QgsField("layer", QVariant.Int),
         QgsField("aquifer_top", QVariant.Double),
         QgsField("aquifer_bottom", QVariant.Double),
@@ -65,16 +65,16 @@ class Aquifer(TransientElement):
         QgsField("aquitard_npor", QVariant.Double),
         QgsField("aquifer_npor", QVariant.Double),
     ]
-    ttim_attributes = (
+    transient_attributes = (
         QgsField("time_min", QVariant.Double),
         QgsField("laplace_inversion_M", QVariant.Int),
         QgsField("start_date", QVariant.DateTime),
     )
-    timml_defaults = {
+    steady_defaults = {
         "aquifer_npor": QgsDefaultValue("0.3"),
         "aquitard_npor": QgsDefaultValue("0.3"),
     }
-    ttim_defaults = {
+    transient_defaults = {
         "time_min": QgsDefaultValue("0.01"),
         "laplace_inversion_M": QgsDefaultValue("10"),
         "start_date": QgsDefaultValue(
@@ -90,42 +90,42 @@ class Aquifer(TransientElement):
 
     def __init__(self, path: str, name: str):
         self._initialize_default(path, name)
-        self.timml_name = f"timml {self.element_type}:Aquifer"
-        self.ttim_name = "ttim Temporal Settings:Aquifer"
+        self.steady_name = f"steady-state {self.element_type}:Aquifer"
+        self.transient_name = "transient Temporal Settings:Aquifer"
 
     def write(self):
-        self.timml_layer = geopackage.write_layer(
-            self.path, self.timml_layer, self.timml_name, newfile=True
+        self.steady_layer = geopackage.write_layer(
+            self.path, self.steady_layer, self.steady_name, newfile=True
         )
-        self.ttim_layer = geopackage.write_layer(
-            self.path, self.ttim_layer, self.ttim_name
+        self.transient_layer = geopackage.write_layer(
+            self.path, self.transient_layer, self.transient_name
         )
         self.set_defaults()
 
     def remove_from_geopackage(self):
         """This element may not be removed."""
-        return
+        pass
 
-    def to_timml(self) -> ElementExtraction:
-        missing = self.check_timml_columns()
+    def extract_steady_data(self) -> ElementExtraction:
+        missing = self.check_steady_columns()
         if missing:
             return ElementExtraction(errors=missing)
 
-        data = self.table_to_dict(layer=self.timml_layer)
-        errors = self.schema.validate_timml(name=self.timml_layer.name(), data=data)
+        data = self.table_to_dict(layer=self.steady_layer)
+        errors = self.schema.validate_steady(name=self.steady_layer.name(), data=data)
         return ElementExtraction(errors=errors, data=data)
 
-    def to_ttim(self) -> ElementExtraction:
-        missing = self.check_ttim_columns()
+    def extract_transient_data(self) -> ElementExtraction:
+        missing = self.check_transient_columns()
         if missing:
             return ElementExtraction(errors=missing)
 
-        data = self.table_to_dict(layer=self.timml_layer)
-        time_data = self.table_to_records(layer=self.ttim_layer)
+        data = self.table_to_dict(layer=self.steady_layer)
+        time_data = self.table_to_records(layer=self.transient_layer)
         errors = {
-            **self.schema.validate_ttim(name=self.timml_layer.name(), data=data),
-            **self.assoc_schema.validate_ttim(
-                name=self.ttim_layer.name(), data=time_data
+            **self.schema.validate_transient(name=self.steady_layer.name(), data=data),
+            **self.assoc_schema.validate_transient(
+                name=self.transient_layer.name(), data=time_data
             ),
         }
         if errors:
@@ -140,33 +140,33 @@ class Aquifer(TransientElement):
         extract_data(transient=True) to get a start_date, which fails in
         validation for steady-state models.
         """
-        time_data = self.table_to_records(layer=self.ttim_layer)
+        time_data = self.table_to_records(layer=self.transient_layer)
         return time_data[0]["start_date"]
 
-    def create_ttim_layer(self, crs):
-        # Initiate the self.ttim_layer and add the default values to it, so that
+    def create_transient_layer(self, crs):
+        # Initiate the self.transient_layer and add the default values to it, so that
         # the user doesn't have to do it manually. This to get a start_date
         # somewhere, which is used in transient simulations as well as particle
         # tracking.
-        super().create_ttim_layer(crs)
+        super().create_transient_layer(crs)
         # Set defaults before row is added, so that default values are applied
         # to the row.
         self.set_defaults()
 
-        if self.ttim_layer.featureCount() > 0:
+        if self.transient_layer.featureCount() > 0:
             # Return if the layer already contains features, to avoid
             # overwriting user input.
             return
 
         # Add a single row to the layer, containing default values.
-        self.ttim_layer.startEditing()
-        feature = QgsVectorLayerUtils.createFeature(self.ttim_layer)
-        self.ttim_layer.addFeature(feature)
-        self.ttim_layer.commitChanges()
-        self.ttim_layer.updateExtents()
+        self.transient_layer.startEditing()
+        feature = QgsVectorLayerUtils.createFeature(self.transient_layer)
+        self.transient_layer.addFeature(feature)
+        self.transient_layer.commitChanges()
+        self.transient_layer.updateExtents()
 
     def extract_data(self, transient: bool) -> ElementExtraction:
         if transient:
-            return self.to_ttim()
+            return self.extract_transient_data()
         else:
-            return self.to_timml()
+            return self.extract_steady_data()

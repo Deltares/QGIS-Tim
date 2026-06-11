@@ -23,41 +23,43 @@ from qgistim.core.schemata import (
 
 
 class ParticleSchema(RowWiseSchema):
-    timml_schemata = {
+    steady_schemata = {
         "geometry": Required(),
         "z_start": Required(),
         "max_horizontal_step": Required(StrictlyPositive()),
         "max_vertical_step_fraction": Required(StrictlyPositive()),
         "nstep_max": Required(StrictlyPositive()),
     }
-    ttim_schemata = {
+    transient_schemata = {
         "time_start": Optional(Positive()),
         "time_step": Optional(Positive()),
         "time_end": Optional(Positive()),
     }
-    timml_consistency_schemata = (
+    steady_consistency_schemata = (
         AllGreaterEqual("z_start", "minimum_z_aquifer"),
         AllLesserEqual("z_start", "maximum_z_aquifer"),
     )
-    ttim_consistency_schemata = (AllOrNone(("time_start", "time_step", "time_end")),)
+    transient_consistency_schemata = (
+        AllOrNone(("time_start", "time_step", "time_end")),
+    )
 
 
 class Particle(TransientElement, abc.ABC):
     element_type = None
     geometry_type = "Point"
-    timml_attributes = (
+    steady_attributes = (
         QgsField("label", QVariant.String),
         QgsField("z_start", QVariant.Double),
         QgsField("max_horizontal_step", QVariant.Double),
         QgsField("max_vertical_step_fraction", QVariant.Double),
         QgsField("nstep_max", QVariant.Int),
     )
-    ttim_attributes = (
+    transient_attributes = (
         QgsField("time_start", QVariant.Double),
         QgsField("time_step", QVariant.Double),
         QgsField("time_end", QVariant.Double),
     )
-    timml_defaults = {
+    steady_defaults = {
         "nstep_max": QgsDefaultValue("100"),
     }
     transient_columns = (
@@ -67,7 +69,7 @@ class Particle(TransientElement, abc.ABC):
     )
     schema = ParticleSchema()
 
-    def process_timml_row(self, row, other=None) -> Dict[str, Any]:
+    def process_steady_row(self, row, other=None) -> Dict[str, Any]:
         x, y = self.point_xy(row)
         return {
             "xstart": x,
@@ -79,7 +81,7 @@ class Particle(TransientElement, abc.ABC):
             "label": row["label"],
         }
 
-    def process_ttim_row(self, row, grouped) -> Dict[str, Any]:
+    def process_transient_row(self, row, grouped) -> Dict[str, Any]:
         x, y = self.point_xy(row)
         return {
             "xstart": x,
@@ -109,15 +111,15 @@ class Particle_Forward(Particle):
 class Particle_Backward(Particle):
     element_type = "Particle Backward"
 
-    def process_timml_row(self, row, other=None) -> Dict[str, Any]:
-        data = super().process_timml_row(row, other)
+    def process_steady_row(self, row, other=None) -> Dict[str, Any]:
+        data = super().process_steady_row(row, other)
         data["hstepmax"] = -data[
             "hstepmax"
         ]  # Reverse horizontal step reverses direction
         return data
 
-    def process_ttim_row(self, row, grouped) -> Dict[str, Any]:
-        data = super().process_ttim_row(row, grouped)
+    def process_transient_row(self, row, grouped) -> Dict[str, Any]:
+        data = super().process_transient_row(row, grouped)
         data["hstepmax"] = -data[
             "hstepmax"
         ]  # Reverse horizontal step reverses direction

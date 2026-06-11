@@ -20,17 +20,17 @@ from qgistim.core.schemata import (
 
 
 class CircularAreaSinkSchema(RowWiseSchema):
-    timml_schemata = {
+    steady_schemata = {
         "geometry": Required(CircularGeometry()),
         "rate": Required(),
         "layer": Required(Membership("aquifer layers")),
     }
-    ttim_schemata = {
+    transient_schemata = {
         "time_start": Optional(Positive()),
         "time_end": Optional(Positive()),
-        "timeseries_id": Optional(Membership("ttim timeseries IDs")),
+        "timeseries_id": Optional(Membership("transient timeseries IDs")),
     }
-    ttim_consistency_schemata = (
+    transient_consistency_schemata = (
         AllOrNone("time_start", "time_end", "rate_transient"),
         NotBoth("time_start", "timeseries_id"),
     )
@@ -44,7 +44,7 @@ class CircularAreaSinkSchema(RowWiseSchema):
 class CircularAreaSink(TransientElement):
     element_type = "Circular Area Sink"
     geometry_type = "Polygon"
-    timml_attributes = (
+    steady_attributes = (
         QgsField("rate", QVariant.Double),
         QgsField("layer", QVariant.Int),
         QgsField("label", QVariant.String),
@@ -53,7 +53,7 @@ class CircularAreaSink(TransientElement):
         QgsField("rate_transient", QVariant.Double),
         QgsField("timeseries_id", QVariant.Int),
     )
-    ttim_attributes = (
+    transient_attributes = (
         QgsField("timeseries_id", QVariant.Int),
         QgsField("time_start", QVariant.Double),
         QgsField("rate", QVariant.Double),
@@ -80,7 +80,7 @@ class CircularAreaSink(TransientElement):
         radius = ((x - xc) ** 2 + (y - yc) ** 2) ** 0.5
         return xc, yc, radius
 
-    def process_timml_row(self, row, other=None) -> Dict[str, Any]:
+    def process_steady_row(self, row, other=None) -> Dict[str, Any]:
         xc, yc, radius = self._centroid_and_radius(row)
         return {
             "xc": xc,
@@ -90,7 +90,7 @@ class CircularAreaSink(TransientElement):
             "label": row["label"],
         }
 
-    def process_ttim_row(self, row, grouped):
+    def process_transient_row(self, row, grouped):
         xc, yc, radius = self._centroid_and_radius(row)
         tsandN, times = self.transient_input(row, grouped, "rate")
         return {

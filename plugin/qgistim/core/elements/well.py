@@ -20,22 +20,22 @@ from qgistim.core.schemata import (
 
 
 class WellSchema(RowWiseSchema):
-    timml_schemata = {
+    steady_schemata = {
         "geometry": Required(),
         "discharge": Required(),
         "radius": Required(StrictlyPositive()),
         "resistance": Required(Positive()),
         "layer": Required(Membership("aquifer layers")),
     }
-    timml_consistency_schemata = (ConditionallyRequired("slug", "caisson_radius"),)
-    ttim_schemata = {
+    steady_consistency_schemata = (ConditionallyRequired("slug", "caisson_radius"),)
+    transient_schemata = {
         "caisson_radius": Optional(StrictlyPositive()),
         "slug": Required(),
         "time_start": Optional(Positive()),
         "time_end": Optional(Positive()),
-        "timeseries_id": Optional(Membership("ttim timeseries IDs")),
+        "timeseries_id": Optional(Membership("transient timeseries IDs")),
     }
-    ttim_consistency_schemata = (
+    transient_consistency_schemata = (
         AllOrNone(("time_start", "time_end", "discharge_transient")),
         NotBoth("time_start", "timeseries_id"),
     )
@@ -49,7 +49,7 @@ class WellSchema(RowWiseSchema):
 class Well(TransientElement):
     element_type = "Well"
     geometry_type = "Point"
-    timml_attributes = (
+    steady_attributes = (
         QgsField("discharge", QVariant.Double),
         QgsField("radius", QVariant.Double),
         QgsField("resistance", QVariant.Double),
@@ -62,12 +62,12 @@ class Well(TransientElement):
         QgsField("slug", QVariant.Bool),
         QgsField("timeseries_id", QVariant.Int),
     )
-    ttim_attributes = (
+    transient_attributes = (
         QgsField("timeseries_id", QVariant.Int),
         QgsField("time_start", QVariant.Double),
         QgsField("discharge", QVariant.Double),
     )
-    timml_defaults = {
+    steady_defaults = {
         "radius": QgsDefaultValue("0.1"),
         "resistance": QgsDefaultValue("0.0"),
         "slug": QgsDefaultValue("False"),
@@ -86,7 +86,7 @@ class Well(TransientElement):
     def renderer(cls) -> QgsSingleSymbolRenderer:
         return cls.marker_renderer(color=GREEN, size="3")
 
-    def process_timml_row(self, row, other=None) -> Dict[str, Any]:
+    def process_steady_row(self, row, other=None) -> Dict[str, Any]:
         x, y = self.point_xy(row)
         return {
             "xw": x,
@@ -98,7 +98,7 @@ class Well(TransientElement):
             "label": row["label"],
         }
 
-    def process_ttim_row(self, row, grouped):
+    def process_transient_row(self, row, grouped):
         x, y = self.point_xy(row)
         tsandQ, times = self.transient_input(row, grouped, "discharge")
         return {

@@ -17,8 +17,8 @@ from qgistim.core.schemata import (
 )
 
 
-class LineSinkDitchSchema(RowWiseSchema):
-    timml_schemata = {
+class DitchSchema(RowWiseSchema):
+    steady_schemata = {
         "geometry": Required(),
         "discharge": Required(),
         "resistance": Required(Positive()),
@@ -26,14 +26,14 @@ class LineSinkDitchSchema(RowWiseSchema):
         "order": Required(Positive()),
         "layer": Required(Membership("aquifer layers")),
     }
-    ttim_consistency_schemata = (
+    transient_consistency_schemata = (
         AllOrNone("time_start", "time_end", "discharge_transient"),
         NotBoth("time_start", "timeseries_id"),
     )
-    ttim_schemata = {
+    transient_schemata = {
         "time_start": Optional(Positive()),
         "time_end": Optional(Positive()),
-        "timeseries_id": Optional(Membership("ttim timeseries IDs")),
+        "timeseries_id": Optional(Membership("transient timeseries IDs")),
     }
     timeseries_schemata = {
         "timeseries_id": AllRequired(),
@@ -42,10 +42,10 @@ class LineSinkDitchSchema(RowWiseSchema):
     }
 
 
-class LineSinkDitch(TransientElement):
-    element_type = "Line Sink Ditch"
+class Ditch(TransientElement):
+    element_type = "Ditch"
     geometry_type = "Linestring"
-    timml_attributes = (
+    steady_attributes = (
         QgsField("discharge", QVariant.Double),
         QgsField("resistance", QVariant.Double),
         QgsField("width", QVariant.Double),
@@ -57,12 +57,12 @@ class LineSinkDitch(TransientElement):
         QgsField("discharge_transient", QVariant.Double),
         QgsField("timeseries_id", QVariant.Int),
     )
-    ttim_attributes = (
+    transient_attributes = (
         QgsField("timeseries_id", QVariant.Int),
         QgsField("time_start", QVariant.Double),
         QgsField("discharge", QVariant.Double),
     )
-    timml_defaults = {
+    steady_defaults = {
         "order": QgsDefaultValue("4"),
     }
     transient_columns = (
@@ -71,13 +71,13 @@ class LineSinkDitch(TransientElement):
         "discharge_transient",
         "timeseries_id",
     )
-    schema = LineSinkDitchSchema()
+    schema = DitchSchema()
 
     @classmethod
     def renderer(cls) -> QgsSingleSymbolRenderer:
         return cls.line_renderer(color=GREEN, width="0.75")
 
-    def process_timml_row(self, row, other=None):
+    def process_steady_row(self, row, other=None):
         return {
             "xy": self.linestring_xy(row),
             "Qls": row["discharge"],
@@ -88,7 +88,7 @@ class LineSinkDitch(TransientElement):
             "label": row["label"],
         }
 
-    def process_ttim_row(self, row, grouped):
+    def process_transient_row(self, row, grouped):
         tsandQ, times = self.transient_input(row, grouped, "discharge")
         return {
             "xy": self.linestring_xy(row),

@@ -22,7 +22,7 @@ from qgistim.core.schemata import (
 
 
 class PolygonInhomogeneitySchema(RowWiseSchema):
-    timml_schemata = {
+    steady_schemata = {
         "geometry": Required(),
         "inhomogeneity_id": Required(Membership("properties inhomogeneity_id")),
         "order": Required(Positive()),
@@ -31,7 +31,7 @@ class PolygonInhomogeneitySchema(RowWiseSchema):
 
 
 class AssociatedPolygonInhomogeneitySchema(TableSchema):
-    timml_schemata = {
+    steady_schemata = {
         "inhomogeneity_id": AllRequired(),
         "layer": AllRequired(Equals("aquifer layers")),
         "aquifer_top": AllRequired(StrictlyDecreasing()),
@@ -42,7 +42,7 @@ class AssociatedPolygonInhomogeneitySchema(TableSchema):
         "semiconf_head": OptionalFirstOnly(),
         "rate": OptionalFirstOnly(),
     }
-    timml_consistency_schemata = (
+    steady_consistency_schemata = (
         SemiConfined(),
         AllGreaterEqual("aquifer_top", "aquifer_bottom"),
     )
@@ -51,7 +51,7 @@ class AssociatedPolygonInhomogeneitySchema(TableSchema):
 class PolygonInhomogeneity(AssociatedElement):
     element_type = "Polygon Inhomogeneity"
     geometry_type = "Polygon"
-    timml_attributes = (
+    steady_attributes = (
         QgsField("inhomogeneity_id", QVariant.Int),
         QgsField("order", QVariant.Int),
         QgsField("ndegrees", QVariant.Int),
@@ -69,7 +69,7 @@ class PolygonInhomogeneity(AssociatedElement):
         QgsField("aquitard_npor", QVariant.Double),
         QgsField("aquifer_npor", QVariant.Double),
     ]
-    timml_defaults = {
+    steady_defaults = {
         "order": QgsDefaultValue("4"),
         "ndegrees": QgsDefaultValue("6"),
         "inhomogeneity_id": QgsDefaultValue("1"),
@@ -86,7 +86,7 @@ class PolygonInhomogeneity(AssociatedElement):
             color=TRANSPARENT_GREY, color_border=GREY, width_border="0.75"
         )
 
-    def process_timml_row(self, row: Dict[str, Any], grouped: Dict[int, Any]):
+    def process_steady_row(self, row: Dict[str, Any], grouped: Dict[int, Any]):
         inhom_id = row["inhomogeneity_id"]
         raw_data = grouped[inhom_id]
         aquifer_data = self.aquifer_data(raw_data, transient=False)
