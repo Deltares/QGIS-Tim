@@ -133,10 +133,10 @@ def headgrid_code(domain) -> Tuple[str, str]:
     return xg, yg, t
 
 
-def elements_and_observations(data, mapping: Dict[str, str], tim: str):
+def elements_and_observations(data, mapping: Dict[str, str], temporal_mode: str):
     strings = []
     observations = []
-    model_string = textwrap.indent(f"model={tim}_model,", prefix=PREFIX)
+    model_string = textwrap.indent(f"model={temporal_mode}_model,", prefix=PREFIX)
 
     for layername, element_data in data.items():
         prefix, name = layername.split(":")
@@ -155,12 +155,12 @@ def elements_and_observations(data, mapping: Dict[str, str], tim: str):
                 # )
                 kwargs.pop("label")
                 observations.append(
-                    f"observation_{sanitized(name)}_{i}={tim}_model.head(\n{format_kwargs(kwargs)}\n)"
+                    f"observation_{sanitized(name)}_{i}={temporal_mode}_model.head(\n{format_kwargs(kwargs)}\n)"
                 )
             elif plugin_name == "Discharge Observation":
                 kwargs.pop("label")
                 observations.append(
-                    f"discharge_observation_{sanitized(name)}_{i}={tim}_model.intnormflux(\n{format_kwargs(kwargs)}\n)"
+                    f"discharge_observation_{sanitized(name)}_{i}={temporal_mode}_model.intnormflux(\n{format_kwargs(kwargs)}\n)"
                 )
             else:
                 # Has to be added to the model.
@@ -171,7 +171,7 @@ def elements_and_observations(data, mapping: Dict[str, str], tim: str):
                 # )
                 kwargs = format_kwargs(kwargs)
                 strings.append(
-                    f"{tim}_{sanitized(name)}_{i} = timflow.{tim}.{tim_name}(\n{model_string}\n{kwargs}\n)"
+                    f"{temporal_mode}_{sanitized(name)}_{i} = timflow.{temporal_mode}.{tim_name}(\n{model_string}\n{kwargs}\n)"
                 )
 
     return strings, observations
@@ -190,7 +190,7 @@ def steady_script_content(data: Dict[str, Any]):
     ]
 
     element_strings, observations = elements_and_observations(
-        data, STEADY_MAPPING, tim="steady-state"
+        data, STEADY_MAPPING, temporal_mode="steady-state"
     )
     strings = strings + element_strings
     return strings, observations
@@ -221,7 +221,7 @@ def transient_script(
     )
 
     element_strings, observations = elements_and_observations(
-        data, TRANSIENT_MAPPING, tim="transient"
+        data, TRANSIENT_MAPPING, temporal_mode="transient"
     )
     strings = strings + element_strings
     strings.append("\nsteady-state_model.solve()\ntransient_model.solve()\n")
