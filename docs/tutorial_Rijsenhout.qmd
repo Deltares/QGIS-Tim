@@ -152,13 +152,13 @@ Your window looks like in @fig-Panel-QGIS-Tim.
 
 ![QGIS-Tim panel](figures/tutorial/Panel-QGIS-Tim.png){width=50% #fig-Panel-QGIS-Tim}
 
-(@) Check in the *Layers* panel on the left that your new geopackage is added as a group. <br> A sub group **timml** for the steady state model input and the sub group **ttim** for the transient model input.
+(@) Check in the *Layers* panel on the left that your new geopackage is added as a group. <br> A sub group **steady-state** for the steady state model input and the sub group **transient** for the transient model input.
 
 If you had no introduction to the Tim plugin, read the Intermezzo below for a general explanation of the components.
 
 > **Intermezzo:** *introduction Tabs on the Tim panel*
 >
-> - Model Manager: an overview of the elements in your geopackage. In case you switch to transient modelling, an extra column with *ttim* elements is added.
+> - Model Manager: an overview of the elements in your geopackage. In case you switch to transient modelling, an extra column with *transient* elements is added.
 > - Elements: a list of at least 16 Tim elements from which you can build your model.
 > - Results: here you can define your domain and cell size, decide if your model is transient or not and manage the output files.
 
@@ -168,7 +168,7 @@ Now we are ready to define our first steady state model by parameterizing our Aq
 We start with a very simple 'model', only the parameters of a single aquifer. <br>
 Important message: all editing of model parameters and model elements you do in the *Layers* panel on the left!
 
-(@) So select the layer "timml Aquifer:Aquifer" on the left.
+(@) So select the layer "steady-state Aquifer:Aquifer" on the left.
 (@) Click your right mouse button and from the menu select *Attribute Table* to open the table in a new window. <br> **NB** Alternative is to press F6 or use the button *Open Attribute Table* (![](figures/tutorial/button-Qgis-OpenAttributeTable.png){width=3%}).
 (@) Start the editing mode with a click on the *Toggle Editing Mode* button (![](figures/tutorial/button-Qgis-AttributeTable-StartEditingMode.png ){width=4%}).
 (@) Hover with your mouse over the buttons and find the *Add Feature* button (![](figures/tutorial/button-AttributeTable-AddFeature.png){width=20%}). Perhaps button 5 from left.
@@ -223,9 +223,9 @@ The calculation result is now visible and we see a mesh with just the value 0, n
 (@) Click on the element "Well" and a window opens to create a new (vector) layer in QGIS.
 (@) Give the layer a name, e.g. "DewateringWell" and click *OK*.
 
-See that layer "timml Well:DewateringWell" is added to the timml sub group in your geopackage with 'point' as geometry. Also in the ttim sub group an element with the same name is added. This is a table that can store transient well data while referring to the x/y locations in the timml layer. Next step is to add the actual well, both the location and its parameters.
+See that layer "steady-state Well:DewateringWell" is added to the steady-state sub group in your geopackage with 'point' as geometry. Also in the transient sub group an element with the same name is added. This is a table that can store transient well data while referring to the x/y locations in the steady-state layer. Next step is to add the actual well, both the location and its parameters.
 
-(@) Select the layer "timml Well:DewateringWell".
+(@) Select the layer "steady-state Well:DewateringWell".
 (@) Click your right mouse button and select the *Toggle Editing Mode* (![](figures/tutorial/button-Qgis-AttributeTable-StartEditingMode.png ){width=4%}).
 (@) To add a new well (feature) to the layer click the *Add Point Feature* button (![](figures/tutorial/button_AddPointFeature.png){width=4%}).
 (@) With your mouse, click on a location in the centre of the group of bombs.
@@ -275,7 +275,7 @@ A single aquifer is of course not enough to describe the geology of our project 
 
 ![Project area cross section (left) lifting the World War II bomb (right)](figures/tutorial/photo-fieldwork-liftbomb-crosssection.jpg){width=100% #fig-photo-fieldwork-liftbomb-crosssection}
 
-(@) In your geopackage select the layer "timml Aquifer:Aquifer" and click your right mouse button.
+(@) In your geopackage select the layer "steady-state Aquifer:Aquifer" and click your right mouse button.
 (@) From the menu select *Open Attribute Table* and the table opens in a new window. Once again, press F6 for a quick open of the Attribute Table.
 (@) Start the editing mode with a click on the *Toggle Editing Mode* button (![](figures/tutorial/button-Qgis-AttributeTable-StartEditingMode.png ){width=4%}).
 (@) Add three extra aquifers / features; click three times on the *Add Feature* button (![](figures/tutorial/button-AttributeTable-AddFeature.png){width=15%}).
@@ -310,7 +310,7 @@ Now we introduce a new but frequently used element: the sheet pile.
 (@) Return to the QGIS-Tim panel and go to the tab *Elements*.
 (@) Click on the element "Leaky Wall".
 (@) Give the layer a name, e.g. "sheetpile".
-(@) In your geopackage select the layer "timml Leaky Wall:sheetpile" and start editing using the *Toggle Editing Mode* button (![](figures/tutorial/button-Qgis-AttributeTable-StartEditingMode.png ){width=4%}).
+(@) In your geopackage select the layer "steady-state Leaky Wall:sheetpile" and start editing using the *Toggle Editing Mode* button (![](figures/tutorial/button-Qgis-AttributeTable-StartEditingMode.png ){width=4%}).
 (@) In the editing mode, the *Add Line Feature* button (![](figures/tutorial/button_AddLineFeature.png){width=4%}) is available. Click the button and draw a box around the 5 bombs (click left to start, click right to close).
 (@) In the *Feature Attributes* window make resistance = 1500 and layer = 0.
 (@) Click *OK*.
@@ -365,11 +365,11 @@ To prevent damage on the private properties caused by the dewatering, the author
 (@) On the tab *Elements* in QGIS-Tim click on the element "Ditch".
 (@) Give the layer a name, e.g. "InfiltrationWell".
 
-See that layer "timml Ditch:InfiltrationWell" is added to the timml sub group in your geopackage with 'line' as geometry. For the transient version of the model a table with the same name is added to the ttim sub group. Next step is to add the location of the horizontal well and its capacity.
+See that layer "steady-state Ditch:InfiltrationWell" is added to the steady-state sub group in your geopackage with 'line' as geometry. For the transient version of the model a table with the same name is added to the transient sub group. Next step is to add the location of the horizontal well and its capacity.
 
 (@) Click the *Measure Line" button (![](figures/tutorial/button_MeasureLine.png){width=4%}) from the "Attributes Toolbar".
 (@) With your left mouse button try to get an idea what a distance of 400 m along the road looks like. Close the window.
-(@) Select the layer "timml Ditch:InfiltrationWell".
+(@) Select the layer "steady-state Ditch:InfiltrationWell".
 (@) Start editing with the *Toggle Editing Mode*.
 (@) Use the *Add Line Feature* button (![](figures/tutorial/button_AddLineFeature.png){width=4%}) to draw a 400 m line (click left to start, click right to close).
 (@) Fill these feature within the table: discharge = -1000 (negative abstraction is flux into the model), resistance = 1, width = 1, layer = 0! not *NULL* ;-). By default order = 4.
@@ -385,11 +385,11 @@ We have the Value Tool and the Cross section tool to check for calculated values
 
 (@) On the tab *Elements* in QGIS-Tim click on the element "Head Observation".
 (@) Give the layer a name, e.g. "Piezometers".
-(@) Select the new layer "timml Head Observation:Piezometers".
+(@) Select the new layer "steady-state Head Observation:Piezometers".
 (@) Start editing with the *Toggle Editing Mode* and use *Add Point Feature* button (![](figures/tutorial/button_AddPointFeature.png){width=4%}).
 (@) Click with your left mouse button to place a point near point A.
 (@) In the poped up window fill in Label = A and click *OK*.
-(@) Go to the layer "timml Head Observation:Piezometers", click your right mouse button and activate "![](figures/tutorial/icon-showlabels.png){width=4%} show labels"
+(@) Go to the layer "steady-state Head Observation:Piezometers", click your right mouse button and activate "![](figures/tutorial/icon-showlabels.png){width=4%} show labels"
 (@) Add point B close to the dwatering well (@fig-figure_ObservationsLocations).
 
 ![Observation locations (*A*-*E*) together with other Tim elements](figures/tutorial/figure_ObservationsLocations.png){width=80% #fig-figure_ObservationsLocations}
@@ -398,13 +398,13 @@ Are you tired of the pop-up window every time you add a point? There is an optio
 
 (@) On the tab *Model Manager*, in the lowest section, check the option "Suppress attribute form pop-up after feature creation".
 (@) Place points C to E.
-(@) Open the Attribute Table from layer "timml Head Observation:Piezometers" and fill in the Labels C to E.
+(@) Open the Attribute Table from layer "steady-state Head Observation:Piezometers" and fill in the Labels C to E.
 (@) Save your changes and stop the editing mode.
 (@) Compute the model again.
 
 The observed values are saved in a new layer under the existing group "case-Rijsenhout output" and sub group "vector".
 
-(@) In this sub group select the layer "case-Rijsenhout-timml Head Observation:Piezometers" and check the calculated values within this layer by opening the Attribute Table (F6).
+(@) In this sub group select the layer "case-Rijsenhout-steady-state Head Observation:Piezometers" and check the calculated values within this layer by opening the Attribute Table (F6).
 (@) Close the Attribute Table.
 
 ### Draw Contour Lines
@@ -420,10 +420,10 @@ A layer with your contours is saved in the group "case-Rijsenhout-output:vector"
 
 ## Model 7: determine the influence of the nearby lake
 East of the project area there is a large lake. What will be the influence of this lake? Let's find out. <br>
-In Tim a lake is added as an inhomogeneity within the total model domain. This domain is described in table "timml Aquifer:Aquifer" we filled in with the first model.
+In Tim a lake is added as an inhomogeneity within the total model domain. This domain is described in table "steady-state Aquifer:Aquifer" we filled in with the first model.
 
 (@) On the tab *Elements* in QGIS-Tim click on the element "Polygon Semi-Confined Top".
-(@) Give the layer a name, e.g. "Lake" and find out that layer "timml Polygon Semi-Confined Top:Lake" is added to the geopackage.
+(@) Give the layer a name, e.g. "Lake" and find out that layer "steady-state Polygon Semi-Confined Top:Lake" is added to the geopackage.
 (@) Start editing with the *Toggle Editing Mode* and use *Add Polygon Feature* button (![](figures/tutorial/button_AddPolygonFeature.png){width=4%}) to add the Lake contour. <br> **NB** Try to minimize the number of segments because each segment slows down the calculations. With QGIS it is tempting to use detail but the influence of detail on the outcome is small.
 (@) Fill the Lake feature with the following parameters: aquitard_c = 500, semiconf_top = -7 (bottom of the Lake) and semiconf_head = -2 (water level).
 (@) Save your changes and rerun the model.
@@ -434,7 +434,7 @@ In Tim a lake is added as an inhomogeneity within the total model domain. This d
 You can not miss the effect of the Lake in this calculation. In many cases you like to analyse or even save this difference. Let's see how we can use Tim and QGIS to isolate the effect. Therefor we rerun the model without the Lake and rename the output.
 
 (@) In QGIS-Tim go to the tab *Model Manager*.
-(@) In the list of Steady State elements switch off "timml Polygon Semi-Confined Top:Lake".
+(@) In the list of Steady State elements switch off "steady-state Polygon Semi-Confined Top:Lake".
 (@) Go to the tab *Results*.
 (@) Click the button *Set path as ...* and change the name of the output, e.g. "case-Rijsenhout-NoLake".
 (@) Click *Compute* to run the model without the Lake.
@@ -457,48 +457,48 @@ Now you are ready for the last step: make your model transient. We keep it simpl
 (@) In the section *Model Setup* turn on the option "Transient".
 (@) See below that only 5 elements have a transient component.
 
-By selecting the "transient" option, columns containing extra parameters necessary for a transient model have been unhidden now. First of all we see it in the layer "timml Aquifer:Aquifer" where columns "storage" and "porosity are visible now.
+By selecting the "transient" option, columns containing extra parameters necessary for a transient model have been unhidden now. First of all we see it in the layer "steady-state Aquifer:Aquifer" where columns "storage" and "porosity are visible now.
 
-(@) In your geopackage select the layer "timml Aquifer:Aquifer".
+(@) In your geopackage select the layer "steady-state Aquifer:Aquifer".
 (@) Open its table, start the editing mode and for every layer set both acquifer_s and acquitard_s to 0.001. Acquitard_s (layer 0) = 0.25. You can use copy and paste to do it quickly.
 
 **NB!** In transient mode, Tim can not handle aquitard with zero thickness so let's set the aquitard thickness to 0.1 m
 
 (@) Change the values in the column "aquifer_top" to -17.0, -22.1, -27.1 and -47.1 m.
-(@) In your geopackage select the layer "ttim Temporal Settings:Aquifer" to define the temporal properties of the model.
+(@) In your geopackage select the layer "transient Temporal Settings:Aquifer" to define the temporal properties of the model.
 (@) Open its table, start the editing mode and add a new feature.
 (@) Make sure that tmin=0.01, tmax=30, tstart=0, reference_date=2023-03-23 00:00:00.
-(@) In your geopackage select the layer "ttim Computation Times:Domain" in order to define the moments in time for which raster output is saved.
+(@) In your geopackage select the layer "transient Computation Times:Domain" in order to define the moments in time for which raster output is saved.
 (@) Open its table, start the editing mode and add 7 features / periods (click 7 times "Add feature").
 (@) In the column "time" add the moments 1,2,5,10, 15, 20 and 30.
 (@) Save and Close the table.
 
 For the observations we can define a different set of output moments.
 
-(@) In your geopackage select the layer "ttim Head Observation:Piezometers".
+(@) In your geopackage select the layer "transient Head Observation:Piezometers".
 (@) Open its table, start the editing mode and add 10 features / periods (click 10 times "Add feature").
 (@) In the column "time" add the moments 1,2,3,4,5,10,15,20,25 and 30.
 (@) Save and Close the table.
 
 Special attention for the Well package while it has 2 options to make it transient:
 
-- Simple: a well can be switched on and off only once. Parameters are set in the stationary part of the model, so in "timml Well:DewateringWell".
-- Detailed: a well can be switched on and off multiple times within the modelled period. Parameters are set in the transient part of the model, so in "ttim Well:DewateringWell".
+- Simple: a well can be switched on and off only once. Parameters are set in the stationary part of the model, so in "steady-state Well:DewateringWell".
+- Detailed: a well can be switched on and off multiple times within the modelled period. Parameters are set in the transient part of the model, so in "transient Well:DewateringWell".
 
 In this tutorial we show you the simple version.
 
-(@) In your geopackage select the layer "timml Well:DewateringWell".
+(@) In your geopackage select the layer "steady-state Well:DewateringWell".
 (@) Open its table, start the editing mode and see that 6 extra columns with time dependent parameters are visible now ("time_start", "time_end", "discharge_transient", "caisson_radius", "slug" and "timeseries_id").
 (@) Switch off the Steady State abstraction, make discharge = 0 (was 2000).
 (@) Switch on the Transient abstraction: time_start = 2, time_end = 30, discharge_transient = 2000, caisson_radius = 1.
 (@) Save your changes.
 (@) Compute your transient model in the tab *Results*.
 
-In case of a successful calculation a new layer is added to your Vector output: case-Rijsenhout-ttim Head Observation:Piezometers. This layer contains transient data which is indicated with the clock icon right from the layer name. There are 2  ways to visualize these calculated heads in the observations point a) animation over time and b) timeseries at location.
+In case of a successful calculation a new layer is added to your Vector output: case-Rijsenhout-transient Head Observation:Piezometers. This layer contains transient data which is indicated with the clock icon right from the layer name. There are 2  ways to visualize these calculated heads in the observations point a) animation over time and b) timeseries at location.
 
 (@) For the animation over time, activate the *Temporal Control Panel* with the button ![](figures/tutorial/button_TemporalControllerPanel.png){width=4%} on the Map Navigation Toolbar.
 (@) For timeseries at location activate the Timeseries panel with the *Timeseries* button (![](figures/tutorial/button_iMOD-TimeSeries.png){width=4%}) on the iMOD Toolbar.
-(@) Be sure that "case-Rijsenhout-ttim Head Observation:Piezometers" is checked and "case-Rijsenhout-timml Head Observation:Piezometers" is unchecked.
+(@) Be sure that "case-Rijsenhout-transient Head Observation:Piezometers" is checked and "case-Rijsenhout-steady-state Head Observation:Piezometers" is unchecked.
 (@) In the Temporal Controller panel click the green play button (![](figures/tutorial/button_TemporalControllerPanel-menu.png){width=14%}). Navigation buttons appear.
 (@) Increase the *Step* to 16 hours and start the animation with a click on the *Play* button (![](figures/tutorial/button_TemporalControler-play.png){width=4%}).
 
@@ -514,7 +514,7 @@ Only the first few days you see most prominent drawdown. Let's now display the t
 
 In the same way you can display the time series from the Observations.
 
-(@) In the iMOD time series panel select the layer "case-Rijsenhout-ttim Head Observation:Piezometers".
+(@) In the iMOD time series panel select the layer "case-Rijsenhout-transient Head Observation:Piezometers".
 (@) For "ID column:" select *label* and for "Variable:" select *head_layer0*. Don't forget to **deselect *fid***.
 (@) Click the button *Select Points* and draw a box with your mouse to select one or more observation points.
 (@) Click the *Plot* button and the selected timeseries are added to the chart.
