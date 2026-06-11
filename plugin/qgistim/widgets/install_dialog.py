@@ -24,7 +24,7 @@ class InstallTask(QgsTask):
         if result:
             self.message_bar.pushMessage(
                 title="Info",
-                text="Succesfully installed TimML and TTim server",
+                text="Successfully installed timflow server",
                 level=Qgis.Info,
             )
         else:
@@ -35,7 +35,7 @@ class InstallTask(QgsTask):
 
             self.message_bar.pushMessage(
                 title="Error",
-                text=f"Failed to install TimML and TTim server. {message}",
+                text=f"Failed to install timflow server. {message}",
                 level=Qgis.Critical,
             )
         return
@@ -87,7 +87,7 @@ class InstallDialog(QDialog):
     def __init__(self, parent=None):
         QDialog.__init__(self, parent)
         self.parent = parent
-        self.setWindowTitle("Install TimML and TTim server")
+        self.setWindowTitle("Install timflow server")
         self.install_task = None
 
         # Define widgets
@@ -133,7 +133,7 @@ class InstallDialog(QDialog):
     def initialize_version_view(self):
         version_widgets = {}
         version_layout = QGridLayout()
-        for i, package in enumerate(["timml", "ttim", "gistim"]):
+        for i, package in enumerate(["timflow", "gistim"]):
             version_view = QLineEdit()
             version_view.setEnabled(False)
             widgets = (
@@ -147,20 +147,17 @@ class InstallDialog(QDialog):
 
     def update_versions(self):
         versions = self.parent.server_handler.versions()
-        for package in ["timml", "ttim", "gistim"]:
+        for package in ["timflow", "gistim"]:
             self.version_widgets[package][1].setText(versions.get(package))
-        return
 
     def enable_install_buttons(self, enabled: bool) -> None:
         self.install_github_button.setEnabled(enabled)
         self.install_zip_button.setEnabled(enabled)
-        return
 
     def set_zip_path(self) -> None:
         path, _ = QFileDialog.getOpenFileName(self, "Select file", "", "*.zip")
         if path != "":  # Empty string in case of cancel button press
             self.install_zip_line_edit.setText(path)
-        return
 
     def install_from_zip(self) -> None:
         path = self.install_zip_line_edit.text()
@@ -181,7 +178,6 @@ class InstallDialog(QDialog):
         )
         self.enable_install_buttons(False)
         QgsApplication.taskManager().addTask(self.install_task)
-        return
 
     def install_from_github(self) -> None:
         reply = QMessageBox.question(
@@ -196,4 +192,3 @@ class InstallDialog(QDialog):
         self.install_task = InstallGithubTask(self, message_bar=self.parent.message_bar)
         self.enable_install_buttons(False)
         QgsApplication.taskManager().addTask(self.install_task)
-        return

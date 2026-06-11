@@ -1,7 +1,7 @@
 [workspace]
 name = "gistim"
 version = "0.6.0"
-description = "Connects TimML and TTim Analytic Element modeling to QGIS"
+description = "Connects timflow Analytic Element modeling to QGIS"
 authors = ["Huite Bootsma"]
 channels = ["conda-forge"]
 platforms = ["win-64", "linux-64", "osx-64"]
@@ -25,8 +25,7 @@ pyinstaller = "*"
 
 [pypi-dependencies]
 pandas = "*"
-timml = ">=6.3.0"
-ttim = ">=0.8.0"
+timflow = ">=0.2.0"
 xarray = "*"
 numpy = "*"
 

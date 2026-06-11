@@ -11,7 +11,7 @@ from qgistim.core.schemata import (
 
 
 class DischargeObservationSchema(RowWiseSchema):
-    timml_schemata = {
+    steady_schemata = {
         "geometry": Required(),
         "legendre_method": Required(),
         "ndegrees": Required(Positive()),
@@ -21,12 +21,12 @@ class DischargeObservationSchema(RowWiseSchema):
 class DischargeObservation(Element):
     element_type = "Discharge Observation"
     geometry_type = "Linestring"
-    timml_attributes = (
+    steady_attributes = (
         QgsField("legendre_method", QVariant.Bool),
         QgsField("ndegrees", QVariant.Int),
         QgsField("label", QVariant.String),
     )
-    timml_defaults = {
+    steady_defaults = {
         "legendre_method": QgsDefaultValue("True"),
         "ndegrees": QgsDefaultValue("10"),
     }
@@ -36,7 +36,7 @@ class DischargeObservation(Element):
     def renderer(cls) -> QgsSingleSymbolRenderer:
         return cls.line_renderer(color=LIGHT_BLUE, width="0.75", outline_style="dash")
 
-    def process_timml_row(self, row, other=None):
+    def process_steady_row(self, row, other=None):
         return {
             "xy": self.linestring_xy(row),
             "method": "legendre" if row["legendre_method"] else "quad",

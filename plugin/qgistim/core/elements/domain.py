@@ -16,7 +16,7 @@ from qgistim.core.schemata import AllRequired, Positive, Required, StrictlyIncre
 
 
 class DomainSchema(SingleRowSchema):
-    timml_schemata = {"geometry": Required()}
+    steady_schemata = {"geometry": Required()}
     timeseries_schemata = {
         "time": AllRequired(Positive(), StrictlyIncreasing()),
     }
@@ -25,13 +25,13 @@ class DomainSchema(SingleRowSchema):
 class Domain(TransientElement):
     element_type = "Domain"
     geometry_type = "Polygon"
-    ttim_attributes = (QgsField("time", QVariant.Double),)
+    transient_attributes = (QgsField("time", QVariant.Double),)
     schema = DomainSchema()
 
     def __init__(self, path: str, name: str):
         self._initialize_default(path, name)
-        self.timml_name = f"timml {self.element_type}:Domain"
-        self.ttim_name = "ttim Computation Times:Domain"
+        self.steady_name = f"steady-state {self.element_type}:Domain"
+        self.transient_name = "transient Computation Times:Domain"
 
     @classmethod
     def renderer(cls) -> QgsSingleSymbolRenderer:
@@ -46,7 +46,7 @@ class Domain(TransientElement):
         pass
 
     def update_extent(self, iface: Any) -> Tuple[float, float]:
-        provider = self.timml_layer.dataProvider()
+        provider = self.steady_layer.dataProvider()
         provider.truncate()  # removes all features
         canvas = iface.mapCanvas()
         extent = canvas.extent()
@@ -66,10 +66,10 @@ class Domain(TransientElement):
         canvas.refresh()
         return ymax, ymin
 
-    def to_timml(self, other) -> ElementExtraction:
-        data = self.table_to_records(layer=self.timml_layer)
-        errors = self.schema.validate_timml(
-            name=self.timml_layer.name(), data=data, other=other
+    def extract_steady_data(self, other) -> ElementExtraction:
+        data = self.table_to_records(layer=self.steady_layer)
+        errors = self.schema.validate_steady(
+            name=self.steady_layer.name(), data=data, other=other
         )
         if errors:
             return ElementExtraction(errors=errors)
@@ -85,13 +85,13 @@ class Domain(TransientElement):
                 }
             )
 
-    def to_ttim(self, other) -> ElementExtraction:
-        timml_extraction = self.to_timml(other)
-        data = timml_extraction.data
+    def extract_transient_data(self, other) -> ElementExtraction:
+        steady_extraction = self.extract_steady_data(other)
+        data = steady_extraction.data
 
-        timeseries = self.table_to_dict(layer=self.ttim_layer)
+        timeseries = self.table_to_dict(layer=self.transient_layer)
         errors = self.schema.validate_timeseries(
-            name=self.ttim_layer.name(), data=timeseries
+            name=self.transient_layer.name(), data=timeseries
         )
         if errors:
             return ElementExtraction(errors=errors)

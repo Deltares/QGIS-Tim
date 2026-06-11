@@ -17,8 +17,8 @@ from qgistim.core.schemata import (
 )
 
 
-class HeadLineSinkSchema(RowWiseSchema):
-    timml_schemata = {
+class RiverSchema(RowWiseSchema):
+    steady_schemata = {
         "geometry": Required(),
         "head": Required(),
         "resistance": Required(Positive()),
@@ -26,14 +26,14 @@ class HeadLineSinkSchema(RowWiseSchema):
         "order": Required(Positive()),
         "layer": Required(Membership("aquifer layers")),
     }
-    ttim_consistency_schemata = (
+    transient_consistency_schemata = (
         AllOrNone("time_start", "time_end", "head_transient"),
         NotBoth("time_start", "timeseries_id"),
     )
-    ttim_schemata = {
+    transient_schemata = {
         "time_start": Optional(Positive()),
         "time_end": Optional(Positive()),
-        "timeseries_id": Optional(Membership("ttim timeseries IDs")),
+        "timeseries_id": Optional(Membership("transient timeseries IDs")),
     }
     timeseries_schemata = {
         "timeseries_id": AllRequired(),
@@ -42,10 +42,10 @@ class HeadLineSinkSchema(RowWiseSchema):
     }
 
 
-class HeadLineSink(TransientElement):
-    element_type = "Head Line Sink"
+class River(TransientElement):
+    element_type = "River"
     geometry_type = "Linestring"
-    timml_attributes = (
+    steady_attributes = (
         QgsField("head", QVariant.Double),
         QgsField("resistance", QVariant.Double),
         QgsField("width", QVariant.Double),
@@ -57,12 +57,12 @@ class HeadLineSink(TransientElement):
         QgsField("head_transient", QVariant.Double),
         QgsField("timeseries_id", QVariant.Int),
     )
-    ttim_attributes = (
+    transient_attributes = (
         QgsField("timeseries_id", QVariant.Int),
         QgsField("time_start", QVariant.Double),
         QgsField("head", QVariant.Double),
     )
-    timml_defaults = {
+    steady_defaults = {
         "order": QgsDefaultValue("4"),
     }
     transient_columns = (
@@ -71,13 +71,13 @@ class HeadLineSink(TransientElement):
         "head_transient",
         "timeseries_id",
     )
-    schema = HeadLineSinkSchema()
+    schema = RiverSchema()
 
     @classmethod
     def renderer(cls) -> QgsSingleSymbolRenderer:
         return cls.line_renderer(color=BLUE, width="0.75")
 
-    def process_timml_row(self, row, other=None):
+    def process_steady_row(self, row, other=None):
         return {
             "xy": self.linestring_xy(row),
             "hls": row["head"],
@@ -88,7 +88,7 @@ class HeadLineSink(TransientElement):
             "label": row["label"],
         }
 
-    def process_ttim_row(self, row, grouped):
+    def process_transient_row(self, row, grouped):
         tsandh, times = self.transient_input(row, grouped, "head")
         return {
             "xy": self.linestring_xy(row),

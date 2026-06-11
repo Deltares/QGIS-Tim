@@ -10,7 +10,7 @@ from qgistim.core.schemata import Positive, Required
 
 
 class PolygonAreaSinkSchema(RowWiseSchema):
-    timml_schemata = {
+    steady_schemata = {
         "geometry": Required(),
         "rate": Required(),
         "order": Required(Positive()),
@@ -21,12 +21,12 @@ class PolygonAreaSinkSchema(RowWiseSchema):
 class PolygonAreaSink(Element):
     element_type = "Polygon Area Sink"
     geometry_type = "Polygon"
-    timml_attributes = (
+    steady_attributes = (
         QgsField("rate", QVariant.Double),
         QgsField("order", QVariant.Int),
         QgsField("ndegrees", QVariant.Int),
     )
-    timml_defaults = {
+    steady_defaults = {
         "order": QgsDefaultValue("4"),
         "ndegrees": QgsDefaultValue("6"),
     }
@@ -38,7 +38,7 @@ class PolygonAreaSink(Element):
             color=TRANSPARENT_GREEN, color_border=GREEN, width_border="0.75"
         )
 
-    def process_timml_row(self, row, other):
+    def process_steady_row(self, row, other):
         raw_data = deepcopy(other["global_aquifer"])
         raw_data["aquitard_c"][0] = None
         raw_data["semiconf_top"][0] = None

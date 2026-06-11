@@ -7,24 +7,24 @@ from qgistim.core.schemata import Required, RequiresConfinedAquifer
 
 
 class UniformFlowSchema(SingleRowSchema):
-    timml_schemata = {
+    steady_schemata = {
         "slope": Required(),
         "angle": Required(),
     }
-    timml_consistency_schemata = (RequiresConfinedAquifer(),)
+    steady_consistency_schemata = (RequiresConfinedAquifer(),)
 
 
 class UniformFlow(Element):
     element_type = "Uniform Flow"
     geometry_type = "No geometry"
-    timml_attributes = (
+    steady_attributes = (
         QgsField("slope", QVariant.Double),
         QgsField("angle", QVariant.Double),
         QgsField("label", QVariant.String),
     )
     schema = UniformFlowSchema()
 
-    def process_timml_row(self, row, other=None):
+    def process_steady_row(self, row, other=None):
         return {
             "slope": row["slope"],
             "angle": row["angle"],

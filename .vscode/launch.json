@@ -2,6 +2,17 @@
     "version": "0.2.0",
     "configurations": [
         {
+            "name": "Compute gistim server",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${workspaceFolder}/gistim/__main__.py",
+            "console": "integratedTerminal",
+            "args": [
+                "compute",
+                "${input:computeGistimJsonPath}"
+            ]
+        },
+        {
             "name": "Attach to QGIS",
             "type": "debugpy",
             "request": "attach",
@@ -10,6 +21,14 @@
                 "port": 5678
             },
             "justMyCode": true
+        }
+    ],
+    "inputs": [
+        {
+            "id": "computeGistimJsonPath",
+            "type": "promptString",
+            "description": "Path to the JSON input file for the compute command",
+            "default": "${workspaceFolder}/testdata/test.json"
         }
     ]
 }

@@ -23,7 +23,7 @@ from qgistim.core.schemata import (
 
 
 class BuildingPitSchema(RowWiseSchema):
-    timml_schemata = {
+    steady_schemata = {
         "geometry": Required(),
         "inhomogeneity_id": Required(Membership("properties inhomogeneity_id")),
         "order": Required(Positive()),
@@ -32,7 +32,7 @@ class BuildingPitSchema(RowWiseSchema):
 
 
 class AssociatedBuildingPitSchema(TableSchema):
-    timml_schemata = {
+    steady_schemata = {
         "inhomogeneity_id": AllRequired(),
         "layer": AllRequired(Equals("aquifer layers")),
         "aquifer_top": AllRequired(StrictlyDecreasing()),
@@ -43,7 +43,7 @@ class AssociatedBuildingPitSchema(TableSchema):
         "semiconf_head": OptionalFirstOnly(),
         "wall_in_layer": AllRequired(AtleastOneTrue()),
     }
-    timml_consistency_schemata = (
+    steady_consistency_schemata = (
         SemiConfined(),
         AllGreaterEqual("aquifer_top", "aquifer_bottom"),
     )
@@ -52,7 +52,7 @@ class AssociatedBuildingPitSchema(TableSchema):
 class BuildingPit(AssociatedElement):
     element_type = "Building Pit"
     geometry_type = "Polygon"
-    timml_attributes = (
+    steady_attributes = (
         QgsField("inhomogeneity_id", QVariant.Int),
         QgsField("order", QVariant.Int),
         QgsField("ndegrees", QVariant.Int),
@@ -70,7 +70,7 @@ class BuildingPit(AssociatedElement):
         QgsField("aquitard_npor", QVariant.Double),
         QgsField("aquifer_npor", QVariant.Double),
     ]
-    timml_defaults = {
+    steady_defaults = {
         "order": QgsDefaultValue("4"),
         "ndegrees": QgsDefaultValue("6"),
         "inhomogeneity_id": QgsDefaultValue("1"),
@@ -88,7 +88,7 @@ class BuildingPit(AssociatedElement):
             color=TRANSPARENT_RED, color_border=RED, width_border="0.75"
         )
 
-    def process_timml_row(self, row: Dict[str, Any], grouped: Dict[int, Any]):
+    def process_steady_row(self, row: Dict[str, Any], grouped: Dict[int, Any]):
         inhom_id = row["inhomogeneity_id"]
         raw_data = grouped[inhom_id]
         layers = [i for i, active in enumerate(raw_data["wall_in_layer"]) if active]
