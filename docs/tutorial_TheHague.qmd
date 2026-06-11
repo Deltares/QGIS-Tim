@@ -534,7 +534,7 @@ QGIS-Tim offers the opportunity to export the geopackage of the created model to
 
 ![Python script](figures/tutorial/figure_PythonExport01.png){width=90% #fig-figure_PythonExport01}
 
-As can be seen the converted Python file start with calls (e.g. import steady-state) to main necessary Python packages. After that, for each timm element in the model, all data coordinates and parameter values follow. At the end of the Python file the "model.solve" command is stated after which all head values in the domain with the desired mesh density are determined and also at demanded observation points.
+As can be seen the converted Python file start with calls (e.g. import timflow) to main necessary Python packages. After that, for each timm element in the model, all data coordinates and parameter values follow. At the end of the Python file the "model.solve" command is stated after which all head values in the domain with the desired mesh density are determined and also at demanded observation points.
 
 As can be seen the Python script for TimML is written in a very dedicated and condensed manner.
 
