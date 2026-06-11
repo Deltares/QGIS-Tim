@@ -54,6 +54,8 @@ SUPPORTED_TTIM_ELEMENTS = set(
         "Impermeable Wall",
         "Leaky Wall",
         "Head Observation",
+        "Particle Forward",
+        "Particle Backward",
     ]
 )
 
@@ -268,7 +270,9 @@ class DatasetTreeWidget(QTreeWidget):
             if times and (times != {0}):
                 data["steady-state Aquifer:Aquifer"]["tmax"] = max(times)
             else:
-                errors["Model"] = {"TTim input:": ["No transient forcing defined."]}
+                errors["Model"] = {
+                    "Timflow transient input:": ["No transient forcing defined."]
+                }
 
         return errors, data
 
