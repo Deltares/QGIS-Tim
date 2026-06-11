@@ -28,7 +28,7 @@ class CircularAreaSinkSchema(RowWiseSchema):
     transient_schemata = {
         "time_start": Optional(Positive()),
         "time_end": Optional(Positive()),
-        "timeseries_id": Optional(Membership("ttim timeseries IDs")),
+        "timeseries_id": Optional(Membership("transient timeseries IDs")),
     }
     transient_consistency_schemata = (
         AllOrNone("time_start", "time_end", "rate_transient"),

@@ -121,7 +121,7 @@ class LayersPanelGroup:
         ----------
         layer:
             QGIS map layer, raster or vector layer. May be None, in which case
-            nothing is done (useful for optional ttim and associated layers).
+            nothing is done (useful for optional transient and associated layers).
         destination: str
             Legend group
         renderer:
@@ -165,8 +165,8 @@ class LayersPanelGroup:
 class InputGroup(LayersPanelGroup):
     def create_group(self) -> None:
         self._create_group()
-        self.create_subgroup("timml")
-        self.create_subgroup("ttim")
+        self.create_subgroup("steady-state")
+        self.create_subgroup("transient")
         return
 
 
@@ -322,12 +322,12 @@ class QgisTimWidget(QWidget):
         self.dataset_widget.add_element(element)
         self.input_group.add_layer(
             element.steady_layer,
-            "timml",
+            "steady-state",
             renderer=element.renderer(),
             suppress=suppress,
         )
-        self.input_group.add_layer(element.transient_layer, "ttim")
-        self.input_group.add_layer(element.assoc_layer, "timml")
+        self.input_group.add_layer(element.transient_layer, "transient")
+        self.input_group.add_layer(element.assoc_layer, "steady-state")
 
     # QGIS layers
     # -----------

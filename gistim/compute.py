@@ -263,7 +263,7 @@ def _(model: timflow.steady.Model, observations: Dict):
 
 @compute_discharge_observations.register
 def _(model: timflow.transient.ModelMaq, observations: Dict):
-    # intnormflux is not supported by ttim (yet).
+    # intnormflux is not supported by transient (yet).
     return None
 
 
@@ -318,7 +318,7 @@ def compute_steady(
     with open(path, "r") as f:
         data = json.load(f)
 
-    steady_model, elements = initialize_steady(data["timml"])
+    steady_model, elements = initialize_steady(data["steady-state"])
     steady_model.solve()
 
     write_output(
@@ -336,9 +336,9 @@ def compute_transient(
     with open(path, "r") as f:
         data = json.load(f)
 
-    steady_model, _ = initialize_steady(data["timml"])
+    steady_model, _ = initialize_steady(data["steady-state"])
     transient_model, transient_elements = initialize_transient(
-        data["ttim"], steady_model
+        data["transient"], steady_model
     )
     steady_model.solve()
     transient_model.solve()

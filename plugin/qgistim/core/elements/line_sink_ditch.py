@@ -33,7 +33,7 @@ class DitchSchema(RowWiseSchema):
     transient_schemata = {
         "time_start": Optional(Positive()),
         "time_end": Optional(Positive()),
-        "timeseries_id": Optional(Membership("ttim timeseries IDs")),
+        "timeseries_id": Optional(Membership("transient timeseries IDs")),
     }
     timeseries_schemata = {
         "timeseries_id": AllRequired(),

@@ -137,16 +137,10 @@ def elements_and_observations(data, mapping: Dict[str, str], tim: str):
     strings = []
     observations = []
     model_string = textwrap.indent(f"model={tim}_model,", prefix=PREFIX)
-    # TODO: Rename everything to "steady" and "transient" instead of "timml" and
-    #   "ttim", and remove the conditional. ``tim`` will call
-    if tim == "ttim":
-        module_name = "transient"
-    else:
-        module_name = "steady"
 
     for layername, element_data in data.items():
         prefix, name = layername.split(":")
-        plugin_name = re.split("timml |ttim ", prefix)[1]
+        plugin_name = re.split("steady-state |transient ", prefix)[1]
         tim_name = mapping[plugin_name]
         if tim_name is None:
             continue
@@ -171,13 +165,13 @@ def elements_and_observations(data, mapping: Dict[str, str], tim: str):
             else:
                 # Has to be added to the model.
                 # Would result in e.g.:
-                # timml_extraction_0 = timflow.steady.Well(
-                #     model=timml_model,
+                # steady-state_extraction_0 = timflow.steady.Well(
+                #     model=steady-state_model,
                 #     ...
                 # )
                 kwargs = format_kwargs(kwargs)
                 strings.append(
-                    f"{tim}_{sanitized(name)}_{i} = timflow.{module_name}.{tim_name}(\n{model_string}\n{kwargs}\n)"
+                    f"{tim}_{sanitized(name)}_{i} = timflow.{tim}.{tim_name}(\n{model_string}\n{kwargs}\n)"
                 )
 
     return strings, observations
@@ -185,18 +179,18 @@ def elements_and_observations(data, mapping: Dict[str, str], tim: str):
 
 def steady_script_content(data: Dict[str, Any]):
     data = data.copy()  # avoid side-effects
-    aquifer_data = data.pop("timml Aquifer:Aquifer")
-    data.pop("timml Domain:Domain")
+    aquifer_data = data.pop("steady-state Aquifer:Aquifer")
+    data.pop("steady-state Domain:Domain")
 
     strings = [
         "import numpy as np",
         "import timflow",
         "",
-        f"timml_model = timflow.steady.ModelMaq(\n{format_kwargs(aquifer_data)}\n)",
+        f"steady-state_model = timflow.steady.ModelMaq(\n{format_kwargs(aquifer_data)}\n)",
     ]
 
     element_strings, observations = elements_and_observations(
-        data, STEADY_MAPPING, tim="timml"
+        data, STEADY_MAPPING, tim="steady-state"
     )
     strings = strings + element_strings
     return strings, observations
@@ -204,9 +198,9 @@ def steady_script_content(data: Dict[str, Any]):
 
 def steady_script(data: Dict[str, Any]) -> str:
     strings, observations = steady_script_content(data)
-    strings.append("\ntimml_model.solve()\n")
-    xg, yg, _ = headgrid_code(data["timml Domain:Domain"])
-    strings.append(f"head = timml_model.headgrid(\n{xg},\n{yg}\n)")
+    strings.append("\nsteady-state_model.solve()\n")
+    xg, yg, _ = headgrid_code(data["steady-state Domain:Domain"])
+    strings.append(f"head = steady-state_model.headgrid(\n{xg},\n{yg}\n)")
     strings.append("\n")
     strings.extend(observations)
     return "\n".join(strings)
@@ -218,23 +212,23 @@ def transient_script(
     strings, _ = steady_script_content(steady_data)
 
     data = transient_data.copy()  # avoid side-effects
-    aquifer_data = data.pop("timml Aquifer:Aquifer")
-    domain_data = data.pop("timml Domain:Domain")
+    aquifer_data = data.pop("steady-state Aquifer:Aquifer")
+    domain_data = data.pop("steady-state Domain:Domain")
     data.pop("start_date")
 
     strings.append(
-        f"\nttim_model = timflow.transient.ModelMaq(\n{format_kwargs(aquifer_data)}\n{PREFIX}steady=timml_model,\n)"
+        f"\ntransient_model = timflow.transient.ModelMaq(\n{format_kwargs(aquifer_data)}\n{PREFIX}steady=steady-state_model,\n)"
     )
 
     element_strings, observations = elements_and_observations(
-        data, TRANSIENT_MAPPING, tim="ttim"
+        data, TRANSIENT_MAPPING, tim="transient"
     )
     strings = strings + element_strings
-    strings.append("\ntimml_model.solve()\nttim_model.solve()\n")
+    strings.append("\nsteady-state_model.solve()\ntransient_model.solve()\n")
 
     if domain_data.get("time"):
         xg, yg, t = headgrid_code(domain_data)
-        strings.append(f"head = ttim_model.headgrid(\n{xg},\n{yg},\n{t}\n)")
+        strings.append(f"head = transient_model.headgrid(\n{xg},\n{yg},\n{t}\n)")
         strings.append("\n")
 
     strings.extend(observations)
@@ -252,14 +246,14 @@ def data_to_script(
 
 
 def json_elements_and_observations(data, mapping: Dict[str, str]):
-    aquifer_data = data.pop("timml Aquifer:Aquifer")
+    aquifer_data = data.pop("steady-state Aquifer:Aquifer")
 
     observations = {}
     discharge_observations = {}
     tim_data = {"ModelMaq": aquifer_data}
     for layername, element_data in data.items():
         prefix, name = layername.split(":")
-        plugin_name = re.split("timml |ttim ", prefix)[1]
+        plugin_name = re.split("steady-state |transient ", prefix)[1]
         tim_name = mapping[plugin_name]
         if tim_name is None:
             continue
@@ -297,12 +291,12 @@ def steady_json(
     """
     # Process TimML elements
     data = steady_data.copy()  # avoid side-effects
-    domain_data = data.pop("timml Domain:Domain")
+    domain_data = data.pop("steady-state Domain:Domain")
     elements, observations, discharge_observations = json_elements_and_observations(
         data, mapping=STEADY_MAPPING
     )
     json_data = {
-        "timml": elements,
+        "steady-state": elements,
         "observations": observations,
         "discharge_observations": discharge_observations,
         "window": domain_data,
@@ -321,13 +315,13 @@ def transient_json(
     json_data = steady_json(steady_data, output_options)
 
     data = transient_data.copy()
-    domain_data = data.pop("timml Domain:Domain")
+    domain_data = data.pop("steady-state Domain:Domain")
     start_date = data.pop("start_date")
     elements, observations, _ = json_elements_and_observations(
         data, mapping=TRANSIENT_MAPPING
     )
 
-    json_data["ttim"] = elements
+    json_data["transient"] = elements
     json_data["start_date"] = start_date
     json_data["observations"] = observations
     if output_options.mesh or output_options.raster:

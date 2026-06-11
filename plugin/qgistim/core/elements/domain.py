@@ -30,8 +30,8 @@ class Domain(TransientElement):
 
     def __init__(self, path: str, name: str):
         self._initialize_default(path, name)
-        self.steady_name = f"timml {self.element_type}:Domain"
-        self.transient_name = "ttim Computation Times:Domain"
+        self.steady_name = f"steady-state {self.element_type}:Domain"
+        self.transient_name = "transient Computation Times:Domain"
 
     @classmethod
     def renderer(cls) -> QgsSingleSymbolRenderer:

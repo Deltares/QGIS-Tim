@@ -17,7 +17,9 @@ class HeadObservationSchema(RowWiseSchema):
     steady_schemata = {
         "geometry": Required(),
     }
-    transient_schemata = {"timeseries_id": Required(Membership("ttim timeseries IDs"))}
+    transient_schemata = {
+        "timeseries_id": Required(Membership("transient timeseries IDs"))
+    }
     timeseries_schemata = {
         "timeseries_id": AllRequired(),
         "time": AllRequired(Positive(), StrictlyIncreasing()),

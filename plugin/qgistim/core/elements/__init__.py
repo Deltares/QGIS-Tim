@@ -54,15 +54,15 @@ def parse_name(layername: str) -> Tuple[str, str, str]:
     """
     Based on the layer name find out:
 
-    * whether it's a timml or ttim element;
+    * whether it's a steady-state or transient element;
     * which element type it is;
     * what the user provided name is.
 
     For example:
-    parse_name("timml Headwell:drainage") -> ("timml", "Head Well", "drainage")
+    parse_name("steady-state Headwell:drainage") -> ("steady-state", "Head Well", "drainage")
     """
     prefix, name = layername.split(":")
-    element_type = re.split("timml |ttim ", prefix)[1]
+    element_type = re.split("steady-state |transient ", prefix)[1]
     mapping = {
         "Computation Times": "Domain",
         "Temporal Settings": "Aquifer",
@@ -71,15 +71,15 @@ def parse_name(layername: str) -> Tuple[str, str, str]:
         "Leaky Building Pit Properties": "Leaky Building Pit",
     }
     element_type = mapping.get(element_type, element_type)
-    if "timml" in prefix:
+    if "steady-state" in prefix:
         if "Properties" in prefix:
-            tim_type = "timml_assoc"
+            tim_type = "steady-state_assoc"
         else:
-            tim_type = "timml"
-    elif "ttim" in prefix:
-        tim_type = "ttim"
+            tim_type = "steady-state"
+    elif "transient" in prefix:
+        tim_type = "transient"
     else:
-        raise ValueError("Neither timml nor ttim in layername")
+        raise ValueError("Neither steady-state nor transient in layername")
     return tim_type, element_type, name
 
 

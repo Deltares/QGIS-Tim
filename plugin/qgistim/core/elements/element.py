@@ -131,7 +131,7 @@ class Element(ExtractorMixin, abc.ABC):
 
     def __init__(self, path: str, name: str):
         self._initialize_default(path, name)
-        self.steady_name = f"timml {self.element_type}:{name}"
+        self.steady_name = f"steady-state {self.element_type}:{name}"
 
     @classmethod
     def dialog(cls, path: str, crs: Any, iface: Any, names: List[str]):
@@ -355,13 +355,13 @@ class Element(ExtractorMixin, abc.ABC):
 
 class TransientElement(Element, abc.ABC):
     """
-    Abstract base class for transient (ttim) elements.
+    Abstract base class for transient (transient) elements.
     """
 
     def __init__(self, path: str, name: str):
         self._initialize_default(path, name)
-        self.steady_name = f"timml {self.element_type}:{name}"
-        self.transient_name = f"ttim {self.element_type}:{name}"
+        self.steady_name = f"steady-state {self.element_type}:{name}"
+        self.transient_name = f"transient {self.element_type}:{name}"
 
     def create_transient_layer(self, crs: Any):
         self.transient_layer = self.create_layer(
@@ -434,7 +434,7 @@ class TransientElement(Element, abc.ABC):
         else:
             return [(0.0, 0.0)], {0.0}
 
-    def check_ttim_columns(self):
+    def check_transient_columns(self):
         return self._check_table_columns(
             attributes=self.transient_attributes, layer=self.transient_layer
         )
@@ -447,9 +447,9 @@ class TransientElement(Element, abc.ABC):
         other = other.copy()  # avoid side-effects
         timeseries = self.table_to_dict(self.transient_layer)
         if timeseries:
-            other["ttim timeseries IDs"] = set(timeseries["timeseries_id"])
+            other["transient timeseries IDs"] = set(timeseries["timeseries_id"])
         else:
-            other["ttim timeseries IDs"] = {None}
+            other["transient timeseries IDs"] = {None}
 
         data = self.table_to_records(self.steady_layer)
         errors = self.schema.validate_transient(
@@ -490,8 +490,8 @@ class AssociatedElement(Element, abc.ABC):
 
     def __init__(self, path: str, name: str):
         self._initialize_default(path, name)
-        self.steady_name = f"timml {self.element_type}:{name}"
-        self.assoc_name = f"timml {self.element_type} Properties:{name}"
+        self.steady_name = f"steady-state {self.element_type}:{name}"
+        self.assoc_name = f"steady-state {self.element_type} Properties:{name}"
 
     def create_assoc_layer(self, crs: Any):
         self.assoc_layer = self.create_layer(

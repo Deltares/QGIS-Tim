@@ -3,7 +3,7 @@ This widgets displays the available elements in the GeoPackage.
 
 This widget also allows enabling or disabling individual elements for a
 computation. It also forms the link between the geometry layers and the
-associated layers for homogeneities, or for timeseries layers for ttim
+associated layers for homogeneities, or for timeseries layers for transient
 elements.
 
 Not every TimML element has a TTim equivalent (yet). This means that when a
@@ -126,10 +126,10 @@ class DatasetTreeWidget(QTreeWidget):
         Inhomogeneities, or switch them on again.
         """
         self.setColumnHidden(2, not transient)
-        # Disable unsupported ttim items, such as inhomogeneities
+        # Disable unsupported transient items, such as inhomogeneities
         for item in self.items():
             prefix, _ = item.text(1).split(":")
-            _, elementtype = prefix.split("timml ")
+            _, elementtype = prefix.split("steady-state ")
             if elementtype not in SUPPORTED_TTIM_ELEMENTS:
                 item.steady_checkbox.setChecked(not transient)
                 item.steady_checkbox.setEnabled(not transient)
@@ -222,7 +222,7 @@ class DatasetTreeWidget(QTreeWidget):
 
         # First convert the aquifer, since we need its data to validate
         # other elements.
-        name = "timml Aquifer:Aquifer"
+        name = "steady-state Aquifer:Aquifer"
         aquifer = elements.pop(name)
         aquifer_extraction = aquifer.extract_data(transient)
         if aquifer_extraction.errors:
@@ -262,7 +262,7 @@ class DatasetTreeWidget(QTreeWidget):
 
         if transient:
             if times and (times != {0}):
-                data["timml Aquifer:Aquifer"]["tmax"] = max(times)
+                data["steady-state Aquifer:Aquifer"]["tmax"] = max(times)
             else:
                 errors["Model"] = {"TTim input:": ["No transient forcing defined."]}
 
@@ -365,12 +365,12 @@ class DatasetWidget(QWidget):
         suppress = self.suppress_popup_checkbox.isChecked()
         # Start adding the layers
         maplayer = self.parent.input_group.add_layer(
-            element.steady_layer, "timml", element.renderer(), suppress
+            element.steady_layer, "steady-state", element.renderer(), suppress
         )
-        self.parent.input_group.add_layer(element.transient_layer, "ttim")
-        self.parent.input_group.add_layer(element.assoc_layer, "timml")
+        self.parent.input_group.add_layer(element.transient_layer, "transient")
+        self.parent.input_group.add_layer(element.assoc_layer, "steady-state")
         # Set cell size if the item is a domain layer
-        if item.element.steady_name.split(":")[0] == "timml Domain":
+        if item.element.steady_name.split(":")[0] == "steady-state Domain":
             if maplayer.featureCount() <= 0:
                 return
             feature = next(iter(maplayer.getFeatures()))

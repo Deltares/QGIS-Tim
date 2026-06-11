@@ -82,8 +82,8 @@ class Aquifer(TransientElement):
 
     def __init__(self, path: str, name: str):
         self._initialize_default(path, name)
-        self.steady_name = f"timml {self.element_type}:Aquifer"
-        self.transient_name = "ttim Temporal Settings:Aquifer"
+        self.steady_name = f"steady-state {self.element_type}:Aquifer"
+        self.transient_name = "transient Temporal Settings:Aquifer"
 
     def write(self):
         self.steady_layer = geopackage.write_layer(
