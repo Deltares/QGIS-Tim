@@ -359,7 +359,8 @@ def transient_json(
 
     data = transient_data.copy()
     domain_data = data.pop("steady-state Domain:Domain")
-    elements, observations, _ = json_elements_and_observations(
+    data.pop("start_date")
+    elements, observations, _, _ = json_elements_and_observations(
         data, mapping=TRANSIENT_MAPPING
     )
 
