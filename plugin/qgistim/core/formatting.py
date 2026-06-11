@@ -133,9 +133,14 @@ def headgrid_code(domain) -> Tuple[str, str]:
     return xg, yg, t
 
 
-def elements_and_observations(data, mapping: Dict[str, str], temporal_mode: str):
+def elements_and_observations(data, mapping: Dict[str, str], temporal_string: str):
     strings = []
     observations = []
+    if temporal_string == "steady-state":
+        temporal_mode = "steady"
+    else:
+        temporal_mode = "transient"
+
     model_string = textwrap.indent(f"model={temporal_mode}_model,", prefix=PREFIX)
 
     for layername, element_data in data.items():
@@ -186,7 +191,7 @@ def steady_script_content(data: Dict[str, Any]):
         "import numpy as np",
         "import timflow",
         "",
-        f"steady-state_model = timflow.steady.ModelMaq(\n{format_kwargs(aquifer_data)}\n)",
+        f"steady_model = timflow.steady.ModelMaq(\n{format_kwargs(aquifer_data)}\n)",
     ]
 
     element_strings, observations = elements_and_observations(
@@ -198,9 +203,9 @@ def steady_script_content(data: Dict[str, Any]):
 
 def steady_script(data: Dict[str, Any]) -> str:
     strings, observations = steady_script_content(data)
-    strings.append("\nsteady-state_model.solve()\n")
+    strings.append("\nsteady_model.solve()\n")
     xg, yg, _ = headgrid_code(data["steady-state Domain:Domain"])
-    strings.append(f"head = steady-state_model.headgrid(\n{xg},\n{yg}\n)")
+    strings.append(f"head = steady_model.headgrid(\n{xg},\n{yg}\n)")
     strings.append("\n")
     strings.extend(observations)
     return "\n".join(strings)
@@ -217,14 +222,14 @@ def transient_script(
     data.pop("start_date")
 
     strings.append(
-        f"\ntransient_model = timflow.transient.ModelMaq(\n{format_kwargs(aquifer_data)}\n{PREFIX}steady=steady-state_model,\n)"
+        f"\ntransient_model = timflow.transient.ModelMaq(\n{format_kwargs(aquifer_data)}\n{PREFIX}steady=steady_model,\n)"
     )
 
     element_strings, observations = elements_and_observations(
         data, TRANSIENT_MAPPING, temporal_mode="transient"
     )
     strings = strings + element_strings
-    strings.append("\nsteady-state_model.solve()\ntransient_model.solve()\n")
+    strings.append("\nsteady_model.solve()\ntransient_model.solve()\n")
 
     if domain_data.get("time"):
         xg, yg, t = headgrid_code(domain_data)
