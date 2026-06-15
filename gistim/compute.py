@@ -209,10 +209,8 @@ def _(
     model: timflow.steady.Model,
     **kwargs,
 ):
-    # Timflow 0.3.0
-    # result = timflow.steady.trace.trace(model, **kwargs)
-    # return result["trace"]
-    return timflow.steady.trace.timtraceline(model, **kwargs)
+    result = timflow.steady.traceline(model, **kwargs)
+    return result["trace"]
 
 
 @compute_pathline.register
@@ -220,7 +218,7 @@ def _(
     model: timflow.transient.ModelMaq,
     **kwargs,
 ):
-    result = timflow.transient.trace.timtrace(model, **kwargs)
+    result = timflow.transient.timtrace(model, **kwargs)
     return result["xyzt"]
 
 
