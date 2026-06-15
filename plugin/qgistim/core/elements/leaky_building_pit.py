@@ -4,6 +4,7 @@ from PyQt5.QtCore import QVariant
 from qgis.core import QgsDefaultValue, QgsField, QgsSingleSymbolRenderer
 
 from qgistim.core.elements.colors import RED, TRANSPARENT_RED
+from qgistim.core.elements.default_values import DefaultValues
 from qgistim.core.elements.element import AssociatedElement
 from qgistim.core.elements.schemata import RowWiseSchema, TableSchema
 from qgistim.core.schemata import (
@@ -74,8 +75,8 @@ class LeakyBuildingPit(AssociatedElement):
         QgsField("aquifer_npor", QVariant.Double),
     ]
     steady_defaults = {
-        "order": QgsDefaultValue("4"),
-        "ndegrees": QgsDefaultValue("6"),
+        "order": QgsDefaultValue(DefaultValues.order),
+        "ndegrees": QgsDefaultValue(DefaultValues.ndegrees),
         "inhomogeneity_id": QgsDefaultValue("1"),
     }
     assoc_defaults = {
