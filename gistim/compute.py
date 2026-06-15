@@ -212,7 +212,7 @@ def _(
     # Timflow 0.3.0
     # result = timflow.steady.trace.trace(model, **kwargs)
     # return result["trace"]
-    return timflow.steady.trace.traceline(model, **kwargs)
+    return timflow.steady.trace.timtraceline(model, **kwargs)
 
 
 @compute_pathline.register
