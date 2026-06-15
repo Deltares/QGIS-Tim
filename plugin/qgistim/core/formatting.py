@@ -360,12 +360,13 @@ def transient_json(
     data = transient_data.copy()
     domain_data = data.pop("steady-state Domain:Domain")
     data.pop("start_date")
-    elements, observations, _, _ = json_elements_and_observations(
+    elements, observations, _, pathlines = json_elements_and_observations(
         data, mapping=TRANSIENT_MAPPING
     )
 
     json_data["transient"] = elements
     json_data["observations"] = observations
+    json_data["pathlines"] = pathlines
     if output_options.mesh or output_options.raster:
         json_data["headgrid"] = headgrid_entry(domain_data, output_options.spacing)
     return json_data
