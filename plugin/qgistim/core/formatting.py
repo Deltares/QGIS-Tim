@@ -343,7 +343,7 @@ def steady_json(
         "window": domain_data,
         "output_options": output_options._asdict(),
         "start_date": start_date,
-        "pathlines": pathlines,
+        "pathlines": {"steady-state": pathlines},
     }
     if output_options.mesh or output_options.raster:
         json_data["headgrid"] = headgrid_entry(domain_data, output_options.spacing)
@@ -366,7 +366,7 @@ def transient_json(
 
     json_data["transient"] = elements
     json_data["observations"] = observations
-    json_data["pathlines"] = pathlines
+    json_data["pathlines"]["transient"] = pathlines
     if output_options.mesh or output_options.raster:
         json_data["headgrid"] = headgrid_entry(domain_data, output_options.spacing)
     return json_data

@@ -222,9 +222,24 @@ def _(
     return result["xyzt"]
 
 
+@singledispatch
+def get_model_key(model) -> str:
+    raise TypeError("Expected steady-state or transient model")
+
+
+@get_model_key.register
+def _(model: timflow.steady.Model) -> str:
+    return "steady-state"
+
+
+@get_model_key.register
+def _(model: timflow.transient.ModelMaq) -> str:
+    return "transient"
+
+
 def compute_pathlines(
-    model: timflow.steady.Model,
-    particle_starts: List[Dict],
+    model: timflow.steady.Model | timflow.transient.ModelMaq,
+    particle_starts: dict[str, List[Dict]],
     start_date: pd.Timestamp,
 ) -> Dict[str, pd.DataFrame]:
     d = {
@@ -326,7 +341,8 @@ def write_output(
     output_options = data["output_options"]
     observations = data["observations"]
     discharge_observations = data["discharge_observations"]
-    pathlines = data["pathlines"]
+    model_key = get_model_key(model)
+    pathlines = data["pathlines"][model_key]
     start_date = pd.to_datetime(data.get("start_date"))
 
     # Compute gridded head data and write to netCDF.
