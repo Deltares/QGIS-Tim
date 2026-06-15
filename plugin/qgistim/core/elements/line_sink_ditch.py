@@ -2,6 +2,7 @@ from PyQt5.QtCore import QVariant
 from qgis.core import QgsDefaultValue, QgsField, QgsSingleSymbolRenderer
 
 from qgistim.core.elements.colors import GREEN
+from qgistim.core.elements.default_values import DefaultValues
 from qgistim.core.elements.element import TransientElement
 from qgistim.core.elements.schemata import RowWiseSchema
 from qgistim.core.schemata import (
@@ -63,7 +64,7 @@ class Ditch(TransientElement):
         QgsField("discharge", QVariant.Double),
     )
     steady_defaults = {
-        "order": QgsDefaultValue("4"),
+        "order": QgsDefaultValue(DefaultValues.order),
     }
     transient_columns = (
         "time_start",

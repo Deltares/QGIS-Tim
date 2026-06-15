@@ -8,7 +8,6 @@ import sqlite3
 from pathlib import Path
 from typing import Dict, List, NamedTuple, Tuple
 
-import numpy as np
 import pandas as pd
 
 from gistim.geomet import geopackage
@@ -102,9 +101,15 @@ def collect_bounding_box(features, geometry_type) -> BoundingBox:
             x.append(coordinates[0])
             y.append(coordinates[1])
     else:
-        x, y = zip(
+        has_z = len(features[0]["coordinates"][0]) == 3
+        zipped_coordinates = zip(
             *itertools.chain.from_iterable(line["coordinates"] for line in features)
         )
+        if has_z:
+            x, y, _ = zipped_coordinates
+        else:
+            x, y = zipped_coordinates
+
     return BoundingBox(xmin=min(x), ymin=min(y), xmax=max(x), ymax=max(y))
 
 
@@ -130,7 +135,7 @@ def force_sql_datetime(df: pd.DataFrame):
     return {
         colname: "DATETIME"
         for colname, dtype in df.dtypes.to_dict().items()
-        if np.issubdtype(dtype, np.datetime64)
+        if pd.api.types.is_datetime64_any_dtype(dtype)
     }
 
 

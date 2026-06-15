@@ -44,6 +44,7 @@ class OutputOptions(NamedTuple):
     head_observations: bool
     discharge: bool
     discharge_observations: bool
+    pathlines: bool
     spacing: float
 
 
@@ -108,6 +109,7 @@ class ComputeWidget(QWidget):
         self.head_observations_checkbox = QCheckBox("Head Observations")
         self.discharge_checkbox = QCheckBox("Discharge")
         self.discharge_observations_checkbox = QCheckBox("Discharge Observations")
+        self.pathlines_checkbox = QCheckBox("Particle pathlines")
 
         self.spacing_spin_box = QDoubleSpinBox()
         self.spacing_spin_box.setMinimum(0.0)
@@ -175,6 +177,7 @@ class ComputeWidget(QWidget):
         result_layout.addWidget(self.head_observations_checkbox)
         result_layout.addWidget(self.discharge_checkbox)
         result_layout.addWidget(self.discharge_observations_checkbox)
+        result_layout.addWidget(self.pathlines_checkbox)
 
         result_layout.addLayout(button_row)
 
@@ -209,6 +212,7 @@ class ComputeWidget(QWidget):
         self.head_observations_checkbox.setChecked(True)
         self.discharge_checkbox.setChecked(False)
         self.discharge_observations_checkbox.setChecked(False)
+        self.pathlines_checkbox.setChecked(False)
         self.contour_min_box.setValue(-5.0)
         self.contour_max_box.setValue(5.0)
         self.contour_step_box.setValue(0.5)
@@ -255,6 +259,7 @@ class ComputeWidget(QWidget):
             head_observations=self.head_observations_checkbox.isChecked(),
             discharge=self.discharge_checkbox.isChecked(),
             discharge_observations=self.discharge_observations_checkbox.isChecked(),
+            pathlines=self.pathlines_checkbox.isChecked(),
             spacing=self.spacing_spin_box.value(),
         )
 
@@ -524,7 +529,7 @@ class ComputeWidget(QWidget):
                 labels = None
 
             _, element_type, _ = parse_name(layername)
-            renderer = ELEMENTS[element_type].renderer()
+            renderer = ELEMENTS[element_type].renderer_output()
             self.parent.output_group.add_layer(
                 layer, "vector", renderer=renderer, labels=labels
             )

@@ -30,6 +30,8 @@ STEADY_MAPPING = {
     "Leaky Building Pit": "LeakyBuildingPit",
     "Head Observation": "Head Observation",
     "Discharge Observation": "Discharge Observation",
+    "Particle Forward": "Particle Forward",
+    "Particle Backward": "Particle Backward",
 }
 # In TTim, a constant or uniform flow may be added, but they have no effect on
 # the transient superposed result.
@@ -44,6 +46,8 @@ TRANSIENT_MAPPING = {
     "Leaky Wall": "LeakyWallString",
     "Impermeable Wall": "LeakyWallString",
     "Head Observation": "Head Observation",
+    "Particle Forward": "Particle Forward",
+    "Particle Backward": "Particle Backward",
 }
 PREFIX = "    "
 
@@ -133,9 +137,22 @@ def headgrid_code(domain) -> Tuple[str, str]:
     return xg, yg, t
 
 
+def traceline_function(temporal_mode: str) -> str:
+    """
+    Workaround inconsistency between the name of the traceline function in TimML and TTim.
+    """
+    if temporal_mode == "steady":
+        return f"timflow.{temporal_mode}.trace.traceline"
+    elif temporal_mode == "transient":
+        return f"timflow.{temporal_mode}.trace.trace"
+    else:
+        raise ValueError(f"Unknown tim: {temporal_mode}")
+
+
 def elements_and_observations(data, mapping: Dict[str, str], temporal_string: str):
     strings = []
     observations = []
+    tracelines = []
     if temporal_string == "steady-state":
         temporal_mode = "steady"
     else:
@@ -162,6 +179,17 @@ def elements_and_observations(data, mapping: Dict[str, str], temporal_string: st
                 observations.append(
                     f"observation_{sanitized(name)}_{i}={temporal_mode}_model.head(\n{format_kwargs(kwargs)}\n)"
                 )
+            elif plugin_name in ("Particle Forward", "Particle Backward"):
+                kwargs.pop("label")
+                # Work around inconsistency kwarg between elements and tracelines.
+                ml_string = model_string.replace("model=", "ml=")
+                direction_str = plugin_name.split()[-1].lower()
+                # Work around inconsistency in function name between TimML and TTim.
+                traceline_func = traceline_function(temporal_mode)
+                kwargs = format_kwargs(kwargs)
+                tracelines.append(
+                    f"traceline_{sanitized(name)}_{direction_str}_{i} = {traceline_func}(\n{ml_string}\n{kwargs}\n)"
+                )
             elif plugin_name == "Discharge Observation":
                 kwargs.pop("label")
                 observations.append(
@@ -179,7 +207,7 @@ def elements_and_observations(data, mapping: Dict[str, str], temporal_string: st
                     f"{temporal_mode}_{sanitized(name)}_{i} = timflow.{temporal_mode}.{tim_name}(\n{model_string}\n{kwargs}\n)"
                 )
 
-    return strings, observations
+    return strings, observations, tracelines
 
 
 def steady_script_content(data: Dict[str, Any]):
@@ -194,27 +222,29 @@ def steady_script_content(data: Dict[str, Any]):
         f"steady_model = timflow.steady.ModelMaq(\n{format_kwargs(aquifer_data)}\n)",
     ]
 
-    element_strings, observations = elements_and_observations(
+    element_strings, observations, pathlines = elements_and_observations(
         data, STEADY_MAPPING, temporal_mode="steady-state"
     )
     strings = strings + element_strings
-    return strings, observations
+    return strings, observations, pathlines
 
 
 def steady_script(data: Dict[str, Any]) -> str:
-    strings, observations = steady_script_content(data)
+    strings, observations, pathlines = steady_script_content(data)
     strings.append("\nsteady_model.solve()\n")
     xg, yg, _ = headgrid_code(data["steady-state Domain:Domain"])
     strings.append(f"head = steady_model.headgrid(\n{xg},\n{yg}\n)")
     strings.append("\n")
     strings.extend(observations)
+    strings.append("\n")
+    strings.extend(pathlines)
     return "\n".join(strings)
 
 
 def transient_script(
     steady_data: Dict[str, Any], transient_data: Dict[str, Any]
 ) -> str:
-    strings, _ = steady_script_content(steady_data)
+    strings, _, _ = steady_script_content(steady_data)
 
     data = transient_data.copy()  # avoid side-effects
     aquifer_data = data.pop("steady-state Aquifer:Aquifer")
@@ -225,7 +255,7 @@ def transient_script(
         f"\ntransient_model = timflow.transient.ModelMaq(\n{format_kwargs(aquifer_data)}\n{PREFIX}steady=steady_model,\n)"
     )
 
-    element_strings, observations = elements_and_observations(
+    element_strings, observations, pathlines = elements_and_observations(
         data, TRANSIENT_MAPPING, temporal_mode="transient"
     )
     strings = strings + element_strings
@@ -237,6 +267,8 @@ def transient_script(
         strings.append("\n")
 
     strings.extend(observations)
+    strings.append("\n")
+    strings.extend(pathlines)
     return "\n".join(strings)
 
 
@@ -255,6 +287,7 @@ def json_elements_and_observations(data, mapping: Dict[str, str]):
 
     observations = {}
     discharge_observations = {}
+    pathlines = {}
     tim_data = {"ModelMaq": aquifer_data}
     for layername, element_data in data.items():
         prefix, name = layername.split(":")
@@ -268,10 +301,12 @@ def json_elements_and_observations(data, mapping: Dict[str, str]):
             observations[layername] = entry
         elif tim_name == "Discharge Observation":
             discharge_observations[layername] = entry
+        elif tim_name in ("Particle Forward", "Particle Backward"):
+            pathlines[layername] = entry
         else:
             tim_data[layername] = entry
 
-    return tim_data, observations, discharge_observations
+    return tim_data, observations, discharge_observations, pathlines
 
 
 def steady_json(
@@ -297,8 +332,9 @@ def steady_json(
     # Process TimML elements
     data = steady_data.copy()  # avoid side-effects
     domain_data = data.pop("steady-state Domain:Domain")
-    elements, observations, discharge_observations = json_elements_and_observations(
-        data, mapping=STEADY_MAPPING
+    start_date = data.pop("start_date")
+    elements, observations, discharge_observations, pathlines = (
+        json_elements_and_observations(data, mapping=STEADY_MAPPING)
     )
     json_data = {
         "steady-state": elements,
@@ -306,6 +342,8 @@ def steady_json(
         "discharge_observations": discharge_observations,
         "window": domain_data,
         "output_options": output_options._asdict(),
+        "start_date": start_date,
+        "pathlines": {"steady-state": pathlines},
     }
     if output_options.mesh or output_options.raster:
         json_data["headgrid"] = headgrid_entry(domain_data, output_options.spacing)
@@ -321,14 +359,14 @@ def transient_json(
 
     data = transient_data.copy()
     domain_data = data.pop("steady-state Domain:Domain")
-    start_date = data.pop("start_date")
-    elements, observations, _ = json_elements_and_observations(
+    data.pop("start_date")
+    elements, observations, _, pathlines = json_elements_and_observations(
         data, mapping=TRANSIENT_MAPPING
     )
 
     json_data["transient"] = elements
-    json_data["start_date"] = start_date
     json_data["observations"] = observations
+    json_data["pathlines"]["transient"] = pathlines
     if output_options.mesh or output_options.raster:
         json_data["headgrid"] = headgrid_entry(domain_data, output_options.spacing)
     return json_data

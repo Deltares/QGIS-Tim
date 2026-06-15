@@ -4,6 +4,7 @@ from PyQt5.QtCore import QVariant
 from qgis.core import QgsDefaultValue, QgsField, QgsSingleSymbolRenderer
 
 from qgistim.core.elements.colors import GREEN, TRANSPARENT_GREEN
+from qgistim.core.elements.default_values import DefaultValues
 from qgistim.core.elements.element import Element
 from qgistim.core.elements.schemata import RowWiseSchema
 from qgistim.core.schemata import Positive, Required
@@ -27,8 +28,8 @@ class PolygonAreaSink(Element):
         QgsField("ndegrees", QVariant.Int),
     )
     steady_defaults = {
-        "order": QgsDefaultValue("4"),
-        "ndegrees": QgsDefaultValue("6"),
+        "order": QgsDefaultValue(DefaultValues.order),
+        "ndegrees": QgsDefaultValue(DefaultValues.ndegrees),
     }
     schema = PolygonAreaSinkSchema()
 

@@ -76,6 +76,10 @@ from qgistim.core import geopackage
 from qgistim.core.extractor import ExtractorMixin
 
 
+def _interleave(a, b):
+    return [value for pair in zip(a, b) for value in pair]
+
+
 class ElementExtraction(NamedTuple):
     errors: Optional[Dict[str, Any]] = None
     data: Optional[Union[Dict[str, Any], List[Dict[str, Any]]]] = None
@@ -210,6 +214,13 @@ class Element(ExtractorMixin, abc.ABC):
     def renderer(cls):
         return None
 
+    @classmethod
+    def renderer_output(cls):
+        """
+        Can be overridden for output layers, e.g. output of particle points as lines.
+        """
+        return cls.renderer()
+
     def steady_layer_from_geopackage(self) -> QgsVectorLayer:
         self.steady_layer = QgsVectorLayer(
             f"{self.path}|layername={self.steady_name}", self.steady_name
@@ -296,11 +307,14 @@ class Element(ExtractorMixin, abc.ABC):
             return self.extract_steady_data(other)
 
     @staticmethod
-    def aquifer_data(data, transient: bool):
-        """Used by the Aquifer element and the Inhomogeneities."""
+    def get_z_data(data) -> list[float]:
+        return [data["semiconf_top"][0]] + _interleave(
+            data["aquifer_top"], data["aquifer_bottom"]
+        )
 
-        def interleave(a, b):
-            return [value for pair in zip(a, b) for value in pair]
+    @staticmethod
+    def aquifer_data(data, transient: bool) -> Dict[str, Any]:
+        """Used by the Aquifer element and the Inhomogeneities."""
 
         data = deepcopy(data)  # Avoid side-effects
         hstar = data["semiconf_head"][0]
@@ -312,10 +326,8 @@ class Element(ExtractorMixin, abc.ABC):
 
         kaq = data["aquifer_k"]
         c = data["aquitard_c"]
-        z = [data["semiconf_top"][0]] + interleave(
-            data["aquifer_top"], data["aquifer_bottom"]
-        )
-        porosity = interleave(data["aquitard_npor"], data["aquifer_npor"])
+        z = Element.get_z_data(data)
+        porosity = _interleave(data["aquitard_npor"], data["aquifer_npor"])
         s_aquifer = data["aquifer_s"]
         s_aquitard = data["aquitard_s"]
 

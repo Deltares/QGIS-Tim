@@ -199,6 +199,70 @@ def _(
     return df
 
 
+@singledispatch
+def compute_pathline(model, **kwargs):
+    raise TypeError("Expected steady-state or transient model")
+
+
+@compute_pathline.register
+def _(
+    model: timflow.steady.Model,
+    **kwargs,
+):
+    result = timflow.steady.traceline(model, **kwargs)
+    return result["trace"]
+
+
+@compute_pathline.register
+def _(
+    model: timflow.transient.ModelMaq,
+    **kwargs,
+):
+    result = timflow.transient.timtrace(model, **kwargs)
+    return result["xyzt"]
+
+
+@singledispatch
+def get_model_key(model) -> str:
+    raise TypeError("Expected steady-state or transient model")
+
+
+@get_model_key.register
+def _(model: timflow.steady.Model) -> str:
+    return "steady-state"
+
+
+@get_model_key.register
+def _(model: timflow.transient.ModelMaq) -> str:
+    return "transient"
+
+
+def compute_pathlines(
+    model: timflow.steady.Model | timflow.transient.ModelMaq,
+    particle_starts: dict[str, List[Dict]],
+    start_date: pd.Timestamp,
+) -> Dict[str, pd.DataFrame]:
+    d = {
+        "geometry": [],
+        "datetime_start": [],
+        "datetime_end": [],
+        "label": [],
+    }
+    start_date = pd.to_datetime(start_date, utc=False)
+    for kwargs in particle_starts:
+        label = kwargs.pop("label")
+        # FUTURE: Get window from bounding box and give to tim
+        traceline = compute_pathline(model, **kwargs)
+        for start, end in zip(traceline[:-1], traceline[1:]):
+            linesegment = [[start[0], start[1], start[2]], [end[0], end[1], end[2]]]
+            d["geometry"].append({"type": "LineString", "coordinates": linesegment})
+            d["datetime_start"].append(start_date + pd.to_timedelta(start[3], "D"))
+            d["datetime_end"].append(start_date + pd.to_timedelta(end[3], "D"))
+            d["label"].append(label)
+
+    return pd.DataFrame(d)
+
+
 def extract_discharges(elements, nlayers, **_):
     tables = {}
     for layername, content in elements.items():
@@ -277,6 +341,8 @@ def write_output(
     output_options = data["output_options"]
     observations = data["observations"]
     discharge_observations = data["discharge_observations"]
+    model_key = get_model_key(model)
+    pathlines = data["pathlines"][model_key]
     start_date = pd.to_datetime(data.get("start_date"))
 
     # Compute gridded head data and write to netCDF.
@@ -304,9 +370,15 @@ def write_output(
 
     if output_options["discharge_observations"] and discharge_observations:
         for layername, content in discharge_observations.items():
-            observations = compute_discharge_observations(model, content["data"])
-            if observations is not None:
-                tables[layername] = observations
+            computed_observations = compute_discharge_observations(
+                model, content["data"]
+            )
+            if computed_observations is not None:
+                tables[layername] = computed_observations
+
+    if output_options["pathlines"] and pathlines:
+        for layername, content in pathlines.items():
+            tables[layername] = compute_pathlines(model, content["data"], start_date)
 
     write_geopackage(tables, crs, path)
     return

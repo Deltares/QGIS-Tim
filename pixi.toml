@@ -25,7 +25,7 @@ pyinstaller = "*"
 
 [pypi-dependencies]
 pandas = "*"
-timflow = ">=0.2.0"
+timflow = ">=0.3.0"
 xarray = "*"
 numpy = "*"
 

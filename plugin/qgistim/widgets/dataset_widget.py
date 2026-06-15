@@ -54,6 +54,8 @@ SUPPORTED_TTIM_ELEMENTS = set(
         "Impermeable Wall",
         "Leaky Wall",
         "Head Observation",
+        "Particle Forward",
+        "Particle Backward",
     ]
 )
 
@@ -224,23 +226,27 @@ class DatasetTreeWidget(QTreeWidget):
         # other elements.
         name = "steady-state Aquifer:Aquifer"
         aquifer = elements.pop(name)
+
         aquifer_extraction = aquifer.extract_data(transient)
         if aquifer_extraction.errors:
             errors[name] = aquifer_extraction.errors
             return errors, None
 
         raw_data = aquifer_extraction.data
-        aquifer_data = aquifer.aquifer_data(raw_data, transient=transient)
+        aquifer_data = aquifer.aquifer_data(raw_data, transient)
         data[name] = aquifer_data
-        if transient:
-            data["start_date"] = str(raw_data["start_date"].toPyDateTime())
 
-        times = set()
+        data["start_date"] = str(aquifer.get_start_date().toPyDateTime())
+
         other = {
             "aquifer layers": raw_data["layer"],
             "global_aquifer": raw_data,
             "semiconf_head": raw_data["semiconf_head"][0],
+            "minimum_z_aquifer": min(aquifer_data["z"]),
+            "maximum_z_aquifer": max(aquifer_data["z"]),
         }
+
+        times = set()
         for name, element in elements.items():
             try:
                 extraction = element.extract_data(transient, other)
@@ -264,7 +270,9 @@ class DatasetTreeWidget(QTreeWidget):
             if times and (times != {0}):
                 data["steady-state Aquifer:Aquifer"]["tmax"] = max(times)
             else:
-                errors["Model"] = {"TTim input:": ["No transient forcing defined."]}
+                errors["Model"] = {
+                    "Timflow transient input:": ["No transient forcing defined."]
+                }
 
         return errors, data
 
