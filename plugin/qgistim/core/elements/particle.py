@@ -34,13 +34,14 @@ class ParticleSchema(RowWiseSchema):
         "time_start": Optional(Positive()),
         "time_step": Optional(Positive()),
         "time_end": Optional(Positive()),
+        "time_start_offset": Optional(Positive()),
     }
     steady_consistency_schemata = (
         AllGreaterEqual("z_start", "minimum_z_aquifer"),
         AllLesserEqual("z_start", "maximum_z_aquifer"),
     )
     transient_consistency_schemata = (
-        AllOrNone(("time_start", "time_step", "time_end")),
+        AllOrNone(("time_start", "time_step", "time_end", "time_start_offset")),
     )
 
 
@@ -56,14 +57,17 @@ class Particle(TransientElement, abc.ABC):
         QgsField("time_start", QVariant.Double),
         QgsField("time_step", QVariant.Double),
         QgsField("time_end", QVariant.Double),
+        QgsField("time_start_offset", QVariant.Double),
     )
     steady_defaults = {
         "nstep_max": QgsDefaultValue("100"),
+        "time_start_offset": QgsDefaultValue("0.01"),
     }
     transient_columns = (
         "time_start",
         "time_step",
         "time_end",
+        "time_start_offset",
     )
     schema = ParticleSchema()
 
@@ -87,7 +91,7 @@ class Particle(TransientElement, abc.ABC):
             "ystart": y,
             "zstart": row["z_start"],
             "tstartend": [row["time_start"], row["time_end"]],
-            "tstartoffset": 0.01,
+            "tstartoffset": row["time_start_offset"],
             "hstepmax": row["max_horizontal_step"],
             "tstep": row["time_step"],
             "nstepmax": row["nstep_max"],
