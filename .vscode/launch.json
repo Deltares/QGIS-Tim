@@ -9,7 +9,9 @@
             "console": "integratedTerminal",
             "args": [
                 "compute",
-                "${input:computeGistimJsonPath}"
+                "${input:computeGistimJsonPath}",
+                "--transient",
+                "${input:computeIsTransient}"
             ]
         },
         {
@@ -29,6 +31,12 @@
             "type": "promptString",
             "description": "Path to the JSON input file for the compute command",
             "default": "${workspaceFolder}/testdata/test.json"
+        },
+        {
+            "id": "computeIsTransient",
+            "type": "promptString",
+            "description": "--no-transient or --transient",
+            "default": "--no-transient"
         }
     ]
 }
