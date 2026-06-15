@@ -79,19 +79,20 @@ class Particle(TransientElement, abc.ABC):
             "label": row["label"],
         }
 
-    def process_transient_row(self, row, grouped) -> Dict[str, Any]:
+    def process_transient_row(self, row, grouped) -> tuple[Dict[str, Any], set[float]]:
         x, y = self.point_xy(row)
+        times = {row["time_end"]}
         return {
             "xstart": x,
             "ystart": y,
             "zstart": row["z_start"],
+            "tstartend": [row["time_start"], row["time_end"]],
+            "tstartoffset": 0.01,
             "hstepmax": row["max_horizontal_step"],
-            "tstart": row["time_start"],
-            "delt": row["time_step"],
-            "tmax": row["time_end"],
+            "tstep": row["time_step"],
             "nstepmax": row["nstep_max"],
             "label": row["label"],
-        }
+        }, times
 
 
 class Particle_Forward(Particle):
@@ -116,12 +117,12 @@ class Particle_Backward(Particle):
         ]  # Reverse horizontal step reverses direction
         return data
 
-    def process_transient_row(self, row, grouped) -> Dict[str, Any]:
-        data = super().process_transient_row(row, grouped)
+    def process_transient_row(self, row, grouped) -> tuple[Dict[str, Any], set[float]]:
+        data, times = super().process_transient_row(row, grouped)
         data["hstepmax"] = -data[
             "hstepmax"
         ]  # Reverse horizontal step reverses direction
-        return data
+        return data, times
 
     @classmethod
     def renderer(cls) -> QgsSingleSymbolRenderer:
