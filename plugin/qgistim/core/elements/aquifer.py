@@ -2,6 +2,7 @@ from PyQt5.QtCore import QVariant
 from qgis.core import QgsDefaultValue, QgsField, QgsVectorLayerUtils
 
 from qgistim.core import geopackage
+from qgistim.core.elements.default_values import DefaultValues
 from qgistim.core.elements.element import ElementExtraction, TransientElement
 from qgistim.core.elements.schemata import SingleRowSchema, TableSchema
 from qgistim.core.schemata import (
@@ -75,7 +76,7 @@ class Aquifer(TransientElement):
         "aquitard_npor": QgsDefaultValue("0.3"),
     }
     transient_defaults = {
-        "time_min": QgsDefaultValue("0.01"),
+        "time_min": QgsDefaultValue(DefaultValues.tmin),
         "laplace_inversion_M": QgsDefaultValue("10"),
         "start_date": QgsDefaultValue(
             "make_datetime(year(now()), month(now()), day(now()), 0, 0, 0)"

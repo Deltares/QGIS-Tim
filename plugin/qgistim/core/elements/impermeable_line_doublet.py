@@ -2,6 +2,7 @@ from PyQt5.QtCore import QVariant
 from qgis.core import QgsDefaultValue, QgsField, QgsSingleSymbolRenderer
 
 from qgistim.core.elements.colors import RED
+from qgistim.core.elements.default_values import DefaultValues
 from qgistim.core.elements.element import Element
 from qgistim.core.elements.schemata import RowWiseSchema
 from qgistim.core.schemata import Membership, Positive, Required
@@ -24,7 +25,7 @@ class ImpermeableWall(Element):
         QgsField("label", QVariant.String),
     )
     steady_defaults = {
-        "order": QgsDefaultValue("4"),
+        "order": QgsDefaultValue(DefaultValues.order),
     }
     schema = ImpermeableWallSchema()
 

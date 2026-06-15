@@ -9,6 +9,7 @@ from qgis.core import (
 )
 
 from qgistim.core.elements.colors import GREY, LIGHT_GREY
+from qgistim.core.elements.default_values import DefaultValues
 from qgistim.core.elements.element import TransientElement
 from qgistim.core.elements.schemata import RowWiseSchema
 from qgistim.core.schemata import (
@@ -61,7 +62,7 @@ class Particle(TransientElement, abc.ABC):
     )
     steady_defaults = {
         "nstep_max": QgsDefaultValue("100"),
-        "time_start_offset": QgsDefaultValue("0.01"),
+        "time_start_offset": QgsDefaultValue(DefaultValues.tmin),
     }
     transient_columns = (
         "time_start",
