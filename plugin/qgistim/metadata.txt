@@ -29,9 +29,23 @@ changelog=      <p> 0.7.0
                     - Leaky Line Doublet -> Leaky Wall
                     - Impermeable Line Doublet -> Impermeable Wall
                 <p> 0.6.0
-                - Easier installation by packaging the computational core in an
-                  executable.
-                - Add widget to select and install computational core
+                - No separate Python installation of timml and ttim is required.
+                  The server application can be installed from the QGIS plugin.
+                - Model input is validated before trying to compute or convert
+                  to Python. The plugin attempts to give comprehensible error
+                  messages.
+                - The plugin state can be restored from a project file (rather
+                  than having to re-open the geopackage every time QGIS is
+                  closed).
+                - Remote Head Wells and Discharge Observations elements have
+                  been added as TimML elements.
+                - Discharges can be computed per segment for Head Line Sinks,
+                  Line Sinks Ditches; and for Wells and HeadWells. These are
+                  stored in an output geopackage.
+                - The produced output can be controlled (Mesh, Raster, Contours,
+                  Head Observations, Discharge, Discharge Observations).
+                - The TTim temporal settings have been simplified.
+                - Some GUI elements have had their names adjusted.
                 <p> 0.5.1
                 - Support TimML 6.3.0
                 - Add support for the IntNormFlux
