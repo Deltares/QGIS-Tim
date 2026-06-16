@@ -40,7 +40,7 @@ from qgistim.core.elements import Aquifer, Domain, load_elements_from_geopackage
 from qgistim.core.formatting import data_to_json, data_to_script
 from qgistim.widgets.error_window import ValidationDialog
 
-SUPPORTED_TTIM_ELEMENTS = set(
+SUPPORTED_TRANSIENT_ELEMENTS = set(
     [
         "Aquifer",
         "Domain",
@@ -54,8 +54,6 @@ SUPPORTED_TTIM_ELEMENTS = set(
         "Impermeable Wall",
         "Leaky Wall",
         "Head Observation",
-        "Particle Forward",
-        "Particle Backward",
     ]
 )
 
@@ -132,7 +130,7 @@ class DatasetTreeWidget(QTreeWidget):
         for item in self.items():
             prefix, _ = item.text(1).split(":")
             _, elementtype = prefix.split("steady-state ")
-            if elementtype not in SUPPORTED_TTIM_ELEMENTS:
+            if elementtype not in SUPPORTED_TRANSIENT_ELEMENTS:
                 item.steady_checkbox.setChecked(not transient)
                 item.steady_checkbox.setEnabled(not transient)
 
