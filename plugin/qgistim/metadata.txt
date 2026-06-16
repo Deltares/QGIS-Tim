@@ -21,7 +21,7 @@ repository=https://github.com/Deltares/QGIS-Tim
 hasProcessingProvider=no
 # Uncomment the following line and add your changelog:
 changelog=      <p> 0.7.0
-                - Added particle tracking
+                - Added particle tracking for steady-state simulations.
                 - Use Timflow as computational core instead of TimML and TTim.
                 - Clearer names for elements:
                     - Head Line Sink -> River
