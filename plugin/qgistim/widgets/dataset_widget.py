@@ -54,8 +54,6 @@ SUPPORTED_TTIM_ELEMENTS = set(
         "Impermeable Wall",
         "Leaky Wall",
         "Head Observation",
-        "Particle Forward",
-        "Particle Backward",
     ]
 )
 
