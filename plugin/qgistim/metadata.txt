@@ -20,7 +20,33 @@ repository=https://github.com/Deltares/QGIS-Tim
 
 hasProcessingProvider=no
 # Uncomment the following line and add your changelog:
-# changelog=
+changelog=      <p> 0.7.0
+                - Added particle tracking
+                - Use Timflow as computational core instead of TimML and TTim.
+                - Clearer names for elements:
+                    - Head Line Sink -> River
+                    - Line Sink Ditch -> Ditch
+                    - Leaky Line Doublet -> Leaky Wall
+                    - Impermeable Line Doublet -> Impermeable Wall
+                <p> 0.6.0
+                - Easier installation by packaging the computational core in an
+                  executable.
+                - Add widget to select and install computational core
+                <p> 0.5.1
+                - Support TimML 6.3.0
+                - Add support for the IntNormFlux
+                - Add discharge observation element
+                <p> 0.5.0
+                - Add model validation to catch common mistakes, this will
+                  result in clearer error messages if model input is incorrect.
+                - Multiple usability tweaks
+                - Added elements: polygon inhomogeneity, area sink, line sink
+                  and discharge well
+                - Add "Restore" button to restore plugin state from QGIS project
+                - Support for drawing contours from raster files
+
+
+
 
 # Tags are comma separated with spaces allowed
 tags=python, groundwater, groundwater modeling, analytic element, TTim, TimML, Timflow
