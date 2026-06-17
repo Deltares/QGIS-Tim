@@ -3,7 +3,7 @@ title: "Building Pit Rijsenhout"
 ---
 
 ## Requirements
-- Be sure QGIS version 3.28.00 or higher is installed.
+- Be sure QGIS version 3.40 or later is installed, but not version 4.0.
 - Be sure the ``gistim`` Python package is installed (see [installation](install.qmd) for instructions).
 - Download the tutorial material. [Follow this link.](https://deltares.thegood.cloud/s/zryWnfjT43Ryoea)
 - Internet connections is optional during this Tutorial. It is only required for installation of additional plugins and the use of an online topographic background map.
