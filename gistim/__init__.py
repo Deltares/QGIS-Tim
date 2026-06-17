@@ -1,3 +1,3 @@
 import gistim.compute  # noqa: F401
 
-__version__ = "0.7.0.dev0"
+__version__ = "0.7.0.dev1"

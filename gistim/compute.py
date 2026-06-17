@@ -133,7 +133,9 @@ def _(
 
     # Other coordinates
     layer = list(range(nlayer))
-    time = pd.to_datetime(start_date) + pd.to_timedelta(time, "D")
+    time = pd.to_datetime(start_date).as_unit("us") + pd.to_timedelta(
+        time, "D"
+    ).as_unit("us")
     return xr.DataArray(
         data=head,
         name="head",
@@ -178,16 +180,18 @@ def _(
         "observation_id": [],
     }
     heads = []
-    start_date = pd.to_datetime(start_date, utc=False)
+    start_date = pd.to_datetime(start_date, utc=False).as_unit("us")
     for observation_id, kwargs in enumerate(observations):
         x = kwargs["x"]
         y = kwargs["y"]
         t = kwargs["t"]
         n_time = len(t)
-        datetime = start_date + pd.to_timedelta([0] + t, "day")
+        datetime = start_date + pd.to_timedelta([0] + t, "day").as_unit("us")
         d["geometry"].extend([{"type": "Point", "coordinates": [x, y]}] * n_time)
         d["datetime_start"].extend(datetime[:-1])
-        d["datetime_end"].extend(datetime[1:] - pd.to_timedelta(1, "minute"))
+        d["datetime_end"].extend(
+            datetime[1:] - pd.to_timedelta(1, "minute").as_unit("us")
+        )
         d["label"].extend([kwargs["label"]] * n_time)
         d["observation_id"].extend([observation_id] * n_time)
         heads.append(model.head(x=x, y=y, t=t))
@@ -237,6 +241,16 @@ def _(model: timflow.transient.ModelMaq) -> str:
     return "transient"
 
 
+def to_timedelta_no_ns(x: float) -> pd.Timedelta:
+    """
+    Work around the fact that pandas.to_timedelta automatically converts to ns
+    precision when providing a float with decimals, which overflows when
+    converting large time deltas (e.g. 300 year) to ns.
+    """
+    decimals, whole = np.modf(x)
+    return pd.to_timedelta(whole, "D") + pd.to_timedelta(decimals, "D").as_unit("us")
+
+
 def compute_pathlines(
     model: timflow.steady.Model | timflow.transient.ModelMaq,
     particle_starts: dict[str, List[Dict]],
@@ -248,7 +262,7 @@ def compute_pathlines(
         "datetime_end": [],
         "label": [],
     }
-    start_date = pd.to_datetime(start_date, utc=False)
+    start_date = pd.to_datetime(start_date, utc=False).as_unit("us")
     for kwargs in particle_starts:
         label = kwargs.pop("label")
         # FUTURE: Get window from bounding box and give to tim
@@ -256,8 +270,8 @@ def compute_pathlines(
         for start, end in zip(traceline[:-1], traceline[1:]):
             linesegment = [[start[0], start[1], start[2]], [end[0], end[1], end[2]]]
             d["geometry"].append({"type": "LineString", "coordinates": linesegment})
-            d["datetime_start"].append(start_date + pd.to_timedelta(start[3], "D"))
-            d["datetime_end"].append(start_date + pd.to_timedelta(end[3], "D"))
+            d["datetime_start"].append(start_date + to_timedelta_no_ns(start[3]))
+            d["datetime_end"].append(start_date + to_timedelta_no_ns(end[3]))
             d["label"].append(label)
 
     return pd.DataFrame(d)
