@@ -6,7 +6,7 @@ website:
   page-navigation: true
   navbar:
     background: "#080c80"
-    logo: _static/iMOD-doc-logo.svg
+    logo: _static/QGIS-Tim-logo.svg
     left:
       - text: Installation
         href: install.qmd
