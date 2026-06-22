@@ -1,5 +1,5 @@
-from PyQt5.QtCore import QVariant
 from qgis.core import QgsField
+from qgis.PyQt.QtCore import QVariant
 
 from qgistim.core.elements.element import Element
 from qgistim.core.elements.schemata import SingleRowSchema

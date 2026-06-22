@@ -74,11 +74,13 @@ def write_layer(
     options.driverName = "gpkg"
     options.layerName = layername
     if not newfile:
-        options.actionOnExistingFile = QgsVectorFileWriter.CreateOrOverwriteLayer
+        options.actionOnExistingFile = (
+            QgsVectorFileWriter.ActionOnExistingFile.CreateOrOverwriteLayer
+        )
     write_result, error_message = QgsVectorFileWriter.writeAsVectorFormat(
         layer, path, options
     )
-    if write_result != QgsVectorFileWriter.NoError:
+    if write_result != QgsVectorFileWriter.WriterError.NoError:
         raise RuntimeError(
             f"Layer {layername} could not be written to geopackage: {path}"
             f" with error: {error_message}"

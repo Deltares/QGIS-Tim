@@ -2,19 +2,6 @@ import datetime
 from pathlib import Path
 from typing import NamedTuple, Tuple, Union
 
-from PyQt5.QtCore import Qt
-from PyQt5.QtWidgets import (
-    QCheckBox,
-    QDoubleSpinBox,
-    QFileDialog,
-    QGroupBox,
-    QHBoxLayout,
-    QLabel,
-    QLineEdit,
-    QPushButton,
-    QVBoxLayout,
-    QWidget,
-)
 from qgis.core import (
     QgsApplication,
     QgsMapLayerProxyModel,
@@ -26,6 +13,19 @@ from qgis.core import (
     QgsVectorLayer,
 )
 from qgis.gui import QgsMapLayerComboBox
+from qgis.PyQt.QtCore import Qt
+from qgis.PyQt.QtWidgets import (
+    QCheckBox,
+    QDoubleSpinBox,
+    QFileDialog,
+    QGroupBox,
+    QHBoxLayout,
+    QLabel,
+    QLineEdit,
+    QPushButton,
+    QVBoxLayout,
+    QWidget,
+)
 
 from qgistim.core import geopackage, layer_styling
 from qgistim.core.elements import ELEMENTS, parse_name
@@ -130,7 +130,8 @@ class ComputeWidget(QWidget):
         self.contour_button.clicked.connect(self.redraw_contours)
         self.contour_layer = QgsMapLayerComboBox()
         self.contour_layer.setFilters(
-            QgsMapLayerProxyModel.MeshLayer | QgsMapLayerProxyModel.RasterLayer
+            QgsMapLayerProxyModel.Filter.MeshLayer
+            | QgsMapLayerProxyModel.Filter.RasterLayer
         )
         self.contour_min_box = QDoubleSpinBox()
         self.contour_max_box = QDoubleSpinBox()
@@ -183,9 +184,13 @@ class ComputeWidget(QWidget):
 
         contour_row1 = QHBoxLayout()
         to_label = QLabel("to")
-        to_label.setAlignment(Qt.AlignCenter | Qt.AlignVCenter)
+        to_label.setAlignment(
+            Qt.AlignmentFlag.AlignCenter | Qt.AlignmentFlag.AlignVCenter
+        )
         step_label = QLabel("Step")
-        step_label.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
+        step_label.setAlignment(
+            Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignVCenter
+        )
         contour_row1.addWidget(self.contour_min_box)
         contour_row1.addWidget(to_label)
         contour_row1.addWidget(self.contour_max_box)
@@ -392,7 +397,7 @@ class ComputeWidget(QWidget):
         self.start_task = self.parent.start_interpreter_task()
         if self.start_task is not None:
             self.compute_task.addSubTask(
-                self.start_task, [], QgsTask.ParentDependsOnSubTask
+                self.start_task, [], QgsTask.SubTaskDependency.ParentDependsOnSubTask
             )
         self.set_interpreter_interaction(False)
         QgsApplication.taskManager().addTask(self.compute_task)

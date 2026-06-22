@@ -1,5 +1,5 @@
-from PyQt5.QtCore import QVariant
 from qgis.core import QgsDefaultValue, QgsField, QgsVectorLayerUtils
+from qgis.PyQt.QtCore import QVariant
 
 from qgistim.core import geopackage
 from qgistim.core.elements.default_values import DefaultValues

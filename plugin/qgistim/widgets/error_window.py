@@ -1,6 +1,12 @@
 from typing import Any, Dict
 
-from PyQt5.QtWidgets import QDialog, QHBoxLayout, QPushButton, QTextBrowser, QVBoxLayout
+from qgis.PyQt.QtWidgets import (
+    QDialog,
+    QHBoxLayout,
+    QPushButton,
+    QTextBrowser,
+    QVBoxLayout,
+)
 
 
 def format_list(errors: Dict[str, Any]):

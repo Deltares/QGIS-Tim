@@ -11,7 +11,6 @@ from typing import NamedTuple
 
 import numpy as np
 import processing
-from PyQt5.QtCore import QDateTime, QVariant
 from qgis.analysis import QgsMeshContours
 from qgis.core import (
     QgsFeature,
@@ -24,6 +23,7 @@ from qgis.core import (
     QgsVectorLayer,
     QgsVectorLayerTemporalProperties,
 )
+from qgis.PyQt.QtCore import QDateTime, QVariant
 
 from qgistim.core import geopackage
 
@@ -101,7 +101,7 @@ def steady_contours(
         geom = contourer.exportLines(
             qgs_index,
             value,
-            QgsMeshRendererScalarSettings.NeighbourAverage,
+            QgsMeshRendererScalarSettings.DataResamplingMethod.NeighbourAverage,
         )
         if not geom.isNull():
             feature_data.append(SteadyContourData(geom, value))
@@ -164,7 +164,7 @@ def transient_contours(
             geom = contourer.exportLines(
                 qgs_index,
                 value,
-                QgsMeshRendererScalarSettings.NeighbourAverage,
+                QgsMeshRendererScalarSettings.DataResamplingMethod.NeighbourAverage,
             )
             if not geom.isNull():
                 mdal_time = layer.datasetMetadata(
@@ -210,7 +210,7 @@ def set_temporal_properties(layer: QgsVectorLayer) -> None:
         temporal_properties.setStartField("datetime_start")
         temporal_properties.setEndField("datetime_end")
         temporal_properties.setMode(
-            QgsVectorLayerTemporalProperties.ModeFeatureDateTimeStartAndEndFromFields
+            QgsVectorLayerTemporalProperties.TemporalMode.ModeFeatureDateTimeStartAndEndFromFields
         )
         temporal_properties.setIsActive(True)
     return

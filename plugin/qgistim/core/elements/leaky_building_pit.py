@@ -1,7 +1,7 @@
 from typing import Any, Dict
 
-from PyQt5.QtCore import QVariant
 from qgis.core import QgsDefaultValue, QgsField, QgsSingleSymbolRenderer
+from qgis.PyQt.QtCore import QVariant
 
 from qgistim.core.elements.colors import RED, TRANSPARENT_RED
 from qgistim.core.elements.default_values import DefaultValues
