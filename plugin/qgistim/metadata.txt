@@ -6,7 +6,7 @@
 name=Qgis-Tim
 qgisMinimumVersion=3.40
 description=QGIS plugin to setup Timflow multi-layer analytic elements
-version=0.7.0.dev1
+version=0.7.0.dev2
 author=Deltares
 email=huitebootsma@gmail.com
 
