@@ -7,6 +7,7 @@ from qgis.core import (
     QgsMapLayerProxyModel,
     QgsMeshDatasetIndex,
     QgsMeshLayer,
+    QgsMeshRendererScalarSettings,
     QgsProject,
     QgsRasterLayer,
     QgsTask,
@@ -444,7 +445,10 @@ class ComputeWidget(QWidget):
             renderer.setActiveScalarDatasetGroup(index)
 
             scalar_settings = renderer.scalarSettings(index)
-            scalar_settings.setDataResamplingMethod(0)
+            no_resampling = (
+                QgsMeshRendererScalarSettings.DataResamplingMethod.NoResampling
+            )
+            scalar_settings.setDataResamplingMethod(no_resampling)
             renderer.setScalarSettings(index, scalar_settings)
 
             index_layer.setRendererSettings(renderer)
