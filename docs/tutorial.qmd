@@ -5,6 +5,7 @@ listing:
     contents:
       - tutorial_Rijsenhout.qmd
       - tutorial_TheHague.qmd
+      - tutorial_particle_tracking.qmd
 image: figures/logo/iMOD-tutorial.svg
 description: 'Learn how to use QGIS Tim plugin'
 index: "5"
