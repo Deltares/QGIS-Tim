@@ -40,10 +40,10 @@ qgis-stubs = "*"
 qgis-plugin-manager = ">=1.7.5, <2"
 
 [feature.dev.target.win-64.dependencies]
-qgis = ">=3.40"
+qgis = ">=3.40, <5"
 
 [feature.dev.target.linux-64.dependencies]
-qgis = ">=3.40"
+qgis = ">=3.40, <5"
 
 
 [feature.dev.tasks]
