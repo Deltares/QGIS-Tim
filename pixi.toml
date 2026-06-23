@@ -1,6 +1,6 @@
 [workspace]
 name = "gistim"
-version = "0.7.0.dev1"
+version = "0.7.0.dev2"
 description = "Connects timflow Analytic Element modeling to QGIS"
 authors = ["Huite Bootsma"]
 channels = ["conda-forge"]
@@ -40,10 +40,10 @@ qgis-stubs = "*"
 qgis-plugin-manager = ">=1.7.5, <2"
 
 [feature.dev.target.win-64.dependencies]
-qgis = ">=3.40,<4"
+qgis = ">=3.40, <5"
 
 [feature.dev.target.linux-64.dependencies]
-qgis = ">=3.40,<4"
+qgis = ">=3.40, <5"
 
 
 [feature.dev.tasks]

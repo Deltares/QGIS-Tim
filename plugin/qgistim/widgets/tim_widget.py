@@ -8,15 +8,15 @@ layers there.
 
 from typing import Any, Dict, Union
 
-from PyQt5.QtCore import Qt
-from PyQt5.QtWidgets import (
+from qgis.core import QgsApplication, QgsEditFormConfig, QgsMapLayer, QgsProject
+from qgis.PyQt.QtCore import Qt
+from qgis.PyQt.QtWidgets import (
     QPushButton,
     QTabWidget,
     QTreeWidgetItem,
     QVBoxLayout,
     QWidget,
 )
-from qgis.core import QgsApplication, QgsEditFormConfig, QgsMapLayer, QgsProject
 
 from qgistim.core.server_handler import ServerHandler
 from qgistim.core.task import BaseServerTask
@@ -148,9 +148,9 @@ class LayersPanelGroup:
         if suppress is not None:
             config = maplayer.editFormConfig()
             config.setSuppress(
-                QgsEditFormConfig.SuppressOn
+                QgsEditFormConfig.FeatureFormSuppress.SuppressOn
                 if suppress
-                else QgsEditFormConfig.SuppressDefault
+                else QgsEditFormConfig.FeatureFormSuppress.SuppressDefault
             )
         if renderer is not None:
             maplayer.setRenderer(renderer)
@@ -219,7 +219,9 @@ class QgisTimWidget(QWidget):
         self.tabwidget.addTab(self.dataset_widget, "Model Manager")
         self.tabwidget.addTab(self.elements_widget, "Elements")
         self.tabwidget.addTab(self.compute_widget, "Results")
-        self.layout.addWidget(self.config_button, stretch=0, alignment=Qt.AlignRight)
+        self.layout.addWidget(
+            self.config_button, stretch=0, alignment=Qt.AlignmentFlag.AlignRight
+        )
         self.setLayout(self.layout)
 
         # Default to the GeoPackage tab

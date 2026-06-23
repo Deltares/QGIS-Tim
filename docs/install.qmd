@@ -8,7 +8,7 @@ QGIS-Tim therfore consists of three steps:
 
 ## 1. Install QGIS
 
-Download and install a recent version of QGIS (>=3.40, <4.0) from the official
+Download and install a recent version of QGIS (>=3.40) from the official
 QGIS website:
 <https://www.qgis.org/en/site/forusers/download.html>{target="_blank"}
 

@@ -6,7 +6,7 @@ build-backend = "setuptools.build_meta"
 name = "gistim"
 description = "Connects timflow Analytic Element modeling to QGIS"
 readme = "README.md"
-version = "0.7.0.dev1"
+version = "0.7.0.dev2"
 maintainers = [{ name = "Huite Bootsma", email = "huite.bootsma@deltares.nl" }]
 requires-python = ">=3.11"
 dependencies = ['pandas', 'timflow>=0.2.0', 'xarray', 'numpy']

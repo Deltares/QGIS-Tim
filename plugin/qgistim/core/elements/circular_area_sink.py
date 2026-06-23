@@ -1,7 +1,7 @@
 from typing import Any, Dict
 
-from PyQt5.QtCore import QVariant
 from qgis.core import QgsField
+from qgis.PyQt.QtCore import QVariant
 
 from qgistim.core.elements.colors import GREEN, TRANSPARENT_GREEN
 from qgistim.core.elements.element import TransientElement

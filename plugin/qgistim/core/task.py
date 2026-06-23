@@ -5,7 +5,7 @@ from qgis.core import Qgis, QgsTask
 
 class BaseServerTask(QgsTask):
     def __init__(self, parent, data, message_bar):
-        super().__init__(self.task_description, QgsTask.CanCancel)
+        super().__init__(self.task_description, QgsTask.Flag.CanCancel)
         self.parent = parent
         self.data = data
         self.message_bar = message_bar
@@ -35,7 +35,7 @@ class BaseServerTask(QgsTask):
         self.message_bar.pushMessage(
             title="Info",
             text=self.success_message(),
-            level=Qgis.Info,
+            level=Qgis.MessageLevel.Info,
         )
         return
 
@@ -50,7 +50,7 @@ class BaseServerTask(QgsTask):
         self.message_bar.pushMessage(
             title="Error",
             text=f"Failed {self.task_description}. Server error:\n{message}",
-            level=Qgis.Critical,
+            level=Qgis.MessageLevel.Critical,
         )
         return
 

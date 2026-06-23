@@ -46,7 +46,7 @@ title: "Building Pit The Hague "
 ---
 
 ## Requirements
-- Be sure QGIS version 3.40 or later is installed, but not version 4.0.
+- Be sure QGIS version 3.40 or later is installed
 - Be sure the ``gistim`` Python package is installed (see [installation](install.qmd) for instructions).
 - Download the tutorial material. <a href="https://deltares.thegood.cloud/s/JWsmtC82zZjSRx3" target="_blank">Follow this link.</a>
 - Installation of the QGIS-Tim plugin and the MOD plugin is part of this Tutorial. The necessary ZIP files are included in the tutorial material.

@@ -1,6 +1,5 @@
 from typing import Any, Tuple
 
-from PyQt5.QtCore import QVariant
 from qgis.core import (
     QgsFeature,
     QgsField,
@@ -8,6 +7,7 @@ from qgis.core import (
     QgsPointXY,
     QgsSingleSymbolRenderer,
 )
+from qgis.PyQt.QtCore import QVariant
 
 from qgistim.core.elements.colors import BLACK
 from qgistim.core.elements.element import ElementExtraction, TransientElement
