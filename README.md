@@ -21,7 +21,7 @@ necessary computations and writes result files that are loaded back into QGIS by
 
 ## Installation
 
-Download and install a recent version of QGIS (>=3.28):
+Download and install a recent version of QGIS (>=3.40):
 <https://www.qgis.org/en/site/forusers/download.html>
 
 ### Method A: From the QGIS plugin database
