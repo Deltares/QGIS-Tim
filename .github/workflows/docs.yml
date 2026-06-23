@@ -14,6 +14,7 @@ jobs:
   quarto-publish:
     name: Publish with Quarto
     runs-on: ubuntu-latest
+    permissions: pages
     steps:
         # Circumvent this problem: https://github.com/actions/checkout/issues/165
       - name: Checkout code with LFS cache
