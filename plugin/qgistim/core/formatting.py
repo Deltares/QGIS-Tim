@@ -214,6 +214,7 @@ def steady_script_content(data: Dict[str, Any]):
     data = data.copy()  # avoid side-effects
     aquifer_data = data.pop("steady-state Aquifer:Aquifer")
     data.pop("steady-state Domain:Domain")
+    data.pop("start_date")
 
     strings = [
         "import numpy as np",
@@ -223,7 +224,7 @@ def steady_script_content(data: Dict[str, Any]):
     ]
 
     element_strings, observations, pathlines = elements_and_observations(
-        data, STEADY_MAPPING, temporal_mode="steady-state"
+        data, STEADY_MAPPING, temporal_string="steady-state"
     )
     strings = strings + element_strings
     return strings, observations, pathlines
@@ -256,7 +257,7 @@ def transient_script(
     )
 
     element_strings, observations, pathlines = elements_and_observations(
-        data, TRANSIENT_MAPPING, temporal_mode="transient"
+        data, TRANSIENT_MAPPING, temporal_string="transient"
     )
     strings = strings + element_strings
     strings.append("\nsteady_model.solve()\ntransient_model.solve()\n")
