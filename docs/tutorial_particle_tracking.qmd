@@ -5,7 +5,8 @@ title: "Particle Tracking"
 
 ## Requirements
 - Be sure QGIS version 3.40 or later is installed
-- Be sure the ``gistim`` Python package is installed (see [installation](install.qmd) for instructions).
+- Be sure the QGIS-Tim plugin version 0.7.0 or later is installed (see [installation](install.qmd) for instructions).
+- Be sure the ``gistim`` version 0.7.0 or later is installed (see [installation](install.qmd) for instructions).
 
 ## Description
 
