@@ -16,7 +16,7 @@ from pathlib import Path
 from shutil import copy
 from typing import Any, Dict, List, NamedTuple, Set, Tuple
 
-from qgis.core import Qgis, QgsProject, QgsUnitTypes
+from qgis.core import Qgis, QgsEditFormConfig, QgsProject, QgsUnitTypes
 from qgis.PyQt.QtCore import Qt
 from qgis.PyQt.QtWidgets import (
     QAbstractItemView,
@@ -550,7 +550,11 @@ class DatasetWidget(QWidget):
             layer = item.element.steady_layer
             if layer is not None:
                 config = layer.editFormConfig()
-                config.setSuppress(suppress)
+                config.setSuppress(
+                    QgsEditFormConfig.FeatureFormSuppress.SuppressOn
+                    if suppress
+                    else QgsEditFormConfig.FeatureFormSuppress.SuppressDefault
+                )
                 layer.setEditFormConfig(config)
         return
 
