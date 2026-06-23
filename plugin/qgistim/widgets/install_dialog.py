@@ -184,7 +184,7 @@ class InstallDialog(QDialog):
     def install_from_github(self) -> None:
         reply = QMessageBox.question(
             self,
-            "Install from Github?",
+            "Install from GitHub?",
             "This will download and install the latest release from GitHub. Continue?",
             QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
             QMessageBox.StandardButton.No,
