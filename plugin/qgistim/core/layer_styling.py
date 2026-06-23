@@ -8,7 +8,6 @@ ideally with a legend stretching from minimum to maximum.
 
 from typing import List
 
-from PyQt5.QtGui import QColor
 from qgis.core import (
     QgsColorRampShader,
     QgsLineSymbol,
@@ -22,6 +21,7 @@ from qgis.core import (
     QgsTextFormat,
     QgsVectorLayerSimpleLabeling,
 )
+from qgis.PyQt.QtGui import QColor
 
 
 def color_ramp_items(
@@ -71,7 +71,7 @@ def pseudocolor_renderer(
     -------
     renderer: QgsSingleBandPseudoColorRenderer
     """
-    stats = layer.dataProvider().bandStatistics(band, QgsRasterBandStats.All)
+    stats = layer.dataProvider().bandStatistics(band, QgsRasterBandStats.Stats.All)
     minimum = stats.minimumValue
     maximum = stats.maximumValue
 
@@ -80,8 +80,10 @@ def pseudocolor_renderer(
     shader_function.setMinimumValue(minimum)
     shader_function.setMaximumValue(maximum)
     shader_function.setSourceColorRamp(ramp)
-    shader_function.setColorRampType(QgsColorRampShader.Interpolated)
-    shader_function.setClassificationMode(QgsColorRampShader.EqualInterval)
+    shader_function.setColorRampType(QgsColorRampShader.Type.Interpolated)
+    shader_function.setClassificationMode(
+        QgsColorRampShader.ClassificationMode.EqualInterval
+    )
     shader_function.setColorRampItemList(ramp_items)
 
     raster_shader = QgsRasterShader()
@@ -104,7 +106,7 @@ def number_labels(field: str) -> QgsVectorLayerSimpleLabeling:
     pal_layer = QgsPalLayerSettings()
     pal_layer.fieldName = field
     pal_layer.enabled = True
-    pal_layer.placement = QgsPalLayerSettings.Line
+    pal_layer.placement = QgsPalLayerSettings.Placement.Line
     pal_layer.formatNumbers = True
     pal_layer.decimals = 2
 

@@ -1,5 +1,5 @@
-from PyQt5.QtCore import QVariant
 from qgis.core import QgsField, QgsSingleSymbolRenderer
+from qgis.PyQt.QtCore import QVariant
 
 from qgistim.core.elements.colors import RED
 from qgistim.core.elements.element import Element

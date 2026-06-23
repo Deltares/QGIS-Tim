@@ -1,5 +1,6 @@
-from PyQt5.QtCore import Qt
-from PyQt5.QtWidgets import (
+from qgis.core import Qgis, QgsApplication, QgsTask
+from qgis.PyQt.QtCore import Qt
+from qgis.PyQt.QtWidgets import (
     QDialog,
     QFileDialog,
     QGridLayout,
@@ -11,7 +12,6 @@ from PyQt5.QtWidgets import (
     QPushButton,
     QVBoxLayout,
 )
-from qgis.core import Qgis, QgsApplication, QgsTask
 
 from qgistim.core.install_backend import install_from_github, install_from_zip
 
@@ -25,7 +25,7 @@ class InstallTask(QgsTask):
             self.message_bar.pushMessage(
                 title="Info",
                 text="Successfully installed timflow server",
-                level=Qgis.Info,
+                level=Qgis.MessageLevel.Info,
             )
         else:
             if self.exception is not None:
@@ -36,7 +36,7 @@ class InstallTask(QgsTask):
             self.message_bar.pushMessage(
                 title="Error",
                 text=f"Failed to install timflow server. {message}",
-                level=Qgis.Critical,
+                level=Qgis.MessageLevel.Critical,
             )
         return
 
@@ -48,7 +48,7 @@ class InstallTask(QgsTask):
 
 class InstallZipTask(InstallTask):
     def __init__(self, parent, path: str, message_bar):
-        super().__init__("Install from ZIP file", QgsTask.CanCancel)
+        super().__init__("Install from ZIP file", QgsTask.Flag.CanCancel)
         self.parent = parent
         self.path = path
         self.message_bar = message_bar
@@ -65,7 +65,7 @@ class InstallZipTask(InstallTask):
 
 class InstallGithubTask(InstallTask):
     def __init__(self, parent, message_bar):
-        super().__init__("Install from GitHub", QgsTask.CanCancel)
+        super().__init__("Install from GitHub", QgsTask.Flag.CanCancel)
         self.parent = parent
         self.message_bar = message_bar
         self.exception = None
@@ -126,7 +126,9 @@ class InstallDialog(QDialog):
         layout.addWidget(version_group)
         layout.addWidget(github_group)
         layout.addWidget(zip_group)
-        layout.addWidget(self.close_button, stretch=0, alignment=Qt.AlignRight)
+        layout.addWidget(
+            self.close_button, stretch=0, alignment=Qt.AlignmentFlag.AlignRight
+        )
         layout.addStretch()
         self.setLayout(layout)
 
@@ -168,10 +170,10 @@ class InstallDialog(QDialog):
             self,
             "Install from ZIP?",
             "This will install from the selected ZIP file. Continue?",
-            QMessageBox.Yes | QMessageBox.No,
-            QMessageBox.No,
+            QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
+            QMessageBox.StandardButton.No,
         )
-        if reply == QMessageBox.No:
+        if reply == QMessageBox.StandardButton.No:
             return
         self.install_task = InstallZipTask(
             self, path=path, message_bar=self.parent.message_bar
@@ -182,12 +184,12 @@ class InstallDialog(QDialog):
     def install_from_github(self) -> None:
         reply = QMessageBox.question(
             self,
-            "Install from Github?",
+            "Install from GitHub?",
             "This will download and install the latest release from GitHub. Continue?",
-            QMessageBox.Yes | QMessageBox.No,
-            QMessageBox.No,
+            QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
+            QMessageBox.StandardButton.No,
         )
-        if reply == QMessageBox.No:
+        if reply == QMessageBox.StandardButton.No:
             return
         self.install_task = InstallGithubTask(self, message_bar=self.parent.message_bar)
         self.enable_install_buttons(False)

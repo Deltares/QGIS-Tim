@@ -5,8 +5,9 @@
 [general]
 name=Qgis-Tim
 qgisMinimumVersion=3.40
+qgisMaximumVersion=4.99
 description=QGIS plugin to setup Timflow multi-layer analytic elements
-version=0.7.0.dev1
+version=0.7.0.dev2
 author=Deltares
 email=huitebootsma@gmail.com
 
@@ -21,6 +22,7 @@ repository=https://github.com/Deltares/QGIS-Tim
 hasProcessingProvider=no
 # Uncomment the following line and add your changelog:
 changelog=      <p> 0.7.0
+                - Support QGIS 4.0
                 - Added particle tracking for steady-state simulations.
                 - Use Timflow as computational core instead of TimML and TTim.
                 - Clearer names for elements:

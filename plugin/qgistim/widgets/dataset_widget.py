@@ -16,8 +16,9 @@ from pathlib import Path
 from shutil import copy
 from typing import Any, Dict, List, NamedTuple, Set, Tuple
 
-from PyQt5.QtCore import Qt
-from PyQt5.QtWidgets import (
+from qgis.core import Qgis, QgsEditFormConfig, QgsProject, QgsUnitTypes
+from qgis.PyQt.QtCore import Qt
+from qgis.PyQt.QtWidgets import (
     QAbstractItemView,
     QCheckBox,
     QComboBox,
@@ -34,7 +35,6 @@ from PyQt5.QtWidgets import (
     QVBoxLayout,
     QWidget,
 )
-from qgis.core import Qgis, QgsProject, QgsUnitTypes
 
 from qgistim.core.elements import Aquifer, Domain, load_elements_from_geopackage
 from qgistim.core.formatting import data_to_json, data_to_script
@@ -67,15 +67,15 @@ class Extraction(NamedTuple):
 class DatasetTreeWidget(QTreeWidget):
     def __init__(self, parent=None):
         super().__init__(parent)
-        self.setSelectionMode(QAbstractItemView.ExtendedSelection)
+        self.setSelectionMode(QAbstractItemView.SelectionMode.ExtendedSelection)
         self.setHeaderHidden(True)
         self.setSortingEnabled(True)
-        self.setSizePolicy(QSizePolicy.Minimum, QSizePolicy.Preferred)
+        self.setSizePolicy(QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Preferred)
         self.setHeaderLabels(["", "steady-state", "transient"])
         self.setHeaderHidden(False)
         header = self.header()
-        header.setSectionResizeMode(1, QHeaderView.Stretch)
-        header.setSectionResizeMode(2, QHeaderView.Stretch)
+        header.setSectionResizeMode(1, QHeaderView.ResizeMode.Stretch)
+        header.setSectionResizeMode(2, QHeaderView.ResizeMode.Stretch)
         header.setSectionsMovable(False)
         self.setColumnCount(3)
         self.setColumnWidth(0, 1)
@@ -165,10 +165,10 @@ class DatasetTreeWidget(QTreeWidget):
             self,
             "Deleting from Geopackage",
             f"Deleting:\n{message}",
-            QMessageBox.Yes | QMessageBox.No,
-            QMessageBox.No,
+            QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
+            QMessageBox.StandardButton.No,
         )
-        if reply == QMessageBox.No:
+        if reply == QMessageBox.StandardButton.No:
             return
 
         # Start deleting
@@ -282,7 +282,9 @@ class DatasetWidget(QWidget):
         self.dataset_tree = DatasetTreeWidget()
         self.model_crs = None
         self.start_task = None
-        self.dataset_tree.setSizePolicy(QSizePolicy.Preferred, QSizePolicy.Expanding)
+        self.dataset_tree.setSizePolicy(
+            QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Expanding
+        )
         self.dataset_line_edit = QLineEdit()
         self.dataset_line_edit.setEnabled(False)  # Just used as a viewing port
         self.open_geopackage_button = QPushButton("Open")
@@ -431,11 +433,13 @@ class DatasetWidget(QWidget):
         """
         crs = self.parent.iface.mapCanvas().mapSettings().destinationCrs()
         if crs.mapUnits() not in (
-            QgsUnitTypes.DistanceMeters,
-            QgsUnitTypes.DistanceFeet,
+            QgsUnitTypes.DistanceUnit.DistanceMeters,
+            QgsUnitTypes.DistanceUnit.DistanceFeet,
         ):
             msg = "Project Coordinate Reference System map units are not meters or feet"
-            self.parent.message_bar.pushMessage("Error", msg, level=Qgis.Critical)
+            self.parent.message_bar.pushMessage(
+                "Error", msg, level=Qgis.MessageLevel.Critical
+            )
             return
 
         path, _ = QFileDialog.getSaveFileName(self, "Select file", "", "*.gpkg")
@@ -462,7 +466,9 @@ class DatasetWidget(QWidget):
                 self.load_geopackage()
             except:  # noqa: E722
                 msg = f"GeoPackage is not valid QGIS-Tim model input: {path}"
-                self.parent.message_bar.pushMessage("Error", msg, level=Qgis.Critical)
+                self.parent.message_bar.pushMessage(
+                    "Error", msg, level=Qgis.MessageLevel.Critical
+                )
                 self.dataset_line_edit.setText("")
         return
 
@@ -493,7 +499,7 @@ class DatasetWidget(QWidget):
             self.parent.message_bar.pushMessage(
                 title="Error",
                 text="Could not find a QGIS-Tim GeoPackage in this QGIS Project.",
-                level=Qgis.Critical,
+                level=Qgis.MessageLevel.Critical,
             )
             return
 
@@ -501,7 +507,7 @@ class DatasetWidget(QWidget):
             self.parent.message_bar.pushMessage(
                 title="Error",
                 text=f"QGIS-Tim Geopackage {geopackage_path} does not exist.",
-                level=Qgis.Critical,
+                level=Qgis.MessageLevel.Critical,
             )
 
         input_group_name, _ = qgs_project.readEntry("qgistim", "input_group")
@@ -510,10 +516,10 @@ class DatasetWidget(QWidget):
             self,
             "Restore Model from Project",
             f"Re-create Layers Panel group: {input_group_name}?",
-            QMessageBox.Yes | QMessageBox.No,
-            QMessageBox.No,
+            QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
+            QMessageBox.StandardButton.No,
         )
-        if reply == QMessageBox.No:
+        if reply == QMessageBox.StandardButton.No:
             return
 
         self.dataset_line_edit.setText(geopackage_path)
@@ -544,7 +550,11 @@ class DatasetWidget(QWidget):
             layer = item.element.steady_layer
             if layer is not None:
                 config = layer.editFormConfig()
-                config.setSuppress(suppress)
+                config.setSuppress(
+                    QgsEditFormConfig.FeatureFormSuppress.SuppressOn
+                    if suppress
+                    else QgsEditFormConfig.FeatureFormSuppress.SuppressDefault
+                )
                 layer.setEditFormConfig(config)
         return
 
@@ -614,7 +624,7 @@ class DatasetWidget(QWidget):
         self.parent.message_bar.pushMessage(
             title="Info",
             text=f"Converted geopackage to Python script: {outpath}",
-            level=Qgis.Info,
+            level=Qgis.MessageLevel.Info,
         )
         return
 
@@ -661,7 +671,7 @@ class DatasetWidget(QWidget):
         self.parent.message_bar.pushMessage(
             title="Info",
             text=f"Converted geopackage to JSON: {path}",
-            level=Qgis.Info,
+            level=Qgis.MessageLevel.Info,
         )
         return False
 

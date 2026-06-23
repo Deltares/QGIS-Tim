@@ -14,7 +14,7 @@ from contextlib import contextmanager
 from typing import List
 
 from qgis import processing
-from qgis.core import QgsVectorFileWriter, QgsVectorLayer
+from qgis.core import QgsProject, QgsVectorFileWriter, QgsVectorLayer
 
 
 @contextmanager
@@ -74,11 +74,23 @@ def write_layer(
     options.driverName = "gpkg"
     options.layerName = layername
     if not newfile:
-        options.actionOnExistingFile = QgsVectorFileWriter.CreateOrOverwriteLayer
-    write_result, error_message = QgsVectorFileWriter.writeAsVectorFormat(
-        layer, path, options
-    )
-    if write_result != QgsVectorFileWriter.NoError:
+        options.actionOnExistingFile = (
+            QgsVectorFileWriter.ActionOnExistingFile.CreateOrOverwriteLayer
+        )
+    if hasattr(QgsVectorFileWriter, "writeAsVectorFormatV3"):
+        result = QgsVectorFileWriter.writeAsVectorFormatV3(
+            layer,
+            path,
+            QgsProject.instance().transformContext(),
+            options,
+        )
+        write_result = result[0]
+        error_message = result[-1] if len(result) > 1 else ""
+    else:
+        write_result, error_message = QgsVectorFileWriter.writeAsVectorFormat(
+            layer, path, options
+        )
+    if write_result != QgsVectorFileWriter.WriterError.NoError:
         raise RuntimeError(
             f"Layer {layername} could not be written to geopackage: {path}"
             f" with error: {error_message}"

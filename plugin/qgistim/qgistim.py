@@ -49,7 +49,9 @@ class QgisTimPlugin:
 
             self.tim_widget = TimDockWidget("QGIS-Tim")
             self.tim_widget.setObjectName("QgisTimDock")
-            self.iface.addDockWidget(Qt.RightDockWidgetArea, self.tim_widget)
+            self.iface.addDockWidget(
+                Qt.DockWidgetArea.RightDockWidgetArea, self.tim_widget
+            )
             widget = QgisTimWidget(self.tim_widget, self.iface)
             self.tim_widget.setWidget(widget)
             self.tim_widget.hide()

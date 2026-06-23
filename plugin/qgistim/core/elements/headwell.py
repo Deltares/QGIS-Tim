@@ -1,7 +1,5 @@
 from typing import Any, Dict
 
-from PyQt5.QtCore import QVariant
-from PyQt5.QtGui import QColor
 from qgis.core import (
     QgsArrowSymbolLayer,
     QgsDefaultValue,
@@ -9,6 +7,8 @@ from qgis.core import (
     QgsLineSymbol,
     QgsSingleSymbolRenderer,
 )
+from qgis.PyQt.QtCore import QVariant
+from qgis.PyQt.QtGui import QColor
 
 from qgistim.core.elements.colors import BLUE
 from qgistim.core.elements.element import TransientElement

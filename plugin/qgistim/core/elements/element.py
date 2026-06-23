@@ -56,20 +56,20 @@ from collections import defaultdict
 from copy import deepcopy
 from typing import Any, Dict, List, NamedTuple, Optional, Set, Tuple, Union
 
-from PyQt5.QtWidgets import (
-    QDialog,
-    QHBoxLayout,
-    QLabel,
-    QLineEdit,
-    QPushButton,
-    QVBoxLayout,
-)
 from qgis.core import (
     QgsFillSymbol,
     QgsLineSymbol,
     QgsMarkerSymbol,
     QgsSingleSymbolRenderer,
     QgsVectorLayer,
+)
+from qgis.PyQt.QtWidgets import (
+    QDialog,
+    QHBoxLayout,
+    QLabel,
+    QLineEdit,
+    QPushButton,
+    QVBoxLayout,
 )
 
 from qgistim.core import geopackage
@@ -141,7 +141,7 @@ class Element(ExtractorMixin, abc.ABC):
     def dialog(cls, path: str, crs: Any, iface: Any, names: List[str]):
         dialog = NameDialog()
         dialog.show()
-        ok = dialog.exec_()
+        ok = dialog.exec()
         if not ok:
             return
 
