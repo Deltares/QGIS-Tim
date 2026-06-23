@@ -23,8 +23,12 @@ jobs:
         uses: prefix-dev/setup-pixi@v0.9.6
       - name: Build with PyInstaller and create backend ZIP
         run: pixi run zip-backend
+      - name: Create GitHub release if missing
+        run: gh release create -d "${{ github.ref_name }}" --notes "Release ${{ github.ref_name }}"
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
       - name: Release backend ZIP
-        run: gh release upload ${{ github.ref_name }} dist/gistim-${{ runner.os }}.zip dist/sha256-checksum-${{ runner.os }}.txt
+        run: gh release upload --clobber ${{ github.ref_name }} dist/gistim-${{ runner.os }}.zip dist/sha256-checksum-${{ runner.os }}.txt
         env:
           GITHUB_TOKEN: ${{ github.TOKEN }}
       - name: Create plugin ZIP
@@ -32,6 +36,6 @@ jobs:
         run: pixi run zip-plugin
       - name: Release plugin ZIP
         if: matrix.os == 'ubuntu-latest'
-        run: gh release upload ${{ github.ref_name }} dist/QGIS-Tim-plugin.zip
+        run: gh release upload --clobber ${{ github.ref_name }} dist/QGIS-Tim-plugin.zip
         env:
           GITHUB_TOKEN: ${{ github.TOKEN }}
