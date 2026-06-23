@@ -23,6 +23,9 @@ python = "3.11.*"
 [feature.build.dependencies]
 pyinstaller = "*"
 
+[feature.build.pypi-dependencies]
+gistim = { path = ".", editable = true } # To write the version of the backend in the plugin zip, we need to install the backend in editable mode.
+
 [pypi-dependencies]
 pandas = "*"
 timflow = ">=0.3.0"
