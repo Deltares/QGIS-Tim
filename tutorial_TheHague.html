@@ -2,13 +2,16 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.8.24">
+<meta name="generator" content="quarto-1.9.38">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
 <title>Building Pit The Hague – QGIS-Tim</title>
 <style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
 div.columns{display: flex; gap: min(4vw, 1.5em);}
@@ -33,15 +36,14 @@ ul.task-list li input[type="checkbox"] {
 <link href="./tutorial_Rijsenhout.html" rel="prev">
 <script src="site_libs/quarto-html/quarto.js" type="module"></script>
 <script src="site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
-<script src="site_libs/quarto-html/axe/axe-check.js" type="module"></script>
 <script src="site_libs/quarto-html/popper.min.js"></script>
 <script src="site_libs/quarto-html/tippy.umd.min.js"></script>
 <script src="site_libs/quarto-html/anchor.min.js"></script>
 <link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="site_libs/quarto-html/quarto-syntax-highlighting-dc55a5b9e770e841cd82e46aadbfb9b0.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-15634bcf2e68342d4ad2dfa704d543f6.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="site_libs/bootstrap/bootstrap-4978b26caf2fbf66560f9034f076e692.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="site_libs/bootstrap/bootstrap-73da2f715f230a77f008b2aa933638ae.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <link href="site_libs/quarto-contrib/fontawesome6-0.1.0/all.css" rel="stylesheet">
 <link href="site_libs/quarto-contrib/fontawesome6-0.1.0/latex-fontsize.css" rel="stylesheet">
 <script id="quarto-search-options" type="application/json">{
@@ -84,8 +86,8 @@ ul.task-list li input[type="checkbox"] {
       <div class="navbar-container container-fluid">
       <div class="navbar-brand-container mx-auto">
     <a href="./index.html" class="navbar-brand navbar-brand-logo">
-    <img src="./_static/iMOD-doc-logo.svg" alt="" class="navbar-logo light-content">
-    <img src="./_static/iMOD-doc-logo.svg" alt="" class="navbar-logo dark-content">
+    <img src="./_static/QGIS-Tim-logo.svg" alt="" class="navbar-logo light-content">
+    <img src="./_static/QGIS-Tim-logo.svg" alt="" class="navbar-logo dark-content">
     </a>
     <a class="navbar-brand" href="./index.html">
     <span class="navbar-title">QGIS-Tim</span>
@@ -137,10 +139,6 @@ ul.task-list li input[type="checkbox"] {
 <div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
 <!-- sidebar -->
   <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
-    <div class="pt-lg-2 mt-2 text-left sidebar-header sidebar-header-stacked">
-      <a href="./index.html" class="sidebar-logo-link">
-      </a>
-      </div>
     <div class="sidebar-menu-container"> 
     <ul class="list-unstyled mt-1">
         <li class="sidebar-item">
@@ -183,7 +181,7 @@ ul.task-list li input[type="checkbox"] {
   </ul></li>
   <li><a href="#start-your-tim-model" id="toc-start-your-tim-model" class="nav-link" data-scroll-target="#start-your-tim-model">Start your Tim model</a>
   <ul class="collapse">
-  <li><a href="#adding-a-leaky-line-doublet" id="toc-adding-a-leaky-line-doublet" class="nav-link" data-scroll-target="#adding-a-leaky-line-doublet">Adding a Leaky Line Doublet</a></li>
+  <li><a href="#adding-a-leaky-wall" id="toc-adding-a-leaky-wall" class="nav-link" data-scroll-target="#adding-a-leaky-wall">Adding a Leaky Wall</a></li>
   <li><a href="#adding-a-well" id="toc-adding-a-well" class="nav-link" data-scroll-target="#adding-a-well">Adding a Well</a></li>
   </ul></li>
   <li><a href="#computing-the-groundwater-head-drawdown" id="toc-computing-the-groundwater-head-drawdown" class="nav-link" data-scroll-target="#computing-the-groundwater-head-drawdown">Computing the groundwater head drawdown</a></li>
@@ -265,7 +263,7 @@ ol.w {list-style-type: inherit;}
 <section id="requirements" class="level2">
 <h2 class="anchored" data-anchor-id="requirements">Requirements</h2>
 <ul>
-<li>Be sure QGIS version 3.28.00 or higher is installed.</li>
+<li>Be sure QGIS version 3.40 or later is installed</li>
 <li>Be sure the <code>gistim</code> Python package is installed (see <a href="./install.html">installation</a> for instructions).</li>
 <li>Download the tutorial material. <a href="https://deltares.thegood.cloud/s/JWsmtC82zZjSRx3" target="_blank">Follow this link.</a></li>
 <li>Installation of the QGIS-Tim plugin and the MOD plugin is part of this Tutorial. The necessary ZIP files are included in the tutorial material.</li>
@@ -570,13 +568,13 @@ Figure&nbsp;4: QGIS-Tim panel
 </figure>
 </div>
 <ol start="35" class="example" type="1">
-<li>Check in the <em>Layers</em> panel on the left that your new geopackage is added as a group. <br> A sub group <strong>timml</strong> for the steady state model input, the sub group <strong>ttim</strong> for the transient model input and a series of output formats (vector/mesh/raster).</li>
+<li>Check in the <em>Layers</em> panel on the left that your new geopackage is added as a group. <br> A sub group <strong>steady-state</strong> for the steady state model input, the sub group <strong>transient</strong> for the transient model input and a series of output formats (vector/mesh/raster).</li>
 </ol>
 <p>If you had no introduction to the Tim plugin, read the Intermezzo below for a general explanation of the components.</p>
 <blockquote class="blockquote">
 <p><strong>Intermezzo:</strong> <em>introduction Tabs on the Tim panel</em></p>
 <ul>
-<li>Model Manager: an overview of the elements in your geopackage. In case you switch to transient modelling, an extra column with <em>ttim</em> elements is added.</li>
+<li>Model Manager: an overview of the elements in your geopackage. In case you switch to transient modelling, an extra column with <em>transient</em> elements is added.</li>
 <li>Elements: a list of at least 16 Tim elements from which you can build your model.</li>
 <li>Results: here you can define your domain and cell size, decide if your model is transient or not and manage the output files.</li>
 </ul>
@@ -749,7 +747,7 @@ Table&nbsp;2: The characteristics of the subsoil based on LHM data (example, you
 <p>A choice should be made at which depth the hydrogeological base is chosen for this project. Where high aquifer k is followed by a large aquifer c the base is chosen. For this case the base is chosen at -60.5 m (all depth data in <a href="#tbl-SubsoilCharacteristicsLHM" class="quarto-xref">Table&nbsp;2</a> are m NAP). As you can see, values for Holocene layers are not available here and thus not displayed in LHM results. <br><br> Aquitard resistance in the city is quite high, so a value of 3000 days is best guess from experience. <br><br> For marine deposits at -12 a value of 50 to 100 days per meter layer thickness is a proper choice. The permeability of fine Holocene sand is chosen at 10 m/d.</p>
 <p>We are now ready to define our first steady state model by parameterizing our Aquifer.</p>
 <ol start="37" class="example" type="1">
-<li>From the <em>Layers</em> panel, select the layer <em>timml Aquifer:Aquifer</em>.</li>
+<li>From the <em>Layers</em> panel, select the layer <em>steady-state Aquifer:Aquifer</em>.</li>
 <li>Click your right mouse button and from the menu select <em>Open Attribute table</em> (<img src="figures/tutorial/button-Qgis-OpenAttributeTable.png" class="img-fluid" style="width:3.0%">). Search for the same icon somewhere on the <em>Attributes Toolbar</em>.</li>
 <li>Switch to the editing mode in the table with a click on (<img src="figures/tutorial/button-Qgis-AttributeTable-StartEditingMode.png" class="img-fluid" style="width:4.0%">) <em>Toggle Editing</em>.</li>
 <li>Then by clicking 3 times on (<img src="figures/tutorial/button-Qgis-AttributeTable-AddFeature.png" class="img-fluid" style="width:4.0%">) <em>Add feature</em> you will see new rows are added.</li>
@@ -772,18 +770,18 @@ Figure&nbsp;5: The characteristics of the aquifer
 </ol>
 <p>In the QGIS-Tim Window we now introduce the following elements for ground water modelling in the QGIS-Tim tab <em>Element</em>:</p>
 <ul>
-<li>Leaky Line Doublet</li>
+<li>Leaky Wall</li>
 <li>Well</li>
 </ul>
-<section id="adding-a-leaky-line-doublet" class="level3">
-<h3 class="anchored" data-anchor-id="adding-a-leaky-line-doublet">Adding a Leaky Line Doublet</h3>
+<section id="adding-a-leaky-wall" class="level3">
+<h3 class="anchored" data-anchor-id="adding-a-leaky-wall">Adding a Leaky Wall</h3>
 <ol start="44" class="example" type="1">
-<li>In the QGIS-Tim window go to tab <em>Elements</em> and select the button <em>Leaky Line Doublet</em>.</li>
+<li>In the QGIS-Tim window go to tab <em>Elements</em> and select the button <em>Leaky Wall</em>.</li>
 <li>Fill in the name of the layer in the pop-up panel, e.g.&nbsp;‘sheet_pile’, and click <em>OK</em> and this new Layer is added to the <em>Layers</em> panel.</li>
 </ol>
 <p>First, we will <em>draw</em> the location of the sheet pile before <em>adding</em> the parameter values.</p>
 <ol start="46" class="example" type="1">
-<li>In the <em>Layers</em> panel right click on the layer <img src="figures/tutorial/figure_Leakylinedoublet_icon.png" class="img-fluid" style="width:4.0%"> <em>timml Leaky Line Doublet:sheet_pile</em> and start the editing mode by clicking the <em>Toggle Editing</em> button (<img src="figures/tutorial/button-Qgis-AttributeTable-StartEditingMode.png" class="img-fluid" style="width:4.0%">).</li>
+<li>In the <em>Layers</em> panel right click on the layer <img src="figures/tutorial/figure_Leakylinedoublet_icon.png" class="img-fluid" style="width:4.0%"> <em>steady-state Leaky Wall:sheet_pile</em> and start the editing mode by clicking the <em>Toggle Editing</em> button (<img src="figures/tutorial/button-Qgis-AttributeTable-StartEditingMode.png" class="img-fluid" style="width:4.0%">).</li>
 </ol>
 <p>Two important remarks before drawing the sheet pile:</p>
 <ul>
@@ -815,7 +813,7 @@ Figure&nbsp;6: Switching on snapping options
 <img src="figures/tutorial/figure_LeakylinedoubletFeatureAttributes.png" class="img-fluid quarto-figure quarto-figure-left figure-img" style="width:60.0%">
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-LeakylinedoubletFeatureAttributes-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Figure&nbsp;7: The characteristics of the Leaky line doublet
+Figure&nbsp;7: The characteristics of the Leaky Wall
 </figcaption>
 </figure>
 </div>
@@ -824,7 +822,7 @@ Figure&nbsp;7: The characteristics of the Leaky line doublet
 </blockquote>
 <ol start="52" class="example" type="1">
 <li>Close the editing mode with a click on (<img src="figures/tutorial/button-Qgis-AttributeTable-StartEditingMode.png" class="img-fluid" style="width:4.0%">) and you are asked to save your changes.</li>
-<li>Open the attribute table for <em>Leaky Line Doublet</em> (click <img src="figures/tutorial/button-Qgis-OpenAttributeTable.png" class="img-fluid" style="width:3.0%"> or press F6) to check hydraulic resistance values for the sheet pile walls.</li>
+<li>Open the attribute table for <em>Leaky Wall</em> (click <img src="figures/tutorial/button-Qgis-OpenAttributeTable.png" class="img-fluid" style="width:3.0%"> or press F6) to check hydraulic resistance values for the sheet pile walls.</li>
 </ol>
 </section>
 <section id="adding-a-well" class="level3">
@@ -832,7 +830,7 @@ Figure&nbsp;7: The characteristics of the Leaky line doublet
 <ol start="54" class="example" type="1">
 <li>In GIS-Tim go to the tab <em>Elements</em> and select the <em>Well</em> element.</li>
 <li>A name for the element can be given in the pop-up panel, e.g.&nbsp;<em>pumping_wells</em>.</li>
-<li>In the <em>Layers</em> panel right click on the layer <img src="figures/tutorial/figure_well_icon.png" class="img-fluid" style="width:3.0%"> <em>timml Well:pumping_wells</em> and start the editing mode by clicking the <em>Toggle Editing</em> button (<img src="figures/tutorial/button-Qgis-AttributeTable-StartEditingMode.png" class="img-fluid" style="width:4.0%">).</li>
+<li>In the <em>Layers</em> panel right click on the layer <img src="figures/tutorial/figure_well_icon.png" class="img-fluid" style="width:3.0%"> <em>steady-state Well:pumping_wells</em> and start the editing mode by clicking the <em>Toggle Editing</em> button (<img src="figures/tutorial/button-Qgis-AttributeTable-StartEditingMode.png" class="img-fluid" style="width:4.0%">).</li>
 <li>Next click on <em>Add point feature</em> (<img src="figures/tutorial/button_AddPointFeature.png" class="img-fluid" style="width:4.0%">).</li>
 <li>With you left mouse button add the first well location similar to point 1 in <a href="#fig-SchematizationTheHague" class="quarto-xref">Figure&nbsp;8</a>.</li>
 <li>In the pop-up window, fill in the well parameters discharge (50 m3/d), radius (0.1 m), resistance (1 d) and layer (0).</li>
@@ -849,10 +847,10 @@ Figure&nbsp;8: Schematization of the pumping wells, sheet piles and observation 
 </figure>
 </div>
 <ol start="61" class="example" type="1">
-<li>In the <em>Layers</em> panel right select layer <em>timml Well:pumping_wells</em> and open the <em>Attribute Table (F6)</em>.</li>
+<li>In the <em>Layers</em> panel right select layer <em>steady-state Well:pumping_wells</em> and open the <em>Attribute Table (F6)</em>.</li>
 <li>Start the editing mode and fill in the values shown in <a href="#fig-WellAttributeTable" class="quarto-xref">Figure&nbsp;9</a>. Don’t forget the column ‘Label’. <br> The discharge value in the table is a first guess to be adjusted later to desired level of -3.5 m groundwater lowering in the building pit.</li>
 <li>Stop the editing mode, save your work and close the window.</li>
-<li>Select layer <em>timml Well:pumping_wells</em> again, click right and from the menu select <em>Show labels</em>.</li>
+<li>Select layer <em>steady-state Well:pumping_wells</em> again, click right and from the menu select <em>Show labels</em>.</li>
 </ol>
 <div id="fig-WellAttributeTable" class="quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-fig figure">
@@ -866,7 +864,7 @@ Figure&nbsp;9: Well properties
 </div>
 <p>When you finished the input of the wells and their parameters, you have to look back to the combination of wells and sheet pile wall. The reason is that near a well the flow is strong and therefore the flow through the wall is increased. This may lead to extremities in the calculation if wall segments are chosen too large. Tim uses control points but they are set at regular distances on the doublet (the number of control points is 1+order). It is necessary to divide the wall in smaller sections near well locations. The length of each section should be chosen equal to approximately the distance of the wall to the nearest well.</p>
 <ol start="65" class="example" type="1">
-<li>Select the Leaky Line Doublet in the <em>Layers</em> panel and start the editing mode.</li>
+<li>Select the Leaky Wall in the <em>Layers</em> panel and start the editing mode.</li>
 <li>Activate the Vertex Tool (<img src="figures/tutorial/button_VertexTool.png" class="img-fluid" style="width:4.0%">) and then hoover along the sheet pile line in your drawing. The line element near your pointer lights up.</li>
 <li>With the combination of <strong>Shift + double left click</strong>, you can add a new vertex to the line. Repeat that for the number of points you want to add.</li>
 </ol>
@@ -925,7 +923,7 @@ Figure&nbsp;11: Updated results of groundwater head lowering contours due to 8 w
 <ol start="80" class="example" type="1">
 <li>In the QGIS-Tim panel go to the <em>Elements</em> tab and select the element <em>Observation</em>.</li>
 <li>Give a name in the pop-up panel, e.g.&nbsp;“observations”.</li>
-<li>Then go to the <em>Layers</em> panel and select the layer <img src="figures/tutorial/figure_Observation_icon.png" class="img-fluid" style="width:3.0%"><em>timml Observation:observations</em>.</li>
+<li>Then go to the <em>Layers</em> panel and select the layer <img src="figures/tutorial/figure_Observation_icon.png" class="img-fluid" style="width:3.0%"><em>steady-state Observation:observations</em>.</li>
 <li>Go to the toolbar with drawing options and activate Toggle editing (<img src="figures/tutorial/button-Qgis-AttributeTable-StartEditingMode.png" class="img-fluid" style="width:4.0%">).</li>
 <li>Go right to the Add point feature (<img src="figures/tutorial/button_AddPointFeature.png" class="img-fluid" style="width:3.0%">) and drop some piezometers in the drawing. <br> We propose to use 5 points (see <a href="#fig-SchematizationTheHague" class="quarto-xref">Figure&nbsp;8</a>): 1 point in the centre of the building pit, 1 near the lower corner outside, 1 outside near the middle of the eastern sheet pile section and just 2 near street corners.</li>
 <li>Compute the model again.</li>
@@ -934,7 +932,7 @@ Figure&nbsp;11: Updated results of groundwater head lowering contours due to 8 w
 <ol start="86" class="example" type="1">
 <li>Uncheck/check layers in order to display observation results only.</li>
 </ol>
-<p>By default, the label at each observation location is the calculated head for layer 0. Perhaps you see a second number near the location. For your information: this is the “location number” label belonging to the model input in layer <em>timml Observation:observations</em>.</p>
+<p>By default, the label at each observation location is the calculated head for layer 0. Perhaps you see a second number near the location. For your information: this is the “location number” label belonging to the model input in layer <em>steady-state Observation:observations</em>.</p>
 <p>We can observe that the lowering of groundwater around the building pit is quite high due to leakage of the sheet piles or leakage through the bottom clay layer with small resistance. Therefore, it is needed to improve the wall quality or the length. First we check the effect of the clay layer by studying a cross section.</p>
 </section>
 <section id="creating-a-cross-section" class="level3">
@@ -966,12 +964,12 @@ Figure&nbsp;12: Cross section of groundwater heads per layer, sheet pile wall R=
 <p>The authorities demand a drawdown effect of dewatering at a maximum of 0.10 m at surrounding buildings. This means that improvements for leakage control are needed but first we need to discover what parameter to focus on.</p>
 <p>To check whether the wall resistance or the bottom resistance of the layer 1 (below the building pit) is more important we can make 2 variations; one with C-clay=200 d and one with R-wall=500 d.&nbsp;<br> Of course you can change your model input, rerun the model and overwrite your model results. The next steps show you how to change the model input and save the results in separate <em>.gpkg and </em>.nc files.</p>
 <ol start="95" class="example" type="1">
-<li>In the input group select layer <em>timml Aquifer:…</em></li>
+<li>In the input group select layer <em>steady-state Aquifer:…</em></li>
 <li>Open the <em>Attrribute Table</em> (F6) and change the value for “aquitard_c” in layer 1 into 200 d.</li>
 <li>In the QGIS-Tim panel go to the tab <em>Results</em> and change the name of the output, e.g.&nbsp;case-TheHague_v1.</li>
 <li>Click <em>Compute</em> to run variant 1.</li>
 </ol>
-<p>Check in the <em>Layers</em> panel and see that the results are not overwritten but added to the groups, e.g.&nbsp;layer <em>case-TheHague_v1-timml Observation:observations</em> is added to the group <em>Vector</em>.</p>
+<p>Check in the <em>Layers</em> panel and see that the results are not overwritten but added to the groups, e.g.&nbsp;layer <em>case-TheHague_v1-steady-state Observation:observations</em> is added to the group <em>Vector</em>.</p>
 <ol start="99" class="example" type="1">
 <li>Fill in your calculated heads at the observation locations in <a href="#tbl-CalculatedHeads2Variants" class="quarto-xref">Table&nbsp;4</a> or use Excel.</li>
 </ol>
@@ -1056,8 +1054,8 @@ Table&nbsp;3: Table: calculated heads [m] in observation points for 2 variants c
 <p>* Known issue in TimML: you have to multiply Rw by layer permeability (Rw*10).</p>
 <p>Let’s now run Variant 2.</p>
 <ol start="100" class="example" type="1">
-<li>In layer <em>timml Aquifer:…</em> reset the value for “aquitard_c” in layer 1 to the default of 40 d.</li>
-<li>In layer <em>timml Leaky Line Doublet:…</em> change the value for “resistance” into 5000 d (500x10).</li>
+<li>In layer <em>steady-state Aquifer:…</em> reset the value for “aquitard_c” in layer 1 to the default of 40 d.</li>
+<li>In layer <em>steady-state Leaky Wall:…</em> change the value for “resistance” into 5000 d (500x10).</li>
 <li>In the QGIS-Tim panel go to the tab <em>Results</em> and change the name of the output, e.g.&nbsp;case-TheHague_v2.</li>
 <li>Click <em>Compute</em> to run variant 2.</li>
 <li>Fill in your calculated heads at the observation locations in the table above.</li>
@@ -1069,16 +1067,16 @@ Table&nbsp;3: Table: calculated heads [m] in observation points for 2 variants c
 <p>Suppose the best guess value of the clay layer resistance was right, then a mitigation measure for the effect of dewatering in the construction phase could be the installation of the wall to a deeper level where additional hydraulic resistance of 100d can be found at a depth of -13 m to -15 m NAP.</p>
 <p>If we want to create extra depth of the sheet pile we will have to introduce it in a deeper layer. There are 2 options to implement it in your model:</p>
 <ul>
-<li>Add a copy of the geometry of the sheet pile wall to the existing <em>Leaky Line Doublet</em> shape and assign it to layer 1.</li>
-<li>We recommend to create an extra <em>Leaky Line Doublet</em> element. In this case it is more easy to switch on/off this additional element in your sensitivity analysis.</li>
+<li>Add a copy of the geometry of the sheet pile wall to the existing <em>Leaky Wall</em> shape and assign it to layer 1.</li>
+<li>We recommend to create an extra <em>Leaky Wall</em> element. In this case it is more easy to switch on/off this additional element in your sensitivity analysis.</li>
 </ul>
-<p>How to copy the sheet pile wall to an extra <em>Leaky Line Doublet</em> element?</p>
+<p>How to copy the sheet pile wall to an extra <em>Leaky Wall</em> element?</p>
 <ol start="105" class="example" type="1">
-<li>In the QGIS-Tim panel go to the tab <em>Elements</em> and add a second <em>Leaky Line Doublet</em> and give it a name, e.g.&nbsp;“sheet_pile_L1”</li>
+<li>In the QGIS-Tim panel go to the tab <em>Elements</em> and add a second <em>Leaky Wall</em> and give it a name, e.g.&nbsp;“sheet_pile_L1”</li>
 <li>Go to the tab <em>Model Manager</em> and see that the element separately is added to the list. Here is can switch this element on / off for a calculation.</li>
-<li>In the <em>Layers</em> panel select the new layer <em>timml Leaky Line Doublet:sheet_pile_l1</em>.</li>
+<li>In the <em>Layers</em> panel select the new layer <em>steady-state Leaky Wall:sheet_pile_l1</em>.</li>
 <li>Open its <em>Attribute Table</em> (F6) and start the editing mode. The table is empty.</li>
-<li>Also open the <em>Attribute Table</em> of the first <em>Leaky Line Doublet</em> and select the existing element.</li>
+<li>Also open the <em>Attribute Table</em> of the first <em>Leaky Wall</em> and select the existing element.</li>
 <li>Click on the <em>Copy</em> button (<img src="figures/tutorial/button_Copy_Selected_Row.png" class="img-fluid" style="width:3.0%">) in the source table to copy the selected row to the clipboard.</li>
 </ol>
 <p><img src="figures/tutorial/figure_Leakylinedoublet_copy.png" class="img-fluid" style="width:70.0%"></p>
@@ -1163,9 +1161,9 @@ Table&nbsp;4: Effect of 4 Wall alternatives on extraction rate and drawdown Sout
 </section>
 <section id="effect-of-a-not-closed-wall-about-20-cm" class="level2">
 <h2 class="anchored" data-anchor-id="effect-of-a-not-closed-wall-about-20-cm">Effect of a not closed wall (about 20 cm)</h2>
-<p>Authorities are afraid that leakage incidents could be harmful for surrounding monuments. The effect of leakage can be studied by creating a fictitious little opening in the wall. This can be done e.g.&nbsp;by changing the values of first and last coordinate of the leaky line doublet.</p>
+<p>Authorities are afraid that leakage incidents could be harmful for surrounding monuments. The effect of leakage can be studied by creating a fictitious little opening in the wall. This can be done e.g.&nbsp;by changing the values of first and last coordinate of the Leaky Wall.</p>
 <ol start="117" class="example" type="1">
-<li>Select the <em>Leaky Line Doublet</em> in the <em>Layers</em> panel</li>
+<li>Select the <em>Leaky Wall</em> in the <em>Layers</em> panel</li>
 <li>In the editing toolbar go to the toggle editing option (<img src="figures/tutorial/button-Qgis-AttributeTable-StartEditingMode.png" class="img-fluid" style="width:4.0%">) and check the vertex option (<img src="figures/tutorial/button_VertexTool.png" class="img-fluid" style="width:4.0%">).</li>
 <li>On the drawing panel select a point in the line element of the wall and right click.</li>
 </ol>
@@ -1201,7 +1199,7 @@ Figure&nbsp;15: Python script
 </figcaption>
 </figure>
 </div>
-<p>As can be seen the converted Python file start with calls (e.g.&nbsp;import timml) to main necessary Python packages. After that, for each timm element in the model, all data coordinates and parameter values follow. At the end of the Python file the “model.solve” command is stated after which all head values in the domain with the desired mesh density are determined and also at demanded observation points.</p>
+<p>As can be seen the converted Python file start with calls (e.g.&nbsp;import timflow) to main necessary Python packages. After that, for each timm element in the model, all data coordinates and parameter values follow. At the end of the Python file the “model.solve” command is stated after which all head values in the domain with the desired mesh density are determined and also at demanded observation points.</p>
 <p>As can be seen the Python script for TimML is written in a very dedicated and condensed manner.</p>
 <p>To get the Python file running in a platform like Anaconda or Spyder, extra lines should be added at wish, to get the output that the user needs.</p>
 <p>Next this file can be used for geostatistical and scenario-analysis. There are several ways of handling this kind of study, like writing an additional Python program to perform repeated calculations and statistical analysis on results. But an easy way is to use the Probabilistic Toolkit (PTK), a platform for statistical analysis to be used together with geotechnical design programs, developed by Deltares. The PTK can be used for study of model sensitivity for variation of parameter values or reliability analysis.</p>
@@ -1460,7 +1458,7 @@ Figure&nbsp;30: Result of the reliability analysis for the selected failure crit
 <ol start="156" class="example" type="1">
 <li>Return to QGIS and in the QGIS-Tim panel go to the tab <em>Model Manager</em>.</li>
 <li>In the section <em>Model Setup</em> turn on the option “Transient”.</li>
-<li>In the panel <em>Layers</em> select <em>timml Aquifer:Aquifer</em>.</li>
+<li>In the panel <em>Layers</em> select <em>steady-state Aquifer:Aquifer</em>.</li>
 </ol>
 <p>As can be seen in <a href="#fig-Panel-TimmlAquiferAttrTable_v02" class="quarto-xref">Figure&nbsp;31</a>, the matrix of properties is extended in the transient mode with cells for transient parameters, like specific storage coefficients (aquitard_s, and aquifer_s) and porosities (aquitard_npor and aquifer_npor). Take care that specific storage coefficient is a storage per meter layer thickness. In older MWell course material a speadsheet is presented for estimation of coefficient values but there we calculated storage coefficients per whole layer. Those values should be divided by layer thickness.</p>
 <div id="fig-Panel-TimmlAquiferAttrTable_v02" class="quarto-float quarto-figure quarto-figure-center anchored">
@@ -1476,7 +1474,7 @@ Figure&nbsp;31: Attribute Table for Aquifer in transient condition.
 <ol start="159" class="example" type="1">
 <li>Fill in the Table with the corresponding values.</li>
 <li>In the TTim section in the <em>Layers panel</em> go to the list of elements for transient calculations.</li>
-<li>Select <em>ttim Temporal Settings:Aquifer</em> and open its <em>Attribute Table</em> (F6). Here the length of the time series is specified.</li>
+<li>Select <em>transient Temporal Settings:Aquifer</em> and open its <em>Attribute Table</em> (F6). Here the length of the time series is specified.</li>
 <li>Set the starting time to 0.</li>
 </ol>
 <p>But calculations take place for the range of time steps between “time_min” and “time_max”. The time unit is according to central settings in the project, mostly time in days. “Time_min” should not be zero but given a slight offset. Here we also find a “Stehfest_M” number, related to the number of terms in the calculation method performing transformation of formulas in solving differential equations. A reference date can be set to relate the calculation to real time data.</p>
@@ -1489,13 +1487,13 @@ Figure&nbsp;31: Attribute Table for Aquifer in transient condition.
 <img src="figures/tutorial/Panel-TTim AquiferAttrTable_v01.png" class="img-fluid figure-img" style="width:70.0%">
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-Panel-TTimAquiferAttrTable_v01-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Figure&nbsp;32: Table for <em>ttim Temporal Settings:Aquifer</em>
+Figure&nbsp;32: Table for <em>transient Temporal Settings:Aquifer</em>
 </figcaption>
 </figure>
 </div>
 <p><strong>NB!</strong>: In QGIS it is an obligation to use a “reference_date” to get the model running and present outcomes!</p>
 <ol start="164" class="example" type="1">
-<li>Select <em>ttim Computation Times:Domain</em> and set the time values for time steps where we want to get calculations of spatially distributed heads in mesh or raster points and contours.</li>
+<li>Select <em>transient Computation Times:Domain</em> and set the time values for time steps where we want to get calculations of spatially distributed heads in mesh or raster points and contours.</li>
 </ol>
 <div id="fig-Panel-TTim_DomainAttrTable_v01" class="quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-fig figure">
@@ -1503,13 +1501,13 @@ Figure&nbsp;32: Table for <em>ttim Temporal Settings:Aquifer</em>
 <img src="figures/tutorial/Panel-TTim_DomainAttrTable_v01.png" class="img-fluid figure-img" style="width:30.0%">
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-Panel-TTim_DomainAttrTable_v01-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Figure&nbsp;33: Table for <em>ttim Computation Times:Domain</em>
+Figure&nbsp;33: Table for <em>transient Computation Times:Domain</em>
 </figcaption>
 </figure>
 </div>
 <p>For this case we will leave this table blank, because calculating several head distributions at different time steps is rather time consuming during this course.</p>
 <ol start="165" class="example" type="1">
-<li>Select <em>ttim Observation:observations</em> and here we can set the time steps for a time series at certain points we want to monitor the calculation results. We set points at intervals that follow a (approximately) logarithmic increase in time intervals. Proposed values are shown in the next table.</li>
+<li>Select <em>transient Observation:observations</em> and here we can set the time steps for a time series at certain points we want to monitor the calculation results. We set points at intervals that follow a (approximately) logarithmic increase in time intervals. Proposed values are shown in the next table.</li>
 </ol>
 <div id="fig-Panel-TTim_ObservationsAttrTable_v01" class="quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-fig figure">
@@ -1517,14 +1515,14 @@ Figure&nbsp;33: Table for <em>ttim Computation Times:Domain</em>
 <img src="figures/tutorial/Panel-TTim_ObservationsAttrTable_v01.png" class="img-fluid figure-img" style="width:40.0%">
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-Panel-TTim_ObservationsAttrTable_v01-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Figure&nbsp;34: Table for <em>ttim Observation:observations</em>
+Figure&nbsp;34: Table for <em>transient Observation:observations</em>
 </figcaption>
 </figure>
 </div>
 <p>Don’t choose exactly the same time as when changing the flow. So if 60 is an end value, choose 59.9.</p>
-<p>In the <em>Attribute Table</em> of layer <em>ttim Well:pumping_wells</em> we can set the discharge amount. The value might change during time when excavation is considered or construction is performed in phases. For each change we have to add a line of input. In case there are a lot of switch on/off moments, this is a lot of work. <br> We just leave this option without any change because there is an other option in case each well has only a singel start and end time.</p>
+<p>In the <em>Attribute Table</em> of layer <em>transient Well:pumping_wells</em> we can set the discharge amount. The value might change during time when excavation is considered or construction is performed in phases. For each change we have to add a line of input. In case there are a lot of switch on/off moments, this is a lot of work. <br> We just leave this option without any change because there is an other option in case each well has only a singel start and end time.</p>
 <ol start="166" class="example" type="1">
-<li>Therefor go to the layer <em>timml Well:pumping_wells</em> layer. This layer contains simple elements to make it behave as a simple Timm element.</li>
+<li>Therefor go to the layer <em>steady-state Well:pumping_wells</em> layer. This layer contains simple elements to make it behave as a simple Timm element.</li>
 <li>In the <em>Attribute Table</em> make start_time=5, end_time=30 and discharge_transient=15.</li>
 <li>But fill in a value of 0 m3/d in column “Discharge” because this variable is part of TimML well element. We use the “discharge_transient” variable to define flow in TTim. Remember: Solution of TTim is superposed on solution of TimML.</li>
 </ol>

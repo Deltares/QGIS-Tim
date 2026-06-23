@@ -2,13 +2,16 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.8.24">
+<meta name="generator" content="quarto-1.9.38">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
 <title>Install – QGIS-Tim</title>
 <style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
 div.columns{display: flex; gap: min(4vw, 1.5em);}
@@ -32,15 +35,14 @@ ul.task-list li input[type="checkbox"] {
 <meta name="quarto:offset" content="./">
 <script src="site_libs/quarto-html/quarto.js" type="module"></script>
 <script src="site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
-<script src="site_libs/quarto-html/axe/axe-check.js" type="module"></script>
 <script src="site_libs/quarto-html/popper.min.js"></script>
 <script src="site_libs/quarto-html/tippy.umd.min.js"></script>
 <script src="site_libs/quarto-html/anchor.min.js"></script>
 <link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="site_libs/quarto-html/quarto-syntax-highlighting-dc55a5b9e770e841cd82e46aadbfb9b0.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-15634bcf2e68342d4ad2dfa704d543f6.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="site_libs/bootstrap/bootstrap-4978b26caf2fbf66560f9034f076e692.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="site_libs/bootstrap/bootstrap-73da2f715f230a77f008b2aa933638ae.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -81,8 +83,8 @@ ul.task-list li input[type="checkbox"] {
       <div class="navbar-container container-fluid">
       <div class="navbar-brand-container mx-auto">
     <a href="./index.html" class="navbar-brand navbar-brand-logo">
-    <img src="./_static/iMOD-doc-logo.svg" alt="" class="navbar-logo light-content">
-    <img src="./_static/iMOD-doc-logo.svg" alt="" class="navbar-logo dark-content">
+    <img src="./_static/QGIS-Tim-logo.svg" alt="" class="navbar-logo light-content">
+    <img src="./_static/QGIS-Tim-logo.svg" alt="" class="navbar-logo dark-content">
     </a>
     <a class="navbar-brand" href="./index.html">
     <span class="navbar-title">QGIS-Tim</span>
@@ -135,7 +137,7 @@ ul.task-list li input[type="checkbox"] {
   <li><a href="#method-a-from-the-qgis-plugin-database-recommended" id="toc-method-a-from-the-qgis-plugin-database-recommended" class="nav-link" data-scroll-target="#method-a-from-the-qgis-plugin-database-recommended">Method A: From the QGIS plugin database (recommended)</a></li>
   <li><a href="#method-b-from-zip-file" id="toc-method-b-from-zip-file" class="nav-link" data-scroll-target="#method-b-from-zip-file">Method B: From ZIP file</a></li>
   </ul></li>
-  <li><a href="#install-the-timml-and-ttim-server" id="toc-install-the-timml-and-ttim-server" class="nav-link" data-scroll-target="#install-the-timml-and-ttim-server">3. Install the TimML and TTim server</a>
+  <li><a href="#install-the-timflow-server" id="toc-install-the-timflow-server" class="nav-link" data-scroll-target="#install-the-timflow-server">3. Install the timflow server</a>
   <ul class="collapse">
   <li><a href="#method-a-install-from-github-requires-internet-connection" id="toc-method-a-install-from-github-requires-internet-connection" class="nav-link" data-scroll-target="#method-a-install-from-github-requires-internet-connection">Method A: Install from GitHub (requires internet connection)</a></li>
   <li><a href="#method-b-install-from-zip-file" id="toc-method-b-install-from-zip-file" class="nav-link" data-scroll-target="#method-b-install-from-zip-file">Method B: Install from ZIP file</a></li>
@@ -168,7 +170,7 @@ ul.task-list li input[type="checkbox"] {
 <p>QGIS-Tim consists of two parts: A QGIS plugin and the <code>gistim</code> Python package, which runs in a separate Python environment. The installation of QGIS-Tim therfore consists of three steps:</p>
 <section id="install-qgis" class="level2">
 <h2 class="anchored" data-anchor-id="install-qgis">1. Install QGIS</h2>
-<p>Download and install a recent version of QGIS (&gt;=3.28): <a href="https://www.qgis.org/en/site/forusers/download.html" target="_blank">https://www.qgis.org/en/site/forusers/download.html</a></p>
+<p>Download and install a recent version of QGIS (&gt;=3.40) from the official QGIS website: <a href="https://www.qgis.org/en/site/forusers/download.html" target="_blank">https://www.qgis.org/en/site/forusers/download.html</a></p>
 </section>
 <section id="install-the-qgis-plugin" class="level2">
 <h2 class="anchored" data-anchor-id="install-the-qgis-plugin">2. Install the QGIS plugin</h2>
@@ -198,14 +200,14 @@ ul.task-list li input[type="checkbox"] {
 <p>By clicking the icon, the plugin is started.</p>
 </section>
 </section>
-<section id="install-the-timml-and-ttim-server" class="level2">
-<h2 class="anchored" data-anchor-id="install-the-timml-and-ttim-server">3. Install the TimML and TTim server</h2>
-<p>With the plugin installed, we can already define model input and convert it to Python scripts or JSON files. To run TimML and TTim computations directly from QGIS, we need to install a server program which contains TimML and TTim.</p>
+<section id="install-the-timflow-server" class="level2">
+<h2 class="anchored" data-anchor-id="install-the-timflow-server">3. Install the timflow server</h2>
+<p>With the plugin installed, we can already define model input and convert it to Python scripts or JSON files. To run timflow computations directly from QGIS, we need to install a server program which contains timflow.</p>
 <section id="method-a-install-from-github-requires-internet-connection" class="level3">
 <h3 class="anchored" data-anchor-id="method-a-install-from-github-requires-internet-connection">Method A: Install from GitHub (requires internet connection)</h3>
 <ol type="1">
 <li>Start the QGIS-Tim plugin by clicking the QGIS-Tim icon in the toolbar.</li>
-<li>Find and click the “Install TimML and TTim server” button at the bottom of the plugin window.</li>
+<li>Find and click the “Install timflow server” button at the bottom of the plugin window.</li>
 <li>Click the “Install latest release from GitHub” button to download and install the server program.</li>
 </ol>
 </section>
@@ -215,7 +217,7 @@ ul.task-list li input[type="checkbox"] {
 <ol type="1">
 <li>Download the gistim ZIP file for your platform: Windows, macOS, or Linux.</li>
 <li>Start the QGIS-Tim plugin by clicking the QGIS-Tim icon in the toolbar.</li>
-<li>Find and click the “Install TimML and TTim server” button at the bottom of the plugin window.</li>
+<li>Find and click the “Install timflow server” button at the bottom of the plugin window.</li>
 <li>Set the path to the downloaded ZIP file in the “Install from ZIP file” section.</li>
 <li>Click the “Install” button.</li>
 </ol>

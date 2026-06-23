@@ -6,9 +6,8 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
-<meta name="description" content="Learn how to use QGIS Tim plugin">
 
-<title> Tutorials – QGIS-Tim</title>
+<title>Particle Tracking – QGIS-Tim</title>
 <style>
 /* Default styles provided by pandoc.
 ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
@@ -34,9 +33,6 @@ ul.task-list li input[type="checkbox"] {
 <script src="site_libs/quarto-search/fuse.min.js"></script>
 <script src="site_libs/quarto-search/quarto-search.js"></script>
 <meta name="quarto:offset" content="./">
-<link href="./tutorial_Rijsenhout.html" rel="next">
-<script src="site_libs/quarto-listing/list.min.js"></script>
-<script src="site_libs/quarto-listing/quarto-listing.js"></script>
 <script src="site_libs/quarto-html/quarto.js" type="module"></script>
 <script src="site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
 <script src="site_libs/quarto-html/popper.min.js"></script>
@@ -47,8 +43,6 @@ ul.task-list li input[type="checkbox"] {
 <script src="site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
 <link href="site_libs/bootstrap/bootstrap-73da2f715f230a77f008b2aa933638ae.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
-<link href="site_libs/quarto-contrib/fontawesome6-0.1.0/all.css" rel="stylesheet">
-<link href="site_libs/quarto-contrib/fontawesome6-0.1.0/latex-fontsize.css" rel="stylesheet">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -76,70 +70,12 @@ ul.task-list li input[type="checkbox"] {
     "search-label": "Search"
   }
 }</script>
-<script>
 
-  window.document.addEventListener("DOMContentLoaded", function (_event) {
-    const listingTargetEl = window.document.querySelector('#listing-listing .list');
-    if (!listingTargetEl) {
-      // No listing discovered, do not attach.
-      return; 
-    }
-
-    const options = {
-      valueNames: ['listing-title','listing-author','listing-image','listing-description',{ data: ['index'] },{ data: ['categories'] },{ data: ['listing-date-sort'] },{ data: ['listing-file-modified-sort'] }],
-      
-      searchColumns: ["listing-title","listing-author","listing-image","listing-description"],
-    };
-
-    window['quarto-listings'] = window['quarto-listings'] || {};
-    window['quarto-listings']['listing-listing'] = new List('listing-listing', options);
-
-    if (window['quarto-listing-loaded']) {
-      window['quarto-listing-loaded']();
-    }
-  });
-
-  window.addEventListener('hashchange',() => {
-    if (window['quarto-listing-loaded']) {
-      window['quarto-listing-loaded']();
-    }
-  })
-  </script>
-
-  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
-  <script defer="" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
-
-<script type="text/javascript">
-const typesetMath = (el) => {
-  if (window.MathJax) {
-    // MathJax Typeset
-    window.MathJax.typeset([el]);
-  } else if (window.katex) {
-    // KaTeX Render
-    var mathElements = el.getElementsByClassName("math");
-    var macros = [];
-    for (var i = 0; i < mathElements.length; i++) {
-      var texText = mathElements[i].firstChild;
-      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
-        window.katex.render(texText.data, mathElements[i], {
-          displayMode: mathElements[i].classList.contains('display'),
-          throwOnError: false,
-          macros: macros,
-          fleqn: false
-        });
-      }
-    }
-  }
-}
-window.Quarto = {
-  typesetMath
-};
-</script>
 
 <link rel="stylesheet" href="_static/styles.css">
 </head>
 
-<body class="nav-sidebar floating nav-fixed quarto-light">
+<body class="nav-fixed quarto-light">
 
 <div id="quarto-search-results"></div>
   <header id="quarto-header" class="headroom fixed-top">
@@ -165,7 +101,7 @@ window.Quarto = {
 <span class="menu-text">Installation</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link active" href="./tutorial.html" aria-current="page"> 
+    <a class="nav-link" href="./tutorial.html"> 
 <span class="menu-text">Tutorials</span></a>
   </li>  
   <li class="nav-item">
@@ -185,62 +121,35 @@ window.Quarto = {
 </div>
       </div> <!-- /container-fluid -->
     </nav>
-  <nav class="quarto-secondary-nav">
-    <div class="container-fluid d-flex">
-      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
-        <i class="bi bi-layout-text-sidebar-reverse"></i>
-      </button>
-        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./tutorial.html">{{&lt; fa solid book &gt;}} Tutorials</a></li></ol></nav>
-        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
-        </a>
-    </div>
-  </nav>
 </header>
 <!-- content -->
 <div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
 <!-- sidebar -->
-  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
-    <div class="sidebar-menu-container"> 
-    <ul class="list-unstyled mt-1">
-        <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="./tutorial.html" class="sidebar-item-text sidebar-link active">
- <span class="menu-text"> Tutorials</span></a>
-  </div>
-</li>
-        <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="./tutorial_Rijsenhout.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Building Pit Rijsenhout</span></a>
-  </div>
-</li>
-        <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="./tutorial_TheHague.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Building Pit The Hague</span></a>
-  </div>
-</li>
-    </ul>
-    </div>
-</nav>
-<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
 <!-- margin-sidebar -->
-    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar zindex-bottom">
-        
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#requirements" id="toc-requirements" class="nav-link active" data-scroll-target="#requirements">Requirements</a></li>
+  <li><a href="#description" id="toc-description" class="nav-link" data-scroll-target="#description">Description</a></li>
+  <li><a href="#getting-started" id="toc-getting-started" class="nav-link" data-scroll-target="#getting-started">Getting Started</a></li>
+  <li><a href="#load-the-tutorial-data" id="toc-load-the-tutorial-data" class="nav-link" data-scroll-target="#load-the-tutorial-data">Load the tutorial data</a></li>
+  <li><a href="#forward-particle-tracking" id="toc-forward-particle-tracking" class="nav-link" data-scroll-target="#forward-particle-tracking">Forward Particle Tracking</a></li>
+  <li><a href="#travel-times" id="toc-travel-times" class="nav-link" data-scroll-target="#travel-times">Travel times</a></li>
+  <li><a href="#introducing-a-well" id="toc-introducing-a-well" class="nav-link" data-scroll-target="#introducing-a-well">Introducing a well</a></li>
+  <li><a href="#investigate-the-capture-zone" id="toc-investigate-the-capture-zone" class="nav-link" data-scroll-target="#investigate-the-capture-zone">Investigate the capture zone</a></li>
+  </ul>
+</nav>
     </div>
 <!-- main -->
 <main class="content" id="quarto-document-content">
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title"><i class="fa-solid fa-book" aria-label="book"></i> Tutorials</h1>
+<h1 class="title">Particle Tracking</h1>
 </div>
 
-<div>
-  <div class="description">
-    Learn how to use QGIS Tim plugin
-  </div>
-</div>
 
 
 <div class="quarto-title-meta">
@@ -255,74 +164,293 @@ window.Quarto = {
 </header>
 
 
-<p>Modelling with analytic elements is not very common. The QGIS-Tim plugin makes it more easy to build your model in a graphical user interface starting from simple and making it as complex as you like.</p>
-<p>Therefore, we have compiled a set of tutorials to help you get started and give you an overview of the capabilities of analytical elements.</p>
+<section id="requirements" class="level2">
+<h2 class="anchored" data-anchor-id="requirements">Requirements</h2>
+<ul>
+<li>Be sure QGIS version 3.40 or later is installed</li>
+<li>Be sure the <code>gistim</code> Python package is installed (see <a href="./install.html">installation</a> for instructions).</li>
+</ul>
+</section>
+<section id="description" class="level2">
+<h2 class="anchored" data-anchor-id="description">Description</h2>
+<p>In this tutorial, we will show how to use the particle tracking feature of QGIS-Tim. This feature allows you to track the movement of particles in a groundwater flow field, which can be useful for understanding the flow paths and travel times of groundwater. We will use a simple example to demonstrate how to set up and run a particle tracking simulation using QGIS-Tim.</p>
+</section>
+<section id="getting-started" class="level2">
+<h2 class="anchored" data-anchor-id="getting-started">Getting Started</h2>
+<ol class="example" type="1">
+<li>Launch QGIS</li>
+</ol>
+<p>We start with the creation of a new QGIS project.</p>
+<ol start="2" class="example" type="1">
+<li>From the main menu click on <em>Project</em> and select <em>New</em>.</li>
+</ol>
+<p>The case in this tutorial is located in The Netherlands, so next we select the appropriate projection.</p>
+<ol start="3" class="example" type="1">
+<li><p>From the main menu click on <em>Project</em> and select <em>Properties</em>.</p></li>
+<li><p>In the <em>Properties</em> window select the category <em>CRS</em>, search for “EPSG:28992” and you find “Amersfoort / RD New”. Select this option and click the <em>Apply</em> button, followed by the <em>OK</em> button to close the window.</p></li>
+<li><p>Go to <em>Project</em> in the main menu, select <em>Save As</em> and select a folder and a file name for your project, e.g.&nbsp;“…\QGIS-Tim_Tutorial\particle_tracking.qgz”</p></li>
+</ol>
+</section>
+<section id="load-the-tutorial-data" class="level2">
+<h2 class="anchored" data-anchor-id="load-the-tutorial-data">Load the tutorial data</h2>
+<ol start="6" class="example" type="1">
+<li>First we’ll open the model which is part of the tutorial material <insert_link_to_model> . Click on <em>Model Manager</em>, click <em>Open</em> and select ““./Zuilen_particle_tracking.gpkg”“.</insert_link_to_model></li>
+</ol>
+<p>This wil load the model into the QGIS-Tim plugin. The model consists of a single layer with a recharge area (Polygon Area Sink) inbetween two rivers. Let’s compute the groundwater head distribution in the model area.</p>
+<ol start="7" class="example" type="1">
+<li>Click on <em>Results</em> and click on <em>Compute</em> to compute the groundwater head distribution. After the computation is finished, the groundwater head distribution will be visualized in the map canvas.</li>
+</ol>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="figures/tutorial/figure_PRT_reference.png" class="img-fluid figure-img"></p>
+<figcaption>The computed groundwater head distribution will look as follows</figcaption>
+</figure>
+</div>
+</section>
+<section id="forward-particle-tracking" class="level2">
+<h2 class="anchored" data-anchor-id="forward-particle-tracking">Forward Particle Tracking</h2>
+<p>Next, let’s release some particles in the model and track their movement.</p>
+<ol start="8" class="example" type="1">
+<li><p>Go to <em>Elements</em> and click the <em>Particle Forward</em> button. Provide a layer name in the prompt (e.g.&nbsp;“particle”) and click <em>OK</em>.</p></li>
+<li><p>Select the “steady-state Particle Forward” on the left.</p></li>
+<li><p>Click your right mouse button and select the <em>Toggle Editing Mode</em> (<img src="figures/tutorial/button-Qgis-AttributeTable-StartEditingMode.png" class="img-fluid" style="width:4.0%">).</p></li>
+<li><p>Click the <em>Add Point Feature</em> button (<img src="figures/tutorial/button_AddPointFeature.png" class="img-fluid" style="width:4.0%">) and click in the map canvas to add a particle. (TIP: For a nice result, place the particle near the maximum groundwater head.) You can add as many particles as you like, but for this tutorial we will add just one particle.</p></li>
+<li><p>This will open a form to enter the attributes of the particle. Fill in the following values:</p></li>
+</ol>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 25%">
+<col style="width: 25%">
+<col style="width: 25%">
+<col style="width: 25%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>parameter</th>
+<th>value</th>
+<th>unit</th>
+<th>comment</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>fid</td>
+<td>Autogenerate</td>
+<td>[-]</td>
+<td>ID is autogenerated by QGIS</td>
+</tr>
+<tr class="even">
+<td>Label</td>
+<td>1</td>
+<td>[-]</td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>z_start</td>
+<td>-10</td>
+<td>[m MSL]</td>
+<td>starting depth of the particle</td>
+</tr>
+<tr class="even">
+<td>max_horizontal_step</td>
+<td>10</td>
+<td>[m MSL]</td>
+<td>maximum horizontal step size</td>
+</tr>
+<tr class="odd">
+<td>vertical_step_fraction</td>
+<td>0.1</td>
+<td>[-]</td>
+<td>maximum vertical step as fraction of layer thickness</td>
+</tr>
+<tr class="even">
+<td>nstep_max</td>
+<td>100</td>
+<td>[-]</td>
+<td>maximum number of steps</td>
+</tr>
+</tbody>
+</table>
+<p>The latter three paramaters control the step size of the particle tracking. Decreasing the step size will increase the accuracy of the particle tracking, but also increase the computation time.</p>
+<ol start="13" class="example" type="1">
+<li><p>After filling in the attributes, click <em>OK</em> to save the particle.</p></li>
+<li><p>Click on <em>Results</em> and then under <em>Output</em> select the <em>Particle Pathlines</em> checkbox.</p></li>
+<li><p>Next press <em>Compute</em> again to compute the particle tracking results. After the computation is finished, the particle track will be visualized in the map canvas.</p></li>
+</ol>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="figures/tutorial/figure_PRT_1.png" class="img-fluid figure-img"></p>
+<figcaption>The first particle tracking results</figcaption>
+</figure>
+</div>
+<p>You’ll see that particles sent in the direction of the Vecht river (the river on the right) will not be captured by the river, whereas the particles sent in the direction of the Amsterdam Rijn Kanaal (ARK) will be captured by the canal.</p>
+<p><strong>Exercise</strong>: Investigate which River parameter causes this difference in behavior by comparing the attribute tables of the Vecht river and the Amsterdam Rijn Kanaal (ARK). Feel free to modify the parameters of the Vecht river and see how this affects the particle tracking results.</p>
+</section>
+<section id="travel-times" class="level2">
+<h2 class="anchored" data-anchor-id="travel-times">Travel times</h2>
+<p>Let’s also investigate the travel time of the particles.</p>
+<ol start="16" class="example" type="1">
+<li><p>Open the <em>Temporal Controller</em> of QGIS (in the toolbar on top). (<img src="figures/tutorial/button_TemporalControllerPanel.png" class="img-fluid" style="width:4.0%">).</p></li>
+<li><p>In the Temporal Controller panel click the green play button “Animated temporal navigation” on the right of the menu (<img src="figures/tutorial/button_TemporalControllerPanel-menu.png" class="img-fluid" style="width:14.0%">).</p></li>
+</ol>
+<p>Navigation buttons appear which allow you to control the animation of the particle tracking results.</p>
+<ol start="18" class="example" type="1">
+<li><p>First, make sure the animation range is set properly by clicking the “Set to full range” button (<img src="figures/tutorial/button_TemporalController_full_range.png" class="img-fluid" style="width:4.0%">).</p></li>
+<li><p>Second, set the step size to 10 years. This means that the animation will show the particle positions every 10 years.</p></li>
+<li><p>Next, click the play button to start the animation. You should see the particles moving as line segments. These line segments represent the pathlines of the particles within the selected time frame (of 10 years). This time frame is shown on top next to the temporal controller panel menu.</p></li>
+<li><p>Finally, you can view the tracelines of the particles in their entirety again by clicking the red cross button (“Turn off temporal navigation”) on the left of the menu (<img src="figures/tutorial/button_TemporalControllerPanel-menu.png" class="img-fluid" style="width:14.0%">).</p></li>
+</ol>
+<p><strong>Note</strong> that closing the temporal controller panel will NOT turn off the temporal navigation.</p>
+</section>
+<section id="introducing-a-well" class="level2">
+<h2 class="anchored" data-anchor-id="introducing-a-well">Introducing a well</h2>
+<p>Let’s introduce a well in the model and investigate how this affects the particle’s direction and travel time.</p>
+<p>(@): Place a well roughtly in the center of the model, by clicking <em>Elements</em> and then clicking the <em>Well</em> button.</p>
+<ol start="22" class="example" type="1">
+<li><p>Provide a name to the layer</p></li>
+<li><p>Start editing your new well layer by clicking the <em>Toggle Editing Mode</em> button (<img src="figures/tutorial/button-Qgis-AttributeTable-StartEditingMode.png" class="img-fluid" style="width:4.0%">).</p></li>
+<li><p>Click the <em>Add Point Feature</em> button (<img src="figures/tutorial/button_AddPointFeature.png" class="img-fluid" style="width:4.0%">).</p></li>
+<li><p>This will open a form to enter the attributes of the well. Fill in the following values:</p></li>
+</ol>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>parameter</th>
+<th>value</th>
+<th>unit</th>
+<th>comment</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>fid</td>
+<td>Autogenerate</td>
+<td>[-]</td>
+<td>ID is autogenerated by QGIS</td>
+</tr>
+<tr class="even">
+<td>discharge</td>
+<td>30</td>
+<td>[m3/d]</td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>radius</td>
+<td>0.1</td>
+<td>[m]</td>
+<td></td>
+</tr>
+<tr class="even">
+<td>resistance</td>
+<td>0</td>
+<td>[d]</td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>layer</td>
+<td>0</td>
+<td>[-]</td>
+<td></td>
+</tr>
+<tr class="even">
+<td>label</td>
+<td>1</td>
+<td>[-]</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<ol start="26" class="example" type="1">
+<li><p>After filling in the attributes, click <em>OK</em> to save the well.</p></li>
+<li><p>Next press <em>Compute</em> again to compute the particle tracking results.</p></li>
+</ol>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="figures/tutorial/figure_PRT_well.png" class="img-fluid figure-img"></p>
+<figcaption>If everything went well, you’ll see the pathlines were modified</figcaption>
+</figure>
+</div>
+</section>
+<section id="investigate-the-capture-zone" class="level2">
+<h2 class="anchored" data-anchor-id="investigate-the-capture-zone">Investigate the capture zone</h2>
+<p>Let’s introduce trace some particles backwards to investigate the capture zone of the well.</p>
+<ol start="28" class="example" type="1">
+<li><p>Click the <em>Particle Backward</em> button. Provide a layer name in the prompt (e.g.&nbsp;“capture_zone”) and click <em>OK</em>.</p></li>
+<li><p>Select the “steady-state Particle Backward” on the left.</p></li>
+<li><p>Click your right mouse button and select the <em>Toggle Editing Mode</em> button (<img src="figures/tutorial/button-Qgis-AttributeTable-StartEditingMode.png" class="img-fluid" style="width:4.0%">).</p></li>
+<li><p>Zoom in to the well you placed. Click the <em>Add Point Feature</em> button (<img src="figures/tutorial/button_AddPointFeature.png" class="img-fluid" style="width:4.0%">) and click in the map canvas to add a particles just around the well.</p></li>
+<li><p>This will open a form to enter the attributes of the particle. Fill in the following values:</p></li>
+</ol>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 25%">
+<col style="width: 25%">
+<col style="width: 25%">
+<col style="width: 25%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>parameter</th>
+<th>value</th>
+<th>unit</th>
+<th>comment</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>fid</td>
+<td>Autogenerate</td>
+<td>[-]</td>
+<td>ID is autogenerated by QGIS</td>
+</tr>
+<tr class="even">
+<td>Label</td>
+<td>1</td>
+<td>[-]</td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>z_start</td>
+<td>-40</td>
+<td>[m MSL]</td>
+<td>starting depth of the particle</td>
+</tr>
+<tr class="even">
+<td>max_horizontal_step</td>
+<td>10</td>
+<td>[m MSL]</td>
+<td>maximum horizontal step size</td>
+</tr>
+<tr class="odd">
+<td>vertical_step_fraction</td>
+<td>0.1</td>
+<td>[-]</td>
+<td>maximum vertical step as fraction of layer thickness</td>
+</tr>
+<tr class="even">
+<td>nstep_max</td>
+<td>50</td>
+<td>[-]</td>
+<td>maximum number of steps</td>
+</tr>
+</tbody>
+</table>
+<ol start="33" class="example" type="1">
+<li><p>After filling in the attributes, click <em>OK</em> to save the particle.</p></li>
+<li><p>Next press <em>Compute</em> again to compute the particle tracking results.</p></li>
+</ol>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="figures/tutorial/figure_PRT_capture_zone.png" class="img-fluid figure-img"></p>
+<figcaption>If you placed your particles correctly, you’ll get a good idea of the capture zone of the well</figcaption>
+</figure>
+</div>
+<p><strong>Note:</strong> When particles travel for a very long time, the amount of years might exceed the maximum of years allowed in the geopackage (9999 years). In case this happens, you can decrease nstep_max to a lower value (e.g.&nbsp;30) and recompute the particle tracking results.</p>
 
 
+</section>
 
-
-<div class="quarto-listing quarto-listing-container-grid" id="listing-listing">
-<div class="list grid quarto-listing-cols-3">
-<div class="g-col-1" data-index="0" data-listing-file-modified-sort="1782214467128" data-listing-reading-time-sort="31" data-listing-word-count-sort="6060">
-<a href="./tutorial_Rijsenhout.html" class="quarto-grid-link">
-<div class="quarto-grid-item card h-100 card-left">
-<p class="card-img-top"><img loading='lazy' src="figures/tutorial/GeoTOP-Verticaledoorsnede.png" style="height: 150px;"  class="thumbnail-image card-img"/></p>
-<div class="card-body post-contents">
-<h5 class="no-anchor card-title listing-title">
-Building Pit Rijsenhout
-</h5>
-<div class="card-text listing-description delink">
-In this tutorial, you will learn how to:
-</div>
-<div class="card-attribution card-text-small start">
-<div class="listing-author">
-
-</div>
-</div>
-</div>
-</div></a>
-</div>
-<div class="g-col-1" data-index="1" data-listing-file-modified-sort="1782214467128" data-listing-reading-time-sort="44" data-listing-word-count-sort="8629">
-<a href="./tutorial_TheHague.html" class="quarto-grid-link">
-<div class="quarto-grid-item card h-100 card-left">
-<p class="card-img-top"><img loading='lazy' src="figures/tutorial/photo-TheHagueCityCentre.png" style="height: 150px;"  class="thumbnail-image card-img"/></p>
-<div class="card-body post-contents">
-<h5 class="no-anchor card-title listing-title">
-Building Pit The Hague
-</h5>
-<div class="card-text listing-description delink">
-In this tutorial, you will learn how to:
-</div>
-<div class="card-attribution card-text-small start">
-<div class="listing-author">
-
-</div>
-</div>
-</div>
-</div></a>
-</div>
-<div class="g-col-1" data-index="2" data-listing-file-modified-sort="1782214467128" data-listing-reading-time-sort="7" data-listing-word-count-sort="1338">
-<a href="./tutorial_particle_tracking.html" class="quarto-grid-link">
-<div class="quarto-grid-item card h-100 card-left">
-<p class="card-img-top"><img loading='lazy' src="figures/tutorial/figure_PRT_reference.png" style="height: 150px;"  class="thumbnail-image card-img"/></p>
-<div class="card-body post-contents">
-<h5 class="no-anchor card-title listing-title">
-Particle Tracking
-</h5>
-<div class="card-text listing-description delink">
-In this tutorial, we will show how to use the particle tracking feature of QGIS-Tim. This feature allows you to track the movement of particles in a groundwater flow field…
-</div>
-<div class="card-attribution card-text-small start">
-<div class="listing-author">
-
-</div>
-</div>
-</div>
-</div></a>
-</div>
-</div>
-<div class="listing-no-matching d-none">No matching items</div>
-</div></main> <!-- /main -->
+</main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">
   window.document.addEventListener("DOMContentLoaded", function (event) {
     const icon = "";
@@ -723,15 +851,6 @@ In this tutorial, we will show how to use the particle tracking feature of QGIS-
     }
   });
   </script>
-<nav class="page-navigation">
-  <div class="nav-page nav-page-previous">
-  </div>
-  <div class="nav-page nav-page-next">
-      <a href="./tutorial_Rijsenhout.html" class="pagination-link" aria-label="Building Pit Rijsenhout">
-        <span class="nav-page-text">Building Pit Rijsenhout</span> <i class="bi bi-arrow-right-short"></i>
-      </a>
-  </div>
-</nav>
 </div> <!-- /content -->
 
 
