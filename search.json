@@ -158,14 +158,14 @@
     "href": "tutorial_particle_tracking.html",
     "title": "Particle Tracking",
     "section": "",
-    "text": "Be sure QGIS version 3.40 or later is installed\nBe sure the gistim Python package is installed (see installation for instructions)."
+    "text": "Be sure QGIS version 3.40 or later is installed\nBe sure the QGIS-Tim plugin version 0.7.0 or later is installed (see installation for instructions).\nBe sure the gistim version 0.7.0 or later is installed (see installation for instructions)."
   },
   {
     "objectID": "tutorial_particle_tracking.html#requirements",
     "href": "tutorial_particle_tracking.html#requirements",
     "title": "Particle Tracking",
     "section": "",
-    "text": "Be sure QGIS version 3.40 or later is installed\nBe sure the gistim Python package is installed (see installation for instructions)."
+    "text": "Be sure QGIS version 3.40 or later is installed\nBe sure the QGIS-Tim plugin version 0.7.0 or later is installed (see installation for instructions).\nBe sure the gistim version 0.7.0 or later is installed (see installation for instructions)."
   },
   {
     "objectID": "tutorial_particle_tracking.html#description",
