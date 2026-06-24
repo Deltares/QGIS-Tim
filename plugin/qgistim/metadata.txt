@@ -24,6 +24,7 @@ hasProcessingProvider=no
 changelog=      <p> 0.7.2
                 - Fix bug where attribute table showed transient variables when
                   adding elements to a steady-state model.
+                - Fixed security issue when installing backend.
                 <p> 0.7.1
                 - Fix broken generation of Python scripts
                 <p> 0.7.0
