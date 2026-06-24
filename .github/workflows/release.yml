@@ -24,6 +24,7 @@ jobs:
       - name: Build with PyInstaller and create backend ZIP
         run: pixi run zip-backend
       - name: Create GitHub release if missing
+        if: matrix.os == 'ubuntu-latest'
         run: gh release create -d "${{ github.ref_name }}" --notes "Release ${{ github.ref_name }}"
         env:
           GITHUB_TOKEN: ${{ github.token }}
