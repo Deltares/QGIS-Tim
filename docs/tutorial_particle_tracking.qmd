@@ -95,7 +95,7 @@ following values:
 | Label       | 1     | [-]  | |
 | z_start | -10   | [m MSL] | starting depth of the particle |
 | max_horizontal_step | 10 | [m MSL]| maximum horizontal step size |
-| vertical_step_fraction  | 0.1 | [-]| maximum vertical step as fraction of layer thickness |
+| max_vertical_step_fraction  | 0.1 | [-]| maximum vertical step as fraction of layer thickness |
 | nstep_max  | 100 | [-]| maximum number of steps |
 
 The latter three paramaters control the step size of the particle tracking.
