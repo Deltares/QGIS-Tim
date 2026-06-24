@@ -158,70 +158,110 @@
     "href": "tutorial_particle_tracking.html",
     "title": "Particle Tracking",
     "section": "",
-    "text": "Be sure QGIS version 3.40 or later is installed\nBe sure the QGIS-Tim plugin version 0.7.0 or later is installed (see installation for instructions).\nBe sure the gistim version 0.7.0 or later is installed (see installation for instructions)."
+    "text": "Be sure QGIS version 3.40 or later is installed\nBe sure the QGIS-Tim plugin version 0.7.0 or later is installed (see installation for instructions).\nBe sure the gistim version 0.7.0 or later is installed (see installation for instructions).",
+    "crumbs": [
+      "Tutorials",
+      "Particle Tracking"
+    ]
   },
   {
     "objectID": "tutorial_particle_tracking.html#requirements",
     "href": "tutorial_particle_tracking.html#requirements",
     "title": "Particle Tracking",
     "section": "",
-    "text": "Be sure QGIS version 3.40 or later is installed\nBe sure the QGIS-Tim plugin version 0.7.0 or later is installed (see installation for instructions).\nBe sure the gistim version 0.7.0 or later is installed (see installation for instructions)."
+    "text": "Be sure QGIS version 3.40 or later is installed\nBe sure the QGIS-Tim plugin version 0.7.0 or later is installed (see installation for instructions).\nBe sure the gistim version 0.7.0 or later is installed (see installation for instructions).",
+    "crumbs": [
+      "Tutorials",
+      "Particle Tracking"
+    ]
   },
   {
     "objectID": "tutorial_particle_tracking.html#description",
     "href": "tutorial_particle_tracking.html#description",
     "title": "Particle Tracking",
     "section": "Description",
-    "text": "Description\nIn this tutorial, we will show how to use the particle tracking feature of QGIS-Tim. This feature allows you to track the movement of particles in a groundwater flow field, which can be useful for understanding the flow paths and travel times of groundwater. We will use a simple example to demonstrate how to set up and run a particle tracking simulation using QGIS-Tim."
+    "text": "Description\nIn this tutorial, we will show how to use the particle tracking feature of QGIS-Tim. This feature allows you to track the movement of particles in a groundwater flow field, which can be useful for understanding the flow paths and travel times of groundwater. We will use a simple example to demonstrate how to set up and run a particle tracking simulation using QGIS-Tim.",
+    "crumbs": [
+      "Tutorials",
+      "Particle Tracking"
+    ]
   },
   {
     "objectID": "tutorial_particle_tracking.html#area-description",
     "href": "tutorial_particle_tracking.html#area-description",
     "title": "Particle Tracking",
     "section": "Area description",
-    "text": "Area description\nThe area of interest is located in the Netherlands, near the city of Utrecht. The subsurface consists of a complex confining unit, followed by multiple sandy units, finally underlain by a clayey unit that acts as an aquitard. To keep things simple for this example, this clay layer is chosen as hydrogeological base. The area is bounded by a large canal, the Amsterdam-Rijn Kanaal (ARK), which is dug nearly through the confining unit, and a river, the Vecht.\n\n\n\nCross-section of the subsurface in the area (source: REGIS II v2.2.3). In green: the complex confining unit, in orange: the clayey unit. The other sandy units are shown in different colors."
+    "text": "Area description\nThe area of interest is located in the Netherlands, near the city of Utrecht. The subsurface consists of a complex confining unit, followed by multiple sandy units, finally underlain by a clayey unit that acts as an aquitard. To keep things simple for this example, this clay layer is chosen as hydrogeological base. The area is bounded by a large canal, the Amsterdam-Rijn Kanaal (ARK), which is dug nearly through the confining unit, and a river, the Vecht.\n\n\n\nCross-section of the subsurface in the area (source: REGIS II v2.2.3). In green: the complex confining unit, in orange: the clayey unit. The other sandy units are shown in different colors.",
+    "crumbs": [
+      "Tutorials",
+      "Particle Tracking"
+    ]
   },
   {
     "objectID": "tutorial_particle_tracking.html#getting-started",
     "href": "tutorial_particle_tracking.html#getting-started",
     "title": "Particle Tracking",
     "section": "Getting Started",
-    "text": "Getting Started\n\nLaunch QGIS\n\nWe start with the creation of a new QGIS project.\n\nFrom the main menu click on Project and select New.\n\nThe case in this tutorial is located in The Netherlands, so next we select the appropriate projection.\n\nFrom the main menu click on Project and select Properties.\nIn the Properties window select the category CRS, search for “EPSG:28992” and you find “Amersfoort / RD New”. Select this option and click the Apply button, followed by the OK button to close the window.\nGo to Project in the main menu, select Save As and select a folder and a file name for your project, e.g. “…\\QGIS-Tim_Tutorial\\particle_tracking.qgz”"
+    "text": "Getting Started\n\nLaunch QGIS\n\nWe start with the creation of a new QGIS project.\n\nFrom the main menu click on Project and select New.\n\nThe case in this tutorial is located in The Netherlands, so next we select the appropriate projection.\n\nFrom the main menu click on Project and select Properties.\nIn the Properties window select the category CRS, search for “EPSG:28992” and you find “Amersfoort / RD New”. Select this option and click the Apply button, followed by the OK button to close the window.\nGo to Project in the main menu, select Save As and select a folder and a file name for your project, e.g. “…\\QGIS-Tim_Tutorial\\particle_tracking.qgz”",
+    "crumbs": [
+      "Tutorials",
+      "Particle Tracking"
+    ]
   },
   {
     "objectID": "tutorial_particle_tracking.html#load-the-tutorial-data",
     "href": "tutorial_particle_tracking.html#load-the-tutorial-data",
     "title": "Particle Tracking",
     "section": "Load the tutorial data",
-    "text": "Load the tutorial data\n\nFirst we’ll open the model which is part of the tutorial material  . Click on Model Manager, click Open and select ““./Zuilen_particle_tracking.gpkg”“.\n\nThis will load the model into the QGIS-Tim plugin. The model consists of a single 35 m thick sandy aquifer with a K of 10 m/d, bounded by two rivers and topped with a recharge area (Polygon Area Sink). The effect of the complex confined unit is accounted for in the resistances of the rivers in the model.\n\nCheck the attribute tables of the aquifer, the two rivers, and the recharge area to see the parameters that are used in the model.\n\nLet’s compute the groundwater head distribution in the model area.\n\nClick on Results and click on Compute to compute the groundwater head distribution. After the computation is finished, the groundwater head distribution will be visualized in the map canvas.\n\n\n\n\nThe computed groundwater head distribution will look as follows"
+    "text": "Load the tutorial data\n\nFirst we’ll open the model which is part of the tutorial material  . Click on Model Manager, click Open and select ““./Zuilen_particle_tracking.gpkg”“.\n\nThis will load the model into the QGIS-Tim plugin. The model consists of a single 35 m thick sandy aquifer with a K of 10 m/d, bounded by two rivers and topped with a recharge area (Polygon Area Sink). The effect of the complex confined unit is accounted for in the resistances of the rivers in the model.\n\nCheck the attribute tables of the aquifer, the two rivers, and the recharge area to see the parameters that are used in the model.\n\nLet’s compute the groundwater head distribution in the model area.\n\nClick on Results and click on Compute to compute the groundwater head distribution. After the computation is finished, the groundwater head distribution will be visualized in the map canvas.\n\n\n\n\nThe computed groundwater head distribution will look as follows",
+    "crumbs": [
+      "Tutorials",
+      "Particle Tracking"
+    ]
   },
   {
     "objectID": "tutorial_particle_tracking.html#forward-particle-tracking",
     "href": "tutorial_particle_tracking.html#forward-particle-tracking",
     "title": "Particle Tracking",
     "section": "Forward Particle Tracking",
-    "text": "Forward Particle Tracking\nNext, let’s release some particles in the model and track their movement.\n\nGo to Elements and click the Particle Forward button. Provide a layer name in the prompt (e.g. “particle”) and click OK.\nSelect the “steady-state Particle Forward” on the left.\nClick your right mouse button and select the Toggle Editing Mode ().\nClick the Add Point Feature button () and click in the map canvas to add a particle. (TIP: For a nice result, place the particle near the maximum groundwater head.) You can add as many particles as you like, but for this tutorial we will add just one particle.\nThis will open a form to enter the attributes of the particle. Fill in the following values:\n\n\n\n\n\n\n\n\n\n\nparameter\nvalue\nunit\ncomment\n\n\n\n\nfid\nAutogenerate\n[-]\nID is autogenerated by QGIS\n\n\nLabel\n1\n[-]\n\n\n\nz_start\n-10\n[m MSL]\nstarting depth of the particle\n\n\nmax_horizontal_step\n10\n[m MSL]\nmaximum horizontal step size\n\n\nmax_vertical_step_fraction\n0.1\n[-]\nmaximum vertical step as fraction of layer thickness\n\n\nnstep_max\n100\n[-]\nmaximum number of steps\n\n\n\nThe latter three paramaters control the step size of the particle tracking. Decreasing the step size will increase the accuracy of the particle tracking, but also increase the computation time.\n\nAfter filling in the attributes, click OK to save the particle.\nClick on Results and then under Output select the Particle Pathlines checkbox.\nNext press Compute again to compute the particle tracking results. After the computation is finished, the particle track will be visualized in the map canvas.\n\nNote: When particles travel for a very long time, the amount of years might exceed the maximum of years allowed in the geopackage (9999 years) and an error will be thrown. In case this happens, you can decrease nstep_max to a lower value (e.g. 30) and recompute the particle tracking results.\n\n\n\nThe first particle tracking results\n\n\nYou’ll see that particles sent in the direction of the Vecht river (the river on the right) will not be captured by the river, whereas the particles sent in the direction of the Amsterdam Rijn Kanaal (ARK) will be captured by the canal.\nExercise: Investigate which River parameter causes this difference in behavior by comparing the attribute tables of the Vecht river and the Amsterdam Rijn Kanaal (ARK). Feel free to modify the parameters of the Vecht river and see how this affects the particle tracking results."
+    "text": "Forward Particle Tracking\nNext, let’s release some particles in the model and track their movement.\n\nGo to Elements and click the Particle Forward button. Provide a layer name in the prompt (e.g. “particle”) and click OK.\nSelect the “steady-state Particle Forward” on the left.\nClick your right mouse button and select the Toggle Editing Mode ().\nClick the Add Point Feature button () and click in the map canvas to add a particle. (TIP: For a nice result, place the particle near the maximum groundwater head.) You can add as many particles as you like, but for this tutorial we will add just one particle.\nThis will open a form to enter the attributes of the particle. Fill in the following values:\n\n\n\n\n\n\n\n\n\n\nparameter\nvalue\nunit\ncomment\n\n\n\n\nfid\nAutogenerate\n[-]\nID is autogenerated by QGIS\n\n\nLabel\n1\n[-]\n\n\n\nz_start\n-10\n[m MSL]\nstarting depth of the particle\n\n\nmax_horizontal_step\n10\n[m MSL]\nmaximum horizontal step size\n\n\nmax_vertical_step_fraction\n0.1\n[-]\nmaximum vertical step as fraction of layer thickness\n\n\nnstep_max\n100\n[-]\nmaximum number of steps\n\n\n\nThe latter three paramaters control the step size of the particle tracking. Decreasing the step size will increase the accuracy of the particle tracking, but also increase the computation time.\n\nAfter filling in the attributes, click OK to save the particle.\nClick on Results and then under Output select the Particle Pathlines checkbox.\nNext press Compute again to compute the particle tracking results. After the computation is finished, the particle track will be visualized in the map canvas.\n\nNote: When particles travel for a very long time, the amount of years might exceed the maximum of years allowed in the geopackage (9999 years) and an error will be thrown. In case this happens, you can decrease nstep_max to a lower value (e.g. 30) and recompute the particle tracking results.\n\n\n\nThe first particle tracking results\n\n\nYou’ll see that particles sent in the direction of the Vecht river (the river on the right) will not be captured by the river, whereas the particles sent in the direction of the Amsterdam Rijn Kanaal (ARK) will be captured by the canal.\nExercise: Investigate which River parameter causes this difference in behavior by comparing the attribute tables of the Vecht river and the Amsterdam Rijn Kanaal (ARK). Feel free to modify the parameters of the Vecht river and see how this affects the particle tracking results.",
+    "crumbs": [
+      "Tutorials",
+      "Particle Tracking"
+    ]
   },
   {
     "objectID": "tutorial_particle_tracking.html#travel-times",
     "href": "tutorial_particle_tracking.html#travel-times",
     "title": "Particle Tracking",
     "section": "Travel times",
-    "text": "Travel times\nLet’s also investigate the travel time of the particles. To do that, we’ll use the temporal controller of QGIS to animate the particle tracking results.\n\nLet’s first make sure the temporal controller is enabled in QGIS. Go to View in the main menu, select Panels and make sure Temporal Controller is checked.\nOpen the Temporal Controller of QGIS (in the toolbar on top). ().\nIn the Temporal Controller panel click the green play button “Animated temporal navigation” on the right of the menu ().\n\nNavigation buttons appear which allow you to control the animation of the particle tracking results.\n\nFirst, make sure the animation range is set properly by clicking the “Set to full range” button ().\nSecond, set the step size to 10 years. This means that the animation will show the particle positions every 10 years.\nNext, click the play button to start the animation. You should see the particles moving as line segments. These line segments represent the pathlines of the particles within the selected time frame (of 10 years). This time frame is shown on top next to the temporal controller panel menu.\n\nNote Depending on how you modified the model, you might want set the step size to a different value to be able to see the particle movement more clearly.\n\nFinally, you can view the tracelines of the particles in their entirety again by clicking the red cross button (“Turn off temporal navigation”) on the left of the menu ().\n\nNote that closing the temporal controller panel will NOT turn off the temporal navigation."
+    "text": "Travel times\nLet’s also investigate the travel time of the particles. To do that, we’ll use the temporal controller of QGIS to animate the particle tracking results.\n\nLet’s first make sure the temporal controller is enabled in QGIS. Go to View in the main menu, select Panels and make sure Temporal Controller is checked.\nOpen the Temporal Controller of QGIS (in the toolbar on top). ().\nIn the Temporal Controller panel click the green play button “Animated temporal navigation” on the right of the menu ().\n\nNavigation buttons appear which allow you to control the animation of the particle tracking results.\n\nFirst, make sure the animation range is set properly by clicking the “Set to full range” button ().\nSecond, set the step size to 10 years. This means that the animation will show the particle positions every 10 years.\nNext, click the play button to start the animation. You should see the particles moving as line segments. These line segments represent the pathlines of the particles within the selected time frame (of 10 years). This time frame is shown on top next to the temporal controller panel menu.\n\nNote Depending on how you modified the model, you might want set the step size to a different value to be able to see the particle movement more clearly.\n\nFinally, you can view the tracelines of the particles in their entirety again by clicking the red cross button (“Turn off temporal navigation”) on the left of the menu ().\n\nNote that closing the temporal controller panel will NOT turn off the temporal navigation.",
+    "crumbs": [
+      "Tutorials",
+      "Particle Tracking"
+    ]
   },
   {
     "objectID": "tutorial_particle_tracking.html#introducing-a-well",
     "href": "tutorial_particle_tracking.html#introducing-a-well",
     "title": "Particle Tracking",
     "section": "Introducing a well",
-    "text": "Introducing a well\nLet’s introduce a well in the model and investigate how this affects the particle’s direction and travel time.\n(@): Place a well roughtly in the center of the model, by clicking Elements and then clicking the Well button.\n\nProvide a name to the layer\nStart editing your new well layer by clicking the Toggle Editing Mode button ().\nClick the Add Point Feature button ().\nThis will open a form to enter the attributes of the well. Fill in the following values:\n\n\n\n\nparameter\nvalue\nunit\ncomment\n\n\n\n\nfid\nAutogenerate\n[-]\nID is autogenerated by QGIS\n\n\ndischarge\n30\n[m3/d]\n\n\n\nradius\n0.1\n[m]\n\n\n\nresistance\n0\n[d]\n\n\n\nlayer\n0\n[-]\n\n\n\nlabel\n1\n[-]\n\n\n\n\n\nAfter filling in the attributes, click OK to save the well.\nNext press Compute again to compute the particle tracking results.\n\n\n\n\nIf everything went well, you’ll see the pathlines were modified"
+    "text": "Introducing a well\nLet’s introduce a well in the model and investigate how this affects the particle’s direction and travel time.\n(@): Place a well roughtly in the center of the model, by clicking Elements and then clicking the Well button.\n\nProvide a name to the layer\nStart editing your new well layer by clicking the Toggle Editing Mode button ().\nClick the Add Point Feature button ().\nThis will open a form to enter the attributes of the well. Fill in the following values:\n\n\n\n\nparameter\nvalue\nunit\ncomment\n\n\n\n\nfid\nAutogenerate\n[-]\nID is autogenerated by QGIS\n\n\ndischarge\n30\n[m3/d]\n\n\n\nradius\n0.1\n[m]\n\n\n\nresistance\n0\n[d]\n\n\n\nlayer\n0\n[-]\n\n\n\nlabel\n1\n[-]\n\n\n\n\n\nAfter filling in the attributes, click OK to save the well.\nNext press Compute again to compute the particle tracking results.\n\n\n\n\nIf everything went well, you’ll see the pathlines were modified",
+    "crumbs": [
+      "Tutorials",
+      "Particle Tracking"
+    ]
   },
   {
     "objectID": "tutorial_particle_tracking.html#investigate-the-capture-zone",
     "href": "tutorial_particle_tracking.html#investigate-the-capture-zone",
     "title": "Particle Tracking",
     "section": "Investigate the capture zone",
-    "text": "Investigate the capture zone\nLet’s introduce trace some particles backwards to investigate the capture zone of the well.\n\nClick the Particle Backward button. Provide a layer name in the prompt (e.g. “capture_zone”) and click OK.\nSelect the “steady-state Particle Backward” on the left.\nClick your right mouse button and select the Toggle Editing Mode button ().\nZoom in to the well you placed. Click the Add Point Feature button () and click in the map canvas to add a particles just around the well.\nThis will open a form to enter the attributes of the particle. Fill in the following values:\n\n\n\n\n\n\n\n\n\n\nparameter\nvalue\nunit\ncomment\n\n\n\n\nfid\nAutogenerate\n[-]\nID is autogenerated by QGIS\n\n\nLabel\n1\n[-]\n\n\n\nz_start\n-40\n[m MSL]\nstarting depth of the particle\n\n\nmax_horizontal_step\n10\n[m MSL]\nmaximum horizontal step size\n\n\nvertical_step_fraction\n0.1\n[-]\nmaximum vertical step as fraction of layer thickness\n\n\nnstep_max\n50\n[-]\nmaximum number of steps\n\n\n\n\nAfter filling in the attributes, click OK to save the particle.\nNext press Compute again to compute the particle tracking results.\n\n\n\n\nIf you placed your particles correctly, you’ll get a good idea of the capture zone of the well\n\n\nNote: When particles travel for a very long time, the amount of years might exceed the maximum of years allowed in the geopackage (9999 years) and an error will be thrown. In case this happens, you can decrease nstep_max to a lower value (e.g. 30) and recompute the particle tracking results."
+    "text": "Investigate the capture zone\nLet’s introduce trace some particles backwards to investigate the capture zone of the well.\n\nClick the Particle Backward button. Provide a layer name in the prompt (e.g. “capture_zone”) and click OK.\nSelect the “steady-state Particle Backward” on the left.\nClick your right mouse button and select the Toggle Editing Mode button ().\nZoom in to the well you placed. Click the Add Point Feature button () and click in the map canvas to add a particles just around the well.\nThis will open a form to enter the attributes of the particle. Fill in the following values:\n\n\n\n\n\n\n\n\n\n\nparameter\nvalue\nunit\ncomment\n\n\n\n\nfid\nAutogenerate\n[-]\nID is autogenerated by QGIS\n\n\nLabel\n1\n[-]\n\n\n\nz_start\n-40\n[m MSL]\nstarting depth of the particle\n\n\nmax_horizontal_step\n10\n[m MSL]\nmaximum horizontal step size\n\n\nvertical_step_fraction\n0.1\n[-]\nmaximum vertical step as fraction of layer thickness\n\n\nnstep_max\n50\n[-]\nmaximum number of steps\n\n\n\n\nAfter filling in the attributes, click OK to save the particle.\nNext press Compute again to compute the particle tracking results.\n\n\n\n\nIf you placed your particles correctly, you’ll get a good idea of the capture zone of the well\n\n\nNote: When particles travel for a very long time, the amount of years might exceed the maximum of years allowed in the geopackage (9999 years) and an error will be thrown. In case this happens, you can decrease nstep_max to a lower value (e.g. 30) and recompute the particle tracking results.",
+    "crumbs": [
+      "Tutorials",
+      "Particle Tracking"
+    ]
   },
   {
     "objectID": "tutorial.html",
