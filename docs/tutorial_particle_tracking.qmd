@@ -231,7 +231,7 @@ map canvas to add a particles just around the well.
 (@) Next press *Compute* again to compute the particle tracking results.
 
 ![If you placed your particles correctly, you'll get a good idea of the capture
-zone of the well](figures/tutorial/figure_PRT_capture_zone.png)
+zone of the well](figures/tutorial/figure_PRT_capture_zone.png){.preview-image}
 
 **Note:** When particles travel for a very long time, the amount of years might
 exceed the maximum of years allowed in the geopackage (9999 years) and an error
