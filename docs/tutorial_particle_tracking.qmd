@@ -111,6 +111,11 @@ checkbox.
 the computation is finished, the particle track will be visualized in the map
 canvas.
 
+**Note:** When particles travel for a very long time, the amount of years might
+exceed the maximum of years allowed in the geopackage (9999 years). In
+case this happens, you can decrease nstep_max to a lower value (e.g. 30) and
+recompute the particle tracking results.
+
 ![The first particle tracking results](figures/tutorial/figure_PRT_1.png)
 
 You'll see that particles sent in the direction of the Vecht river (the river on
