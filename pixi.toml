@@ -1,6 +1,6 @@
 [workspace]
 name = "gistim"
-version = "0.7.1"
+version = "0.7.2"
 description = "Connects timflow Analytic Element modeling to QGIS"
 authors = ["Huite Bootsma"]
 channels = ["conda-forge"]

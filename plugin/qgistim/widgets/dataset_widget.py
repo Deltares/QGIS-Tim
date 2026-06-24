@@ -93,7 +93,7 @@ class DatasetTreeWidget(QTreeWidget):
 
     def add_item(
         self, steady_name: str, transient_name: str = None, enabled: bool = True
-    ):
+    ) -> QTreeWidgetItem:
         item = QTreeWidgetItem()
         self.addTopLevelItem(item)
         item.steady_checkbox = QCheckBox()
@@ -105,7 +105,7 @@ class DatasetTreeWidget(QTreeWidget):
         item.assoc_item = None
         return item
 
-    def add_element(self, element) -> None:
+    def add_element(self, element) -> QTreeWidgetItem:
         # These are mandatory elements, cannot be unticked
         if isinstance(element, (Domain, Aquifer)):
             enabled = False
@@ -118,7 +118,7 @@ class DatasetTreeWidget(QTreeWidget):
             enabled=enabled,
         )
         item.element = element
-        return
+        return item
 
     def on_transient_changed(self, transient: bool) -> None:
         """
@@ -582,7 +582,9 @@ class DatasetWidget(QWidget):
         return set([item.element.name for item in selection])
 
     def add_element(self, element) -> None:
-        self.dataset_tree.add_element(element)
+        transient = self.transient
+        item = self.dataset_tree.add_element(element)
+        item.element.on_transient_changed(transient)
         return
 
     def set_interpreter_interaction(self, value: bool):
