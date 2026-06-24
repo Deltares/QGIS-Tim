@@ -16,6 +16,20 @@ groundwater flow field, which can be useful for understanding the flow paths and
 travel times of groundwater. We will use a simple example to demonstrate how to
 set up and run a particle tracking simulation using QGIS-Tim.
 
+## Area description
+
+The area of interest is located in the Netherlands, near the city of Utrecht.
+The subsurface consists of a complex confining unit, followed by multiple sandy
+units, finally underlain by a clayey unit that acts as an aquitard. To keep
+things simple for this example, this clay layer is chosen as hydrogeological
+base. The area is bounded by a large canal, the Amsterdam-Rijn Kanaal (ARK),
+which is dug nearly through the confining unit, and a river, the Vecht.
+
+![Cross-section of the subsurface in the area (source: REGIS II v2.2.3). In
+green: the complex confining unit, in orange: the clayey unit. The other sandy
+units are shown in different colors.
+](figures/tutorial/figure_REGIS-subsurface-Zuilen.png)
+
 ## Getting Started
 
 (@) Launch QGIS
@@ -37,9 +51,15 @@ The case in this tutorial is located in The Netherlands, so next we select the a
 <INSERT_LINK_TO_MODEL> . Click on *Model Manager*, click *Open* and select
 ""./Zuilen_particle_tracking.gpkg"".
 
-This wil load the model into the QGIS-Tim plugin. The model consists of a single
-layer with a recharge area (Polygon Area Sink) inbetween two rivers. Let's
-compute the groundwater head distribution in the model area.
+This will load the model into the QGIS-Tim plugin. The model consists of a
+single 35 m thick sandy aquifer with a K of 10 m/d, bounded by two rivers and
+topped with a recharge area (Polygon Area Sink). The effect of the complex
+confined unit is accounted for in the resistances of the rivers in the model.
+
+(@) Check the attribute tables of the aquifer, the two rivers, and the recharge
+area to see the parameters that are used in the model.
+
+Let's compute the groundwater head distribution in the model area.
 
 (@) Click on *Results* and click on *Compute* to compute the groundwater head
 distribution. After the computation is finished, the groundwater head
