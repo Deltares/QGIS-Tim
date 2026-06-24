@@ -133,6 +133,7 @@ ul.task-list li input[type="checkbox"] {
   <ul>
   <li><a href="#requirements" id="toc-requirements" class="nav-link active" data-scroll-target="#requirements">Requirements</a></li>
   <li><a href="#description" id="toc-description" class="nav-link" data-scroll-target="#description">Description</a></li>
+  <li><a href="#area-description" id="toc-area-description" class="nav-link" data-scroll-target="#area-description">Area description</a></li>
   <li><a href="#getting-started" id="toc-getting-started" class="nav-link" data-scroll-target="#getting-started">Getting Started</a></li>
   <li><a href="#load-the-tutorial-data" id="toc-load-the-tutorial-data" class="nav-link" data-scroll-target="#load-the-tutorial-data">Load the tutorial data</a></li>
   <li><a href="#forward-particle-tracking" id="toc-forward-particle-tracking" class="nav-link" data-scroll-target="#forward-particle-tracking">Forward Particle Tracking</a></li>
@@ -176,6 +177,16 @@ ul.task-list li input[type="checkbox"] {
 <h2 class="anchored" data-anchor-id="description">Description</h2>
 <p>In this tutorial, we will show how to use the particle tracking feature of QGIS-Tim. This feature allows you to track the movement of particles in a groundwater flow field, which can be useful for understanding the flow paths and travel times of groundwater. We will use a simple example to demonstrate how to set up and run a particle tracking simulation using QGIS-Tim.</p>
 </section>
+<section id="area-description" class="level2">
+<h2 class="anchored" data-anchor-id="area-description">Area description</h2>
+<p>The area of interest is located in the Netherlands, near the city of Utrecht. The subsurface consists of a complex confining unit, followed by multiple sandy units, finally underlain by a clayey unit that acts as an aquitard. To keep things simple for this example, this clay layer is chosen as hydrogeological base. The area is bounded by a large canal, the Amsterdam-Rijn Kanaal (ARK), which is dug nearly through the confining unit, and a river, the Vecht.</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="figures/tutorial/figure_REGIS-subsurface-Zuilen.png" class="img-fluid figure-img"></p>
+<figcaption>Cross-section of the subsurface in the area (source: REGIS II v2.2.3). In green: the complex confining unit, in orange: the clayey unit. The other sandy units are shown in different colors.</figcaption>
+</figure>
+</div>
+</section>
 <section id="getting-started" class="level2">
 <h2 class="anchored" data-anchor-id="getting-started">Getting Started</h2>
 <ol class="example" type="1">
@@ -197,8 +208,12 @@ ul.task-list li input[type="checkbox"] {
 <ol start="6" class="example" type="1">
 <li>First we’ll open the model which is part of the tutorial material <insert_link_to_model> . Click on <em>Model Manager</em>, click <em>Open</em> and select ““./Zuilen_particle_tracking.gpkg”“.</insert_link_to_model></li>
 </ol>
-<p>This wil load the model into the QGIS-Tim plugin. The model consists of a single layer with a recharge area (Polygon Area Sink) inbetween two rivers. Let’s compute the groundwater head distribution in the model area.</p>
+<p>This will load the model into the QGIS-Tim plugin. The model consists of a single 35 m thick sandy aquifer with a K of 10 m/d, bounded by two rivers and topped with a recharge area (Polygon Area Sink). The effect of the complex confined unit is accounted for in the resistances of the rivers in the model.</p>
 <ol start="7" class="example" type="1">
+<li>Check the attribute tables of the aquifer, the two rivers, and the recharge area to see the parameters that are used in the model.</li>
+</ol>
+<p>Let’s compute the groundwater head distribution in the model area.</p>
+<ol start="8" class="example" type="1">
 <li>Click on <em>Results</em> and click on <em>Compute</em> to compute the groundwater head distribution. After the computation is finished, the groundwater head distribution will be visualized in the map canvas.</li>
 </ol>
 <div class="quarto-figure quarto-figure-center">
@@ -211,7 +226,7 @@ ul.task-list li input[type="checkbox"] {
 <section id="forward-particle-tracking" class="level2">
 <h2 class="anchored" data-anchor-id="forward-particle-tracking">Forward Particle Tracking</h2>
 <p>Next, let’s release some particles in the model and track their movement.</p>
-<ol start="8" class="example" type="1">
+<ol start="9" class="example" type="1">
 <li><p>Go to <em>Elements</em> and click the <em>Particle Forward</em> button. Provide a layer name in the prompt (e.g.&nbsp;“particle”) and click <em>OK</em>.</p></li>
 <li><p>Select the “steady-state Particle Forward” on the left.</p></li>
 <li><p>Click your right mouse button and select the <em>Toggle Editing Mode</em> (<img src="figures/tutorial/button-Qgis-AttributeTable-StartEditingMode.png" class="img-fluid" style="width:4.0%">).</p></li>
@@ -259,7 +274,7 @@ ul.task-list li input[type="checkbox"] {
 <td>maximum horizontal step size</td>
 </tr>
 <tr class="odd">
-<td>vertical_step_fraction</td>
+<td>max_vertical_step_fraction</td>
 <td>0.1</td>
 <td>[-]</td>
 <td>maximum vertical step as fraction of layer thickness</td>
@@ -273,11 +288,12 @@ ul.task-list li input[type="checkbox"] {
 </tbody>
 </table>
 <p>The latter three paramaters control the step size of the particle tracking. Decreasing the step size will increase the accuracy of the particle tracking, but also increase the computation time.</p>
-<ol start="13" class="example" type="1">
+<ol start="14" class="example" type="1">
 <li><p>After filling in the attributes, click <em>OK</em> to save the particle.</p></li>
 <li><p>Click on <em>Results</em> and then under <em>Output</em> select the <em>Particle Pathlines</em> checkbox.</p></li>
 <li><p>Next press <em>Compute</em> again to compute the particle tracking results. After the computation is finished, the particle track will be visualized in the map canvas.</p></li>
 </ol>
+<p><strong>Note:</strong> When particles travel for a very long time, the amount of years might exceed the maximum of years allowed in the geopackage (9999 years) and an error will be thrown. In case this happens, you can decrease nstep_max to a lower value (e.g.&nbsp;30) and recompute the particle tracking results.</p>
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
 <p><img src="figures/tutorial/figure_PRT_1.png" class="img-fluid figure-img"></p>
@@ -289,17 +305,21 @@ ul.task-list li input[type="checkbox"] {
 </section>
 <section id="travel-times" class="level2">
 <h2 class="anchored" data-anchor-id="travel-times">Travel times</h2>
-<p>Let’s also investigate the travel time of the particles.</p>
-<ol start="16" class="example" type="1">
+<p>Let’s also investigate the travel time of the particles. To do that, we’ll use the temporal controller of QGIS to animate the particle tracking results.</p>
+<ol start="17" class="example" type="1">
+<li><p>Let’s first make sure the temporal controller is enabled in QGIS. Go to <em>View</em> in the main menu, select <em>Panels</em> and make sure <em>Temporal Controller</em> is checked.</p></li>
 <li><p>Open the <em>Temporal Controller</em> of QGIS (in the toolbar on top). (<img src="figures/tutorial/button_TemporalControllerPanel.png" class="img-fluid" style="width:4.0%">).</p></li>
 <li><p>In the Temporal Controller panel click the green play button “Animated temporal navigation” on the right of the menu (<img src="figures/tutorial/button_TemporalControllerPanel-menu.png" class="img-fluid" style="width:14.0%">).</p></li>
 </ol>
 <p>Navigation buttons appear which allow you to control the animation of the particle tracking results.</p>
-<ol start="18" class="example" type="1">
+<ol start="20" class="example" type="1">
 <li><p>First, make sure the animation range is set properly by clicking the “Set to full range” button (<img src="figures/tutorial/button_TemporalController_full_range.png" class="img-fluid" style="width:4.0%">).</p></li>
 <li><p>Second, set the step size to 10 years. This means that the animation will show the particle positions every 10 years.</p></li>
 <li><p>Next, click the play button to start the animation. You should see the particles moving as line segments. These line segments represent the pathlines of the particles within the selected time frame (of 10 years). This time frame is shown on top next to the temporal controller panel menu.</p></li>
-<li><p>Finally, you can view the tracelines of the particles in their entirety again by clicking the red cross button (“Turn off temporal navigation”) on the left of the menu (<img src="figures/tutorial/button_TemporalControllerPanel-menu.png" class="img-fluid" style="width:14.0%">).</p></li>
+</ol>
+<p><strong>Note</strong> Depending on how you modified the model, you might want set the step size to a different value to be able to see the particle movement more clearly.</p>
+<ol start="23" class="example" type="1">
+<li>Finally, you can view the tracelines of the particles in their entirety again by clicking the red cross button (“Turn off temporal navigation”) on the left of the menu (<img src="figures/tutorial/button_TemporalControllerPanel-menu.png" class="img-fluid" style="width:14.0%">).</li>
 </ol>
 <p><strong>Note</strong> that closing the temporal controller panel will NOT turn off the temporal navigation.</p>
 </section>
@@ -307,7 +327,7 @@ ul.task-list li input[type="checkbox"] {
 <h2 class="anchored" data-anchor-id="introducing-a-well">Introducing a well</h2>
 <p>Let’s introduce a well in the model and investigate how this affects the particle’s direction and travel time.</p>
 <p>(@): Place a well roughtly in the center of the model, by clicking <em>Elements</em> and then clicking the <em>Well</em> button.</p>
-<ol start="22" class="example" type="1">
+<ol start="24" class="example" type="1">
 <li><p>Provide a name to the layer</p></li>
 <li><p>Start editing your new well layer by clicking the <em>Toggle Editing Mode</em> button (<img src="figures/tutorial/button-Qgis-AttributeTable-StartEditingMode.png" class="img-fluid" style="width:4.0%">).</p></li>
 <li><p>Click the <em>Add Point Feature</em> button (<img src="figures/tutorial/button_AddPointFeature.png" class="img-fluid" style="width:4.0%">).</p></li>
@@ -361,7 +381,7 @@ ul.task-list li input[type="checkbox"] {
 </tr>
 </tbody>
 </table>
-<ol start="26" class="example" type="1">
+<ol start="28" class="example" type="1">
 <li><p>After filling in the attributes, click <em>OK</em> to save the well.</p></li>
 <li><p>Next press <em>Compute</em> again to compute the particle tracking results.</p></li>
 </ol>
@@ -375,7 +395,7 @@ ul.task-list li input[type="checkbox"] {
 <section id="investigate-the-capture-zone" class="level2">
 <h2 class="anchored" data-anchor-id="investigate-the-capture-zone">Investigate the capture zone</h2>
 <p>Let’s introduce trace some particles backwards to investigate the capture zone of the well.</p>
-<ol start="28" class="example" type="1">
+<ol start="30" class="example" type="1">
 <li><p>Click the <em>Particle Backward</em> button. Provide a layer name in the prompt (e.g.&nbsp;“capture_zone”) and click <em>OK</em>.</p></li>
 <li><p>Select the “steady-state Particle Backward” on the left.</p></li>
 <li><p>Click your right mouse button and select the <em>Toggle Editing Mode</em> button (<img src="figures/tutorial/button-Qgis-AttributeTable-StartEditingMode.png" class="img-fluid" style="width:4.0%">).</p></li>
@@ -436,7 +456,7 @@ ul.task-list li input[type="checkbox"] {
 </tr>
 </tbody>
 </table>
-<ol start="33" class="example" type="1">
+<ol start="35" class="example" type="1">
 <li><p>After filling in the attributes, click <em>OK</em> to save the particle.</p></li>
 <li><p>Next press <em>Compute</em> again to compute the particle tracking results.</p></li>
 </ol>
@@ -446,7 +466,7 @@ ul.task-list li input[type="checkbox"] {
 <figcaption>If you placed your particles correctly, you’ll get a good idea of the capture zone of the well</figcaption>
 </figure>
 </div>
-<p><strong>Note:</strong> When particles travel for a very long time, the amount of years might exceed the maximum of years allowed in the geopackage (9999 years). In case this happens, you can decrease nstep_max to a lower value (e.g.&nbsp;30) and recompute the particle tracking results.</p>
+<p><strong>Note:</strong> When particles travel for a very long time, the amount of years might exceed the maximum of years allowed in the geopackage (9999 years) and an error will be thrown. In case this happens, you can decrease nstep_max to a lower value (e.g.&nbsp;30) and recompute the particle tracking results.</p>
 
 
 </section>
