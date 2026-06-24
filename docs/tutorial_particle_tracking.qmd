@@ -6,7 +6,7 @@ title: "Particle Tracking"
 ## Requirements
 - Be sure QGIS version 3.40 or later is installed
 - Be sure the QGIS-Tim plugin version 0.7.0 or later is installed (see [installation](install.qmd) for instructions).
-- Be sure the ``gistim`` version 0.7.0 or later is installed (see [installation](install.qmd) for instructions).
+- Be sure the ``gistim`` version 0.7.0 or later is installed (see [installation](install.qmd) for instructions). This is the Python package that connects QGIS-Tim to the timflow kernel.
 
 ## Description
 
@@ -62,8 +62,10 @@ area to see the parameters that are used in the model.
 Let's compute the groundwater head distribution in the model area.
 
 (@) Click on *Results* and click on *Compute* to compute the groundwater head
-distribution. After the computation is finished, the groundwater head
-distribution will be visualized in the map canvas.
+distribution. This will open a black prompt window, please don't close this!
+Otherwise, the computation will be interrupted. After the computation is
+finished, the groundwater head distribution will be visualized in the map
+canvas.
 
 ![The computed groundwater head distribution will look as follows](figures/tutorial/figure_PRT_reference.png)
 
