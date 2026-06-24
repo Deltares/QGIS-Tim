@@ -112,9 +112,9 @@ the computation is finished, the particle track will be visualized in the map
 canvas.
 
 **Note:** When particles travel for a very long time, the amount of years might
-exceed the maximum of years allowed in the geopackage (9999 years). In
-case this happens, you can decrease nstep_max to a lower value (e.g. 30) and
-recompute the particle tracking results.
+exceed the maximum of years allowed in the geopackage (9999 years) and an error
+will be thrown. In case this happens, you can decrease nstep_max to a lower
+value (e.g. 30) and recompute the particle tracking results.
 
 ![The first particle tracking results](figures/tutorial/figure_PRT_1.png)
 
@@ -129,7 +129,12 @@ how this affects the particle tracking results.
 
 ## Travel times
 
-Let's also investigate the travel time of the particles.
+Let's also investigate the travel time of the particles. To do that, we'll use
+the temporal controller of QGIS to animate the particle tracking results.
+
+(@) Let's first make sure the temporal controller is enabled in QGIS. Go to
+*View* in the main menu, select *Panels* and make sure *Temporal Controller* is
+checked.
 
 (@) Open the *Temporal Controller* of QGIS (in the toolbar on top).
 (![](figures/tutorial/button_TemporalControllerPanel.png){width=4%}).
@@ -144,13 +149,16 @@ Navigation buttons appear which allow you to control the animation of the partic
 full range" button
 (![](figures/tutorial/button_TemporalController_full_range.png){width=4%}).
 
-(@) Second, set the step size to 10 years. This means that the animation will show
-the particle positions every 10 years.
+(@) Second, set the step size to 10 years. This means that the animation will
+show the particle positions every 10 years.
 
 (@) Next, click the play button to start the animation. You should see the
 particles moving as line segments. These line segments represent the pathlines
 of the particles within the selected time frame (of 10 years). This time frame
 is shown on top next to the temporal controller panel menu.
+
+**Note** Depending on how you modified the model, you might want set the step size to
+a different value to be able to see the particle movement more clearly.
 
 (@) Finally, you can view the tracelines of the particles in their entirety
 again by clicking the red cross button ("Turn off temporal navigation") on the
@@ -226,6 +234,6 @@ map canvas to add a particles just around the well.
 zone of the well](figures/tutorial/figure_PRT_capture_zone.png)
 
 **Note:** When particles travel for a very long time, the amount of years might
-exceed the maximum of years allowed in the geopackage (9999 years). In
-case this happens, you can decrease nstep_max to a lower value (e.g. 30) and
-recompute the particle tracking results.
+exceed the maximum of years allowed in the geopackage (9999 years) and an error
+will be thrown. In case this happens, you can decrease nstep_max to a lower
+value (e.g. 30) and recompute the particle tracking results.
