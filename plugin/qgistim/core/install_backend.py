@@ -12,6 +12,8 @@ from zipfile import ZipFile
 
 import requests
 
+REQUEST_TIMEOUT_SECONDS = 30
+
 
 def get_gistim_dir() -> Path:
     if platform.system() == "Windows":
@@ -23,7 +25,7 @@ def get_gistim_dir() -> Path:
 
 def get_release_assets() -> Dict[str, str]:
     GITHUB_URL = "https://api.github.com/repos/deltares/qgis-tim/releases"
-    response = requests.get(GITHUB_URL)
+    response = requests.get(GITHUB_URL, timeout=REQUEST_TIMEOUT_SECONDS)
     json_content = json.loads(response.content)
     last_release = json_content[0]
     assets = last_release["assets"]
@@ -45,10 +47,12 @@ def download_assets(assets: Dict[str, str]) -> ZipFile:
         )
     # Get checksum
     checksum_url = assets[f"sha256-checksum-{github_system}.txt"]
-    checksum_github = requests.get(checksum_url).content.decode("utf-8")
+    checksum_github = requests.get(
+        checksum_url, timeout=REQUEST_TIMEOUT_SECONDS
+    ).content.decode("utf-8")
     # Get zipfile content
     zip_url = assets[f"gistim-{github_system}.zip"]
-    zipfile_content = requests.get(zip_url).content
+    zipfile_content = requests.get(zip_url, timeout=REQUEST_TIMEOUT_SECONDS).content
     # Compare checksums
     sha = hashlib.sha256()
     sha.update(zipfile_content)
