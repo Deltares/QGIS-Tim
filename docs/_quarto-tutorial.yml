@@ -8,6 +8,7 @@ book:
     - tutorial.qmd
     - tutorial_Rijsenhout.qmd
     - tutorial_TheHague.qmd
+    - tutorial_particle_tracking.qmd
 
 format:
   pdf:

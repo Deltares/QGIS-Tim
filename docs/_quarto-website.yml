@@ -35,6 +35,7 @@ website:
         - href: tutorial.qmd
         - href: tutorial_Rijsenhout.qmd
         - href: tutorial_TheHague.qmd
+        - href: tutorial_particle_tracking.qmd
 
 format:
   html:
