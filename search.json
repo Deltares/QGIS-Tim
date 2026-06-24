@@ -158,7 +158,7 @@
     "href": "tutorial_particle_tracking.html",
     "title": "Particle Tracking",
     "section": "",
-    "text": "Be sure QGIS version 3.40 or later is installed\nBe sure the QGIS-Tim plugin version 0.7.0 or later is installed (see installation for instructions).\nBe sure the gistim version 0.7.0 or later is installed (see installation for instructions).",
+    "text": "Be sure QGIS version 3.40 or later is installed\nBe sure the QGIS-Tim plugin version 0.7.0 or later is installed (see installation for instructions).\nBe sure the gistim version 0.7.0 or later is installed (see installation for instructions). This is the Python package that connects QGIS-Tim to the timflow kernel.",
     "crumbs": [
       "Tutorials",
       "Particle Tracking"
@@ -169,7 +169,7 @@
     "href": "tutorial_particle_tracking.html#requirements",
     "title": "Particle Tracking",
     "section": "",
-    "text": "Be sure QGIS version 3.40 or later is installed\nBe sure the QGIS-Tim plugin version 0.7.0 or later is installed (see installation for instructions).\nBe sure the gistim version 0.7.0 or later is installed (see installation for instructions).",
+    "text": "Be sure QGIS version 3.40 or later is installed\nBe sure the QGIS-Tim plugin version 0.7.0 or later is installed (see installation for instructions).\nBe sure the gistim version 0.7.0 or later is installed (see installation for instructions). This is the Python package that connects QGIS-Tim to the timflow kernel.",
     "crumbs": [
       "Tutorials",
       "Particle Tracking"
@@ -213,7 +213,7 @@
     "href": "tutorial_particle_tracking.html#load-the-tutorial-data",
     "title": "Particle Tracking",
     "section": "Load the tutorial data",
-    "text": "Load the tutorial data\n\nFirst we’ll open the model which is part of the tutorial material  . Click on Model Manager, click Open and select ““./Zuilen_particle_tracking.gpkg”“.\n\nThis will load the model into the QGIS-Tim plugin. The model consists of a single 35 m thick sandy aquifer with a K of 10 m/d, bounded by two rivers and topped with a recharge area (Polygon Area Sink). The effect of the complex confined unit is accounted for in the resistances of the rivers in the model.\n\nCheck the attribute tables of the aquifer, the two rivers, and the recharge area to see the parameters that are used in the model.\n\nLet’s compute the groundwater head distribution in the model area.\n\nClick on Results and click on Compute to compute the groundwater head distribution. After the computation is finished, the groundwater head distribution will be visualized in the map canvas.\n\n\n\n\nThe computed groundwater head distribution will look as follows",
+    "text": "Load the tutorial data\n\nFirst we’ll open the model which is part of the tutorial material  . Click on Model Manager, click Open and select ““./Zuilen_particle_tracking.gpkg”“.\n\nThis will load the model into the QGIS-Tim plugin. The model consists of a single 35 m thick sandy aquifer with a K of 10 m/d, bounded by two rivers and topped with a recharge area (Polygon Area Sink). The effect of the complex confined unit is accounted for in the resistances of the rivers in the model.\n\nCheck the attribute tables of the aquifer, the two rivers, and the recharge area to see the parameters that are used in the model.\n\nLet’s compute the groundwater head distribution in the model area.\n\nClick on Results and click on Compute to compute the groundwater head distribution. This will open a black prompt window, please don’t close this! Otherwise, the computation will be interrupted. After the computation is finished, the groundwater head distribution will be visualized in the map canvas.\n\n\n\n\nThe computed groundwater head distribution will look as follows",
     "crumbs": [
       "Tutorials",
       "Particle Tracking"
