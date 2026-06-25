@@ -7,7 +7,7 @@ name=Qgis-Tim
 qgisMinimumVersion=3.40
 qgisMaximumVersion=4.99
 description=QGIS plugin to setup Timflow multi-layer analytic elements
-version=0.7.2
+version=0.7.3
 author=Deltares
 email=huitebootsma@gmail.com
 
@@ -21,7 +21,10 @@ repository=https://github.com/Deltares/QGIS-Tim
 
 hasProcessingProvider=no
 # Uncomment the following line and add your changelog:
-changelog=      <p> 0.7.2
+changelog=      <p> 0.7.3
+                - Fix bug where an error was thrown when attempting to output
+                  discharges.
+                <p> 0.7.2
                 - Fix bug where attribute table showed transient variables when
                   adding elements to a steady-state model.
                 - Fixed security issue when installing backend.

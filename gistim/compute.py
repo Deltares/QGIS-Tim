@@ -8,6 +8,7 @@ import numpy as np
 import pandas as pd
 import timflow
 import xarray as xr
+from timflow.steady.well import WellBase
 
 from gistim.geopackage import CoordinateReferenceSystem, write_geopackage
 from gistim.netcdf import write_raster, write_ugrid
@@ -282,7 +283,7 @@ def extract_discharges(elements, nlayers, **_):
     for layername, content in elements.items():
         sample = content[0]
 
-        if isinstance(sample, timflow.steady.WellBase):
+        if isinstance(sample, WellBase):
             table_rows = []
             for well in content:
                 row = {f"discharge_layer{i}": q for i, q in enumerate(well.discharge())}
