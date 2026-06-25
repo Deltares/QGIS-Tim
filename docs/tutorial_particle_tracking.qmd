@@ -122,7 +122,8 @@ value (e.g. 30) and recompute the particle tracking results.
 
 You'll see that particles sent in the direction of the Vecht river (the river on
 the right) will not be captured by the river, whereas the particles sent in the
-direction of the Amsterdam Rijn Kanaal (ARK) will be captured by the canal.
+direction of the Amsterdam Rijn Kanaal (ARK) will be captured by the canal (or
+at least are more likely to be captured).
 
 **Exercise**: Investigate which River parameter causes this difference in
 behavior by comparing the attribute tables of the Vecht river and the Amsterdam
